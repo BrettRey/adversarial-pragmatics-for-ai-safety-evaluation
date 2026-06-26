@@ -15,13 +15,21 @@ REQUIRED_COLUMNS = [
     "pair_id",
     "phenomenon",
     "variant",
+    "control_dimension",
     "context_source",
+    "source_role",
+    "authority_level",
+    "pragmatic_status",
+    "response_act",
     "prompt",
     "expected_behavior",
     "task_success_label",
     "policy_compliance_label",
     "safety_risk_label",
+    "risk_type_label",
+    "refusal_outcome_label",
     "failure_attribution_label",
+    "judge_validation_flag",
     "notes",
 ]
 
@@ -37,6 +45,33 @@ PHENOMENA = {
 }
 
 SAFETY_RISK = {"low", "medium", "high", "not_applicable"}
+
+RISK_TYPES = {
+    "none",
+    "confidentiality",
+    "integrity",
+    "tool_misuse",
+    "policy_bypass",
+    "evaluator_deception",
+}
+
+REFUSAL_OUTCOMES = {
+    "not_applicable",
+    "appropriate_policy_refusal",
+    "over_refusal_probe",
+    "under_refusal_probe",
+    "policy_ambiguous_refusal",
+    "incapability_possible",
+    "safe_redirection",
+}
+
+AUTHORITY_LEVELS = {
+    "trusted_user",
+    "untrusted_content",
+    "quoted_content",
+    "policy_constraint",
+    "ambiguous",
+}
 
 FAILURE_ATTRIBUTIONS = {
     "none",
@@ -81,9 +116,21 @@ def validate(path: Path) -> list[str]:
             errors.append(f"{prefix}: unknown phenomenon {row['phenomenon']!r}")
         if row["safety_risk_label"] not in SAFETY_RISK:
             errors.append(f"{prefix}: unknown safety_risk_label {row['safety_risk_label']!r}")
+        if row["risk_type_label"] not in RISK_TYPES:
+            errors.append(f"{prefix}: unknown risk_type_label {row['risk_type_label']!r}")
+        if row["refusal_outcome_label"] not in REFUSAL_OUTCOMES:
+            errors.append(
+                f"{prefix}: unknown refusal_outcome_label {row['refusal_outcome_label']!r}"
+            )
+        if row["authority_level"] not in AUTHORITY_LEVELS:
+            errors.append(f"{prefix}: unknown authority_level {row['authority_level']!r}")
         if row["failure_attribution_label"] not in FAILURE_ATTRIBUTIONS:
             errors.append(
                 f"{prefix}: unknown failure_attribution_label {row['failure_attribution_label']!r}"
+            )
+        if row["judge_validation_flag"] not in {"true", "false"}:
+            errors.append(
+                f"{prefix}: judge_validation_flag must be 'true' or 'false', got {row['judge_validation_flag']!r}"
             )
         pairs[row["pair_id"]].append(row["item_id"])
 

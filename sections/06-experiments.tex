@@ -1,7 +1,15 @@
 \section{Experiments}
 
-The first empirical pass should be deliberately small. Run the seed benchmark against several public or accessible models, then compare three grading routes: direct human annotation, LLM-as-judge annotation, and rule-aided scoring from the item metadata.
+The first empirical pass is a measurement-calibration pass, not a leaderboard. Before running models, generate fake data over the planned design: item, phenomenon family, model, application surface, rubric criterion, and judge prompt. The fake-data exercise should state expected failure patterns and decision thresholds for item revision, taxonomy revision, judge-prompt revision, or exclusion.
 
-The experiment shouldn't rank models as the primary endpoint. The endpoint is diagnostic: which linguistic contrasts destabilize model behaviour, which ones destabilize graders, and which failure attributions can be recovered from transcript evidence.
+Then run the seed benchmark and a 50--100 item development set against several public or accessible models. Compare three grading routes: expert human evaluation, LLM-as-judge annotation, and rule-aided scoring from the item metadata. Store prompts, model outputs, judge prompts, judge rationales, adjudication notes, and per-item labels; raw API logs should be sanitized before release.
 
-The minimum experimental table should report performance by phenomenon family, not only aggregate score. A second table should report rater-role divergence. A third should identify cases where the gold label shifted after adjudication, because those are likely taxonomy-instability cases rather than mere model failures.
+The development pass should include policy and linguistic expert evaluation for each item, ideally with two independent evaluations in each criterion family. It should not collect ordinary-user labels or treat evaluator responses as data about evaluator populations. Ten to twenty percent of items should be repeated or lightly paraphrased to measure item and protocol stability. Gold labels should be produced only after the disagreement source has been classified.
+
+The LLM-judge arm is a validation experiment, not a shortcut. Use at least two judge prompts, perturb source-order presentation, include fluent but instruction-violating outputs, and compare judge labels with adjudicated expert labels. Report judge-prompt sensitivity and the failure types that fool the judge, especially quotation/use errors, source-authority errors, and over-refusal of safe analysis requests.
+
+The crossed structure is item by model by application surface by rubric criterion by judge prompt. Duplicate expert evaluation is a quality-control check for the measurement system, not a sampling design over people. The endpoint is diagnostic: which linguistic contrasts destabilize model behaviour, which ones destabilize adjudication, and which failure attributions can be recovered from transcript evidence.
+
+The minimum experimental table should report performance by phenomenon family, not only aggregate score. A second table should report adjudication instability by item family and criterion conflict. A third should identify cases where the gold label shifted after adjudication, because those are likely taxonomy-instability cases rather than mere model failures.
+
+A fourth table should report application-surface transfer. It should separate prompt-only items from webpage, document, email, tool-result, and transcript wrappers, with risk types split into integrity, confidentiality, tool misuse, policy bypass, and evaluator deception. This prevents colour-token success from being mistaken for agent-security robustness.

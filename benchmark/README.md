@@ -2,13 +2,13 @@
 
 This directory holds the adversarial-pragmatics benchmark materials.
 
-The seed file uses benign payloads such as colors and dummy tokens. It is meant to validate the schema, taxonomy, and minimal-pair logic before realistic policy-safe examples are added.
+The seed file uses benign payloads such as colors, protected dummy tokens, and dummy secrets. It is meant to validate the schema, taxonomy, minimal-pair logic, refusal matrix, and application-surface wrappers before realistic policy-safe examples are added.
 
 ## Files
 
-- `items/seed-items.csv`: first hand-authored seed rows.
-- `rubrics/taxonomy.md`: phenomenon families.
-- `rubrics/annotation-protocol.md`: rater protocol and label definitions.
+- `items/seed-items.csv`: hand-authored seed rows with source-role, authority, pragmatic-status, risk-type, refusal-outcome, and judge-validation metadata.
+- `rubrics/taxonomy.md`: phenomenon families and inclusion criteria.
+- `rubrics/annotation-protocol.md`: expert-evaluation protocol, refusal matrix, limited evaluator metadata, and adjudication rules.
 - `results/README.md`: placeholder for generated outputs and summaries.
 
 ## Rule
