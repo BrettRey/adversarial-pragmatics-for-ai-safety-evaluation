@@ -5,51 +5,37 @@
 
 % Update PDF metadata
 \hypersetup{
-  pdftitle={Adversarial Pragmatics for AI Safety Evaluation},
-  pdfkeywords={TODO, keywords}
+  pdftitle={Adversarial Pragmatics for AI Safety Evaluation: A Benchmark for Instruction Conflict, Embedded Commands, and Policy Ambiguity},
+  pdfkeywords={AI safety evaluation, adversarial pragmatics, instruction hierarchy, prompt injection, annotation protocols, benchmark validity, LLM judges}
 }
 
-\title{Adversarial Pragmatics for AI Safety Evaluation}
+\title{Adversarial Pragmatics for AI Safety Evaluation: A Benchmark for Instruction Conflict, Embedded Commands, and Policy Ambiguity}
 \author{Brett Reynolds \orcidlink{0000-0003-0073-7195}%
 \thanks{Contact: \href{mailto:brett.reynolds@humber.ca}{brett.reynolds@humber.ca}}\\
 Humber Polytechnic \& University of Toronto}
-\date{\today}
+\date{June 2026}
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
-TODO: Write abstract here.
+Safety evaluations for language models increasingly depend on judgments about ambiguous natural-language behaviour: whether a model has followed an instruction, refused appropriately, complied with a policy, resisted an embedded command, or misreported progress in an agentic task. Existing benchmarks often compress these distinctions into pass/fail labels, obscuring whether failures arise from capability limits, policy ambiguity, instruction conflict, scaffold failure, or unstable evaluator judgments. This paper introduces adversarial pragmatics as a benchmark and annotation protocol for evaluating model behaviour under instruction conflict, embedded commands, quotation, scope ambiguity, deixis, indirect speech acts, and multi-turn agent transcripts. The contribution is empirical and methodological: a linguistically controlled taxonomy, a minimal-pair benchmark, a rater protocol distinguishing task success, policy compliance, safety risk, and evaluator confidence, and metrics for diagnostic ambiguity and taxonomy drift. The framework turns linguistic judgment methodology into a practical tool for validating safety evals, LLM judges, gold-set construction, prompt-injection tests, and safety documentation.
 \end{abstract}
 
-\noindent\textbf{Keywords:} TODO; keywords
+\noindent\textbf{Keywords:} AI safety evaluation; adversarial pragmatics; instruction hierarchy; prompt injection; annotation protocols; benchmark validity; LLM judges
 
-\section{Introduction}
+\input{sections/01-evaluation-problem}
+\input{sections/02-pass-fail}
+\input{sections/03-taxonomy}
+\input{sections/04-benchmark-construction}
+\input{sections/05-annotation-rater-roles}
+\input{sections/06-experiments}
+\input{sections/07-metrics}
+\input{sections/08-implications}
+\input{sections/09-conclusion}
 
-TODO: Write introduction here.
-
-\section{Background}
-
-TODO: Add background section.
-
-\section{Analysis}
-
-TODO: Add analysis section.
-
-\section{Discussion}
-
-TODO: Add discussion.
-
-\section{Conclusion}
-
-TODO: Write conclusion.
-
-\section*{Acknowledgements}
-
-% TODO: Replace [MODEL LIST] with the actual models used on this project and their current versions.
-% Check model names: frontier models change frequently.
-% Example list shape when accurate: Claude 3.5 & 4.5; ChatGPT o1 pro & 5.2 pro; Gemini 3; and DeepSeek V3.
-The large language models [MODEL LIST] served as drafting and editing aids throughout the preparation of this paper. I am responsible for all theoretical claims, arguments, errors, and interpretive choices.
+% Restore a non-blind acknowledgements / AI-use statement only after the actual
+% models used on the project have been recorded and current names verified.
 
 \clearpage
 \printbibliography

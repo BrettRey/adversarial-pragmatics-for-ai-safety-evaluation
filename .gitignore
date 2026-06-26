@@ -13,3 +13,13 @@
 
 # macOS
 .DS_Store
+
+# Generated benchmark/model outputs
+data/processed/*
+benchmark/results/*
+!data/processed/README.md
+!benchmark/results/README.md
+
+# Local secrets/config for API-based evaluation runs
+.env
+*.local.json

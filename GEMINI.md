@@ -1,157 +1,84 @@
-# CLAUDE.md
+# Adversarial Pragmatics for AI Safety Evaluation
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This repository contains Brett Reynolds's empirical evaluation paper project:
 
-## Project Overview
+**Adversarial Pragmatics for AI Safety Evaluation: A Benchmark for Instruction Conflict, Embedded Commands, and Policy Ambiguity**
 
-This is an academic research paper titled "Adversarial Pragmatics for AI Safety Evaluation" by Brett Reynolds.
+## Project Frame
 
-## Build System
+This is an empirical AI-evaluation paper, not another primarily conceptual AI-and-language paper.
 
-This LaTeX project requires **XeLaTeX** (not pdfLaTeX) due to the Charis SIL font requirement.
+Core signal:
 
-**Avoid LuaLaTeX** – it tends to run words together in the underlying PDF text layer, breaking copy-paste and accessibility.
+> Turn messy language-mediated judgment into reliable, auditable AI evaluation.
 
-### Compilation Commands
+The paper should produce a hiring-legible artifact: taxonomy, benchmark, annotation protocol, scoring metrics, and a concise policy/eval memo. The philosophy and linguistics are infrastructure for the evaluation design, not the advertised endpoint.
+
+## Central Thesis
+
+A large class of AI safety evaluation failures are failures in language-mediated control. Models and evaluators must decide what counts as an instruction, whose instruction has authority, whether a string is quoted or commanded, whether a request is literal or indirect, whether refusal is appropriate, and whether an agent transcript shows capability failure, safety refusal, scaffold failure, goal drift, or misreporting.
+
+## Required Project Shape
+
+- Build a small, auditable benchmark before expanding the theory.
+- Prefer minimal pairs over one-off prompts.
+- Keep examples non-operational: use harmless payloads such as colors, tokens, or dummy secrets unless a verified policy-safe item requires more.
+- Separate task success, policy compliance, safety risk, evaluator confidence, and failure attribution.
+- Treat disagreement as data: identify when disagreement is a property of the construct rather than rater noise.
+- Validate LLM-as-judge behavior rather than assuming it.
+
+## Repository Layout
+
+```text
+benchmark/
+  items/              # seed and later gold-set items
+  rubrics/            # taxonomy, annotation protocol, codebook
+  results/            # generated evaluation results, not raw API logs by default
+data/
+  seed/               # hand-authored seed material
+  processed/          # generated derived datasets
+notes/                # project brief, source verification, pressure tests
+scripts/              # validation/evaluation helpers
+sections/             # LaTeX section files
+submission/           # future submission materials
+reviews/              # review-board or external review notes
+```
+
+## Source Discipline
+
+- Do not cite the setup prompt as if it verifies its linked claims.
+- Before adding a citation or factual claim about an organization, job posting, safety report, or research agenda, verify the source and record it in `notes/source-verification.md`.
+- New bibliographic entries belong in `references-local.bib` unless Brett explicitly asks for a central-bib update.
+- Keep `references.bib` as the symlink to the central bibliography.
+
+## Build and Checks
+
+Use XeLaTeX, not pdfLaTeX or LuaLaTeX.
 
 ```bash
-# Full build sequence
-xelatex main.tex
-biber main
-xelatex main.tex
-xelatex main.tex
-
-# Or use automated build
-make              # Full build
-make quick        # Single pass
-make clean        # Clean artifacts
+make quick
+make
+python3 scripts/validate_items.py benchmark/items/seed-items.csv
 ```
 
-The multiple runs are necessary to resolve all cross-references and citations.
+Before any submission or public preprint:
 
-## File Structure
+- Run the central style checker on `main.tex`.
+- Run the benchmark validator.
+- Verify all sources in `notes/source-verification.md`.
+- Ensure raw model outputs, API logs, and any sensitive examples are not committed unless intentionally sanitized.
 
-```
-adversarial-pragmatics-for-ai-safety-evaluation/
-├── main.tex                  # Main document
-├── references.bib            # Bibliography
-├── .house-style/             # House style snapshot
-│   ├── preamble.tex         # LaTeX preamble
-│   └── style-rules.yaml     # Style conventions
-├── Makefile                  # Build automation
-├── CLAUDE.md                 # This file
-├── AGENTS.md                 # Synced with this file
-└── GEMINI.md                 # Synced with this file
-```
+## Writing Priorities
 
-## House Style
+- Start from the evaluation bottleneck, not from disciplinary positioning.
+- Use linguistics where it sharpens operational distinctions.
+- Avoid "what linguistics can contribute to AI safety" framing.
+- Avoid AGI ontology as the lead. This project is the practical evaluation layer below that abstraction.
+- Make the method reusable for model-policy teams, frontier-risk evaluators, red-teamers, system-card authors, and external assurance teams.
 
-This project uses Brett Reynolds house style (see `.house-style/style-rules.yaml`).
+## Key Terms
 
-### Key LaTeX Conventions
-
-**Terms, Mentions, Quotations:**
-- Use `\term{}` for terms/concepts (small caps): `\term{definiteness}`
-- Use `\mention{}` for mentions/forms (italics): `\mention{the}`
-- Use `\olang{}` for object language (italics): `\olang{der Hund}`
-- Use `\enquote{}` for quotations: `\enquote{actual quote}`
-- Never use raw quotes for mention
-
-**Cross-linguistic Notation:**
-- Cross-linguistic: `\textsc{subject}\crossmark`
-- Language-specific: `\textsc{subject}\textsubscript{eng}`
-
-**Dashes:**
-- Parenthetical: `foo~-- bar~-- baz` (en dash with spaces)
-- Ranges: `2001--2025` (en dash, no spaces)
-- Compounds: `corpus-based` (hyphen)
-
-**Citations:**
-- Parenthetical: `\citep{key}`
-- Textual: `\textcite{key}`
-
-**Citations and BibTeX (LAW):**
-- Citations and BibTeX entries must NEVER be placeholders
-- Citations must NEVER be generated from training data
-- LLMs MUST browse the web to find DOIs and verify bibliographic data
-- Every citation must be confirmed against an authoritative source
-- If you cannot verify a citation, say so. Do not guess. Do not fabricate.
-
-### Writing Style
-
-**Preferred:**
-- Use contractions (don't, won't)
-- Keep paragraphs ~60 words, max 100
-- Direct verbs and short clauses
-- Concrete before abstract
-
-**Avoid:**
-- Throat-clearers: "It is important to note that..."
-- `\paragraph{}` headings (use topic sentences)
-- Bold labels in prose
-- Hackneyed adverbs: moreover, furthermore
-
-**Document Structure:**
-- Keep keywords by default: maintain the visible keyword line after the abstract and keep `pdfkeywords` metadata in `\hypersetup{}` in sync
-- Put `\clearpage` before `\printbibliography`
-- Use `\section{}` and `\subsection{}` only
-- Avoid bullet points for arguments (use prose)
-
-**Explanation-Level Discipline:**
-- Define the target behavior, judgment, category, model output, or social fact before proposing mechanisms.
-- Mark the explanatory level: behavioral, algorithmic, social-practical, corpus-distributional, model-internal, neural/biological, institutional, or normative.
-- Avoid filler verbs (`underlies`, `involves`, `regulates`, `drives`, `encodes`, `represents`) unless the mechanism, test, or level-specific meaning is explicit.
-- Avoid mereological slippage: neurons do not understand, embeddings do not mean, fields do not decide, grammars do not judge.
-- Treat internal maps (connectomes, activations, vector spaces, corpus inventories) as resources for testing hypotheses, not as explanations by themselves.
-- Use ordinal markers: "first," "second," "third"
-
-**Examples (gb4e):**
-```latex
-\ea\label{ex:example}
-\textit{Example sentence.}
-\z
-```
-
-## Common Tasks
-
-**Adding References:**
-1. Add entry to `references.bib`
-2. Protect capitals: `title = {The {Cambridge} Grammar...}`
-3. Use `\textcite{key}` or `\citep{key}`
-
-**Building:**
-```bash
-make              # Full build
-make quick        # Fast build
-make clean        # Clean up
-```
-
-**Git Workflow:**
-- Pre-commit hook keeps CLAUDE.md, AGENTS.md, GEMINI.md synced
-- Commit often with meaningful messages
-- Build before committing to ensure no LaTeX errors
-
-## Multi-Agent Dispatch (MANDATORY)
-
-**Before dispatching multiple agents, ALWAYS ask Brett:**
-
-1. **Which model(s)?** Options: Claude, Codex, Gemini, Copilot
-   - Codex is often best for Brett's work
-   - Claude and Gemini both have 1M token context windows
-   - Different models have different strengths
-
-2. **Redundant outputs?** Should multiple models tackle the same task?
-   - Useful for judgment calls (e.g., "Should I add this figure?")
-   - Not needed for factual tasks
-
-### CLI Command Patterns
-
-| CLI | Command | Notes |
-|-----|---------|-------|
-| **Codex** | `codex -p 'prompt' > output.txt &` | Include "Read [PATH] first" in prompt |
-| **Gemini** | `cat file.tex \| gemini --yolo -o text 'prompt'` | Must pipe content (file reading broken in YOLO) |
-| **Copilot** | `copilot -p 'prompt' > output.txt &` | Fast; add `--allow-all-tools` for file ops |
-
-**Token limits:** Claude 1M = Gemini 1M+ > Codex
-
-See portfolio `CLAUDE.md` or `HPC book/.agent/workflows/multi-agent-review.md` for full patterns.
+- Use `\term{}` for analytic terms and constructs.
+- Use `\mention{}` for strings and prompt text.
+- Use `\enquote{}` for quoted natural-language content.
+- Keep `pdfkeywords` and the visible keyword line synchronized.

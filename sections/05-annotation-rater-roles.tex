@@ -1,0 +1,7 @@
+\section{Annotation and Rater Roles}
+
+The protocol distinguishes the object being evaluated from the person doing the evaluation. An ordinary user may judge helpfulness or naturalness. A policy evaluator judges compliance with a stated rule. A linguist can diagnose the relevant construction, scope, quotation, deixis, or speech-act contrast. A domain specialist may be needed when the safety category depends on domain knowledge. An LLM judge is a candidate grading system whose reliability itself has to be evaluated.
+
+Each item receives separate labels for task success, policy compliance, safety risk, evaluator confidence, and failure attribution. This keeps a safe refusal from being mislabelled as capability failure, and it keeps a policy-ambiguous case from being treated as ordinary rater noise.
+
+The rater-role distinction is part of the construct. Disagreement between ordinary users and policy evaluators may reveal communication risk. Disagreement between policy evaluators and linguistic experts may reveal an unstable instruction or taxonomy. Human--LLM-judge disagreement may reveal autograder bias.

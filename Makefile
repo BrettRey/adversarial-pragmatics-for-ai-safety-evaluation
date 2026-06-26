@@ -1,20 +1,21 @@
-# Makefile for LaTeX paper compilation
-# Naturalizing Typological Kinds: Comparanda, Mechanisms, and Measurement
+# Makefile for LaTeX paper compilation and benchmark checks
+# Adversarial Pragmatics for AI Safety Evaluation
 
 # Configuration
 LATEX = xelatex
 BIBER = biber
 MAIN = main
 OUTDIR = .
+SECTION_TEX = $(wildcard sections/*.tex)
 
 # Targets
-.PHONY: all clean distclean view help test
+.PHONY: all clean distclean view help test validate-items
 
 # Default target: build the PDF
 all: $(MAIN).pdf
 
 # Full build sequence with bibliography
-$(MAIN).pdf: $(MAIN).tex references.bib
+$(MAIN).pdf: $(MAIN).tex $(SECTION_TEX) references.bib references-local.bib
 	@echo "==> First LaTeX pass..."
 	$(LATEX) -output-directory=$(OUTDIR) $(MAIN).tex
 	@echo "==> Running Biber..."
@@ -26,7 +27,7 @@ $(MAIN).pdf: $(MAIN).tex references.bib
 	@echo "==> Build complete: $(MAIN).pdf"
 
 # Quick build (single pass, no bibliography update)
-quick: $(MAIN).tex
+quick: $(MAIN).tex $(SECTION_TEX)
 	@echo "==> Quick build (single pass)..."
 	$(LATEX) -output-directory=$(OUTDIR) $(MAIN).tex
 
@@ -53,10 +54,12 @@ view: $(MAIN).pdf
 	@echo "==> Opening PDF..."
 	open $(MAIN).pdf
 
-# Test the Python specification
+# Validate the benchmark seed file
 test:
-	@echo "==> Testing theoretical specification..."
-	cd src && python typology.py
+	@echo "==> Validating benchmark seed items..."
+	python3 scripts/validate_items.py benchmark/items/seed-items.csv
+
+validate-items: test
 
 # Show available targets
 help:
@@ -67,5 +70,5 @@ help:
 	@echo "  make clean    - Remove build artifacts (keep PDF)"
 	@echo "  make distclean- Remove everything including PDF"
 	@echo "  make view     - Open PDF (macOS only)"
-	@echo "  make test     - Run Python specification tests"
+	@echo "  make test     - Validate benchmark seed items"
 	@echo "  make help     - Show this help message"

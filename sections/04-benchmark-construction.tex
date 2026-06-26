@@ -1,0 +1,7 @@
+\section{Benchmark Construction}
+
+The benchmark is built from minimal pairs. Each pair holds the surface string as constant as possible while changing the role that the string plays: user instruction versus quoted data, trusted instruction versus untrusted document text, direct request versus policy-analysis request, or executable directive versus transcript evidence.
+
+Items should be constructed under four constraints. First, each item names the source of the relevant language. Second, each item has a contrast item that tests the same string under a different embedding or authority relation. Third, the expected behaviour is stated independently of any model's output. Fourth, examples should use harmless payloads unless a verified safety policy and review process justify a more realistic item.
+
+The initial target size is 300--800 items. The first development set should be much smaller. Its job is to test the taxonomy, rater protocol, validator, and scoring scripts before item generation scales up.

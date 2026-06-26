@@ -1,0 +1,7 @@
+\section{The Evaluation Problem}
+
+Frontier-model safety evaluation is increasingly an evaluation of language-mediated control. The central question isn't only whether a model can solve a task. It also asks whether the model can identify which natural-language material has directive force, which policy boundary applies, and what a transcript shows about the model's behaviour.
+
+The practical bottleneck is visible in prompt injection, model-policy evaluation, red-team triage, LLM-as-judge grading, and agent transcript review. In each setting, a surface string may be an instruction, a quotation, a cited passage, a tool output, a policy example, a user request, or an adversarial attempt to change authority. A pass/fail label loses information when it doesn't say which role the string had and why.
+
+This paper treats those distinctions as evaluation targets. The aim is to build a small but auditable benchmark in which the relevant contrasts are controlled. The benchmark isn't intended to crown a winning model. It's designed to show which linguistic contrasts make safety claims stable, which ones expose over-refusal or under-refusal, and which ones reveal instability in the evaluation itself.
