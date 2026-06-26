@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "If you use this benchmark, protocol, or manuscript draft, please cite it as below."
+title: "Adversarial Pragmatics for AI Safety Evaluation: A Benchmark for Instruction Conflict, Embedded Commands, and Policy Ambiguity"
+authors:
+  - family-names: Reynolds
+    given-names: Brett
+    orcid: "https://orcid.org/0000-0003-0073-7195"
+year: 2026
+date-released: "2026-06-26"
+license: "CC-BY-4.0"
+repository-code: "https://github.com/BrettRey/adversarial-pragmatics-for-ai-safety-evaluation"
+type: dataset

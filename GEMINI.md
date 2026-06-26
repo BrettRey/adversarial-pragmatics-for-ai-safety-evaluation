@@ -49,7 +49,7 @@ reviews/              # review-board or external review notes
 - Do not cite the setup prompt as if it verifies its linked claims.
 - Before adding a citation or factual claim about an organization, job posting, safety report, or research agenda, verify the source and record it in `notes/source-verification.md`.
 - New bibliographic entries belong in `references-local.bib` unless Brett explicitly asks for a central-bib update.
-- Keep `references.bib` as the symlink to the central bibliography.
+- `references.bib` is a vendored public-repository snapshot of the central bibliography; update it only when refreshing the public build dependency.
 
 ## Build and Checks
 

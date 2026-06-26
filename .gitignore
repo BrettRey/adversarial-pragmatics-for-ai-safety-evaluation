@@ -10,6 +10,7 @@
 *.fdb_latexmk
 *.fls
 *.synctex.gz
+*.pdf
 
 # macOS
 .DS_Store

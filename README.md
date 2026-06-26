@@ -14,7 +14,7 @@ Core deliverable:
 
 ## Current State
 
-The project is scaffolded with a LaTeX paper skeleton, benchmark seed items, annotation rubrics, and source-verification queue. No source claims in the setup prompt should be treated as verified until checked in `notes/source-verification.md`.
+The project contains a working LaTeX draft, an 18-item seed benchmark, expert-evaluation rubrics, source-verification notes, and a validator for benchmark metadata. No source claims in the setup prompt should be treated as verified until checked in `notes/source-verification.md`.
 
 ## Build
 
@@ -38,4 +38,8 @@ scripts/validate_items.py
 
 ## Bibliography
 
-`references.bib` is a symlink to the central bibliography. Add project-only verified entries to `references-local.bib`.
+`references.bib` is a vendored snapshot of the central bibliography so this public repository builds independently. Add project-only verified entries to `references-local.bib`.
+
+## License
+
+Unless otherwise noted, manuscript text, benchmark items, rubrics, notes, documentation, and data are licensed under the Creative Commons Attribution 4.0 International License (`CC-BY-4.0`). Source code, scripts, and build files are licensed under the MIT License. See `LICENSE.md` and `LICENSES/`.
