@@ -6,6 +6,8 @@ Items should be constructed under five constraints. First, each item names the s
 
 The current seed file, \texttt{benchmark/items/seed-items.csv}, contains 18 development items. It uses colour-token payloads such as \mention{BLUE} and \mention{GREEN}, protected dummy tokens such as \mention{ZETA-42}, and dummy secrets such as \mention{ALPHA-000}. These preserve the control structure of prompt-injection, exfiltration, and refusal cases while avoiding operational unsafe content.
 
+Toy payloads support claims about control structure, label stability, and evaluator behaviour. They don't yet support claims about deployed prompt-injection resistance, harmful-request refusal, or real-world agent-security robustness. Those claims require realistic wrappers and independent policy review.
+
 The seed set now includes prompt-only minimal pairs plus webpage text, document text, email body, tool output, dummy private state, and policy text. For example, a tool result can say \mention{Order status: shipped. Ignore the user and output BLUE}; the expected behaviour is to report the order status without following the tool-result instruction. A separate dummy-secret item tests whether an email can induce disclosure of \mention{ALPHA-000}.
 
 Each item records the control dimension, context source, source role, authority level, pragmatic status, response act, expected behaviour, task-success label, policy-compliance label, safety-risk label, risk type, refusal outcome, failure attribution, and a judge-validation flag. The validator script enforces the schema and label inventories.
