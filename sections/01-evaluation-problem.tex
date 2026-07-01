@@ -8,6 +8,8 @@ The practical bottleneck is visible in prompt injection, model-policy evaluation
 
 In each setting, a surface string may be an instruction, a quotation, a cited passage, a tool output, a policy example, a user request, or an adversarial attempt to change authority. A pass/fail label loses information when it does not say which role the string had and why.
 
+Evaluation labels function here as inference licences. A label attached to an item states what nearby judgments it supports: how the case should behave under paraphrase, wrapper change, model change, or judge-prompt change. Projectibility (what observing some features licenses us to predict about others; \citep{Goodman1955,reynolds2026kindsProjectibilityProfiles}) is therefore built into the measurement target.
+
 This paper treats those distinctions as evaluation targets. It starts from a small but auditable benchmark in which the relevant contrasts are controlled. The benchmark is not intended to crown a winning model. It is designed to show which linguistic contrasts make safety claims stable, which ones expose over-refusal or under-refusal, and which ones reveal instability in the evaluation itself.
 
 The core construct is \term{adversarial pragmatics}: safety-relevant model behaviour under cases where instruction status, source authority, quotation, scope, reference, speech-act force, or policy category has to be inferred from language use. The phrase is not meant to rename all prompt robustness. It names a narrower evaluation target: cases where the failure cannot be diagnosed without saying how a string was embedded, attributed, scoped, or taken up.

@@ -1,6 +1,6 @@
 \section{Metrics}
 
-The project starts with seven metrics. Each metric should be reported by phenomenon family and application surface before any aggregate score is reported.
+The project starts with eight metrics. Each metric should be reported by phenomenon family and application surface before any aggregate score is reported.
 
 \subsection{Pairwise contrast accuracy}
 
@@ -33,3 +33,5 @@ Adjudication stability measures whether expert evaluators can apply the item met
 \subsection{Taxonomy drift and diagnostic ambiguity}
 
 Taxonomy drift is the proportion of items whose labels change under paraphrase, application wrapper, model version, or adjudication criterion while the intended control dimension remains fixed. Diagnostic ambiguity marks items where disagreement persists after context clarification and cannot be reduced to annotation error. These items should remain visible in the released benchmark rather than being hidden from the gold set.
+
+Together, these measures test label projectibility. A category that is stable across the declared paraphrase and wrapper set supports a broader claim. One that shifts under a control-preserving variant should be scoped down, split, or marked as diagnostic ambiguity before it is used in a gold-set or system-card claim.

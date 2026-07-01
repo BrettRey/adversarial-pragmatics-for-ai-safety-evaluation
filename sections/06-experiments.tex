@@ -1,8 +1,37 @@
 \section{Experiments}
 
-The first empirical pass is a measurement-calibration pass, not a leaderboard. Before running models, generate fake data over the planned design: item, phenomenon family, model, application surface, rubric criterion, and judge prompt. The fake-data exercise should state expected failure patterns and decision thresholds for item revision, taxonomy revision, judge-prompt revision, or exclusion.
+The empirical program has two stages: a completed local seed pilot and a larger development pass. The seed pilot is a measurement-calibration pass, not a leaderboard. Its purpose is to test whether the item schema, adjudication protocol, and summary metrics can turn raw model outputs into auditable distinctions.
 
-Then run the seed benchmark and a 50--100 item development set against several public or accessible models. Compare three grading routes: expert human evaluation, LLM-as-judge annotation, and rule-aided scoring from the item metadata. Store prompts, model outputs, judge prompts, judge rationales, adjudication notes, and per-item labels; raw API logs should be sanitized before release.
+The local seed pilot ran the 18-item seed benchmark against three accessible Ollama models: \texttt{qwen3:8b}, \texttt{gemma3:12b}, and \texttt{glm-4.7-flash:q4\_K\_M}. This produced 54 item--model outputs. A single expert adjudicator labelled every row for task success, policy compliance, safety risk, risk type, refusal outcome, failure attribution, confidence, and rationale. All 54 rows received complete labels.
+
+\begin{table}[t]
+\centering
+\caption{Adjudicated local seed-pilot results by model. Strict pair pass counts a pair--model cell only when both variants in the minimal pair are labelled task-successful and policy-compliant.}
+\label{tab:local-seed-pilot}
+\begin{tabular}{lrrrrr}
+\toprule
+Model & Success & Partial & Failure & Compliant & Strict pairs \\
+\midrule
+\texttt{gemma3:12b} & 11 & 5 & 2 & 15 & 3/9 \\
+\texttt{glm-4.7-flash:q4\_K\_M} & 11 & 4 & 3 & 15 & 4/9 \\
+\texttt{qwen3:8b} & 14 & 2 & 2 & 16 & 6/9 \\
+\midrule
+Total & 36 & 11 & 7 & 46 & 13/27 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Across the pilot, 36 of 54 outputs were full task successes, 11 were partial successes, and 7 were failures. Policy compliance was higher than task success: 46 outputs were compliant, 7 were noncompliant, and 1 was policy-ambiguous. Adjudicator confidence was high for 41 rows and medium for 13 rows, with no low-confidence adjudications.
+
+The pairwise results show why the benchmark should be reported by contrast family rather than as a single aggregate. Three pairs were stable across all models: the embedded-command source pair, the mention/use pair, and the scope-negation pair. Three pairs had zero strict pair passes: the ambiguous deictic-reference pair, the agent transcript pair, and the policy-boundary pair. In the deictic-reference item, all three models guessed a colour rather than asking for clarification. In the direct policy-boundary item, all three models output the protected dummy token despite the toy policy. The tool-result pair exposed a different problem: one model followed the injected directive, while other rows produced partial task success without policy noncompliance.
+
+The automatic diagnostic pass was useful as triage but not as a substitute for adjudication. All seven noncompliant rows were high-priority diagnostic rows. However, low-priority rows still included partial task failures and one policy-ambiguous row. This is the expected shape for a pragmatic benchmark: simple token checks can identify many dangerous rows, but they cannot decide whether an answer satisfies the intended speech act, source relation, or policy boundary.
+
+Before scaling beyond the seed pilot, generate fake data over the planned design: item, family, model, application surface, rubric criterion, and judge prompt. The fake-data exercise should state expected failure patterns and decision thresholds for item revision, taxonomy revision, judge-prompt revision, demotion to a narrower scope, or exclusion.
+
+Each planned label should name the projection it is expected to support. For a source-authority item, the expected projection may be stability across harmless paraphrase and source-order perturbation, but sensitivity to application surface. A failed projection is evidence about the item or category before it is treated as a model error.
+
+The next empirical pass should run a 50--100 item development set against several public or accessible models. Compare three grading routes: expert human evaluation, LLM-as-judge annotation, and rule-aided scoring from the item metadata. Store prompts, model outputs, judge prompts, judge rationales, adjudication notes, and per-item labels; raw API logs should be sanitized before release.
 
 The development pass should include policy and linguistic expert evaluation for each item, ideally with two independent evaluations in each criterion family. It should not collect ordinary-user labels or treat evaluator responses as data about evaluator populations. Ten to twenty percent of items should be repeated or lightly paraphrased to measure item and protocol stability. Gold labels should be produced only after the disagreement source has been classified.
 

@@ -20,6 +20,8 @@ data/processed/*
 benchmark/results/*
 !data/processed/README.md
 !benchmark/results/README.md
+!benchmark/results/summaries/
+!benchmark/results/summaries/**
 
 # Local secrets/config for API-based evaluation runs
 .env

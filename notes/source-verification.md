@@ -43,6 +43,7 @@ Checked 2026-06-26 for use in the literature review, benchmark design, and citat
 | L18 | https://aclanthology.org/2022.tacl-1.6/ | Davani, Díaz, and Prabhakaran argue that majority vote can suppress systematic annotator differences in subjective annotation tasks. | verified 2026-06-26; paper/method |
 | L19 | https://aclanthology.org/Q19-1043/ | Pavlick and Kwiatkowski show that some human NLI disagreements persist with more ratings and context; DOI `10.1162/tacl_a_00293`. | verified 2026-06-26; paper/method |
 | L20 | `/Users/brettreynolds/Documents/LLM-CLI-projects/literature/arditi2024refusal.md` | Arditi et al. report that a one-dimensional refusal direction can be ablated to reduce refusal on harmful instructions or added to elicit refusal on harmless instructions, supporting separate scoring of refusal behaviour and request safety. | verified 2026-06-26; paper/background |
+| L21 | `/Users/brettreynolds/Documents/LLM-CLI-projects/papers/preprints/kinds-as-projectibility-profiles/main.tex`; https://philarchive.org/rec/REYKAP-2 | Reynolds frames kinds as projectibility profiles and gives support grades and demotion rules for categories whose projected inferences fail. | verified 2026-06-26; paper/method |
 
 ## Verification Rule
 

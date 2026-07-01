@@ -7,9 +7,17 @@ BIBER = biber
 MAIN = main
 OUTDIR = .
 SECTION_TEX = $(wildcard sections/*.tex)
+PILOT_MODELS ?= qwen3:8b gemma3:12b glm-4.7-flash:q4_K_M
+PILOT_SMOKE_RUN_ID = smoke-$(shell date +%Y%m%d-%H%M%S)
+RUN_DIR ?=
+RESPONSES ?=
+SUMMARY_DIR ?= benchmark/results/summaries
+RUN_DIR_ARG = $(if $(RUN_DIR),--run-dir $(RUN_DIR),)
+RESPONSES_ARG = $(if $(RESPONSES),--responses $(RESPONSES),)
+SUMMARY_DIR_ARG = $(if $(SUMMARY_DIR),--summary-dir $(SUMMARY_DIR),)
 
 # Targets
-.PHONY: all clean distclean view help test validate-items
+.PHONY: all clean distclean view help test validate-items pilot-local pilot-smoke pilot-diagnose pilot-review-app pilot-ingest-adjudication pilot-adjudication-report
 
 # Default target: build the PDF
 all: $(MAIN).pdf
@@ -61,6 +69,36 @@ test:
 
 validate-items: test
 
+# Run the seed benchmark against the default local Ollama model set
+pilot-local: test
+	@echo "==> Running local Ollama pilot..."
+	python3 scripts/run_local_pilot.py --models $(PILOT_MODELS)
+
+# Run a two-item smoke test without committing generated outputs
+pilot-smoke: test
+	@echo "==> Running local Ollama pilot smoke test..."
+	python3 scripts/run_local_pilot.py --limit 2 --run-id $(PILOT_SMOKE_RUN_ID) --out-dir benchmark/results/_scratch --models $(PILOT_MODELS)
+
+# Prepare adjudication and diagnostic files for the latest local pilot run
+pilot-diagnose:
+	@echo "==> Preparing local pilot diagnostic readout..."
+	python3 scripts/diagnose_local_pilot.py $(RUN_DIR_ARG)
+
+# Build an offline browser app for human adjudication of pilot rows
+pilot-review-app:
+	@echo "==> Building local adjudication review app..."
+	python3 scripts/build_adjudication_review_app.py $(RUN_DIR_ARG)
+
+# Merge downloaded adjudication JSON files into pilot tables
+pilot-ingest-adjudication:
+	@echo "==> Ingesting local adjudication responses..."
+	python3 scripts/ingest_adjudication_responses.py $(RUN_DIR_ARG) $(RESPONSES_ARG)
+
+# Summarize adjudicated pilot labels for manuscript use
+pilot-adjudication-report:
+	@echo "==> Summarizing adjudicated local pilot results..."
+	python3 scripts/summarize_adjudication_pilot.py $(RUN_DIR_ARG) $(SUMMARY_DIR_ARG)
+
 # Show available targets
 help:
 	@echo "Available targets:"
@@ -71,4 +109,10 @@ help:
 	@echo "  make distclean- Remove everything including PDF"
 	@echo "  make view     - Open PDF (macOS only)"
 	@echo "  make test     - Validate benchmark seed items"
+	@echo "  make pilot-local - Run seed items on local Ollama models"
+	@echo "  make pilot-smoke - Run two-item local Ollama smoke test"
+	@echo "  make pilot-diagnose - Build adjudication/readout files for latest pilot"
+	@echo "  make pilot-review-app - Build offline adjudication app for latest pilot"
+	@echo "  make pilot-ingest-adjudication - Merge downloaded adjudication JSON"
+	@echo "  make pilot-adjudication-report - Summarize adjudicated pilot labels"
 	@echo "  make help     - Show this help message"

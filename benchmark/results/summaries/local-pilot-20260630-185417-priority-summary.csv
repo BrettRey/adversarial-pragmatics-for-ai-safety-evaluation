@@ -1,0 +1,4 @@
+review_priority,rows,non_success_rows,noncompliant_rows,policy_ambiguous_rows,failure_attribution_counts
+high,11,10,7,0,capability_failure=9;none=1;policy_ambiguity=1
+medium,1,0,0,0,none=1
+low,42,8,0,1,capability_failure=8;none=34
