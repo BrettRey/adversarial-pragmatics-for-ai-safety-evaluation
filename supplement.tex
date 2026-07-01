@@ -44,6 +44,8 @@ Path & Role \\
 \path{scripts/build_adjudication_review_app.py} & Offline browser app for row-level human adjudication. \\
 \path{scripts/ingest_adjudication_responses.py} & Merger from downloaded adjudication JSON into project-local CSVs. \\
 \path{scripts/summarize_adjudication_pilot.py} & Aggregate model, pair, priority, and manuscript-facing summaries. \\
+\path{scripts/run_llm_judge_validation.py} & Local LLM-judge validation against expert adjudication labels. \\
+\path{scripts/simulate_dev_pass.py} & Fake-data calibration for the planned development pass. \\
 \path{benchmark/results/summaries/} & Sanitized aggregate pilot summaries suitable for tracking. \\
 \bottomrule
 \end{tabular}
@@ -203,6 +205,51 @@ Strict pair pass counts a pair--model cell only when both variants in the minima
 \label{fig:supp-pilot-confidence}
 \end{figure}
 
+\section{LLM-judge validation}
+
+The first judge-validation pass used \texttt{glm-4.7-flash:q4\_K\_M} as a local judge over all 54 adjudicated item--model rows. The judge prompt required separate labels for task success, policy compliance, safety risk, risk type, refusal outcome, failure attribution, confidence, and rationale. The output parser validated the returned JSON labels before summary.
+
+\begin{table}[h]
+\centering
+\caption{LLM-judge agreement with expert adjudication.}
+\begin{tabular}{L{0.35\linewidth}rrr}
+\toprule
+Label family & Matched & Total & Accuracy \\
+\midrule
+\texttt{task\_success} & 36 & 54 & 66.7\% \\
+\texttt{policy\_compliance} & 48 & 54 & 88.9\% \\
+\texttt{safety\_risk} & 39 & 54 & 72.2\% \\
+\texttt{risk\_type} & 45 & 54 & 83.3\% \\
+\texttt{refusal\_outcome} & 53 & 54 & 98.1\% \\
+\texttt{failure\_attribution} & 42 & 54 & 77.8\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The pass produced no parse errors or invalid judge responses. Its weakest phenomenon/axis cells were policy-boundary ambiguity for task success and failure attribution, embedded-command safety-risk labels, transcript-interpretation task success and failure attribution, and deictic-reference policy and risk labels. The result supports using LLM judges as validated triage tools rather than as unvalidated substitutes for expert adjudication.
+
+\section{Fake development-pass calibration}
+
+The repository includes a deterministic fake-data pass for checking the planned development design before collecting new model outputs or expert judgments. The generated files are explicitly marked as simulated. They exercise the crossed structure of phenomenon, application surface, model, judge prompt, and label family, but they don't make empirical claims about model or judge behaviour.
+
+\begin{table}[h]
+\centering
+\caption{Simulated development-pass decision counts.}
+\begin{tabular}{lr}
+\toprule
+Recommended decision & Cells \\
+\midrule
+Keep & 7 \\
+Revise item & 9 \\
+Revise judge prompt & 23 \\
+Narrow scope & 8 \\
+Exclude & 1 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The point of this fake pass is to test whether the planned tables and figures distinguish item problems, taxonomy problems, judge-prompt problems, surface-transfer problems, and exclusion cases before any real development-pass budget is spent.
+
 \clearpage
 
 \section{Reproducibility commands}
@@ -214,8 +261,10 @@ make pilot-diagnose
 make pilot-review-app
 make pilot-ingest-adjudication RUN_DIR=/path/to/local-pilot-run
 make pilot-adjudication-report RUN_DIR=/path/to/local-pilot-run
+make pilot-judge-validation RUN_DIR=/path/to/local-pilot-run
+make fake-dev-calibration
 \end{verbatim}
 
-The final command writes sanitized aggregate files to \path{benchmark/results/summaries/}. The main paper's pilot table is derived from those summaries, not from \path{~/Downloads} and not from untracked raw output logs.
+The report, judge-validation, and fake-calibration commands write sanitized aggregate files to \path{benchmark/results/summaries/}. The main paper's pilot table is derived from those summaries, not from \path{~/Downloads} and not from untracked raw output logs.
 
 \end{document}

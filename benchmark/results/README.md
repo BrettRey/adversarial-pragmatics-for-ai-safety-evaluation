@@ -39,6 +39,22 @@ After ingesting responses, generate aggregate adjudication summaries with:
 make pilot-adjudication-report
 ```
 
+Validate a local LLM judge against the adjudicated labels with:
+
+```bash
+make pilot-judge-validation
+```
+
+Generate fake development-pass calibration summaries with:
+
+```bash
+make fake-dev-calibration
+```
+
+These fake summaries are for checking table schemas, plot layouts, rater-workload
+assumptions, and decision thresholds before spending model or expert time. They
+are not empirical evidence about model or judge performance.
+
 The full run bundle remains ignored because it contains raw model outputs. The
 report target also writes sanitized aggregate copies under
 `benchmark/results/summaries/`, which is the durable project-local location for
@@ -67,6 +83,7 @@ benchmark/results/local-pilot-<timestamp>/
   adjudication_priority_summary.csv
   adjudication-readout.md
   diagnostic_matrix.csv
+  judge_validation/
   review_app/
   README.md
 ```
@@ -79,6 +96,8 @@ benchmark/results/summaries/
   local-pilot-<timestamp>-model-summary.csv
   local-pilot-<timestamp>-pair-summary.csv
   local-pilot-<timestamp>-priority-summary.csv
+  fake-dev-pass-calibration-*.csv
+  fake-dev-pass-calibration-readout.md
 ```
 
 - `outputs.jsonl`: one structured record per item/model.
@@ -95,6 +114,7 @@ benchmark/results/summaries/
 - `adjudication_priority_summary.csv`: diagnostic-priority performance summary.
 - `adjudication-readout.md`: manuscript-facing summary of adjudicated pilot results.
 - `diagnostic_matrix.csv`: compact item/model diagnostic matrix.
+- `judge_validation/`: raw local LLM-judge prompts, outputs, labels, and validation summaries.
 - `review_app/`: generated offline browser app and downloaded adjudication JSON.
 - `README.md`: generated run note.
 

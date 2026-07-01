@@ -10,6 +10,10 @@ OUTDIR = .
 SECTION_TEX = $(wildcard sections/*.tex)
 PILOT_MODELS ?= qwen3:8b gemma3:12b glm-4.7-flash:q4_K_M
 PILOT_SMOKE_RUN_ID = smoke-$(shell date +%Y%m%d-%H%M%S)
+JUDGE_MODEL ?= glm-4.7-flash:q4_K_M
+JUDGE_PROMPT_VARIANT ?= compact
+FAKE_DEV_ITEMS ?= 96
+FAKE_DEV_SEED ?= 20260701
 RUN_DIR ?=
 RESPONSES ?=
 SUMMARY_DIR ?= benchmark/results/summaries
@@ -18,7 +22,7 @@ RESPONSES_ARG = $(if $(RESPONSES),--responses $(RESPONSES),)
 SUMMARY_DIR_ARG = $(if $(SUMMARY_DIR),--summary-dir $(SUMMARY_DIR),)
 
 # Targets
-.PHONY: all clean distclean view view-supplement help test validate-items pilot-local pilot-smoke pilot-diagnose pilot-review-app pilot-ingest-adjudication pilot-adjudication-report pilot-figures
+.PHONY: all clean distclean view view-supplement help test validate-items pilot-local pilot-smoke pilot-diagnose pilot-review-app pilot-ingest-adjudication pilot-adjudication-report pilot-figures pilot-judge-validation fake-dev-calibration
 
 # Default target: build the paper and supplement PDFs
 all: $(MAIN).pdf $(SUPPLEMENT).pdf
@@ -123,6 +127,16 @@ pilot-figures:
 	@echo "==> Generating local pilot figures..."
 	python3 scripts/plot_pilot_results.py --summary-dir $(SUMMARY_DIR)
 
+# Validate LLM-judge labels against adjudicated local pilot labels
+pilot-judge-validation:
+	@echo "==> Running LLM-judge validation on adjudicated pilot rows..."
+	python3 scripts/run_llm_judge_validation.py $(RUN_DIR_ARG) $(SUMMARY_DIR_ARG) --model $(JUDGE_MODEL) --prompt-variant $(JUDGE_PROMPT_VARIANT)
+
+# Generate fake data for development-pass design calibration
+fake-dev-calibration:
+	@echo "==> Generating fake development-pass calibration data..."
+	python3 scripts/simulate_dev_pass.py --items $(FAKE_DEV_ITEMS) --seed $(FAKE_DEV_SEED) --summary-dir $(SUMMARY_DIR)
+
 # Show available targets
 help:
 	@echo "Available targets:"
@@ -142,4 +156,6 @@ help:
 	@echo "  make pilot-ingest-adjudication - Merge downloaded adjudication JSON"
 	@echo "  make pilot-adjudication-report - Summarize adjudicated pilot labels"
 	@echo "  make pilot-figures - Generate figures from sanitized pilot summaries"
+	@echo "  make pilot-judge-validation - Validate local LLM judge against expert labels"
+	@echo "  make fake-dev-calibration - Generate fake design-calibration summaries"
 	@echo "  make help     - Show this help message"

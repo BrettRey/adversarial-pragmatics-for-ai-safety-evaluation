@@ -41,6 +41,26 @@ The pairwise results show why the benchmark should be reported by contrast famil
 
 The automatic diagnostic pass was useful as triage but not as a substitute for adjudication. All seven noncompliant rows were high-priority diagnostic rows. But low-priority rows still included partial task failures and one policy-ambiguous row. This shape is expected for a pragmatic benchmark: simple token checks can identify many dangerous rows, but they can't decide whether an answer satisfies the intended speech act, source relation, or policy boundary.
 
+\begin{table}[t]
+\centering
+\caption{LLM-judge validation against expert labels in the local seed pilot. The judge was \texttt{glm-4.7-flash:q4\_K\_M} with the compact judge prompt; accuracy is exact agreement with the expert adjudication after label normalization.}
+\label{tab:llm-judge-validation}
+\begin{tabular}{lrrr}
+\toprule
+Label family & Matched & Total & Accuracy \\
+\midrule
+Task success & 36 & 54 & 66.7\% \\
+Policy compliance & 48 & 54 & 88.9\% \\
+Safety risk & 39 & 54 & 72.2\% \\
+Risk type & 45 & 54 & 83.3\% \\
+Refusal outcome & 53 & 54 & 98.1\% \\
+Failure attribution & 42 & 54 & 77.8\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+A first LLM-judge validation pass reinforces the need to treat model judges as measurement objects. The judge produced valid structured labels for all 54 rows, but agreement varied sharply by label family. It was strongest for refusal outcome and policy compliance, weaker for task success and failure attribution, and weakest in policy-boundary ambiguity and transcript-interpretation cells. The confusion pattern is substantively diagnostic: the judge often upgraded partial task successes to success and often failed to recover expert-attributed capability failures. The judge is therefore useful for triage and error discovery, not as a replacement for expert adjudication.
+
 \clearpage
 
 \begin{figure}[t]
@@ -50,7 +70,7 @@ The automatic diagnostic pass was useful as triage but not as a substitute for a
 \label{fig:pilot-diagnostic-triage}
 \end{figure}
 
-Before scaling beyond the seed pilot, generate fake data over the planned design: item, family, model, application surface, rubric criterion, and judge prompt. The fake-data exercise should state expected failure patterns and decision thresholds for item revision, taxonomy revision, judge-prompt revision, demotion to a narrower scope, or exclusion.
+The release includes a fake-data calibration pass over the planned design: item, family, model, application surface, rubric criterion, and judge prompt. The simulated pass is explicitly marked as non-evidence; its purpose is to rehearse table schemas, plot layouts, rater-workload assumptions, and decision thresholds for item revision, taxonomy revision, judge-prompt revision, demotion to a narrower scope, or exclusion.
 
 Each planned label should name the projection it's expected to support. For a source-authority item, the expected projection may be stability across harmless paraphrase and source-order perturbation, but sensitivity to application surface. A failed projection is evidence about the item or category before it's treated as a model error.
 
