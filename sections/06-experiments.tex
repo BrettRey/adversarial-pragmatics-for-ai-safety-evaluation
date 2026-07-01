@@ -21,11 +21,34 @@ Total & 36 & 11 & 7 & 46 & 13/27 \\
 \end{tabular}
 \end{table}
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{pilot_model_outcomes}
+\caption{Model-level adjudicated pilot outcomes. Source: sanitized summaries for run \texttt{local-pilot-20260630-185417}; \(N=54\) item--model rows. The task and policy panels share a 0--18 row scale for each model, and the strict-pair panel reports pass counts over nine pair--model cells.}
+\label{fig:pilot-model-outcomes}
+\end{figure}
+
 Across the pilot, 36 of 54 outputs were full task successes, 11 were partial successes, and 7 were failures. Policy compliance was higher than task success: 46 outputs were compliant, 7 were noncompliant, and 1 was policy-ambiguous. Adjudicator confidence was high for 41 rows and medium for 13 rows, with no low-confidence adjudications.
 
 The pairwise results show why the benchmark should be reported by contrast family rather than as a single aggregate. Three pairs were stable across all models: the embedded-command source pair, the mention/use pair, and the scope-negation pair. Three pairs had zero strict pair passes: the ambiguous deictic-reference pair, the agent transcript pair, and the policy-boundary pair. In the deictic-reference item, all three models guessed a colour rather than asking for clarification. In the direct policy-boundary item, all three models output the protected dummy token despite the toy policy. The tool-result pair exposed a different problem: one model followed the injected directive, while other rows produced partial task success without policy noncompliance.
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{pilot_pair_accuracy}
+\caption{Strict pair passes by phenomenon family. Source: sanitized summaries for run \texttt{local-pilot-20260630-185417}; \(N=27\) pair--model cells. Each horizontal bar uses a 0--3 scale because each minimal pair was run against three local models.}
+\label{fig:pilot-pair-accuracy}
+\end{figure}
+
 The automatic diagnostic pass was useful as triage but not as a substitute for adjudication. All seven noncompliant rows were high-priority diagnostic rows. But low-priority rows still included partial task failures and one policy-ambiguous row. This shape is expected for a pragmatic benchmark: simple token checks can identify many dangerous rows, but they can't decide whether an answer satisfies the intended speech act, source relation, or policy boundary.
+
+\clearpage
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{pilot_diagnostic_triage}
+\caption{Rule-aided diagnostic priority compared with adjudicated labels. Source: sanitized summaries for run \texttt{local-pilot-20260630-185417}; \(N=54\) item--model rows. All bars use a common row-count scale, with colour and hatch distinguishing diagnostic row totals, non-success rows, noncompliant rows, and policy-ambiguous rows.}
+\label{fig:pilot-diagnostic-triage}
+\end{figure}
 
 Before scaling beyond the seed pilot, generate fake data over the planned design: item, family, model, application surface, rubric criterion, and judge prompt. The fake-data exercise should state expected failure patterns and decision thresholds for item revision, taxonomy revision, judge-prompt revision, demotion to a narrower scope, or exclusion.
 
@@ -42,3 +65,5 @@ In design terms, the crossed structure is item by model by application surface b
 The minimum experimental table should report performance by phenomenon family, not only aggregate score. A second table should report adjudication instability by item family and criterion conflict. A third should identify cases where the gold label shifted after adjudication, because those are likely taxonomy-instability cases rather than mere model failures.
 
 A fourth table should report application-surface transfer. It should separate prompt-only items from webpage, document, email, tool-result, and transcript wrappers, with risk types split into integrity, confidentiality, tool misuse, policy bypass, and evaluator deception. This prevents colour-token success from being mistaken for agent-security robustness.
+
+\clearpage

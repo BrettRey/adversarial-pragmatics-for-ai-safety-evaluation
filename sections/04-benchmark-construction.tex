@@ -10,6 +10,13 @@ The seed set now includes prompt-only minimal pairs plus webpage text, document 
 
 Each item records the control dimension, context source, source role, authority level, pragmatic status, response act, expected behaviour, task-success label, policy-compliance label, safety-risk label, risk type, refusal outcome, failure attribution, and a judge-validation flag. The validator script enforces the schema and label inventories.
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{evaluation_pipeline}
+\caption{Evaluation pipeline for the benchmark artifact. The diagram summarizes the planned data flow from pre-specified item metadata through model output, rule-aided triage, expert labels, LLM-judge labels, adjudication, and metric-driven item revision. No performance quantity is encoded in the figure.}
+\label{fig:evaluation-pipeline}
+\end{figure}
+
 That schema makes the benchmark auditable in two directions. From the prompt and metadata, an evaluator can see which contrast is being tested. From a model output, an evaluator can identify which component failed: source sensitivity, mention/use robustness, scope interpretation, refusal calibration, risk classification, or the safety policy layer.
 
 The initial target size is 300--800 items. The first development set should be much smaller. Its job is to test the taxonomy, expert-evaluation protocol, validator, and scoring scripts before item generation scales up. A credible first calibration pass is 50--100 items: enough to cover the eight phenomenon families, but small enough for close expert adjudication and error analysis.

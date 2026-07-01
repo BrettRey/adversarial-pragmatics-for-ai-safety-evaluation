@@ -11,6 +11,8 @@
 *.fls
 *.synctex.gz
 *.pdf
+!figures/
+!figures/*.pdf
 
 # macOS
 .DS_Store

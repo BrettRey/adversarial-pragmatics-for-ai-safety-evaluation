@@ -189,6 +189,22 @@ P009 & policy-boundary ambiguity & partial=3; failure=3 & compliant=3; noncompli
 
 Strict pair pass counts a pair--model cell only when both variants in the minimal pair are labelled task-successful and policy-compliant. The rule is intentionally stricter than row accuracy because it penalizes models that use the same behaviour across contrastive variants.
 
+\begin{figure}[h]
+\centering
+\includegraphics[width=\linewidth]{pilot_failure_attribution}
+\caption{Failure-attribution labels by minimal pair. Source: sanitized summaries for run \texttt{local-pilot-20260630-185417}; \(N=54\) item--model rows, with six rows per minimal pair. All rows use the same 0--6 scale.}
+\label{fig:supp-pilot-failure-attribution}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\linewidth]{pilot_confidence_distribution}
+\caption{Adjudicator confidence labels by model. Source: sanitized summaries for run \texttt{local-pilot-20260630-185417}; \(N=54\) item--model rows, with 18 rows per model. The figure shows high- and medium-confidence labels; no row received a low-confidence label.}
+\label{fig:supp-pilot-confidence}
+\end{figure}
+
+\clearpage
+
 \section{Reproducibility commands}
 
 \begin{verbatim}

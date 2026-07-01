@@ -18,7 +18,7 @@ RESPONSES_ARG = $(if $(RESPONSES),--responses $(RESPONSES),)
 SUMMARY_DIR_ARG = $(if $(SUMMARY_DIR),--summary-dir $(SUMMARY_DIR),)
 
 # Targets
-.PHONY: all clean distclean view view-supplement help test validate-items pilot-local pilot-smoke pilot-diagnose pilot-review-app pilot-ingest-adjudication pilot-adjudication-report
+.PHONY: all clean distclean view view-supplement help test validate-items pilot-local pilot-smoke pilot-diagnose pilot-review-app pilot-ingest-adjudication pilot-adjudication-report pilot-figures
 
 # Default target: build the paper and supplement PDFs
 all: $(MAIN).pdf $(SUPPLEMENT).pdf
@@ -118,6 +118,11 @@ pilot-adjudication-report:
 	@echo "==> Summarizing adjudicated local pilot results..."
 	python3 scripts/summarize_adjudication_pilot.py $(RUN_DIR_ARG) $(SUMMARY_DIR_ARG)
 
+# Generate manuscript and supplement figures from sanitized pilot summaries
+pilot-figures:
+	@echo "==> Generating local pilot figures..."
+	python3 scripts/plot_pilot_results.py --summary-dir $(SUMMARY_DIR)
+
 # Show available targets
 help:
 	@echo "Available targets:"
@@ -136,4 +141,5 @@ help:
 	@echo "  make pilot-review-app - Build offline adjudication app for latest pilot"
 	@echo "  make pilot-ingest-adjudication - Merge downloaded adjudication JSON"
 	@echo "  make pilot-adjudication-report - Summarize adjudicated pilot labels"
+	@echo "  make pilot-figures - Generate figures from sanitized pilot summaries"
 	@echo "  make help     - Show this help message"
