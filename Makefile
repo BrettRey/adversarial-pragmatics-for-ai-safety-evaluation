@@ -5,6 +5,7 @@
 LATEX = xelatex
 BIBER = biber
 MAIN = main
+SUPPLEMENT = supplement
 OUTDIR = .
 SECTION_TEX = $(wildcard sections/*.tex)
 PILOT_MODELS ?= qwen3:8b gemma3:12b glm-4.7-flash:q4_K_M
@@ -17,10 +18,10 @@ RESPONSES_ARG = $(if $(RESPONSES),--responses $(RESPONSES),)
 SUMMARY_DIR_ARG = $(if $(SUMMARY_DIR),--summary-dir $(SUMMARY_DIR),)
 
 # Targets
-.PHONY: all clean distclean view help test validate-items pilot-local pilot-smoke pilot-diagnose pilot-review-app pilot-ingest-adjudication pilot-adjudication-report
+.PHONY: all clean distclean view view-supplement help test validate-items pilot-local pilot-smoke pilot-diagnose pilot-review-app pilot-ingest-adjudication pilot-adjudication-report
 
-# Default target: build the PDF
-all: $(MAIN).pdf
+# Default target: build the paper and supplement PDFs
+all: $(MAIN).pdf $(SUPPLEMENT).pdf
 
 # Full build sequence with bibliography
 $(MAIN).pdf: $(MAIN).tex $(SECTION_TEX) references.bib references-local.bib
@@ -33,6 +34,17 @@ $(MAIN).pdf: $(MAIN).tex $(SECTION_TEX) references.bib references-local.bib
 	@echo "==> Third LaTeX pass (finalizing)..."
 	$(LATEX) -output-directory=$(OUTDIR) $(MAIN).tex
 	@echo "==> Build complete: $(MAIN).pdf"
+
+$(SUPPLEMENT).pdf: $(SUPPLEMENT).tex
+	@echo "==> First supplement LaTeX pass..."
+	$(LATEX) -output-directory=$(OUTDIR) $(SUPPLEMENT).tex
+	@echo "==> Running Biber for supplement..."
+	$(BIBER) $(SUPPLEMENT)
+	@echo "==> Second supplement LaTeX pass..."
+	$(LATEX) -output-directory=$(OUTDIR) $(SUPPLEMENT).tex
+	@echo "==> Third supplement LaTeX pass..."
+	$(LATEX) -output-directory=$(OUTDIR) $(SUPPLEMENT).tex
+	@echo "==> Build complete: $(SUPPLEMENT).pdf"
 
 # Quick build (single pass, no bibliography update)
 quick: $(MAIN).tex $(SECTION_TEX)
@@ -49,18 +61,25 @@ clean:
 	rm -f $(MAIN).aux $(MAIN).bbl $(MAIN).bcf $(MAIN).blg $(MAIN).log
 	rm -f $(MAIN).out $(MAIN).run.xml $(MAIN).toc $(MAIN).fdb_latexmk
 	rm -f $(MAIN).fls $(MAIN).synctex.gz
+	rm -f $(SUPPLEMENT).aux $(SUPPLEMENT).bbl $(SUPPLEMENT).bcf $(SUPPLEMENT).blg $(SUPPLEMENT).log
+	rm -f $(SUPPLEMENT).out $(SUPPLEMENT).run.xml $(SUPPLEMENT).toc $(SUPPLEMENT).fdb_latexmk
+	rm -f $(SUPPLEMENT).fls $(SUPPLEMENT).synctex.gz
 	@echo "==> Clean complete"
 
 # Clean everything including PDF
 distclean: clean
 	@echo "==> Removing PDF..."
-	rm -f $(MAIN).pdf
+	rm -f $(MAIN).pdf $(SUPPLEMENT).pdf
 	@echo "==> Deep clean complete"
 
 # Open PDF viewer (macOS)
 view: $(MAIN).pdf
 	@echo "==> Opening PDF..."
 	open $(MAIN).pdf
+
+view-supplement: $(SUPPLEMENT).pdf
+	@echo "==> Opening supplement PDF..."
+	open $(SUPPLEMENT).pdf
 
 # Validate the benchmark seed file
 test:
@@ -103,11 +122,13 @@ pilot-adjudication-report:
 help:
 	@echo "Available targets:"
 	@echo "  make          - Build PDF with full bibliography (default)"
+	@echo "  make supplement.pdf - Build supplementary material PDF"
 	@echo "  make quick    - Quick build (single pass, no bib update)"
 	@echo "  make lualatex - Build using LuaLaTeX (not recommended)"
 	@echo "  make clean    - Remove build artifacts (keep PDF)"
 	@echo "  make distclean- Remove everything including PDF"
 	@echo "  make view     - Open PDF (macOS only)"
+	@echo "  make view-supplement - Open supplementary material PDF"
 	@echo "  make test     - Validate benchmark seed items"
 	@echo "  make pilot-local - Run seed items on local Ollama models"
 	@echo "  make pilot-smoke - Run two-item local Ollama smoke test"
