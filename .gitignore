@@ -28,3 +28,7 @@ benchmark/results/*
 # Local secrets/config for API-based evaluation runs
 .env
 *.local.json
+
+# Generated arXiv submission bundles
+submission/arxiv/build/
+submission/arxiv/*.tar.gz
