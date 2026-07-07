@@ -198,23 +198,23 @@ Strict pair pass counts a pair--model cell only when both variants in the minima
 
 \section{LLM-judge validation}
 
-The first judge-validation pass used \texttt{glm-4.7-flash:q4\_K\_M} as a local judge over all 54 adjudicated item--model rows. The judge prompt required separate labels for task success, policy compliance, safety risk, risk type, refusal outcome, failure attribution, confidence, and rationale. The output parser validated the returned JSON labels before summary.
+The first judge-validation pass used \texttt{glm-4.7-flash:q4\_K\_M} as a local judge over all 54 adjudicated item--model rows. The judge prompt required separate labels for task success, policy compliance, safety risk, risk type, refusal outcome, failure attribution, confidence, and rationale. The output parser validated the returned JSON labels before summary. Two design caveats apply to every number in this section: the judge model is also one of the three evaluated models, so it graded its own 18 outputs, and the judge prompt included each item's expected-behaviour field, so agreement here is an upper bound on rubric-aided judging rather than judging as deployed.
 
-\begin{longtable}{L{0.35\linewidth}rrr}
-\caption{LLM-judge agreement with expert adjudication.}\\
+\begin{longtable}{L{0.30\linewidth}rrrrr}
+\caption{LLM-judge agreement with expert adjudication. Base rate is the majority-class share of the expert labels, the score of a constant judge; \(\kappa\) is Cohen's kappa.}\\
 \toprule
-Label family & Matched & Total & Accuracy \\
+Label family & Matched & Total & Accuracy & Base rate & \(\kappa\) \\
 \midrule
-\texttt{task\_success} & 36 & 54 & 66.7\% \\
-\texttt{policy\_compliance} & 48 & 54 & 88.9\% \\
-\texttt{safety\_risk} & 39 & 54 & 72.2\% \\
-\texttt{risk\_type} & 45 & 54 & 83.3\% \\
-\texttt{refusal\_outcome} & 53 & 54 & 98.1\% \\
-\texttt{failure\_attribution} & 42 & 54 & 77.8\% \\
+\texttt{task\_success} & 36 & 54 & 66.7\% & 66.7\% & 0.26 \\
+\texttt{policy\_compliance} & 48 & 54 & 88.9\% & 85.2\% & 0.45 \\
+\texttt{safety\_risk} & 39 & 54 & 72.2\% & 79.6\% & 0.14 \\
+\texttt{risk\_type} & 45 & 54 & 83.3\% & 81.5\% & 0.27 \\
+\texttt{refusal\_outcome} & 53 & 54 & 98.1\% & 96.3\% & 0.79 \\
+\texttt{failure\_attribution} & 42 & 54 & 77.8\% & 66.7\% & 0.40 \\
 \bottomrule
 \end{longtable}
 
-The pass produced no parse errors or invalid judge responses. Its weakest phenomenon/axis cells were policy-boundary ambiguity for task success and failure attribution, embedded-command safety-risk labels, transcript-interpretation task success and failure attribution, and deictic-reference policy and risk labels. The result supports using LLM judges as validated triage tools rather than as unvalidated substitutes for expert adjudication.
+The pass produced no parse errors or invalid judge responses. Its weakest phenomenon/axis cells were policy-boundary ambiguity for task success and failure attribution, embedded-command safety-risk labels, transcript-interpretation task success and failure attribution, and deictic-reference policy and risk labels. Against the base rates, the pass is a negative result about unvalidated judging: agreement sits at or near the constant-judge baseline for most families, minority-class recall is low, and the rule-aided diagnostic pass recovered all seven noncompliant rows. The result supports the protocol's requirement that judges be validated before use, not the use of this judge for grading.
 
 \section{Representative adjudication rows}
 

@@ -2,7 +2,7 @@
 
 The empirical program has two stages: a completed local seed pilot and a larger development pass. The seed pilot is a measurement-calibration pass, not a leaderboard. Its purpose is to test whether the item schema, adjudication protocol, and summary metrics can turn raw model outputs into auditable distinctions.
 
-The local seed pilot ran the 18-item seed benchmark against three accessible Ollama models: \texttt{qwen3:8b}, \texttt{gemma3:12b}, and \texttt{glm-4.7-flash:q4\_K\_M}. This produced 54 item--model outputs. The run used local Ollama 0.15.2 on June 30, 2026. Generation settings were temperature 0, seed 1, 256 predicted tokens, no thinking trace, and model unloading between runs. A single expert adjudicator labelled every row for task success, policy compliance, safety risk, risk type, refusal outcome, failure attribution, confidence, and rationale. All 54 rows received complete labels.
+The local seed pilot ran the 18-item seed benchmark against three accessible Ollama models: \texttt{qwen3:8b}, \texttt{gemma3:12b}, and \texttt{glm-4.7-flash:q4\_K\_M}. This produced 54 item--model outputs. The run used local Ollama 0.15.2 on June 30, 2026. Generation settings were temperature 0, seed 1, 256 predicted tokens, no thinking trace, and model unloading between runs. A single expert adjudicator (the author, who also wrote the items and their expected-behaviour labels) labelled every row for task success, policy compliance, safety risk, risk type, refusal outcome, failure attribution, confidence, and rationale. All 54 rows received complete labels.
 
 \begin{table}[!htbp]
 \centering
@@ -43,23 +43,29 @@ The automatic diagnostic pass was useful as triage but not as a substitute for a
 
 \begin{table}[!htbp]
 \centering
-\caption{LLM-judge validation against expert labels in the local seed pilot. The judge was \texttt{glm-4.7-flash:q4\_K\_M} with the compact judge prompt; accuracy is exact agreement with the expert adjudication after label normalization.}
+\caption{LLM-judge validation against expert labels in the local seed pilot. Agreement is exact match after label normalization. Base rate is the majority-class share of the expert labels, the score of a constant judge. \(\kappa\) is Cohen's kappa. Minority recall is the judge's recall on non-majority expert labels. The judge was \texttt{glm-4.7-flash:q4\_K\_M} with the compact judge prompt; two design caveats apply (see text): the judge is one of the three evaluated models, and its prompt included each item's expected-behaviour field.}
 \label{tab:llm-judge-validation}
-\begin{tabular}{lrrr}
+\begin{tabular}{lrrrl}
 \toprule
-Label family & Matched & Total & Accuracy \\
+Label family & Agreement & Base rate & \(\kappa\) & Minority recall \\
 \midrule
-Task success & 36 & 54 & 66.7\% \\
-Policy compliance & 48 & 54 & 88.9\% \\
-Safety risk & 39 & 54 & 72.2\% \\
-Risk type & 45 & 54 & 83.3\% \\
-Refusal outcome & 53 & 54 & 98.1\% \\
-Failure attribution & 42 & 54 & 77.8\% \\
+Task success & 66.7\% & 66.7\% & 0.26 & 0/11 partial \\
+Policy compliance & 88.9\% & 85.2\% & 0.45 & 3/7 noncompliant \\
+Safety risk & 72.2\% & 79.6\% & 0.14 & 0/11 risk-labelled \\
+Risk type & 83.3\% & 81.5\% & 0.27 & 1/10 non-\texttt{none} \\
+Refusal outcome & 98.1\% & 96.3\% & 0.79 & 2/2 refusals \\
+Failure attribution & 77.8\% & 66.7\% & 0.40 & 6/18 non-\texttt{none} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-A first LLM-judge validation pass reinforces the need to treat model judges as measurement objects. The judge produced valid structured labels for all 54 rows, but agreement varied sharply by label family. It was strongest for refusal outcome and policy compliance, weaker for task success and failure attribution, and weakest in policy-boundary ambiguity and transcript-interpretation cells. The confusion pattern is substantively diagnostic: the judge often upgraded partial task successes to success and often failed to recover expert-attributed capability failures. The judge can support triage and error discovery, but can't replace expert adjudication.
+A first LLM-judge validation pass reinforces the need to treat model judges as measurement objects, though not in the way raw agreement suggests. The judge produced valid structured labels for all 54 rows, but the expert label distributions are heavily skewed, so exact agreement mostly tracks base rates (Table~\ref{tab:llm-judge-validation}): task-success agreement equals the majority-class baseline, safety-risk agreement falls below it, and the refusal-outcome figure sits 1.8 points above a constant judge. Chance-corrected agreement runs from \(\kappa = 0.14\) (safety risk) to \(\kappa = 0.79\) (refusal outcome).
+
+The informative statistic is minority-class recall, and it's low exactly where safety evaluation needs it. The judge recovered none of the 11 partial task successes (upgrading 10 to full success), 3 of 7 noncompliant rows, none of the 11 risk-labelled rows, and 6 of 17 capability-failure attributions. It did recover both true refusals and the direct policy-boundary failures.
+
+Three design features cap what this pass can show. The judge is one of the three evaluated models, so it graded its own 18 outputs. The judge prompt included each item's expected-behaviour field, so these figures are an upper bound on rubric-aided judging, not judging as deployed. And the reference labels come from a single adjudicator who also wrote the items (see Limitations and Next Steps).
+
+On this pilot, triage belongs to the rule-aided diagnostic pass, which flagged all 7 noncompliant rows; the unvalidated judge missed most of the labels that matter. The pass is best read as a negative result that motivates the judge-validation protocol, not as support for judge-based grading. The confusion pattern is still diagnostic: the judge upgrades partials and misses capability attributions, exactly the failure profile a validation pass must screen for.
 
 \begin{figure}[!htbp]
 \centering

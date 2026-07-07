@@ -2,13 +2,15 @@
 
 Frontier-model safety evaluation increasingly evaluates language-mediated control. The central question isn't only whether a model can solve a task. It also asks whether the model can identify which natural-language material has directive force, which policy boundary applies, and what a transcript shows about the model's behaviour.
 
+This makes AI security partly a problem of \term{secure delegation}: systems act through natural-language instructions, tool outputs, retrieved documents, policy text, and agent transcripts. A safety evaluation is incomplete if it only asks whether the final output was acceptable. It also has to ask whether the system preserved control over which language counted as an instruction, whose authority it carried, what action it licensed, and how any failure should be attributed.
+
 The problem already appears in work on holistic language-model evaluation, which treats model assessment as a multi-scenario, multi-metric problem rather than a single accuracy number \parencite{liang2022holistic}. Safety evaluation adds a sharper version of the same problem: the relevant behaviour is often not just an answer, but the model's uptake of an instruction, policy, or source relation.
 
 The practical bottleneck is visible in prompt injection, model-policy evaluation, red-team triage, LLM-as-judge grading, and agent transcript review. Prompt-injection research shows that LLM-integrated applications can blur the boundary between data and instructions \parencite{greshake2023not}; instruction-hierarchy work frames the same vulnerability as failure to follow privileged rather than lower-priority instructions \parencite{wallace2024instruction}. Agent evaluations make the issue harder because untrusted content can arrive through tools and retrieved documents rather than through the user turn itself \parencite{debenedetti2024agentdojo}.
 
 In each setting, a surface string may be an instruction, a quotation, a cited passage, a tool output, a policy example, a user request, or an adversarial attempt to change authority. A pass/fail label loses information when it doesn't say which role the string had and why.
 
-Evaluation labels function here as inference licenses. A label attached to an item states what nearby judgments it supports: how the case should behave under paraphrase, wrapper change, model change, or judge-prompt change. Projectibility (what observing some features licenses us to predict about others; \citep{Goodman1955,reynolds2026kindsProjectibilityProfiles}) is built into the measurement target.
+Evaluation labels function here as inference licenses. A label attached to an item states what nearby judgments it supports: how the case should behave under paraphrase, wrapper change, model change, or judge-prompt change. Projectibility, what observing some features licenses us to predict about others \parencite{Goodman1955,reynolds2026kindsProjectibilityProfiles}, is built into the measurement target.
 
 This paper treats those distinctions as evaluation targets. It starts from a small but auditable benchmark in which the relevant contrasts are controlled. The benchmark isn't intended to crown a winning model. Its design shows which linguistic contrasts make safety claims stable, which ones expose over-refusal or under-refusal, and which ones reveal instability in the evaluation itself.
 
@@ -18,5 +20,5 @@ The core construct is \term{adversarial pragmatics}: safety-relevant model behav
 \noindent\fbox{%
 \begin{minipage}{0.94\linewidth}
 \small
-\textbf{Artifact and pilot findings.} The release includes 18 seed items in nine minimal pairs, a schema validator, a local Ollama runner, rule-aided diagnostic scripts, an adjudication review app, an LLM-judge validation script, sanitized pilot summaries, and reproducibility commands. The local seed pilot produced 54 item--model rows: 36 full task successes, 46 policy-compliant outputs, 13/27 strict pair passes, and LLM-judge exact agreement ranging from 66.7\% to 98.1\% by label family.
+\textbf{Artifact and pilot findings.} The release includes 18 seed items in nine minimal pairs, a schema validator, a local Ollama runner, rule-aided diagnostic scripts, an adjudication review app, an LLM-judge validation script, sanitized pilot summaries, and reproducibility commands. The local seed pilot produced 54 item--model rows: 36 full task successes, 46 policy-compliant outputs, and 13/27 strict pair passes. A first LLM-judge validation pass showed exact agreement of 66.7--98.1\% by label family, but the expert labels are heavily skewed, so most of those figures sit at or near majority-class base rates (Cohen's \(\kappa\) 0.14--0.79), with low recall on the safety-relevant minority classes.
 \end{minipage}}
