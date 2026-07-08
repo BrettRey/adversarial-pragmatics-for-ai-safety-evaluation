@@ -2,7 +2,7 @@
 
 Frontier-model safety evaluation increasingly evaluates language-mediated control. The central question isn't only whether a model can solve a task. It also asks whether the model can identify which natural-language material has directive force, which policy boundary applies, and what a transcript shows about the model's behaviour.
 
-This makes AI security partly a problem of \term{secure delegation}: systems act through natural-language instructions, tool outputs, retrieved documents, policy text, and agent transcripts. A safety evaluation is incomplete if it only asks whether the final output was acceptable. It also has to ask whether the system preserved control over which language counted as an instruction, whose authority it carried, what action it licensed, and how any failure should be attributed.
+This connects AI safety evaluation to \term{language-mediated delegation}: systems act through natural-language instructions, tool outputs, retrieved documents, policy text, and agent transcripts. A safety evaluation is incomplete if it only asks whether the final output was acceptable. It also has to ask whether the system preserved control over which language counted as an instruction, whose authority it carried, what action it licensed, and how any failure should be attributed.
 
 The problem already appears in work on holistic language-model evaluation, which treats model assessment as a multi-scenario, multi-metric problem rather than a single accuracy number \parencite{liang2022holistic}. Safety evaluation adds a sharper version of the same problem: the relevant behaviour is often not just an answer, but the model's uptake of an instruction, policy, or source relation.
 
@@ -12,7 +12,7 @@ In each setting, a surface string may be an instruction, a quotation, a cited pa
 
 Evaluation labels function here as inference licenses. A label attached to an item states what nearby judgments it supports: how the case should behave under paraphrase, wrapper change, model change, or judge-prompt change. Projectibility, what observing some features licenses us to predict about others \parencite{Goodman1955,reynolds2026kindsProjectibilityProfiles}, is built into the measurement target.
 
-This paper treats those distinctions as evaluation targets. It starts from a small but auditable benchmark in which the relevant contrasts are controlled. The benchmark isn't intended to crown a winning model. Its design shows which linguistic contrasts make safety claims stable, which ones expose over-refusal or under-refusal, and which ones reveal instability in the evaluation itself.
+This paper treats those distinctions as evaluation targets. It starts from a small but auditable benchmark in which the relevant contrasts are controlled. The benchmark isn't intended to crown a winning model. Its design shows which linguistic contrasts make safety-evaluation claims stable, which ones expose over-refusal or under-refusal, and which ones reveal instability in the evaluation itself.
 
 The core construct is \term{adversarial pragmatics}: safety-relevant model behaviour under cases where instruction status, source authority, quotation, scope, reference, speech-act force, or policy category has to be inferred from language use. The phrase doesn't rename all prompt robustness. It names a narrower evaluation target: cases where the failure can't be diagnosed without saying how a string was embedded, attributed, scoped, or taken up.
 

@@ -16,7 +16,7 @@ The assistant retrieves a vendor page that includes useful pricing data and an e
 
 A usable evidence record would include the user's delegated task, the relevant policy and permission state, the tool schema, the source and trust label for the retrieved page, the proposed action, the approval state, and any blocked or executed tool call. If the assistant drafts only the comparison memo, a reviewer should be able to see why reading the budget was licensed and disclosing it wasn't. If the assistant emails the vendor, the trace should show whether the failure came from model uptake, tool gating, scaffold state, approval routing, or audit loss.
 
-The evaluator is part of the same example. A judge that sees a polished final memo and scores it as safe hasn't validated delegation unless it checks the action trace. It has to distinguish task success, policy compliance, information-flow control, tool licensing, refusal calibration, and failure attribution. The running example reaches from instruction to tool use, audit record, and judge validation.
+The evaluator belongs in the same assurance example. A judge that sees a polished final memo and scores it as safe hasn't validated delegation unless it checks the action trace. It has to distinguish task success, policy compliance, information-flow control, tool licensing, refusal calibration, and failure attribution. The running example reaches from instruction to tool use, audit record, and judge validation.
 
 \begin{table}[tbp]
 \small
@@ -50,7 +50,7 @@ The framework can be written as a compact claim/argument/evidence pattern.
   \item \textbf{Scope subclaim.} \(S\) keeps action bounded by target, time, tool, data class, and permitted operation.
   \item \textbf{Information-flow subclaim.} \(S\) separates read access from disclosure authority.
   \item \textbf{Persistence subclaim.} \(S\) requires authority for durable memory or state changes.
-  \item \textbf{Audit subclaim.} \(S\) produces evidence sufficient for third-party reconstruction.
+  \item \textbf{Audit subclaim.} \(S\)'s deployment produces and preserves evidence sufficient for third-party reconstruction.
   \item \textbf{Evaluation subclaim.} Evaluators preserve the same distinctions rather than collapsing success, safety, refusal, and compliance.
 \end{itemize}
 

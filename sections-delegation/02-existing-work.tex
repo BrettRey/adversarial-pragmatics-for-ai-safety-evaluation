@@ -14,7 +14,7 @@ These works show why language-mediated control is a security problem. They leave
 
 Instruction-hierarchy work treats prompt injection as a priority problem. Systems have to follow privileged instructions over lower-priority or untrusted strings, and training can improve selective ignoring of lower-priority content \parencite{wallace2024instruction}. It's central to delegation assurance because delegated authority often arrives as language: system instructions, developer constraints, user requests, retrieved documents, memory, policy examples, and tool outputs all appear as strings.
 
-Priority handles source order, while status determines what the string is doing. A string may be a command, quotation, example, report, policy boundary, tool result, or request for analysis. The adversarial-pragmatics benchmark tests that middle layer by varying instruction status, quotation, source authority, scope, refusal, and failure attribution under controlled contrasts. In this paper, that benchmark is one evidence layer rather than the whole assurance framework.
+Priority handles source order, while status determines what the string is doing. A string may be a command, quotation, example, report, policy boundary, tool result, or request for analysis. Delegation assurance needs evidence that status is preserved before priority and licensing are applied.
 
 \subsection{Delegation Protocols and Access Control}
 
@@ -36,7 +36,7 @@ Evaluation work supplies both tools and risks. LLM-as-judge methods can reduce g
 
 Judge reliability is itself part of the assurance problem. LLMBar shows that fluent but instruction-violating outputs can mislead evaluators \parencite{zeng2024llmbar}. Survey work treats consistency, bias, and domain adaptation as continuing problems for LLM-as-judge systems \parencite{gu2025judgeSurvey}. Bias studies show that both human and LLM judges can be vulnerable to judgment biases and attacks on those biases \parencite{chen2024judgementBias}.
 
-Delegation assurance treats the evaluator as part of the delegated system when the evaluator's label licenses a safety, compliance, or deployment claim. A judge that scores only final-answer safety may miss whether an action was authorized, whether a refusal abandoned delegated work, or whether a transcript supports the stated failure attribution. Judge validation belongs inside the evidence standard rather than after it.
+Delegation assurance treats evaluation as part of the assurance chain when an evaluator's label licenses a safety, compliance, or deployment claim. A judge that scores only final-answer safety may miss whether an action was authorized, whether a refusal abandoned delegated work, or whether a transcript supports the stated failure attribution. Judge validation belongs inside the evidence standard rather than after it.
 
 \subsection{The Gap}
 

@@ -1,11 +1,40 @@
 \section{Governance and Legal Sources}
 
-The intake target for this section is cross-jurisdictional, with emphasis on Canada, the European Union, the United States, and Australia where official sources are especially probative. The relevant sources fall into three groups.
+This section is cross-jurisdictional, with emphasis on Canada, the European Union, the United States, and Australia where official sources are especially probative. The relevant sources fall into three groups.
 
 Agency law supplies the clearest vocabulary for the underlying relation: a principal authorizes an agent to act on the principal's behalf, and actual authority may be express or implied \parencite{cornellWexAgency,cornellWexActualAuthority}. That analogy clarifies the question, but it also marks the limit. In ordinary agency, the agent can be a responsible legal or institutional actor. In AI deployments, the system can execute delegated action, but responsibility remains with the person or entity that authorizes and controls its use \parencite{cornellWexPrincipal}.
 
-First, AI-governance instruments require logs, documentation, intended-purpose limits, instructions for use, human oversight, impact assessment, monitoring, recourse, and disclosure. The EU AI Act requires high-risk systems to support traceability through logging capabilities, requires instructions for use, and assigns deployers obligations around use, input data, monitoring, serious-incident reporting, and human oversight by people with competence, training, and authority \parencite{europeanUnion2024aiAct}. Canada's Algorithmic Impact Assessment asks comparable operational questions about project authority, system accountability, audit trails, system-produced reasons, recourse, human override, documentary evidence, and changes in system functionality or scope \parencite{canadaAIA2026}. These instruments generate evidence, but they usually stop short of specifying what evidence is sufficient to prove that a concrete action stayed within delegated authority.
+First, AI-governance instruments require logs, documentation, intended-purpose limits, instructions for use, human oversight, impact assessment, monitoring, recourse, and disclosure. The EU AI Act requires high-risk systems to support traceability through logging capabilities, requires instructions for use, and assigns deployers obligations around use, input data, monitoring, serious-incident reporting, and human oversight by people with competence, training, and authority \parencite{europeanUnion2024aiAct}.
+
+Canada's Algorithmic Impact Assessment asks comparable operational questions about project authority, system accountability, audit trails, system-produced reasons, recourse, human override, documentary evidence, and changes in system functionality or scope \parencite{canadaAIA2026}. These instruments generate evidence, but they usually stop short of specifying what evidence is sufficient to support a finding that a concrete action stayed within delegated authority.
+
+Financial-reporting law supplies a useful institutional analogue. Sarbanes--Oxley Section 404 requires internal-control reporting that states management's responsibility for adequate controls and assesses their effectiveness; the SEC's implementing rules require management to identify the framework used for that evaluation, and Exchange Act Rule 13a-15 requires a suitable, recognized control framework for evaluating internal control over financial reporting \parencite{sarbanesOxley404,sec2003managementReport,secExchangeRule13a15}.
+
+This comparison is limited but clarifying. SOX doesn't ask investors to trust a company's bare assertion that the numbers came out right. It asks whether management maintained a reviewable control environment around the reporting process. Evidentiary assurance asks for the same kind of move for AI action: not a transcript alone, and not a model-level safety claim alone, but a control record tying action to authority, scope, procedure, integrity, and accountable institutional actors.
 
 Second, electronic-evidence and electronic-signature law already has mature concepts for authenticity, integrity, attribution, secure signatures, and tamper detection. The Canada Evidence Act places the burden of authenticating an electronic document on the party seeking admission and ties the best-evidence rule to proof of the integrity of the electronic-document system or an applicable evidentiary presumption \parencite{canadaEvidenceAct1985}. PIPEDA Part 2 and Canadian e-signature guidance add related primitives: signer identity, signer authority, association between signature and record, record retention, timestamps, transaction records, and integrity of the signed data and supporting information \parencite{pipeda2000,canadaESignatures2025}. Those doctrines aren't AI-specific, but they provide strong analogues for AI action traces.
 
 Third, public failures show the practical stakes. The Robodebt Royal Commission recommended clear review paths for affected people, plain-language notice that automated decision-making is used, and public availability of business rules and algorithms for independent expert scrutiny \parencite{robodebtRoyalCommission2023}. That recommendation set is close to the evidentiary-assurance question: what record lets an affected person, auditor, regulator, court, or internal reviewer determine whether the system acted within authority the institution could validly delegate?
+
+\begin{table}[tbp]
+\small
+\centering
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.22\linewidth}%
+                >{\raggedright\arraybackslash}p{0.28\linewidth}%
+                >{\raggedright\arraybackslash}p{0.40\linewidth}}
+\toprule
+Source family & Evidence primitives supported & Remaining gap \\
+\midrule
+Agency law & Authority, scope, attribution, accountability. & Ordinary agency assumes a responsible agent; AI systems execute action without becoming accountable legal subjects. \\
+AI governance & Procedure, monitoring, documentation, oversight, recourse, traceability. & Governance duties create records without specifying the action-level sufficiency test. \\
+Financial-reporting controls & Management responsibility, control frameworks, effectiveness assessment, attestation, change monitoring. & Internal control over reporting isn't yet an action-level standard for delegated AI systems. \\
+Electronic evidence & Authenticity, integrity, attribution, preservation, evidentiary presumptions. & Document integrity doesn't by itself show that an AI action was authorized. \\
+Electronic signatures & Identity, authority to sign, record association, timestamping, transaction evidence. & Signature validity doesn't generalize automatically to multi-step agentic action. \\
+Public automation failures & Contestability, notice, review paths, business-rule disclosure, independent scrutiny. & Post-failure recommendations still have to be translated into deployable evidence bundles. \\
+\bottomrule
+\end{tabular}
+\caption{Legal and governance sources as evidence primitives.}
+\label{tab:legal-governance-primitives}
+\end{table}
+
+Taken together, these sources set the frame. Governance law tells deployers to create and preserve records. Evidence law tells reviewers how authenticity and integrity can be established for digital artefacts. Agency law clarifies why authority and accountability have to be separated in AI systems. Public-sector failures show what happens when automated action can't be reconstructed or contested. Evidentiary assurance joins these materials around a single action-level question: what's enough evidence to defend this action, by this system, under this delegation, at this time?

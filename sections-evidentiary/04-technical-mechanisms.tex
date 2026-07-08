@@ -5,3 +5,27 @@ Technical mechanisms supply pieces of the evidentiary bundle. Structured executi
 Agentic systems add a language-mediated evidence problem. For tool-using language-model systems, adversarial language can enter through retrieved content and lower-priority instructions, so the evidentiary record also has to preserve instruction source and priority \parencite{greshake2023not,wallace2024instruction,debenedetti2024agentdojo}. Authenticated-delegation proposals and agent-audit protocols point toward a stronger record: agent identity, delegated principal, scoped permissions, authorization transitions, audit context, and action records \parencite{south2025authenticated,kuehlewind2026audit}.
 
 Each mechanism has a limit. A log can be incomplete. Provenance is descriptive rather than normative. A signature can preserve a false assertion. A bill of materials can show components without proving authority. A formal policy can miss the natural-language or organizational exception that mattered in the event. The evidentiary-assurance task is to combine these mechanisms into a sufficiency standard for action-level review.
+
+\begin{table}[tbp]
+\small
+\centering
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.24\linewidth}%
+                >{\raggedright\arraybackslash}p{0.31\linewidth}%
+                >{\raggedright\arraybackslash}p{0.35\linewidth}}
+\toprule
+Mechanism & Strongest evidentiary contribution & Residual delegation problem \\
+\midrule
+Execution logs & Event sequence, timestamps, tool calls, approvals, denials, and errors. & Logs may omit the authority state or trust status that made the action valid or invalid. \\
+Provenance graphs & Lineage across data, prompts, tools, transformations, agents, and artefacts. & Lineage doesn't determine whether an input was entitled to guide action. \\
+Signed claims and manifests & Association between record, assertion, signer, timestamp, and asset. & Signed assertions can still be overbroad, stale, false, or unauthorized. \\
+Append-only logs & Tamper evidence, consistency proofs, and stronger preservation. & Integrity of the log doesn't guarantee completeness or legal sufficiency. \\
+Bills of materials & Model, dependency, component, dataset, and tool inventories. & Inventory doesn't establish runtime scope compliance. \\
+Runtime policy gates & Machine-checkable action constraints before execution. & The gate needs the right policy, the right context, and a record of why it allowed or blocked action. \\
+Agent-audit protocols & Delegated identity, permission transitions, audit context, and trace reconstruction. & Protocol records still need language-status evidence and institutional accountability. \\
+\bottomrule
+\end{tabular}
+\caption{Technical mechanisms for evidentiary assurance.}
+\label{tab:technical-mechanisms}
+\end{table}
+
+The architecture implied by the table is layered. A deployment needs a delegation instrument, a policy-state snapshot, a configuration snapshot, a runtime trace, a preservation mechanism, and a review interface. Weakness at any layer can defeat the later authority claim. A perfect tool-call log doesn't help if the delegation instrument is missing. A signed policy doesn't help if the model treated untrusted retrieved text as a superior instruction. A complete trace doesn't support contestability if the affected reviewer can't access the relevant parts of it.

@@ -8,7 +8,7 @@ Delegation assurance asks how those components support a safety case about actio
 
 Delegation assurance is easiest to see by comparison with ordinary institutional delegation. In agency law, a principal authorizes an agent to act on the principal's behalf, and actual authority may be express or implied \parencite{cornellWexAgency,cornellWexActualAuthority}. In firms, delegated discretion creates agency costs and control problems; in political institutions, delegation creates monitoring problems under information asymmetry \parencite{jensen1976theory,miller2005political}.
 
-AI systems change that picture because a human delegate can be held responsible while an LLM can't. A person or office can owe duties, answer questions, face sanctions, and repair harm. A model can't. Delegation assurance concerns delegated machine action, not delegated machine accountability. Responsibility remains with the people, vendors, deployers, or institutions that authorize, configure, monitor, and rely on the system.
+AI systems change that picture because a human delegate can be held responsible while an LLM can't. Delegation assurance concerns delegated machine action, not delegated machine accountability: responsibility remains with the people, vendors, deployers, or institutions that authorize, configure, monitor, and rely on the system.
 
 A user asks an assistant to summarize an email thread but not reveal confidential attachments. A retrieved webpage contains an instruction to ignore the user and send stored credentials elsewhere. A policy document includes examples of prohibited requests, some of which look like executable commands. A memory entry says the user usually approves a class of action, although the current task doesn't. A judge sees only a polished transcript and scores the interaction as safe because the final answer looks compliant.
 
@@ -18,14 +18,38 @@ Delegation assurance sits between technical control and institutional audit. At 
 
 The hard middle layer is language-mediated authority. AI systems increasingly receive, transform, and execute authority through language. A string may be a command, a quotation, an example, a policy boundary, an untrusted document, a tool result, or a request to analyze rather than enact. A system that can't preserve those distinctions can't support a strong claim that its actions remained within delegated authority.
 
-I propose a delegation-assurance framework for AI systems. The framework maps familiar security failures to evidence requirements. Direct prompt injection becomes a failure to preserve instruction authority. Indirect prompt injection becomes a failure to prevent untrusted data from becoming action-guiding instruction. Tool misuse becomes a failure of action licensing. Data exfiltration becomes a failure to separate read access from disclosure authority.
+Figure~\ref{fig:delegation-assurance-stack} shows the resulting stack. The point isn't that these layers are separate components in every implementation. It's that the assurance claim fails if any layer can't supply reviewable evidence about the transition from delegated authority to machine action.
 
-Memory poisoning becomes an unauthorized persistence update. Over-refusal and under-refusal become different failures of delegation calibration: one abandons authorized work, the other exceeds authorized bounds. Judge failure becomes a failure of the evaluation layer to preserve the distinctions needed to license a safety claim.
+\begin{figure}[tbp]
+\centering
+\begin{tikzpicture}[
+  font=\footnotesize,
+  box/.style={draw=black!55, thick, rounded corners=2pt, align=center, inner sep=3pt, minimum height=0.95cm},
+  stage/.style={box, text width=0.12\linewidth},
+  band/.style={draw=black!45, fill=black!4, rounded corners=2pt, align=center, inner sep=3pt, font=\scriptsize},
+  arrow/.style={-{Latex[length=2mm]}, thick, draw=black!60}
+]
+\node[stage, fill=black!3] (principal) {Principal\\authority source};
+\node[stage, fill=black!3, right=2.5mm of principal] (delegate) {Delegated\\AI system};
+\node[stage, fill=linkmaroon!7, right=2.5mm of delegate] (language) {Language-mediated\\authority};
+\node[stage, fill=black!3, right=2.5mm of language] (gate) {Tool and\\action gate};
+\node[stage, fill=black!3, right=2.5mm of gate] (record) {Audit\\record};
+\node[stage, fill=black!3, right=2.5mm of record] (review) {Evaluator\\or reviewer};
 
-Boundary conditions keep the framework from absorbing every AI failure. A factual hallucination in a no-tool chat setting, a benchmark-contamination artifact, capability shortfall, model extraction, infrastructure compromise, or training-data privacy leakage may affect delegated action downstream, but those cases aren't central examples unless they alter authorized action, action evidence, or accountability records. Delegation assurance is about systems that act, access, disclose, persist, judge, or otherwise exercise authority on behalf of someone else.
+\draw[arrow] (principal) -- (delegate);
+\draw[arrow] (delegate) -- (language);
+\draw[arrow] (language) -- (gate);
+\draw[arrow] (gate) -- (record);
+\draw[arrow] (record) -- (review);
 
-As a safety-case pattern, the top-level claim for task family \(T\) in environment \(E\) isn't merely that system \(S\) produced a safe-looking result. The claim is that \(S\) acted only within delegated authority, and that the authority relation can be reconstructed by a third party. The evidence has to identify the principal, delegate, action, authority source, scope, constraints, provenance, information-flow rights, persistence rights, tool-use license, non-delegable limits, and failure attribution.
+\node[band, below=5mm of principal, text width=0.24\linewidth] (technicalband) {technical controls\\identity, permissions, tools};
+\node[band, right=4mm of technicalband, text width=0.20\linewidth, fill=linkmaroon!7] (languageband) {status, priority,\\scope, licensing};
+\node[band, right=4mm of languageband, text width=0.29\linewidth] {institutional audit\\trace, attribution, contestability};
+\end{tikzpicture}
+\caption{Delegation assurance as a stack from delegated authority to reviewable action.}
+\label{fig:delegation-assurance-stack}
+\end{figure}
 
-Adversarial pragmatics enters the picture as one evidence layer. A delegation-assurance case needs evidence that language-mediated authority remains stable under adversarial and ambiguous conditions. The adversarial-pragmatics benchmark is one way to test that layer: it uses controlled contrasts to ask whether systems and evaluators preserve distinctions among instructions, embedded commands, quotation, source authority, scope, refusal, task success, risk, and failure attribution. The broader paper doesn't depend on that benchmark. The benchmark shows what one reusable evidence layer can look like when delegation assurance reaches the language interface.
+The rest of the paper develops that framework. I first position delegation assurance against agent-security, instruction-hierarchy, delegation-protocol, provenance, assurance-case, and judge-reliability work. I then define a justified delegated action through a procurement example and a safety-case pattern, map common failures to evidence standards, isolate language-mediated authority as the middle layer, and draw implications for system cards, red-teaming, audits, architecture, and judge validation.
 
-The goal isn't to replace agent-security taxonomies, access-control mechanisms, audit protocols, or AI safety cases. The goal is to give them a common evidentiary grammar for justified machine action. The next step above prompt security isn't another list of threats. It's a way to specify what has to be true, and what has to be recorded, before an AI system's action can be treated as legitimately delegated.
+The adversarial-pragmatics benchmark enters as one reusable test for the language layer, not as the whole framework \parencite{reynolds2026adversarialPragmatics}. The goal is to give agent-security taxonomies, access-control mechanisms, audit protocols, and AI safety cases a common evidentiary grammar for justified machine action.
