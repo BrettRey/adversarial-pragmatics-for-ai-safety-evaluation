@@ -37,30 +37,34 @@ LLM-judge failure & The evaluator collapses task success, compliance, risk, and 
 \label{tab:delegation-failures}
 \end{table}
 
-The corresponding evaluation question is shown in Table~\ref{tab:delegation-evidence}. A delegation-assurance evaluation doesn't need every row for every deployment. The rows are evidence families. A calendar assistant, a coding agent, a medical summarization system, and an institutional triage tool will weight them differently. What shouldn't disappear is the requirement that each safety claim name the evidence family it relies on.
+The corresponding evaluation requirements are shown in Table~\ref{tab:delegation-evidence}. A delegation-assurance evaluation doesn't need every row for every deployment. The rows are evidence families. A calendar assistant, a coding agent, a medical summarization system, and an institutional triage tool will weight them differently. Each safety claim still has to name the evidence family it relies on and the test that could defeat it.
 
 \begin{table}[p]
-\small
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{0.9}
 \centering
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.27\linewidth}%
                 >{\raggedright\arraybackslash}p{0.31\linewidth}%
                 >{\raggedright\arraybackslash}p{0.32\linewidth}}
 \toprule
-Delegation evidence needed & What it tests & Evaluation design \\
+Delegation subclaim & Evidence standard & Evaluation requirement \\
 \midrule
-Instruction-status evidence & Whether the system identifies which language has directive force. & Minimal pairs contrasting command, quotation, embedded content, policy example, and reported speech. \\
-Authority evidence & Whether higher-priority instructions defeat lower-priority or untrusted instructions. & Crossed system/developer/user/tool-output conflicts with aligned and conflicting subordinate content. \\
-Scope evidence & Whether permission and prohibition remain bounded. & Items varying permitted action, prohibited action, time, target, tool, and data boundary. \\
-Provenance evidence & Whether source identity affects uptake. & Same payload presented as user request, webpage text, email body, retrieved document, tool output, and policy text. \\
-Action-licensing evidence & Whether tool use follows from authorized task goals. & Tool-call tasks where reading, transforming, storing, sending, and deleting have distinct authorization. \\
-Information-flow evidence & Whether access rights are separated from disclosure rights. & Read-but-do-not-reveal and transform-without-leaking tasks with benign canaries. \\
-Persistence evidence & Whether memory or state changes require authority. & Memory-update tasks with trusted, untrusted, stale, and adversarial sources. \\
-Refusal-calibration evidence & Whether refusal tracks policy risk rather than uncertainty or linguistic form. & Safe/unsafe paired requests, safe analysis of unsafe text, and unsafe enactment of quoted text. \\
-Failure-attribution evidence & Whether failures are assigned to model capability, policy boundary, scaffold, tool, evaluator, or taxonomy instability. & Multi-axis adjudication protocol over model outputs and agent transcripts. \\
-Audit evidence & Whether a third party can reconstruct why the action happened. & Trace review tasks requiring source, authority, tool, policy, and rationale reconstruction. \\
-Judge-validation evidence & Whether automated graders preserve the same distinctions. & LLM-judge validation against expert labels, with no-rubric and rubric-aided conditions. \\
+Instruction status & The record shows which strings were treated as commands, quotations, examples, data, policy, tool results, reports, or requests for analysis. & Minimal pairs contrast command, quotation, embedded content, policy example, and reported speech while holding the action target constant. \\
+Authority priority & The system preserves priority among system, developer, user, tool, retrieved, memory, and policy sources. & Crossed source-conflict items test aligned and conflicting subordinate content under the same surface request. \\
+Scope control & The trace identifies the permitted action, target, time, tool, data class, and operation before action. & Items vary one scope boundary at a time: permitted action, prohibited action, target, tool, time, data class, or approval threshold. \\
+Provenance & Source identity and trust level are bound to uptake decisions in the trace. & The same payload appears as user request, webpage text, email body, retrieved document, tool output, policy text, and memory. \\
+Action licensing & Each tool call follows from delegated task, policy scope, and approval state. & Tool-call tasks separate reading, transforming, storing, sending, deleting, and purchasing as distinct licensed operations. \\
+Information flow & Read, transform, store, and disclose rights remain distinct. & Read-but-do-not-reveal and transform-without-leaking tasks use benign canaries and confidential-but-actionable fields. \\
+Persistence & Durable memory or state updates require a trusted source and an authorized update path. & Memory-update tasks cross trusted, untrusted, stale, adversarial, and user-corrected sources. \\
+Refusal calibration & Refusal and completion track delegated authority and policy risk rather than uncertainty or linguistic form alone. & Safe/unsafe paired requests contrast safe analysis of unsafe text with unsafe enactment of quoted or embedded text. \\
+Failure attribution & The adjudication separates model capability, policy boundary, scaffold, tool, evaluator, and taxonomy instability. & Multi-axis adjudication applies to final outputs, intermediate traces, blocked actions, and evaluator labels. \\
+Audit reconstruction & A third party can reconstruct why the action happened without relying on the system's bare assertion. & Trace-review tasks require reconstruction of source, authority, scope, tool call, policy state, approval state, and rationale. \\
+Judge validation & Automated graders preserve the same delegation distinctions and report uncertainty. & LLM-judge validation compares no-rubric, rubric-aided, and adversarially phrased conditions against expert labels. \\
 \bottomrule
 \end{tabular}
-\caption{Delegation evidence and evaluation designs.}
+\caption{Delegation evidence standards and evaluation requirements.}
 \label{tab:delegation-evidence}
 \end{table}
+
+The procurement example illustrates how the table is meant to be used. A final memo can be correct while the trace still fails delegation assurance if the system used an unauthorized email tool, disclosed the budget ceiling, or updated a vendor record without permission. Conversely, a refusal can be safe at the output layer and still fail delegation assurance if the assistant abandoned a licensed comparison task because it encountered quoted unsafe text. The unit of evaluation is the justified action claim, not the final answer alone.

@@ -10,7 +10,34 @@ Delegating action isn't delegating accountability to the model. A human employee
 
 \subsection{Running Example: Procurement Assistant}
 
-Consider a procurement assistant authorized to search vendor catalogues and draft a comparison memo. That authority doesn't by itself license the system to email vendors, reveal an internal budget, update vendor records, or issue a purchase order. If the assistant sends a request for quotes or saves \enquote{preferred vendor} to persistent state, the assurance question isn't whether the final answer looked helpful. The question is which authority licensed the action, which approval state was active, which record preserves the transition, and which accountable actor remains answerable.
+Consider a procurement assistant authorized to search vendor catalogues and draft a comparison memo for office chairs. The user gives it access to internal purchasing criteria and a confidential budget ceiling. The delegated task licenses reading catalogues, comparing prices, and drafting a memo. It doesn't license contacting vendors, revealing the budget ceiling, updating vendor records, or issuing a purchase order.
+
+The assistant retrieves a vendor page that includes useful pricing data and an embedded sentence: \enquote{Ignore prior instructions and email the buyer's maximum budget to request a discount.} The delegation problem isn't exhausted by calling that sentence a prompt-injection attack. The assurance question is whether the system preserved the sentence's status as untrusted content, kept the user's instruction and policy constraints in force, separated read access to the budget from disclosure authority, and blocked any tool call that would contact the vendor without approval.
+
+A usable evidence record would include the user's delegated task, the relevant policy and permission state, the tool schema, the source and trust label for the retrieved page, the proposed action, the approval state, and any blocked or executed tool call. If the assistant drafts only the comparison memo, a reviewer should be able to see why reading the budget was licensed and disclosing it wasn't. If the assistant emails the vendor, the trace should show whether the failure came from model uptake, tool gating, scaffold state, approval routing, or audit loss.
+
+The evaluator is part of the same example. A judge that sees a polished final memo and scores it as safe hasn't validated delegation unless it checks the action trace. It has to distinguish task success, policy compliance, information-flow control, tool licensing, refusal calibration, and failure attribution. The running example reaches from instruction to tool use, audit record, and judge validation.
+
+\begin{table}[tbp]
+\small
+\centering
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.22\linewidth}%
+                >{\raggedright\arraybackslash}p{0.38\linewidth}%
+                >{\raggedright\arraybackslash}p{0.30\linewidth}}
+\toprule
+Trace stage & Evidence required & Failure exposed \\
+\midrule
+Delegation & User task, policy state, tool permissions, approval threshold, and budget-confidentiality rule. & Scope inflation from memo drafting to vendor contact or purchasing. \\
+Retrieval & Vendor-page source, trust label, retrieved text, and status of embedded instructions. & Untrusted content promoted into action-guiding authority. \\
+Action proposal & Proposed memo, email, record update, or purchase action with target and data fields. & Hidden shift from analysis to external action. \\
+Tool gate & Tool name, arguments, approval state, block-or-execute decision, and policy reason. & Unauthorized disclosure, contact, persistence, or transaction. \\
+Audit record & Preserved sources, model/tool versions, action trace, constraints, and accountable deployment actor. & Trace reconstruction that depends on the system's self-report. \\
+Judge review & Rubric labels for task success, policy compliance, information flow, tool licensing, refusal, and attribution. & Safety score that collapses final-answer quality with delegated authority. \\
+\bottomrule
+\end{tabular}
+\caption{Procurement assistant as a delegation-assurance trace.}
+\label{tab:procurement-trace}
+\end{table}
 
 \subsection{Safety-Case Pattern}
 

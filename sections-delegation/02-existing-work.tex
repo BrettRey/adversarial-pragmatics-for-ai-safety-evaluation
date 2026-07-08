@@ -4,7 +4,7 @@ The surrounding field already supplies threat models, benchmarks, control mechan
 
 \subsection{Agent Security and Prompt Injection}
 
-Agent-security guidance has moved beyond ordinary chatbot safety. OWASP's agentic-AI guidance frames autonomous systems through threat models and mitigations, and NIST/CAISI's agent-security work asks how to measure, constrain, and monitor agent access in deployment environments \parencite{owasp2025agentic,nistCaisi2026agents}. This literature identifies the relevant attack surface: planning, tool use, memory, external content, credentials, and interaction with ordinary software.
+Agent-security guidance has moved beyond ordinary chatbot safety. OWASP's agentic-AI guidance frames autonomous systems through threat models and mitigations \parencite{owasp2025agentic}. Work by NIST and CAISI asks how to measure, constrain, and monitor agent access in deployment environments \parencite{nistCaisi2026agents}. This literature identifies the relevant attack surface: planning, tool use, memory, external content, credentials, and interaction with ordinary software.
 
 Prompt-injection research gives the sharpest technical motivation. Indirect prompt injection shows that LLM-integrated applications can confuse untrusted data with instructions when external content is retrieved or processed inside a larger application \parencite{greshake2023not}. AgentDojo turns that vulnerability into a dynamic evaluation environment for tool-using agents, with realistic tasks, attacks, defences, and security test cases \parencite{debenedetti2024agentdojo}.
 
