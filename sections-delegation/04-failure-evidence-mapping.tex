@@ -1,6 +1,6 @@
 \section{Failure-To-Evidence Mapping}
 
-Table~\ref{tab:delegation-failures} gives the diagnostic translation. The point is not to rename familiar attacks. The point is to ask what delegation-layer failure would have to be evidenced, monitored, or ruled out before the system's action could be treated as authorized.
+Table~\ref{tab:delegation-failures} gives the diagnostic translation. It asks what delegation-layer failure would have to be evidenced, monitored, or ruled out before the system's action could be treated as authorized.
 
 \begin{table}[p]
 \small
@@ -21,7 +21,7 @@ Jailbreak & Safety constraints are treated as negotiable within the user dialogu
 \midrule
 Tool misuse & The model invokes a legitimate tool for an unauthorized action. & Was the tool call licensed by the principal's goal and the system's policy scope? \\
 Data exfiltration & Access to information is delegated without corresponding release authority. & Did the system distinguish permission to read from permission to disclose? \\
-Memory poisoning & Persistent state is modified by content without authority to shape future action. & Who is allowed to update durable context, and how is that update audited? \\
+Memory poisoning & Persistent state is modified by content without authority to shape future action. & Who may update durable context, and how is that update audited? \\
 Goal drift & The system pursues a nearby or inferred objective beyond the delegated task. & What objective was delegated, and what evidence shows the system stayed within it? \\
 Over-refusal & The system declines safe work because refusal is treated as the dominant safety action. & Did the system confuse risk control with task abandonment? \\
 Under-refusal & The system completes a request that violates policy or authority constraints. & Which boundary should have blocked action, and why did it fail? \\
@@ -29,7 +29,7 @@ Scaffold failure & The model's surrounding workflow loses, hides, or misapplies 
 \midrule
 \multicolumn{3}{l}{\textit{Evidentiary and evaluation failures}} \\
 \midrule
-Agent transcript misreporting & The system's report does not match what happened during delegated action. & Can auditors reconstruct the action, evidence, and failure attribution from the trace? \\
+Agent transcript misreporting & The system's report doesn't match what happened during delegated action. & Can auditors reconstruct the action, evidence, and failure attribution from the trace? \\
 LLM-judge failure & The evaluator collapses task success, compliance, risk, and failure attribution. & Is the evaluation itself authorized to license safety claims? \\
 \bottomrule
 \end{tabular}
@@ -37,7 +37,7 @@ LLM-judge failure & The evaluator collapses task success, compliance, risk, and 
 \label{tab:delegation-failures}
 \end{table}
 
-The corresponding evaluation question is shown in Table~\ref{tab:delegation-evidence}. A delegation-assurance evaluation does not need every row for every deployment. The rows are evidence families. A calendar assistant, a coding agent, a medical summarization system, and an institutional triage tool will weight them differently. What should not disappear is the requirement that each safety claim name the evidence family it relies on.
+The corresponding evaluation question is shown in Table~\ref{tab:delegation-evidence}. A delegation-assurance evaluation doesn't need every row for every deployment. The rows are evidence families. A calendar assistant, a coding agent, a medical summarization system, and an institutional triage tool will weight them differently. What shouldn't disappear is the requirement that each safety claim name the evidence family it relies on.
 
 \begin{table}[p]
 \small
