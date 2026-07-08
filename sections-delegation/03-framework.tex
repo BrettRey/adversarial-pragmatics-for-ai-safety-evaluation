@@ -1,8 +1,16 @@
 \section{Delegated Action: Principal, Authority, Scope, and Evidence}
 
-By \term{justified}, this paper means justified for the purposes of security and assurance: there is enough evidence to support the claim that the action remained within delegated authority in the relevant operational context. The claim is narrower than moral, legal, or political legitimacy. A procedurally justified action may still be unwise, harmful, illegal in a particular jurisdiction, or institutionally unacceptable. Delegation assurance asks whether the security and assurance record supports the claim that the system stayed inside the authority it was given.
+By \term{justified}, this paper means justified for the purposes of security and assurance: there's enough evidence to support the claim that the action remained within delegated authority in the relevant operational context. The claim is narrower than moral, legal, or political legitimacy. A procedurally justified action may still be ill-advised, harmful, illegal in a particular jurisdiction, or institutionally unacceptable. Delegation assurance asks whether the security and assurance record supports the claim that the system stayed inside the authority it was given.
 
 A delegated AI action is justified only when a reviewer can reconstruct, from evidence independent of the system's bare assertion, who authorized the action, what action was licensed, under what scope and constraints, through which sources and tools, with what information-flow and persistence rights, subject to which non-delegable limits, and with what attribution if control fails.
+
+\subsection{Accountability Asymmetry}
+
+Delegating action isn't delegating accountability to the model. A human employee, officer, contractor, or professional delegate can be a responsible agent in the ordinary institutional sense. An LLM can't owe fiduciary duties, answer under sanction, exercise legal judgment, or repair harm as an accountable subject \parencite{cornellWexPrincipal}. The accountable bearer is the human, team, vendor, deployer, or institution that configured and used the system. The model is part of the mechanism whose action record has to support that attribution.
+
+\subsection{Running Example: Procurement Assistant}
+
+Consider a procurement assistant authorized to search vendor catalogues and draft a comparison memo. That authority doesn't by itself license the system to email vendors, reveal an internal budget, update vendor records, or issue a purchase order. If the assistant sends a request for quotes or saves \enquote{preferred vendor} to persistent state, the assurance question isn't whether the final answer looked helpful. The question is which authority licensed the action, which approval state was active, which record preserves the transition, and which accountable actor remains answerable.
 
 \subsection{Safety-Case Pattern}
 
@@ -23,4 +31,4 @@ The framework can be written as a compact claim/argument/evidence pattern.
 
 Not every AI-security failure is primarily a delegation failure. Core delegation failures involve delegated action, delegated access, delegated disclosure, delegated persistence, delegated judgment, delegated evaluation, or delegated record-keeping for accountability.
 
-Non-core cases include ordinary hallucination in no-tool chat, model extraction, benchmark contamination, infrastructure compromise, training-data leakage, and capability shortfall without action rights. These can affect delegation downstream, but they are not delegation failures unless they alter authorized action or auditability.
+Non-core cases include ordinary hallucination in no-tool chat, model extraction, benchmark contamination, infrastructure compromise, training-data leakage, and capability shortfall without action rights. These can affect delegation downstream, but they aren't delegation failures unless they alter authorized action or auditability.
