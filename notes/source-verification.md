@@ -74,6 +74,7 @@ Checked 2026-06-26 for use in the literature review, benchmark design, and citat
 | L49 | https://oll.libertyfund.org/publications/reading-room/hayek-boll-12-f-a-hayek-the-use-of-knowledge-in-society-1945 | Hayek's "The Use of Knowledge in Society" argues that prices disseminate widely diffused knowledge about demand and resource availability. | verified 2026-07-08; knowledge-problem analogy |
 | L50 | https://link.springer.com/article/10.1007/BF01103327 | Klein's "Economic Calculation and the Limits of Organization" applies Austrian economic-calculation arguments to the theory of the firm and limits of organization. | verified 2026-07-08; firm-boundary analogy |
 | L51 | https://masonlec.org/site/rte_uploads/files/Masten_Coase_Nature%20of%20the%20Firm%20-excerpt.pdf | Coase argues that firms substitute internal entrepreneurial coordination for market coordination, but firm size is limited where internal organizing costs and mistakes offset the benefits of internal coordination. | verified 2026-07-08; firm-boundary analogy |
+| L52 | `/Users/brettreynolds/Downloads/2026037pap.md`; https://doi.org/10.17016/FEDS.2026.037 | Klee et al. argue that digital money backed by safe reserves can still be fragile when the settlement rail relies on congestion-sensitive decentralized verification, separating liability safety from rail fragility. | verified 2026-07-08; evidentiary-assurance infrastructure analogy |
 
 ## Verification Rule
 
