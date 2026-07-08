@@ -1,0 +1,40 @@
+\documentclass[12pt]{article}
+
+% House style preamble
+\input{.house-style/preamble.tex}
+
+\setlength{\headheight}{13.6pt}
+\emergencystretch=2em
+
+\hypersetup{
+  pdftitle={Delegation Assurance for AI Systems: Evidence Standards for Justified Machine Action},
+  pdfkeywords={AI security, AI agents, delegation assurance, prompt injection, auditability, safety cases, LLM judges}
+}
+
+\title{Delegation Assurance for AI Systems: Evidence Standards for Justified Machine Action}
+\author{Brett Reynolds \orcidlink{0000-0003-0073-7195}%
+\thanks{Contact: \href{mailto:brett.reynolds@humber.ca}{brett.reynolds@humber.ca}}\\
+Humber Polytechnic \& University of Toronto}
+\date{July 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Current agent-security work provides threat taxonomies, attacks, defences, benchmarks, and architectural controls. Less developed is the evidentiary question: what would justify the claim that an AI system's action remained within delegated authority? This paper calls that problem \term{delegation assurance}. Delegation assurance requires evidence across three layers: technical control, language-mediated authority, and institutional audit. I map common AI-security failures to delegation-layer failures and derive evaluation designs for authority uptake, scope control, tool licensing, information flow, persistence, refusal calibration, audit reconstruction, and judge validation. The goal is not to replace agent-security taxonomies, access-control mechanisms, audit protocols, or AI safety cases. The goal is to give them a common evidentiary grammar for justified machine action.
+\end{abstract}
+
+\noindent\textbf{Keywords:} AI security; AI agents; delegation assurance; prompt injection; auditability; safety cases; LLM judges
+
+\input{sections-delegation/01-introduction}
+\input{sections-delegation/02-existing-work}
+\input{sections-delegation/03-framework}
+\input{sections-delegation/04-failure-evidence-mapping}
+\input{sections-delegation/05-language-mediated-authority}
+\input{sections-delegation/06-implications}
+\input{sections-delegation/07-conclusion}
+
+\clearpage
+\printbibliography
+
+\end{document}

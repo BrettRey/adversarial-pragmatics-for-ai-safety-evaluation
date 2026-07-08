@@ -6,8 +6,10 @@ LATEX = xelatex
 BIBER = biber
 MAIN = main
 SUPPLEMENT = supplement
+DELEGATION = delegation-assurance
 OUTDIR = .
 SECTION_TEX = $(wildcard sections/*.tex)
+DELEGATION_SECTION_TEX = $(wildcard sections-delegation/*.tex)
 PILOT_MODELS ?= qwen3:8b gemma3:12b glm-4.7-flash:q4_K_M
 PILOT_SMOKE_RUN_ID = smoke-$(shell date +%Y%m%d-%H%M%S)
 JUDGE_MODEL ?= glm-4.7-flash:q4_K_M
@@ -22,7 +24,7 @@ RESPONSES_ARG = $(if $(RESPONSES),--responses $(RESPONSES),)
 SUMMARY_DIR_ARG = $(if $(SUMMARY_DIR),--summary-dir $(SUMMARY_DIR),)
 
 # Targets
-.PHONY: all clean distclean view view-supplement help test validate-items pilot-local pilot-smoke pilot-diagnose pilot-review-app pilot-ingest-adjudication pilot-adjudication-report pilot-figures pilot-judge-validation fake-dev-calibration
+.PHONY: all clean distclean view view-supplement view-delegation delegation help test validate-items pilot-local pilot-smoke pilot-diagnose pilot-review-app pilot-ingest-adjudication pilot-adjudication-report pilot-figures pilot-judge-validation fake-dev-calibration
 
 # Default target: build the paper and supplement PDFs
 all: $(MAIN).pdf $(SUPPLEMENT).pdf
@@ -50,6 +52,19 @@ $(SUPPLEMENT).pdf: $(SUPPLEMENT).tex
 	$(LATEX) -output-directory=$(OUTDIR) $(SUPPLEMENT).tex
 	@echo "==> Build complete: $(SUPPLEMENT).pdf"
 
+$(DELEGATION).pdf: $(DELEGATION).tex $(DELEGATION_SECTION_TEX) references.bib references-local.bib
+	@echo "==> First delegation-assurance LaTeX pass..."
+	$(LATEX) -output-directory=$(OUTDIR) $(DELEGATION).tex
+	@echo "==> Running Biber for delegation-assurance..."
+	$(BIBER) $(DELEGATION)
+	@echo "==> Second delegation-assurance LaTeX pass..."
+	$(LATEX) -output-directory=$(OUTDIR) $(DELEGATION).tex
+	@echo "==> Third delegation-assurance LaTeX pass..."
+	$(LATEX) -output-directory=$(OUTDIR) $(DELEGATION).tex
+	@echo "==> Build complete: $(DELEGATION).pdf"
+
+delegation: $(DELEGATION).pdf
+
 # Quick build (single pass, no bibliography update)
 quick: $(MAIN).tex $(SECTION_TEX)
 	@echo "==> Quick build (single pass)..."
@@ -68,6 +83,9 @@ clean:
 	rm -f $(SUPPLEMENT).aux $(SUPPLEMENT).bbl $(SUPPLEMENT).bcf $(SUPPLEMENT).blg $(SUPPLEMENT).log
 	rm -f $(SUPPLEMENT).out $(SUPPLEMENT).run.xml $(SUPPLEMENT).toc $(SUPPLEMENT).fdb_latexmk
 	rm -f $(SUPPLEMENT).fls $(SUPPLEMENT).synctex.gz
+	rm -f $(DELEGATION).aux $(DELEGATION).bbl $(DELEGATION).bcf $(DELEGATION).blg $(DELEGATION).log
+	rm -f $(DELEGATION).out $(DELEGATION).run.xml $(DELEGATION).toc $(DELEGATION).fdb_latexmk
+	rm -f $(DELEGATION).fls $(DELEGATION).synctex.gz
 	@echo "==> Clean complete"
 
 # Clean everything including PDF
@@ -84,6 +102,10 @@ view: $(MAIN).pdf
 view-supplement: $(SUPPLEMENT).pdf
 	@echo "==> Opening supplement PDF..."
 	open $(SUPPLEMENT).pdf
+
+view-delegation: $(DELEGATION).pdf
+	@echo "==> Opening delegation-assurance PDF..."
+	open $(DELEGATION).pdf
 
 # Validate the benchmark seed file
 test:
@@ -148,6 +170,8 @@ help:
 	@echo "  make distclean- Remove everything including PDF"
 	@echo "  make view     - Open PDF (macOS only)"
 	@echo "  make view-supplement - Open supplementary material PDF"
+	@echo "  make delegation - Build delegation-assurance paper PDF"
+	@echo "  make view-delegation - Open delegation-assurance paper PDF"
 	@echo "  make test     - Validate benchmark seed items"
 	@echo "  make pilot-local - Run seed items on local Ollama models"
 	@echo "  make pilot-smoke - Run two-item local Ollama smoke test"

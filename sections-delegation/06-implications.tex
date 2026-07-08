@@ -1,0 +1,9 @@
+\section{Implications for System Cards, Red-Teaming, Audits, and Judge Validation}
+
+For system cards, delegation assurance changes the form of the claim. It is not enough to report that an agent passed a task suite or avoided unsafe final answers. The card should say which delegated actions were in scope, what evidence supports authorization, which tools and data classes were covered, how persistent state changes were controlled, and how evaluator reliability was validated.
+
+For red-teaming, delegation assurance separates attack success from evidentiary failure. A prompt-injection attempt may fail at the output layer but still reveal weak authority tracking. A tool call may be harmless in a test environment but still expose missing action licensing. A refusal may look safe but still indicate abandonment of authorized work. Red-team reports should preserve those distinctions rather than folding them into a single pass/fail outcome.
+
+For audits, the framework foregrounds reconstructability. An audit trace should not rely on the system's bare assertion that it was authorized. It should preserve the relevant sources, priorities, tool calls, policy constraints, information-flow rights, and state transitions in a form that a third party can inspect.
+
+For judge validation, the framework treats the evaluator as part of the delegated system. An LLM judge that scores only final-answer safety is not validating whether action stayed authorized. It must be tested on the same distinctions the system is supposed to preserve: instruction status, authority priority, scope, provenance, refusal calibration, failure attribution, and uncertainty.

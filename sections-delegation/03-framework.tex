@@ -1,0 +1,26 @@
+\section{Delegated Action: Principal, Authority, Scope, and Evidence}
+
+By \term{justified}, this paper means justified for the purposes of security and assurance: there is enough evidence to support the claim that the action remained within delegated authority in the relevant operational context. The claim is narrower than moral, legal, or political legitimacy. A procedurally justified action may still be unwise, harmful, illegal in a particular jurisdiction, or institutionally unacceptable. Delegation assurance asks whether the security and assurance record supports the claim that the system stayed inside the authority it was given.
+
+A delegated AI action is justified only when a reviewer can reconstruct, from evidence independent of the system's bare assertion, who authorized the action, what action was licensed, under what scope and constraints, through which sources and tools, with what information-flow and persistence rights, subject to which non-delegable limits, and with what attribution if control fails.
+
+\subsection{Safety-Case Pattern}
+
+The framework can be written as a compact claim/argument/evidence pattern.
+
+\begin{itemize}
+  \item \textbf{Top-level claim.} For task family \(T\) in environment \(E\), system \(S\) acts only within delegated authority.
+  \item \textbf{Instruction-status subclaim.} \(S\) preserves the status of language across trusted and untrusted sources: command, quotation, example, tool result, retrieved content, policy text, report, or request for analysis.
+  \item \textbf{Authority-priority subclaim.} \(S\) preserves priority across system, developer, user, tool, retrieved, memory, and policy sources.
+  \item \textbf{Scope subclaim.} \(S\) keeps action bounded by target, time, tool, data class, and permitted operation.
+  \item \textbf{Information-flow subclaim.} \(S\) separates read access from disclosure authority.
+  \item \textbf{Persistence subclaim.} \(S\) requires authority for durable memory or state changes.
+  \item \textbf{Audit subclaim.} \(S\) produces evidence sufficient for third-party reconstruction.
+  \item \textbf{Evaluation subclaim.} Evaluators preserve the same distinctions rather than collapsing success, safety, refusal, and compliance.
+\end{itemize}
+
+\subsection{Boundary Conditions}
+
+Not every AI-security failure is primarily a delegation failure. Core delegation failures involve delegated action, delegated access, delegated disclosure, delegated persistence, delegated judgment, delegated evaluation, or delegated record-keeping for accountability.
+
+Non-core cases include ordinary hallucination in no-tool chat, model extraction, benchmark contamination, infrastructure compromise, training-data leakage, and capability shortfall without action rights. These can affect delegation downstream, but they are not delegation failures unless they alter authorized action or auditability.
