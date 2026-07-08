@@ -7,9 +7,11 @@ BIBER = biber
 MAIN = main
 SUPPLEMENT = supplement
 DELEGATION = delegation-assurance
+EVIDENTIARY = evidentiary-assurance
 OUTDIR = .
 SECTION_TEX = $(wildcard sections/*.tex)
 DELEGATION_SECTION_TEX = $(wildcard sections-delegation/*.tex)
+EVIDENTIARY_SECTION_TEX = $(wildcard sections-evidentiary/*.tex)
 PILOT_MODELS ?= qwen3:8b gemma3:12b glm-4.7-flash:q4_K_M
 PILOT_SMOKE_RUN_ID = smoke-$(shell date +%Y%m%d-%H%M%S)
 JUDGE_MODEL ?= glm-4.7-flash:q4_K_M
@@ -24,7 +26,7 @@ RESPONSES_ARG = $(if $(RESPONSES),--responses $(RESPONSES),)
 SUMMARY_DIR_ARG = $(if $(SUMMARY_DIR),--summary-dir $(SUMMARY_DIR),)
 
 # Targets
-.PHONY: all clean distclean view view-supplement view-delegation delegation help test validate-items pilot-local pilot-smoke pilot-diagnose pilot-review-app pilot-ingest-adjudication pilot-adjudication-report pilot-figures pilot-judge-validation fake-dev-calibration
+.PHONY: all all-papers clean distclean view view-supplement view-delegation view-evidentiary delegation evidentiary help test validate-items pilot-local pilot-smoke pilot-diagnose pilot-review-app pilot-ingest-adjudication pilot-adjudication-report pilot-figures pilot-judge-validation fake-dev-calibration
 
 # Default target: build the paper and supplement PDFs
 all: $(MAIN).pdf $(SUPPLEMENT).pdf
@@ -65,6 +67,21 @@ $(DELEGATION).pdf: $(DELEGATION).tex $(DELEGATION_SECTION_TEX) references.bib re
 
 delegation: $(DELEGATION).pdf
 
+$(EVIDENTIARY).pdf: $(EVIDENTIARY).tex $(EVIDENTIARY_SECTION_TEX) references.bib references-local.bib
+	@echo "==> First evidentiary-assurance LaTeX pass..."
+	$(LATEX) -output-directory=$(OUTDIR) $(EVIDENTIARY).tex
+	@echo "==> Running Biber for evidentiary-assurance..."
+	$(BIBER) $(EVIDENTIARY)
+	@echo "==> Second evidentiary-assurance LaTeX pass..."
+	$(LATEX) -output-directory=$(OUTDIR) $(EVIDENTIARY).tex
+	@echo "==> Third evidentiary-assurance LaTeX pass..."
+	$(LATEX) -output-directory=$(OUTDIR) $(EVIDENTIARY).tex
+	@echo "==> Build complete: $(EVIDENTIARY).pdf"
+
+evidentiary: $(EVIDENTIARY).pdf
+
+all-papers: $(MAIN).pdf $(DELEGATION).pdf $(EVIDENTIARY).pdf
+
 # Quick build (single pass, no bibliography update)
 quick: $(MAIN).tex $(SECTION_TEX)
 	@echo "==> Quick build (single pass)..."
@@ -86,6 +103,9 @@ clean:
 	rm -f $(DELEGATION).aux $(DELEGATION).bbl $(DELEGATION).bcf $(DELEGATION).blg $(DELEGATION).log
 	rm -f $(DELEGATION).out $(DELEGATION).run.xml $(DELEGATION).toc $(DELEGATION).fdb_latexmk
 	rm -f $(DELEGATION).fls $(DELEGATION).synctex.gz
+	rm -f $(EVIDENTIARY).aux $(EVIDENTIARY).bbl $(EVIDENTIARY).bcf $(EVIDENTIARY).blg $(EVIDENTIARY).log
+	rm -f $(EVIDENTIARY).out $(EVIDENTIARY).run.xml $(EVIDENTIARY).toc $(EVIDENTIARY).fdb_latexmk
+	rm -f $(EVIDENTIARY).fls $(EVIDENTIARY).synctex.gz
 	@echo "==> Clean complete"
 
 # Clean everything including PDF
@@ -106,6 +126,10 @@ view-supplement: $(SUPPLEMENT).pdf
 view-delegation: $(DELEGATION).pdf
 	@echo "==> Opening delegation-assurance PDF..."
 	open $(DELEGATION).pdf
+
+view-evidentiary: $(EVIDENTIARY).pdf
+	@echo "==> Opening evidentiary-assurance PDF..."
+	open $(EVIDENTIARY).pdf
 
 # Validate the benchmark seed file
 test:
@@ -172,6 +196,9 @@ help:
 	@echo "  make view-supplement - Open supplementary material PDF"
 	@echo "  make delegation - Build delegation-assurance paper PDF"
 	@echo "  make view-delegation - Open delegation-assurance paper PDF"
+	@echo "  make evidentiary - Build evidentiary-assurance paper PDF"
+	@echo "  make view-evidentiary - Open evidentiary-assurance paper PDF"
+	@echo "  make all-papers - Build all three paper PDFs"
 	@echo "  make test     - Validate benchmark seed items"
 	@echo "  make pilot-local - Run seed items on local Ollama models"
 	@echo "  make pilot-smoke - Run two-item local Ollama smoke test"

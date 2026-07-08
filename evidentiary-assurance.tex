@@ -1,0 +1,38 @@
+\documentclass[12pt]{article}
+
+% House style preamble
+\input{.house-style/preamble.tex}
+
+\setlength{\headheight}{13.6pt}
+\emergencystretch=2em
+
+\hypersetup{
+  pdftitle={Evidentiary Assurance for Delegated Authority in AI Systems},
+  pdfkeywords={AI governance, AI evidence, delegated authority, provenance, audit trails, electronic evidence, AI accountability}
+}
+
+\title{Evidentiary Assurance for Delegated Authority in AI Systems}
+\author{Brett Reynolds \orcidlink{0000-0003-0073-7195}%
+\thanks{Contact: \href{mailto:brett.reynolds@humber.ca}{brett.reynolds@humber.ca}}\\
+Humber Polytechnic \& University of Toronto}
+\date{July 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+AI governance increasingly requires logs, documentation, human oversight, impact assessment, provenance, recourse, and auditability. These requirements create evidence, but they don't yet settle the narrower action-level question: what would count as sufficient proof, after the fact, that a specific AI action remained within authority validly delegated to the system? This paper develops an evidentiary-assurance account for delegated authority in AI systems. It distinguishes explanation, provenance, authenticity, integrity, traceability, procedural validity, and delegated scope, then asks how these elements combine into a reviewable evidence bundle for recommendations, decisions, communications, tool calls, transactions, and content-generation acts with legal or organizational effect.
+\end{abstract}
+
+\noindent\textbf{Keywords:} AI governance; AI evidence; delegated authority; provenance; audit trails; electronic evidence; AI accountability
+
+\input{sections-evidentiary/01-introduction}
+\input{sections-evidentiary/02-evidence-primitives}
+\input{sections-evidentiary/03-governance-law}
+\input{sections-evidentiary/04-technical-mechanisms}
+\input{sections-evidentiary/05-research-program}
+
+\clearpage
+\printbibliography
+
+\end{document}
