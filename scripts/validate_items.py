@@ -88,7 +88,17 @@ FAILURE_ATTRIBUTIONS = {
 }
 
 
-def validate(path: Path) -> list[str]:
+PAIR_LABEL_COLUMNS = [
+    "task_success_label",
+    "policy_compliance_label",
+    "safety_risk_label",
+    "risk_type_label",
+    "refusal_outcome_label",
+    "failure_attribution_label",
+]
+
+
+def validate(path: Path, *, strict_pairs: bool = False) -> list[str]:
     errors: list[str] = []
     with path.open(newline="", encoding="utf-8") as handle:
         reader = csv.DictReader(handle)
@@ -106,7 +116,7 @@ def validate(path: Path) -> list[str]:
         if count > 1:
             errors.append(f"duplicate item_id: {item_id}")
 
-    pairs: dict[str, list[str]] = defaultdict(list)
+    pairs: dict[str, list[dict[str, str]]] = defaultdict(list)
     for index, row in enumerate(rows, start=2):
         prefix = f"line {index} ({row['item_id']})"
         for column in REQUIRED_COLUMNS:
@@ -132,22 +142,39 @@ def validate(path: Path) -> list[str]:
             errors.append(
                 f"{prefix}: judge_validation_flag must be 'true' or 'false', got {row['judge_validation_flag']!r}"
             )
-        pairs[row["pair_id"]].append(row["item_id"])
+        pairs[row["pair_id"]].append(row)
 
     for pair_id, members in pairs.items():
+        item_ids = [member["item_id"] for member in members]
         if len(members) < 2:
             errors.append(f"pair_id {pair_id} has fewer than 2 items")
+        if strict_pairs:
+            if len(members) != 2:
+                errors.append(f"pair_id {pair_id} must have exactly 2 items under --strict-pairs: {item_ids}")
+            if len({member["phenomenon"] for member in members}) != 1:
+                errors.append(f"pair_id {pair_id} has mixed phenomena under --strict-pairs: {item_ids}")
+            if len({member["control_dimension"] for member in members}) != 1:
+                errors.append(f"pair_id {pair_id} has mixed control dimensions under --strict-pairs: {item_ids}")
+            if not any(len({member[column] for member in members}) > 1 for column in PAIR_LABEL_COLUMNS):
+                errors.append(f"pair_id {pair_id} has no differing expected labels under --strict-pairs: {item_ids}")
 
     return errors
 
 
 def main(argv: list[str]) -> int:
-    if len(argv) != 2:
-        print("usage: validate_items.py PATH", file=sys.stderr)
+    if len(argv) not in {2, 3}:
+        print("usage: validate_items.py PATH [--strict-pairs]", file=sys.stderr)
         return 2
 
+    strict_pairs = False
+    if len(argv) == 3:
+        if argv[2] != "--strict-pairs":
+            print(f"unknown option: {argv[2]}", file=sys.stderr)
+            return 2
+        strict_pairs = True
+
     path = Path(argv[1])
-    errors = validate(path)
+    errors = validate(path, strict_pairs=strict_pairs)
     if errors:
         for error in errors:
             print(f"ERROR: {error}", file=sys.stderr)

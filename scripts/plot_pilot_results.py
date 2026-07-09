@@ -263,9 +263,10 @@ def plot_model_outcomes(model_rows: list[dict[str, str]], out_dir: Path) -> None
             fontsize=8,
         )
     axes[2].set_title("Strict pairs")
-    axes[2].set_xlabel("Cells (of 9)")
-    axes[2].set_xlim(0, 9)
-    axes[2].set_xticks([0, 3, 6, 9])
+    max_cells = max(cells) if cells else 0
+    axes[2].set_xlabel(f"Eligible cells (of {max_cells})")
+    axes[2].set_xlim(0, max_cells)
+    axes[2].set_xticks(range(0, max_cells + 1, 2))
     axes[2].invert_yaxis()
     add_grid(axes[2], axis="x")
     axes[2].set_axisbelow(True)
@@ -328,10 +329,11 @@ def plot_pair_accuracy(pair_rows: list[dict[str, str]], out_dir: Path) -> None:
         zorder=3,
     )
     for y, passed, total in zip(y_values, passes, cells, strict=True):
+        label = "excluded" if total == 0 else count_label(passed, total)
         ax.text(
             3.08,
             y,
-            count_label(passed, total),
+            label,
             ha="left",
             va="center",
             color=COLORS["dark"],
@@ -342,7 +344,7 @@ def plot_pair_accuracy(pair_rows: list[dict[str, str]], out_dir: Path) -> None:
     ax.set_yticklabels(labels)
     ax.set_xlim(0, 3.45)
     ax.set_xticks([0, 1, 2, 3])
-    ax.set_xlabel("Strict pair passes (of 3 model cells)")
+    ax.set_xlabel("Strict pair passes (of 3 eligible model cells)")
     ax.invert_yaxis()
     add_grid(ax, axis="x")
     ax.set_axisbelow(True)

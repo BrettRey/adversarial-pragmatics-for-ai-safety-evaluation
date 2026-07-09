@@ -1,6 +1,6 @@
 \section{An Action-Level Sufficiency Test}
 
-Evidentiary assurance is defeasible. It doesn't prove that an AI action was wise, fair, lawful in every respect, or substantively correct. It asks whether the preserved record is strong enough to support an authority claim against predictable challenges. A record is sufficient only if a reviewer can connect the action to authority, scope, system state, context, procedure, preservation, and accountable review without relying on the system's bare assertion.
+Evidentiary assurance is defeasible. It doesn't prove that an AI action was wise, fair, lawful in every respect, or substantively correct. It asks whether the preserved record is strong enough to support an authority claim against predictable challenges. A record is sufficient only if a reviewer can connect the action to valid authority, scope, system state, context, procedure, preservation, and accountable review without relying on the system's bare assertion.
 
 \begin{table}[tbp]
 \small
@@ -12,6 +12,7 @@ Evidentiary assurance is defeasible. It doesn't prove that an AI action was wise
 Sufficiency claim & Required showing & Typical defeater \\
 \midrule
 Authority source & A principal, role, law, policy, or organizational mandate authorized this class of action. & Missing, stale, ambiguous, or overbroad delegation instrument. \\
+Authority validity & The principal could validly confer the action class, and the action doesn't cross a non-delegable legal, organizational, or policy limit. & The record documents a delegation the institution had no power to make. \\
 Scope application & The concrete action fits the permitted operation, target, time, data class, threshold, and approval condition. & Scope inflation from analysis to disclosure, persistence, contact, purchase, or decision. \\
 Runtime state & The relevant model, prompts, tools, policies, permissions, memory state, and deployment settings are identified. & Unverifiable configuration, untracked model change, or missing policy snapshot. \\
 Context provenance & User instructions, retrieved material, tool outputs, memory entries, and policy text have source and trust labels. & Lower-trust language is promoted into action-guiding authority. \\
@@ -24,6 +25,8 @@ Answerability and review & A human, vendor, deployer, or institution remains ans
 \label{tab:sufficiency-test}
 \end{table}
 
-The test shifts the target from record production to record adequacy. A log can be authentic and still inadequate if it omits the authority state. A policy can be valid and still inadequate if the system's runtime configuration can't be reconstructed. A complete trace can still be inadequate if no accountable actor remains answerable or no affected person can challenge the action.
+The test shifts the target from record production to record adequacy. A log can be authentic and still inadequate if it omits the authority state. A policy can be valid and still inadequate if the system's runtime configuration can't be reconstructed. A complete trace can still be inadequate if no accountable actor remains answerable or no affected person can challenge the action. A flawless bundle can also document an invalid delegation; validity is a separate showing, not an inference from clean procedure.
 
-The standard is also risk-sensitive. A low-stakes internal recommendation may require a lighter record than a benefits decision, clinical summary, procurement action, or external communication. The difference is evidentiary burden, not evidentiary kind: higher-risk deployments need stronger showings for the same authority, scope, state, context, procedure, preservation, and review claims.
+The table also supports a burden-shifting account for audits and assurance reviews. In a forum that adopts such a standard, an adequate bundle could support a rebuttable audit inference that the action was authorized: the proponent shows authority, validity, scope, state, context, procedure, preservation, and review; a challenger points to a defeater such as invalid authority, scope inflation, missing configuration, contaminated context, or record gaps. Legal presumptions would require a separate doctrinal argument. The applicable standard of proof is forum-specific, but ties shouldn't be resolved by the model's self-report.
+
+The standard is also risk-sensitive. A low-stakes internal recommendation may require a lighter record than a benefits decision, clinical summary, procurement action, or external communication. The difference is evidentiary burden, not evidentiary kind: higher-risk deployments need stronger showings for the same validity, authority, scope, state, context, procedure, preservation, and review claims.

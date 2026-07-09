@@ -8,7 +8,7 @@ Agent-security guidance has moved beyond ordinary chatbot safety. OWASP's agenti
 
 Prompt-injection research gives the sharpest technical motivation. Indirect prompt injection shows that LLM-integrated applications can confuse untrusted data with instructions when external content is retrieved or processed inside a larger application \parencite{greshake2023not}. AgentDojo turns that vulnerability into a dynamic evaluation environment for tool-using agents, with realistic tasks, attacks, defences, and security test cases \parencite{debenedetti2024agentdojo}.
 
-These works establish the security problem. They don't say what record would later justify a specific action as authorized, scoped, attributable, contestable, remediable, and auditable.
+These works establish the security problem. They don't by themselves say what record would later justify a specific action as authorized, scoped, attributable, contestable, remediable, and auditable.
 
 \subsection{Instruction Hierarchy and Language-Mediated Authority}
 
@@ -18,9 +18,9 @@ Priority handles source order, while status determines what the string is doing.
 
 \subsection{Delegation Protocols and Access Control}
 
-The closest protocol work already uses delegation language. South et al. propose authenticated, authorized, and auditable delegation for AI agents by extending OAuth/OpenID-style infrastructure with agent credentials, scoped permissions, accountability chains, and natural-language permission translation \parencite{south2025authenticated}. Kühlewind and Birkholz's IETF Internet-Draft approaches the same problem from the audit side, linking user intent, delegation, authorization, execution, and trace reconstruction through audit records and propagated audit context \parencite{kuehlewind2026audit}.
+The closest protocol work already uses delegation language. South et al. propose authenticated, authorized, and auditable delegation for AI agents by extending OAuth/OpenID-style infrastructure with agent credentials, scoped permissions, accountability chains, and natural-language permission translation \parencite{south2025authenticated}. Kühlewind and Birkholz's IETF Internet-Draft, a work-in-progress rather than a standard, approaches the same problem from the audit side, linking user intent, delegation, authorization, execution, and trace reconstruction through audit records and propagated audit context \parencite{kuehlewind2026audit}.
 
-This work supplies core infrastructure for delegation assurance. Scoped credentials, delegated principal identity, authorization-transition records, and audit context can make authority state more explicit than ordinary prompts or application logs. But a protocol can preserve a scope without proving that the system interpreted the governing language correctly, separated read access from disclosure authority, refused for the right reason, or kept an evaluator from licensing a bad safety claim.
+This work supplies core infrastructure for delegation assurance. Scoped credentials, delegated principal identity, authorization-transition records, and audit context can make authority state more explicit than ordinary prompts or application logs. The remaining gap isn't that those works ignore delegation. It's that infrastructure for delegation still has to be joined to language-status interpretation, refusal calibration, evaluator licensing, and evidence adequacy for the justified-action claim. A protocol can preserve a scope without proving that the system interpreted the governing language correctly, separated read access from disclosure authority, refused for the right reason, or kept an evaluator from licensing a bad safety claim.
 
 \subsection{Assurance Cases, Governance, and Provenance}
 

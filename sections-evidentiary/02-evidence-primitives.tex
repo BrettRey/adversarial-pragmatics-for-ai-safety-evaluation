@@ -1,6 +1,6 @@
 \section{Evidence Primitives}
 
-Table~\ref{tab:evidentiary-primitives} separates eight review questions that often get collapsed. The columns matter together: the middle column names the record each primitive needs, while the right column prevents that primitive from doing more work than it can support. A system can have authentic logs without valid authority, clear provenance without delegated scope, or a plausible explanation without a reliable record of which model, prompt, policy, tool, or approval path produced the action.
+Table~\ref{tab:evidentiary-primitives} separates nine review questions that often get collapsed. The columns matter together: the middle column names the record each primitive needs, while the right column prevents that primitive from doing more work than it can support. A system can have authentic logs without valid authority, clear provenance without delegated scope, or a plausible explanation without a reliable record of which model, prompt, policy, tool, or approval path produced the action.
 
 \begin{table}[tbp]
 \small
@@ -11,7 +11,8 @@ Table~\ref{tab:evidentiary-primitives} separates eight review questions that oft
 \toprule
 Primitive & Evidence it needs & What it doesn't establish alone \\
 \midrule
-Authority & Delegation instrument, role, policy source, or legal/organizational mandate. & That this action stayed within the delegated limits. \\
+Authority & Delegation instrument, role, policy source, or legal/organizational mandate. & That the principal could validly confer that authority. \\
+Validity & Legal or organizational power to delegate this action class, including non-delegable limits. & That this action stayed within the delegated limits. \\
 Scope & Action class, target, time, tool, data class, threshold, exception, and approval condition. & That the action was actually produced under that scope. \\
 Attribution & System instance, model and tool versions, configuration, actor, approval, and execution trace. & That the action was validly authorized. \\
 Accountability & Human, role, vendor, deployer, or institution answerable for authorization, monitoring, reliance, and correction. & That the accountable party personally performed the action. \\

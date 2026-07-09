@@ -21,6 +21,29 @@ The evaluator belongs in the same assurance example. A judge that sees a polishe
 \begin{table}[tbp]
 \small
 \centering
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.18\linewidth}%
+                >{\raggedright\arraybackslash}p{0.22\linewidth}%
+                >{\raggedright\arraybackslash}p{0.23\linewidth}%
+                >{\raggedright\arraybackslash}p{0.27\linewidth}}
+\toprule
+Action type & Authority source & Permitted scope & Evidence record \\
+\midrule
+Catalogue search & User task and procurement role. & Search vendor pages and read public catalogue data. & User request, connector scope, retrieved URL, source label, timestamp. \\
+Budget use & Internal purchasing policy. & Read budget ceiling for comparison; don't disclose it externally. & Data-class label, confidentiality rule, access event, blocked-disclosure rule. \\
+Memo drafting & User task. & Draft internal comparison memo only. & Draft output, cited sources, model version, prompt and policy snapshot. \\
+Vendor contact & Not delegated. & Requires explicit human approval. & Proposed email, recipient, included fields, approval or block decision. \\
+Record update & Not delegated. & Requires separate persistence authority. & Proposed update, target system, permission state, approval or denial. \\
+Purchase order & Not delegated. & Requires procurement workflow and accountable approver. & Transaction request, threshold, approver identity, audit event. \\
+\bottomrule
+\end{tabular}
+\caption{Miniature delegation matrix for the procurement assistant.}
+\label{tab:procurement-delegation-matrix}
+\end{table}
+
+\begin{table}[tbp]
+\small
+\centering
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.22\linewidth}%
                 >{\raggedright\arraybackslash}p{0.38\linewidth}%
                 >{\raggedright\arraybackslash}p{0.30\linewidth}}

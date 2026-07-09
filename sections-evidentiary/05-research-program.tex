@@ -1,6 +1,6 @@
 \section{Research Program}
 
-The sufficiency test in Table~\ref{tab:sufficiency-test} still needs deployable record formats and calibration. Table~\ref{tab:minimum-evidence-bundle} gives one candidate minimum bundle for delegated AI action: delegation instrument, policy and permission state, configuration snapshot, model and tool versions, input context, retrievals, tool calls, approvals, overrides, safety interventions, timestamps, human-oversight records, and integrity protections.
+The sufficiency test in Table~\ref{tab:sufficiency-test} still needs deployable record formats and calibration. Table~\ref{tab:minimum-evidence-bundle} gives one candidate minimum bundle for delegated AI action: delegation instrument, policy and permission state, configuration snapshot, model and tool versions, input context, retrievals, tool calls, approvals, overrides, safety interventions, timestamps, human-oversight records, integrity protections, and privacy controls.
 
 \begin{table}[tbp]
 \small
@@ -10,19 +10,19 @@ The sufficiency test in Table~\ref{tab:sufficiency-test} still needs deployable 
 \toprule
 Evidence layer & Minimum record \\
 \midrule
-Delegation & Principal, system role, delegated task, authority source, scope, limits, approval thresholds, and accountable actor. \\
+Delegation & Principal, system role, delegated task, authority source, validity basis, scope, non-delegable limits, approval thresholds, and accountable actor. \\
 Configuration & Model version, system/developer instructions, tool list, permissions, policy snapshot, memory state, and relevant deployment settings. \\
-Context & User request, retrieved material, source/trust labels, input data classes, and confidentiality/disclosure constraints. \\
+Context & User request, retrieved material where retention is justified, source/trust labels, input data classes, and confidentiality/disclosure constraints. \\
 Execution & Intermediate plans where retained, tool calls, arguments, tool responses, blocked actions, retries, failures, and timestamps. \\
 Oversight & Human approvals, overrides, escalations, notices, recourse paths, and exception handling. \\
-Preservation & Record identity, custody, retention, integrity protection, tamper evidence, and access controls. \\
-Review & Reasons, trace summary, evidence access, uncertainty, failure attribution, and correction/remediation path. \\
+Preservation & Record identity, custody, retention schedule, minimization and redaction rules, integrity protection, tamper evidence, and access controls. \\
+Review & Reasons, trace summary, protected evidence access, uncertainty, failure attribution, and correction/remediation path. \\
 \bottomrule
 \end{tabular}
 \caption{Candidate minimum evidence bundle for delegated AI action.}
 \label{tab:minimum-evidence-bundle}
 \end{table}
 
-This bundle is a research hypothesis, not a finished standard. It needs domain-specific calibration. A consumer chatbot, a medical summarizer, a benefits triage tool, and a procurement assistant don't require the same evidence depth. But the domains differ by burden and risk, not by primitive. Each has to answer the same review questions: who authorized action, what was delegated, what happened, what record supports the claim, who remains answerable, and how the action can be challenged or corrected.
+This bundle is a research hypothesis, not a finished standard. It needs domain-specific calibration. A consumer chatbot, a medical summarizer, a benefits triage tool, and a procurement assistant don't require the same evidence depth. But the domains differ by burden and risk, not by primitive. Each has to answer the same review questions: who authorized action, whether that authority could validly be delegated, what happened, what record supports the claim, who remains answerable, how sensitive evidence is protected, and how the action can be challenged or corrected.
 
 The financial-reporting analogy suggests how such a test could mature. A delegation-assurance standard could define control objectives for authorization, scope, information flow, persistence, tool use, record integrity, and remediation, then test whether a deployment's controls make action-level reconstruction possible.

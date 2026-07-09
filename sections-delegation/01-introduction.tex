@@ -4,7 +4,9 @@ AI security work has made real progress by identifying prompt injection, jailbre
 
 This paper calls that problem \term{delegation assurance}. The term doesn't introduce a new class of AI-agent attacks. It names an evidentiary problem: what would justify the claim that an AI system's action was authorized, scoped, attributable, contestable, remediable, and auditable? Existing agent-security work gives threat models, benchmarks, defences, access-control mechanisms, and audit protocols. Those are essential components.
 
-Delegation assurance asks how those components support a safety case about action: who delegated authority, what action was licensed, what sources could change that license, which limits were non-delegable, what evidence records the transition from instruction to action, and how failure would be attributed after the fact.
+The paper's specific contribution is the status/priority/licensing distinction. \term{Status} asks what a string is doing: command, quotation, policy example, tool result, retrieved content, memory, or request for analysis. \term{Priority} asks which source controls when strings conflict. \term{Licensing} asks what external action, disclosure, persistence, or evaluation claim is permitted to follow. A system can fail delegation assurance by collapsing any one of these distinctions.
+
+Delegation assurance asks how those components support a safety case about action: who delegated authority, what action was licensed, what sources could change that license, which limits were non-delegable, what evidence records the transition from instruction to action, and how failure would be attributed after the fact. Assurance cases mix system-behaviour claims with evidence for those claims; delegation assurance is evidentiary because it asks what would support the behaviour claim, not because the system-design claim disappears.
 
 Delegation assurance is easiest to see by comparison with ordinary institutional delegation. In agency law, a principal authorizes an agent to act on the principal's behalf, and actual authority may be express or implied \parencite{cornellWexAgency,cornellWexActualAuthority}. In firms, delegated discretion creates agency costs and control problems; in political institutions, delegation creates monitoring problems under information asymmetry \parencite{jensen1976theory,miller2005political}.
 
@@ -16,7 +18,7 @@ In each case, the system's failure isn't adequately described by output safety a
 
 Delegation assurance sits between technical control and institutional audit. At one end are familiar engineering mechanisms: least privilege, access control, scoped credentials, tool permissions, logs, monitors, and memory controls. At the other end are assurance practices: structured claims, arguments, evidence, audit records, incident review, and external accountability.
 
-The hard middle layer is language-mediated authority. AI systems increasingly receive, transform, and execute authority through language. A strong assurance claim depends on preserving status, priority, scope, and licensing as authority moves from string to action.
+The hard middle layer is language-mediated authority. AI systems increasingly receive, transform, and execute authority through language. The core architectural distinction is status, priority, and licensing: what a string is doing, whose string controls when sources conflict, and what external action follows. A strong assurance claim depends on preserving status before priority and licensing are applied.
 
 Figure~\ref{fig:delegation-assurance-stack} shows the resulting stack. The point isn't that these layers are separate components in every implementation. It's that the assurance claim fails if any layer can't supply reviewable evidence about the transition from delegated authority to machine action.
 
@@ -52,4 +54,4 @@ Figure~\ref{fig:delegation-assurance-stack} shows the resulting stack. The point
 
 The argument has four parts: a field position, a justified-action criterion, a failure-to-evidence mapping, and implications for system cards, red-teaming, audits, architecture, and judge validation.
 
-The adversarial-pragmatics benchmark \parencite{reynolds2026adversarialPragmatics} functions as one reusable test for the language layer, not as the whole account. Delegation assurance links agent-security taxonomies, access-control mechanisms, audit protocols, and AI safety cases to the same question of action-level proof.
+The adversarial-pragmatics benchmark \parencite{reynolds2026adversarialPragmatics} measures language-mediated control. The evidentiary-assurance account \parencite{reynolds2026evidentiaryAssurance} develops the legal and governance record for later review. This paper sits between them: it gives the AI-security and assurance standard for authorized machine action.
