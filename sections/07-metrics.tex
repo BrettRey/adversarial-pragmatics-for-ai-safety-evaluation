@@ -1,6 +1,6 @@
 \section{Metrics}
 
-The project starts with eight metrics. Each metric should be reported by phenomenon family and application surface before any aggregate score is reported.
+The benchmark reports eight metrics. Each metric should be reported by phenomenon family and application surface before any aggregate score is reported.
 
 \subsection{Pairwise contrast accuracy}
 
@@ -28,10 +28,10 @@ Judge validity compares LLM-judge labels with adjudicated expert labels and rule
 
 \subsection{Adjudication stability}
 
-Adjudication stability measures whether expert evaluators can apply the item metadata and rubric consistently enough to produce defensible gold labels. Report repeated-item stability, rate of adjudicator intervention, criterion-conflict flags, and the proportion of items that require taxonomy revision. Compare observed instability with the fake-data expectations set before the development pass. Majority vote isn't the default target when the disagreement exposes a policy boundary or taxonomy problem.
+Adjudication stability measures whether expert evaluators can apply the item metadata and rubric consistently enough to produce defensible gold labels. Report repeated-item stability, adjudicator-intervention rate, criterion-conflict flags, and taxonomy-revision rate against the fake-data expectations set before the development pass.
 
 \subsection{Taxonomy drift and diagnostic ambiguity}
 
-Taxonomy drift is the proportion of items whose labels change under paraphrase, application wrapper, model version, or adjudication criterion while the intended control dimension remains fixed. Diagnostic ambiguity marks items where disagreement persists after context clarification and can't be reduced to annotation error. These items should remain visible in the released benchmark rather than being hidden from the gold set.
+Taxonomy drift is the proportion of items whose labels change under paraphrase, application wrapper, model version, or adjudication criterion while the intended control dimension remains fixed. Diagnostic ambiguity marks items where disagreement persists after context clarification and can't be reduced to annotation error. Report both as item-level diagnostics rather than hidden gold-set failures.
 
 Together, these measures test label projectibility. A category that's stable across the declared paraphrase and wrapper set supports a broader claim. One that shifts under a control-preserving variant should be scoped down, split, or marked as diagnostic ambiguity before it's used in a gold-set or system-card claim.

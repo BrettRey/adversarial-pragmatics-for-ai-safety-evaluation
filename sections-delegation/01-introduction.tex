@@ -16,7 +16,7 @@ In each case, the system's failure isn't adequately described by output safety a
 
 Delegation assurance sits between technical control and institutional audit. At one end are familiar engineering mechanisms: least privilege, access control, scoped credentials, tool permissions, logs, monitors, and memory controls. At the other end are assurance practices: structured claims, arguments, evidence, audit records, incident review, and external accountability.
 
-The hard middle layer is language-mediated authority. AI systems increasingly receive, transform, and execute authority through language. A string may be a command, a quotation, an example, a policy boundary, an untrusted document, a tool result, or a request to analyze rather than enact. A system that can't preserve those distinctions can't support a strong claim that its actions remained within delegated authority.
+The hard middle layer is language-mediated authority. AI systems increasingly receive, transform, and execute authority through language. A strong assurance claim depends on preserving status, priority, scope, and licensing as authority moves from string to action.
 
 Figure~\ref{fig:delegation-assurance-stack} shows the resulting stack. The point isn't that these layers are separate components in every implementation. It's that the assurance claim fails if any layer can't supply reviewable evidence about the transition from delegated authority to machine action.
 
@@ -50,6 +50,6 @@ Figure~\ref{fig:delegation-assurance-stack} shows the resulting stack. The point
 \label{fig:delegation-assurance-stack}
 \end{figure}
 
-The rest of the paper develops that framework. I first position delegation assurance against agent-security, instruction-hierarchy, delegation-protocol, provenance, assurance-case, and judge-reliability work. I then define a justified delegated action through a procurement example and a safety-case pattern, map common failures to evidence standards, isolate language-mediated authority as the middle layer, and draw implications for system cards, red-teaming, audits, architecture, and judge validation.
+The argument has four parts: a field position, a justified-action criterion, a failure-to-evidence mapping, and implications for system cards, red-teaming, audits, architecture, and judge validation.
 
-The adversarial-pragmatics benchmark enters as one reusable test for the language layer, not as the whole framework \parencite{reynolds2026adversarialPragmatics}. The goal is to give agent-security taxonomies, access-control mechanisms, audit protocols, and AI safety cases a common evidentiary grammar for justified machine action.
+The adversarial-pragmatics benchmark \parencite{reynolds2026adversarialPragmatics} functions as one reusable test for the language layer, not as the whole account. Delegation assurance links agent-security taxonomies, access-control mechanisms, audit protocols, and AI safety cases to the same question of action-level proof.

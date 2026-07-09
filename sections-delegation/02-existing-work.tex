@@ -1,6 +1,6 @@
 \section{What Existing Agent-Security Work Leaves Open}
 
-The surrounding field already supplies threat models, benchmarks, control mechanisms, audit proposals, and assurance methods. Delegation assurance belongs in that field, but it asks a narrower question: what evidence would justify the action-level claim that a system acted within delegated authority?
+The surrounding field already supplies threat models, benchmarks, control mechanisms, audit proposals, and assurance methods. Those pieces still leave one action-level question open.
 
 \subsection{Agent Security and Prompt Injection}
 
@@ -8,13 +8,13 @@ Agent-security guidance has moved beyond ordinary chatbot safety. OWASP's agenti
 
 Prompt-injection research gives the sharpest technical motivation. Indirect prompt injection shows that LLM-integrated applications can confuse untrusted data with instructions when external content is retrieved or processed inside a larger application \parencite{greshake2023not}. AgentDojo turns that vulnerability into a dynamic evaluation environment for tool-using agents, with realistic tasks, attacks, defences, and security test cases \parencite{debenedetti2024agentdojo}.
 
-These works show why language-mediated control is a security problem. They leave open the action-level evidence question. A test can show that an attack succeeded, a mitigation failed, or a tool call was unsafe. Delegation assurance asks what records and evaluations would show that the action was authorized, scoped, attributable, contestable, remediable, and auditable.
+These works establish the security problem. They don't say what record would later justify a specific action as authorized, scoped, attributable, contestable, remediable, and auditable.
 
 \subsection{Instruction Hierarchy and Language-Mediated Authority}
 
 Instruction-hierarchy work treats prompt injection as a priority problem. Systems have to follow privileged instructions over lower-priority or untrusted strings, and training can improve selective ignoring of lower-priority content \parencite{wallace2024instruction}. It's central to delegation assurance because delegated authority often arrives as language: system instructions, developer constraints, user requests, retrieved documents, memory, policy examples, and tool outputs all appear as strings.
 
-Priority handles source order, while status determines what the string is doing. A string may be a command, quotation, example, report, policy boundary, tool result, or request for analysis. Delegation assurance needs evidence that status is preserved before priority and licensing are applied.
+Priority handles source order, while status determines what the string is doing. Delegation assurance needs evidence that status is preserved before priority and licensing are applied.
 
 \subsection{Delegation Protocols and Access Control}
 
@@ -28,7 +28,7 @@ Assurance-case methods provide the right argumentative shape. The claim/argument
 
 Governance and provenance standards supply adjacent evidence primitives. NIST's AI RMF and generative-AI profile foreground governance, monitoring, documentation, provenance, testing, and incident disclosure \parencite{nist2023artificial,nist2024generative}. W3C PROV, C2PA, and Certificate Transparency show how lineage, signed assertions, manifests, timestamps, hashes, and append-only logs can support reconstruction and tamper detection \parencite{moreau2013provdm,c2pa2026spec,laurie2013certificate}.
 
-Those mechanisms are necessary but normatively thin. Provenance can show where content came from, and an append-only log can make later alteration harder. Neither shows that a system was entitled to treat a string as an instruction, disclose information it could read, update durable state, or issue an external action. Delegation assurance joins provenance and governance evidence to an authority claim.
+Those mechanisms are necessary but normatively thin. Provenance can show where content came from, and an append-only log can make later alteration harder. Neither shows that a system was entitled to treat a string as an instruction, disclose information it could read, update durable state, or issue an external action. Delegation assurance joins provenance and governance evidence to an authority claim. The evidentiary-assurance account \parencite{reynolds2026evidentiaryAssurance} develops the legal, governance, provenance, and digital-evidence side of that record.
 
 \subsection{Evaluation and Judge Reliability}
 
@@ -36,8 +36,8 @@ Evaluation work supplies both tools and risks. LLM-as-judge methods can reduce g
 
 Judge reliability is itself part of the assurance problem. LLMBar shows that fluent but instruction-violating outputs can mislead evaluators \parencite{zeng2024llmbar}. Survey work treats consistency, bias, and domain adaptation as continuing problems for LLM-as-judge systems \parencite{gu2025judgeSurvey}. Bias studies show that both human and LLM judges can be vulnerable to judgment biases and attacks on those biases \parencite{chen2024judgementBias}.
 
-Delegation assurance treats evaluation as part of the assurance chain when an evaluator's label licenses a safety, compliance, or deployment claim. A judge that scores only final-answer safety may miss whether an action was authorized, whether a refusal abandoned delegated work, or whether a transcript supports the stated failure attribution. Judge validation belongs inside the evidence standard rather than after it.
+Evaluation becomes part of the assurance chain when a label licenses a safety, compliance, or deployment claim. Evaluation methods contribute evidence only when their own labels are scoped and validated.
 
 \subsection{The Gap}
 
-The literature already has controls, attacks, protocols, and audit concepts. The missing piece is an integrated action-level evidence standard. A threat taxonomy says which failures to consider. An instruction hierarchy says which sources should dominate. An access-control protocol scopes what an agent may do. An audit architecture records transitions. A safety case gives the claim/argument/evidence form. Delegation assurance asks how those pieces support one claim: this concrete machine action stayed within delegated authority and can be reconstructed by a reviewer.
+The gap isn't another component. It's the integrated action-level claim those components jointly need to support: this concrete machine action stayed within delegated authority and can be reconstructed by a reviewer.

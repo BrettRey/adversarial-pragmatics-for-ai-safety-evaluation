@@ -1,19 +1,6 @@
 \section{Evidence Primitives}
 
-The framework separates eight evidentiary primitives. Each primitive answers a different review question, and none is interchangeable with the others.
-
-\begin{itemize}
-  \item \textbf{Authority.} What source authorized use of the system for the action?
-  \item \textbf{Scope.} What acts, targets, tools, data classes, thresholds, and exceptions were delegated?
-  \item \textbf{Attribution.} Which system instance, model version, tool, and configuration produced the action, and which organizational actor or workflow approved it?
-  \item \textbf{Accountability.} Which person, role, vendor, deployer, or institution remains answerable for authorizing, supervising, relying on, or correcting the action?
-  \item \textbf{Procedure.} Which required steps, reviews, approvals, notices, or escalation paths were followed?
-  \item \textbf{Authenticity.} Are the records what they purport to be?
-  \item \textbf{Integrity.} Are the records intact, complete, and protected against undetected alteration?
-  \item \textbf{Contestability.} Can an affected person, auditor, regulator, court, or internal reviewer inspect enough of the record to challenge the action?
-\end{itemize}
-
-The primitives are best treated as a bundle. A system can have authentic logs without valid authority. It can have clear provenance without delegated scope. It can have a plausible explanation without a reliable record of which model, prompt, policy, tool, or approval path produced the action. It can have a valid delegation instrument but fail contestability because the affected person can't inspect the evidence needed to challenge the result.
+Table~\ref{tab:evidentiary-primitives} separates eight review questions that often get collapsed. The columns matter together: the middle column names the record each primitive needs, while the right column prevents that primitive from doing more work than it can support. A system can have authentic logs without valid authority, clear provenance without delegated scope, or a plausible explanation without a reliable record of which model, prompt, policy, tool, or approval path produced the action.
 
 \begin{table}[tbp]
 \small
@@ -38,4 +25,4 @@ Contestability & Accessible reasons, relevant record, disclosure path, review fo
 \label{tab:evidentiary-primitives}
 \end{table}
 
-These primitives overlap with explanation, provenance, audit logging, and documentation, but none of those neighbouring concepts is sufficient on its own. Explanation helps with reasons. Provenance helps with lineage. Logging helps with reconstruction. Documentation helps with intended use and lifecycle context. Delegated-authority assurance needs a bundle that can support an action-level claim.
+Explanation, provenance, audit logging, and documentation map onto parts of the table. Delegated-authority assurance needs the bundle: enough linked evidence to support an action-level authority claim.
