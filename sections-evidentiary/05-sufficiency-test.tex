@@ -1,0 +1,29 @@
+\section{An Action-Level Sufficiency Test}
+
+Evidentiary assurance is defeasible. It doesn't prove that an AI action was wise, fair, lawful in every respect, or substantively correct. It asks whether the preserved record is strong enough to support an authority claim against predictable challenges. A record is sufficient only if a reviewer can connect the action to authority, scope, system state, context, procedure, preservation, and accountable review without relying on the system's bare assertion.
+
+\begin{table}[tbp]
+\small
+\centering
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.23\linewidth}%
+                >{\raggedright\arraybackslash}p{0.34\linewidth}%
+                >{\raggedright\arraybackslash}p{0.33\linewidth}}
+\toprule
+Sufficiency claim & Required showing & Typical defeater \\
+\midrule
+Authority source & A principal, role, law, policy, or organizational mandate authorized this class of action. & Missing, stale, ambiguous, or overbroad delegation instrument. \\
+Scope application & The concrete action fits the permitted operation, target, time, data class, threshold, and approval condition. & Scope inflation from analysis to disclosure, persistence, contact, purchase, or decision. \\
+Runtime state & The relevant model, prompts, tools, policies, permissions, memory state, and deployment settings are identified. & Unverifiable configuration, untracked model change, or missing policy snapshot. \\
+Context provenance & User instructions, retrieved material, tool outputs, memory entries, and policy text have source and trust labels. & Lower-trust language is promoted into action-guiding authority. \\
+Execution procedure & Tool calls, arguments, approvals, denials, overrides, retries, and failures are reconstructable. & The record contains only a final answer or self-reported rationale. \\
+Preservation integrity & The record has custody, retention, access-control, timestamp, signature, hash, or tamper-evidence protections appropriate to the risk. & Gaps, alteration risk, selective logging, or unverifiable custody. \\
+Answerability and review & A human, vendor, deployer, or institution remains answerable, and affected parties have a review or correction path. & Accountability is implicitly offloaded to the model, or the affected reviewer can't inspect the relevant record. \\
+\bottomrule
+\end{tabular}
+\caption{Defeasible sufficiency test for delegated AI action.}
+\label{tab:sufficiency-test}
+\end{table}
+
+The test shifts the target from record production to record adequacy. A log can be authentic and still inadequate if it omits the authority state. A policy can be valid and still inadequate if the system's runtime configuration can't be reconstructed. A complete trace can still be inadequate if no accountable actor remains answerable or no affected person can challenge the action.
+
+The standard is also risk-sensitive. A low-stakes internal recommendation may require a lighter record than a benefits decision, clinical summary, procurement action, or external communication. The difference is evidentiary burden, not evidentiary kind: higher-risk deployments need stronger showings for the same authority, scope, state, context, procedure, preservation, and review claims.
