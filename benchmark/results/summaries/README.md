@@ -1,7 +1,8 @@
 # Sanitized Result Summaries
 
-This directory stores aggregate, manuscript-facing pilot summaries that can be
-tracked without committing raw model outputs or browser-export files.
+This directory stores sanitized row-level and aggregate, manuscript-facing pilot
+summaries that can be tracked without committing raw model outputs or
+browser-export files.
 
 Generate these files with:
 

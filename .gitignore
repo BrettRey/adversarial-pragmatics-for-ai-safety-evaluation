@@ -29,6 +29,14 @@ benchmark/results/*
 .env
 *.local.json
 
+# Local-only research material. These paths may contain private interaction
+# histories, opaque provenance maps, or evaluator-identifying response files.
+# The README exceptions document the boundary without admitting any data.
+/private/*
+!/private/README.md
+/benchmark/study-a/_runs/*
+!/benchmark/study-a/_runs/README.md
+
 # Generated arXiv submission bundles
 submission/arxiv/build/
 submission/arxiv/*.tar.gz

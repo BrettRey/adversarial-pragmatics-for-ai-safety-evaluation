@@ -25,4 +25,5 @@ Upload notes:
 - Use the text in `abstract.txt` for the arXiv abstract field.
 - Public arXiv identifier: `2607.01153`.
 - Use the category and comment fields in `metadata.md`.
+- For the next public revision, confirm that the generated PDF matches the repaired strict-pair readout: P008 excluded from strict-pair scoring and 12/24 eligible strict-pair passes.
 - Upload the single generated `.tar.gz` source package. Do not upload the generated PDFs unless arXiv explicitly routes the submission through PDF-only processing.

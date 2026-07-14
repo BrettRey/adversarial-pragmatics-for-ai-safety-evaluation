@@ -1,7 +1,7 @@
 # Results
 
-Generated summaries can be stored here once model runs begin. The default
-local pilot command is:
+Generated summaries and ignored local run bundles live here. The default local
+pilot command is:
 
 ```bash
 make pilot-local
@@ -56,7 +56,7 @@ assumptions, and decision thresholds before spending model or expert time. They
 are not empirical evidence about model or judge performance.
 
 The full run bundle remains ignored because it contains raw model outputs. The
-report target also writes sanitized aggregate copies under
+report target also writes sanitized row-level and aggregate copies under
 `benchmark/results/summaries/`, which is the durable project-local location for
 manuscript-facing pilot evidence. Browser downloads are temporary imports only.
 
@@ -96,6 +96,8 @@ benchmark/results/summaries/
   local-pilot-<timestamp>-model-summary.csv
   local-pilot-<timestamp>-pair-summary.csv
   local-pilot-<timestamp>-priority-summary.csv
+  local-pilot-<timestamp>-row-evidence.csv
+  local-pilot-<timestamp>-judge-validation-*.csv
   fake-dev-pass-calibration-*.csv
   fake-dev-pass-calibration-readout.md
 ```

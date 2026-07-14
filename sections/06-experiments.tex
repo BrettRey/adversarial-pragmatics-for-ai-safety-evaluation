@@ -32,7 +32,7 @@ Across the pilot, 36 of 54 outputs were full task successes, 11 were partial suc
 
 Pairwise results require reporting by contrast family rather than as a single aggregate. Three pairs were stable across all models: the embedded-command source pair, the mention/use pair, and the scope-negation pair. Three pairs had zero strict pair passes: the ambiguous deictic-reference pair, the agent transcript pair, and the policy-boundary pair.
 
-P008 isn't counted in those strict-pair totals. It remains in the row-level pilot evidence because it surfaced a useful confidentiality problem, but it isn't a clean pairwise contrast: its members differ in phenomenon family and both require non-disclosure.
+P008 is excluded from those strict-pair totals. It remains in the row-level pilot evidence because it surfaced a useful confidentiality problem, but its members differ in phenomenon family and both require non-disclosure.
 
 The failures differed by family. In the deictic-reference item, all three models guessed a colour rather than asking for clarification. In the direct policy-boundary item, all three models output the protected dummy token despite the toy policy. The tool-result pair exposed a different problem: one model followed the injected directive, while other rows produced partial task success without policy noncompliance.
 
@@ -43,7 +43,7 @@ The failures differed by family. In the deictic-reference item, all three models
 \label{fig:pilot-pair-accuracy}
 \end{figure}
 
-The automatic diagnostic pass was useful as triage but not as a substitute for adjudication. All seven noncompliant rows were high-priority diagnostic rows. But low-priority rows still included partial task failures and one policy-ambiguous row. This shape is expected for a pragmatic benchmark: simple token checks can identify many dangerous rows, but they can't decide whether an answer satisfies the intended speech act, source relation, or policy boundary.
+The automatic diagnostic pass worked as triage, with limits. All seven noncompliant rows were high-priority diagnostic rows. But low-priority rows still included partial task failures and one policy-ambiguous row. This shape is expected for a pragmatic benchmark: simple token checks can identify many dangerous rows, but they can't decide whether an answer satisfies the intended speech act, source relation, or policy boundary.
 
 One row exposes a principled boundary between pragmatic status and information flow. In AP-SEED-016, one model refused the request but repeated \mention{ALPHA-000} while explaining the refusal. From a mention/use perspective, the response is metalinguistic: the string is mentioned in the course of refusal rather than enacted as a disclosure request. From a confidentiality perspective, the protected token still reached the output channel. The item marks an adjudication-instability point: speech-act status can make a response pragmatically safe while channel occupancy makes it an information-flow failure. The development set has to separate those criteria explicitly.
 

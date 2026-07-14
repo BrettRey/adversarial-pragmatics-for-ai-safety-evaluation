@@ -1,0 +1,78 @@
+{
+  "manifest_version": 1,
+  "artifact_id": "local-pilot-20260630-185417",
+  "status": "frozen_provisional_author_labels",
+  "created_at": "2026-07-10T14:55:23.895261+00:00",
+  "reason": "Initial freeze before blind independent re-adjudication",
+  "label_interpretation": "Historical author adjudications preserved for comparison; not an independent reference standard or gold labels.",
+  "expected": {
+    "seed_items": 18,
+    "pilot_output_rows": 54,
+    "provisional_author_label_rows": 54,
+    "models": 3
+  },
+  "public_files": [
+    {
+      "path": "benchmark/items/seed-items.csv",
+      "sha256": "96e1ef4bd876f404d4efdecdf350286835877905335cb2dcb25c4ffd1db2971c",
+      "bytes": 7928,
+      "records": 18
+    },
+    {
+      "path": "data/provisional/local-pilot-20260630-185417-provisional-author-labels.csv",
+      "sha256": "078629308b3fa45dadf6f4020b7c2edc301034c4ab62193e17dd35bce716ac0c",
+      "bytes": 15336,
+      "records": 54
+    },
+    {
+      "path": "benchmark/results/summaries/local-pilot-20260630-185417-model-summary.csv",
+      "sha256": "65fd0b1576810fdba34235123524aed487c793bb622220d5fed3c859b6b2df2c",
+      "bytes": 591,
+      "records": 3
+    },
+    {
+      "path": "benchmark/results/summaries/local-pilot-20260630-185417-pair-summary.csv",
+      "sha256": "d871577ad173f39c3700f86f88248fefeb613f4daf655bdcfdc2dff9cc13c6cb",
+      "bytes": 1448,
+      "records": 9
+    },
+    {
+      "path": "benchmark/results/summaries/local-pilot-20260630-185417-priority-summary.csv",
+      "sha256": "da46cea7b7b3f1f1e99fc92eed07a0b9d7782c921f57e4e6dcc361b95121fb5e",
+      "bytes": 231,
+      "records": 3
+    },
+    {
+      "path": "benchmark/results/summaries/local-pilot-20260630-185417-row-evidence.csv",
+      "sha256": "df1d5c7c731739d645dc27beec8efec03e6d7630b3333e64c546388c82b89eaa",
+      "bytes": 16636,
+      "records": 54
+    },
+    {
+      "path": "benchmark/results/summaries/local-pilot-20260630-185417-adjudication-readout.md",
+      "sha256": "d7758008b6a7a25c5d86ff8755478d60bf822c94d76de1951e39e74710e8c65c",
+      "bytes": 5345,
+      "records": null
+    }
+  ],
+  "local_source_fingerprints": [
+    {
+      "path": "benchmark/results/local-pilot-20260630-185417/outputs.csv",
+      "sha256": "6dedf8334f118df8388bdd3ed2120d17a46ce5759b553ca35cc141afb1ce408d",
+      "bytes": 33535,
+      "records": 54
+    },
+    {
+      "path": "benchmark/results/local-pilot-20260630-185417/adjudication_responses.csv",
+      "sha256": "28fb172b16f93cb3b8b2098e3e6fabd8a7757bb0b3c6d39613eb6c4a852df291",
+      "bytes": 24843,
+      "records": 54
+    },
+    {
+      "path": "benchmark/results/local-pilot-20260630-185417/run_metadata.json",
+      "sha256": "0f47be58a4af7e618bf7e25fcbe119ecd6af12ccb1289ccb1e8f080486b8e570",
+      "bytes": 3747,
+      "records": null
+    }
+  ]
+}

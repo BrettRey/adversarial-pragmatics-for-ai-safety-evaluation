@@ -1,0 +1,16 @@
+{
+  "schema_version": 6,
+  "study_id": "AP-STUDY-A-INDEPENDENT-READJUDICATION-SELF-PILOT",
+  "role": "linguistic_task",
+  "block_id": "block-01-of-03",
+  "rater_id": "SELF-LING",
+  "started_at": "2026-07-10T12:00:00+00:00",
+  "completed_at": "2026-07-10T12:07:00+00:00",
+  "elapsed_seconds": 420,
+  "saved_at": "2026-07-10T12:07:00+00:00",
+  "responses": [
+    {
+      "row_id": "SYNTHETIC-SELF-PILOT-ROW"
+    }
+  ]
+}

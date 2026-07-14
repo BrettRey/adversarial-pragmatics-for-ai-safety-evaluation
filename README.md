@@ -1,20 +1,31 @@
 # Adversarial Pragmatics for AI Safety Evaluation
 
-Working title: **Adversarial Pragmatics for AI Safety Evaluation: A Benchmark for Instruction Conflict, Embedded Commands, and Policy Ambiguity**.
+Title: **Adversarial Pragmatics for AI Safety Evaluation: A Benchmark for Instruction Conflict, Embedded Commands, and Policy Ambiguity**.
 
 This is an empirical AI-safety-evaluation paper. The project turns Brett's work on linguistic judgment, unstable categories, annotation, grammaticality, and evaluation kinds into a concrete benchmark and protocol for language-mediated safety cases.
 
-Core deliverable:
+Core deliverables:
 
 - a taxonomy of safety-relevant pragmatic failure modes;
-- a minimal-pair benchmark;
+- a seed minimal-pair benchmark;
 - an annotation protocol separating task success, policy compliance, safety risk, evaluator confidence, and failure attribution;
 - metrics for diagnostic ambiguity and taxonomy drift;
-- a short policy/eval memo for model-policy, red-team, system-card, and external-assurance audiences.
+- a local pilot and LLM-judge validation pass;
+- supplementary documentation for model-policy, red-team, system-card, and external-assurance audiences.
 
 ## Current State
 
-The project contains a working LaTeX draft, an 18-item seed benchmark, expert-evaluation rubrics, source-verification notes, and a validator for benchmark metadata. No source claims in the setup prompt should be treated as verified until checked in `notes/source-verification.md`.
+The canonical repository state contains:
+
+- an 18-item seed benchmark with eight eligible strict contrast pairs plus one diagnostic confidentiality contrast;
+- a 54-row local pilot over three Ollama models;
+- sanitized row-level and aggregate pilot summaries under `benchmark/results/summaries/`;
+- a judge-validation pass showing that a rubric-aided LLM judge missed the safety-relevant minority classes under favourable conditions;
+- LaTeX source for the main paper, supplement, and two related framework papers.
+
+Public-version note: arXiv v1 (`2607.01153v1`) reflects an earlier version of the pilot readout. The current repository state is the canonical source for the repaired strict-pair treatment: P008 is excluded from strict-pair scoring, leaving 12/24 eligible strict-pair passes.
+
+No source claims in setup prompts or review notes should be treated as verified until checked in `notes/source-verification.md`.
 
 ## Build
 
@@ -22,6 +33,23 @@ The project contains a working LaTeX draft, an 18-item seed benchmark, expert-ev
 make quick
 make
 make test
+```
+
+Verify the frozen pilot and exercise the new preparation workflows with:
+
+```bash
+make phase1-check
+make study-a-synthetic
+make discovery-synthetic
+```
+
+The latter two commands use deterministic synthetic fixtures only. They do not
+run an external study or import private interaction history.
+
+Build the main paper, supplement, and two related framework papers with:
+
+```bash
+make all-papers
 ```
 
 ## Layout
@@ -35,6 +63,17 @@ notes/source-verification.md
 notes/12-pressure-test.md
 scripts/validate_items.py
 ```
+
+## Release Checklist
+
+Before using the project as a public job-market or citation artifact:
+
+- build clean PDFs with `make all-papers`;
+- rebuild the arXiv source bundle with `bash scripts/build_arxiv_bundle.sh`;
+- submit an arXiv revision matching the repaired strict-pair readout;
+- tag a numbered GitHub release from the same commit;
+- archive the release with a DOI if the artifact will be cited externally;
+- keep raw model-output bundles ignored unless they are intentionally sanitized for release.
 
 ## Bibliography
 

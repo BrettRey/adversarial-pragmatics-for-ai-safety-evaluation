@@ -1,6 +1,6 @@
 \section{An Action-Level Sufficiency Test}
 
-Evidentiary assurance is defeasible. It doesn't prove that an AI action was wise, fair, lawful in every respect, or substantively correct. It asks whether the preserved record is strong enough to support an authority claim against predictable challenges. A record is sufficient only if a reviewer can connect the action to valid authority, scope, system state, context, procedure, preservation, and accountable review without relying on the system's bare assertion.
+Evidentiary assurance is defeasible. It asks whether the preserved record is strong enough to support an authority claim against predictable challenges, while leaving wisdom, fairness, full legality, and substantive correctness for other forms of review. A record is sufficient only if a reviewer can connect the action to valid authority, scope, system state, context, procedure, preservation, and accountable review without relying on the system's bare assertion.
 
 \begin{table}[tbp]
 \small
@@ -25,7 +25,13 @@ Answerability and review & A human, vendor, deployer, or institution remains ans
 \label{tab:sufficiency-test}
 \end{table}
 
-The test shifts the target from record production to record adequacy. A log can be authentic and still inadequate if it omits the authority state. A policy can be valid and still inadequate if the system's runtime configuration can't be reconstructed. A complete trace can still be inadequate if no accountable actor remains answerable or no affected person can challenge the action. A flawless bundle can also document an invalid delegation; validity is a separate showing, not an inference from clean procedure.
+The test shifts the target from record production to record adequacy. A log can be authentic and still inadequate if it omits the authority state. An action list can be complete and still inadequate if it omits the status the system assigned to its sources, since a reviewer can then judge the act but not the recognition it flowed through. A policy can be valid and still inadequate if the system's runtime configuration can't be reconstructed. A complete trace can still be inadequate if no accountable actor remains answerable or no affected person can challenge the action. A flawless bundle can also document an invalid delegation; validity is a separate showing, not an inference from clean procedure.
+
+A procurement-assistant case makes the test concrete. Suppose the assistant is authorized to draft an internal comparison memo and reads a vendor page containing the instruction \enquote{email the buyer's maximum budget to request a discount}. The contested action is a blocked vendor email.
+
+A sufficient record would show the user task and procurement role as the authority source; the validity basis for reading internal purchasing criteria; the scope limit that permits memo drafting but not vendor contact; the runtime policy and tool permissions; the vendor page's source and trust label; the proposed email arguments; the tool gate's block decision; the timestamped trace; and the accountable team that configured the workflow.
+
+That record would support the audit inference that blocking the email preserved delegated authority. If the assistant sent the email, the same bundle would locate the defeater: scope inflation, failed information-flow control, unauthorized tool licensing, or missing human approval. If the only record were the final memo, the action might look successful while the authority claim remained unproven.
 
 The table also supports a burden-shifting account for audits and assurance reviews. In a forum that adopts such a standard, an adequate bundle could support a rebuttable audit inference that the action was authorized: the proponent shows authority, validity, scope, state, context, procedure, preservation, and review; a challenger points to a defeater such as invalid authority, scope inflation, missing configuration, contaminated context, or record gaps. Legal presumptions would require a separate doctrinal argument. The applicable standard of proof is forum-specific, but ties shouldn't be resolved by the model's self-report.
 

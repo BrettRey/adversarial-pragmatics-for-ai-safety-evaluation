@@ -13,7 +13,7 @@ The table treats each mechanism as partial evidence. Each secures part of the re
                 >{\raggedright\arraybackslash}p{0.31\linewidth}%
                 >{\raggedright\arraybackslash}p{0.35\linewidth}}
 \toprule
-Mechanism & Strongest evidentiary contribution & Residual delegation problem \\
+Mechanism & Evidentiary contribution & Residual delegation problem \\
 \midrule
 Execution logs & Event sequence, timestamps, tool calls, approvals, denials, and errors. & Logs may omit the authority state or trust status that made the action valid or invalid. \\
 Provenance graphs & Lineage across data, prompts, tools, transformations, agents, and artefacts. & Lineage doesn't determine whether an input was entitled to guide action. \\
@@ -30,4 +30,4 @@ Agent-audit protocols & Delegated identity, permission transitions, audit contex
 
 The architecture implied by the table is layered. A deployment needs a delegation instrument, a policy-state snapshot, a configuration snapshot, a runtime trace, a preservation mechanism, and a review interface. Weakness at any layer can defeat the later authority claim. A perfect tool-call log doesn't help if the delegation instrument is missing. A signed policy doesn't help if the model treated untrusted retrieved text as a superior instruction. A complete trace doesn't support contestability if the affected reviewer can't access the relevant parts of it.
 
-The same architecture also creates privacy and security risk. Evidence capture should include minimization, redaction, retention schedules, role-based access, and protected review channels. The goal isn't maximal logging. It's enough preserved evidence for authorized review without turning every delegated action into an unnecessary archive of sensitive context.
+The same architecture also creates privacy and security risk. Evidence capture should include minimization, redaction, retention schedules, role-based access, and protected review channels. The goal is enough preserved evidence for authorized review without turning every delegated action into an unnecessary archive of sensitive context.

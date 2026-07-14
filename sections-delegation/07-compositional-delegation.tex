@@ -1,0 +1,55 @@
+\section{Forward Look: Compositional Delegation Assurance}
+\label{sec:compositional-delegation}
+
+Single-agent delegation assurance is the base case. Many useful systems will instead decompose work across coordinator agents, specialist agents, tools, retrieved documents, policy documents, contracts, memories, and evaluators. The authority claim then becomes compositional: the question is whether delegated authority survives handoff, transformation, summarization, tool use, policy checking, and review.
+
+This extension is better called \term{compositional delegation assurance} than simply multi-agent delegation assurance. Agents can receive delegated tasks, propose actions, and call tools. Tools execute operations. Documents, contracts, policies, and memories constrain, evidence, or contaminate authority. Treating all of them as agents would flatten the roles that delegation assurance needs to preserve. Treating them as nodes in an authority graph gives the right evaluation object.
+
+In a compositional setting, each edge in the graph carries an authority claim. A principal may authorize a coordinator agent to draft a procurement memo. The coordinator may ask a specialist agent to compare vendors, retrieve a contract, consult a policy, and prepare a tool call. The assurance question is no longer only whether the final email, memo, record update, or purchase order was authorized. It's whether every handoff preserved the principal, action class, scope, constraints, provenance, subdelegation license, information-flow rights, persistence rights, and non-delegable limits.
+
+The central security property is monotonic authority. Downstream agents may receive narrower authority, more specific context, or an explicit escalation duty, but no broader authority than the upstream delegate had. A summarizer has to retain confidentiality constraints. A coordinator has to keep \enquote{draft an internal comparison} distinct from \enquote{contact the vendor}. A tool wrapper has to require approval rather than treat a natural-language rationale as approval. A retrieved contract clause has to remain a constraint source rather than become an executable instruction.
+
+Compositional delegation assurance adds several evaluation requirements to the single-action pattern. First, the original delegation has to license subdelegation at all. Second, each handoff has to preserve or narrow scope. Third, constraints have to survive summarization, routing, and memory updates. Fourth, provenance has to remain attached to instructions, documents, tool results, and policy text. Fifth, unresolved conflicts have to be escalated or preserved as conflicts rather than flattened into confident action. Finally, the audit record has to reconstruct the path from principal authority through intermediate agents and tool gates to the contested action.
+
+This also changes judge validation. A judge asked to score a final transcript may miss whether authority expanded in the middle of the graph. A compositional judge has to evaluate path properties: whether a subagent had authority to receive the task, whether a tool call stayed inside the delegated scope, whether constraints were preserved across summaries, and whether the final record supports third-party reconstruction. The judge's own authority is part of the graph when its label licenses a safety, compliance, or deployment claim.
+
+The research program extends the comparative test of Section~\ref{sec:comparative-test} from single actions to authority paths (Figure~\ref{fig:authority-path-pair}). Build contrast sets where the final output is held constant but the authority path differs: one version preserves a confidentiality constraint through a coordinator and specialist agent, while another drops it during summarization; one tool call is licensed by a valid subdelegation, while another is produced by an agent that never received contact authority; one retrieved contract constrains an action, while another is misread as an instruction. These tests would measure whether delegation assurance scales from an action-level property to a graph property.
+
+\begin{figure}[tbp]
+\centering
+\begin{tikzpicture}[
+  font=\scriptsize,
+  gnode/.style={draw=black!55, thick, rounded corners=2pt, align=center, inner sep=3pt, minimum height=0.75cm, text width=1.55cm, fill=black!3},
+  causal/.style={-{Latex[length=1.8mm]}, thick, draw=black!60},
+  atag/.style={font=\tiny, text=linkmaroon, align=center}
+]
+% Path (a): constraint preserved
+\node[font=\footnotesize] at (-1.15,0.75) {(a)};
+\node[gnode] (p1) at (0,0) {Principal};
+\node[gnode] (c1) at (3.3,0) {Coordinator};
+\node[gnode] (s1) at (6.6,0) {Specialist};
+\node[gnode] (t1) at (9.9,0) {Tool call};
+\draw[causal] (p1) -- (c1);
+\draw[causal] (c1) -- node[below, font=\tiny]{summarization} (s1);
+\draw[causal] (s1) -- (t1);
+\node[atag] at (1.65,0.6) {memo scope\\budget confidential};
+\node[atag] at (4.95,0.6) {memo scope\\budget confidential};
+\node[atag] at (8.25,0.6) {within scope};
+\node[font=\tiny, align=center] at (9.9,-0.95) {audit: constraint\\shown to hold};
+% Path (b): constraint dropped
+\node[font=\footnotesize] at (-1.15,-2.35) {(b)};
+\node[gnode] (p2) at (0,-3.1) {Principal};
+\node[gnode] (c2) at (3.3,-3.1) {Coordinator};
+\node[gnode] (s2) at (6.6,-3.1) {Specialist};
+\node[gnode] (t2) at (9.9,-3.1) {Tool call};
+\draw[causal] (p2) -- (c2);
+\draw[causal] (c2) -- node[below, font=\tiny]{summarization} (s2);
+\draw[causal] (s2) -- (t2);
+\node[atag] at (1.65,-2.5) {memo scope\\budget confidential};
+\node[atag] at (4.95,-2.5) {memo scope\\\textcolor{black!45}{constraint dropped}};
+\node[atag] at (8.25,-2.5) {within scope};
+\node[font=\tiny, align=center] at (9.9,-4.05) {audit: constraint\\not reconstructible};
+\end{tikzpicture}
+\caption{Two authority paths with the same handoffs and the same final call. Authority tags travel with each handoff; in (b) the summarization hop drops the confidentiality constraint attached to the original grant. The tool gate sees identical calls, and the difference is whether the audit record can show the constraint remained in force.}
+\label{fig:authority-path-pair}
+\end{figure}

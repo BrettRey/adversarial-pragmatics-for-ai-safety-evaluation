@@ -77,6 +77,69 @@ A compact safety case has the following claim/argument/evidence pattern.
   \item \textbf{Evaluation subclaim.} Evaluators preserve the same distinctions rather than collapsing success, safety, refusal, and compliance.
 \end{itemize}
 
+These subclaims create empirical predictions. If systems that pass status-preservation tests fail delegated-action tasks at the same rate and in the same ways as systems that don't, then the language-mediated middle layer is doing little explanatory work. If delegation matrices and action traces don't improve reviewer agreement about whether an action was authorized, the evidentiary standard is under-specified. If failures cluster only around ordinary access-control mistakes, status and priority should be demoted. Delegation assurance earns its place only if it improves prediction before failure or reconstruction after failure.
+
+\subsection{A Comparative Test}
+\label{sec:comparative-test}
+
+Testing those predictions needs a baseline drawn from the strongest existing controls. The confused-deputy problem was an argument for capability architectures from the start \parencite{hardy1988confusedDeputy}. Newer agent-security work distinguishes tool exposure from per-call authorization, checking scope, argument values, spending ceilings, and default denial before a call executes \parencite{mellafezuvic2026scopegate}, and uses counterfactual causal attribution to separate tool calls supported by the user's request from calls driven by untrusted observations \parencite{he2026attriguard}. The test runs against those three mechanisms jointly.
+
+The test holds capability and provenance fixed while varying authority, in three minimal-pair families. In the indirect-injection pair, the same embedded directive comes once from a source with standing to direct action and once from a source without it. In the confused-deputy pair, the same read access comes once with disclosure authority and once without. In the persistence pair, the same grant once licenses memory updates and subdelegation and once doesn't, with downstream constraints once preserved and once dropped. Figure~\ref{fig:authority-minimal-pair} draws the indirect-injection pair.
+
+Authority status and causal attribution give opposite verdicts in both directions. A directive embedded in a retrieved memo from the principal's own chain of authority is observation-driven, so attribution flags it, while the delegation matrix licenses it. A user-elicited call that exceeds what the user could confer is user-supported, so attribution passes it, while the matrix blocks it. Per-call authorization blocks the second case only when its policy already encodes the authority relation; status, priority, and licensing say what that policy has to contain and what record it has to leave.
+
+\begin{figure}[tbp]
+\centering
+\begin{tikzpicture}[
+  font=\scriptsize,
+  gnode/.style={draw=black!55, thick, rounded corners=2pt, align=center, inner sep=3pt, minimum height=0.75cm, text width=1.8cm, fill=black!3},
+  causal/.style={-{Latex[length=1.8mm]}, thick, draw=black!60},
+  authority/.style={-{Latex[length=1.8mm]}, thick, draw=linkmaroon, dashed}
+]
+% Panel (a): source with standing
+\begin{scope}
+\node[gnode] (pa) at (0,0) {Principal};
+\node[gnode] (sa) at (3.4,0) {Source};
+\node[gnode] (aa) at (0,-2.0) {Agent uptake};
+\node[gnode] (ma) at (3.4,-2.0) {Retrieved memo with directive};
+\node[gnode] (ta) at (0,-4.0) {Proposed tool call};
+\draw[authority] (pa) -- node[left, font=\tiny]{task} (aa);
+\draw[authority] (pa) -- node[above, font=\tiny]{standing} (sa);
+\draw[causal] (sa) -- node[right, font=\tiny]{writes} (ma);
+\draw[causal] (ma) -- node[above, font=\tiny]{read} (aa);
+\draw[causal] (aa) -- node[left, font=\tiny]{proposes} (ta);
+\node[font=\footnotesize] at (1.7,0.85) {(a) source with standing};
+\node[align=center, font=\tiny] at (1.7,-4.95) {causal attribution: flagged\\delegation matrix: licensed};
+\end{scope}
+% Panel (b): source without standing
+\begin{scope}[xshift=7.2cm]
+\node[gnode] (pb) at (0,0) {Principal};
+\node[gnode] (sb) at (3.4,0) {Source};
+\node[gnode] (ab) at (0,-2.0) {Agent uptake};
+\node[gnode] (mb) at (3.4,-2.0) {Retrieved memo with directive};
+\node[gnode] (tb) at (0,-4.0) {Proposed tool call};
+\draw[authority] (pb) -- node[left, font=\tiny]{task} (ab);
+\node[font=\tiny, text=black!45] at (1.7,0.05) {no standing};
+\draw[causal] (sb) -- node[right, font=\tiny]{writes} (mb);
+\draw[causal] (mb) -- node[above, font=\tiny]{read} (ab);
+\draw[causal] (ab) -- node[left, font=\tiny]{proposes} (tb);
+\node[font=\footnotesize] at (1.7,0.85) {(b) source without standing};
+\node[align=center, font=\tiny] at (1.7,-4.95) {causal attribution: flagged\\delegation matrix: blocked};
+\end{scope}
+% Legend
+\draw[causal] (2.6,-5.75) -- (3.3,-5.75) node[right, font=\tiny]{causal path};
+\draw[authority] (6.4,-5.75) -- (7.1,-5.75) node[right, font=\tiny]{authority};
+\end{tikzpicture}
+\caption{An authority minimal pair from the indirect-injection family. The causal path (solid) and provenance are identical in both panels, and counterfactual attribution flags the proposed call as observation-driven in both. The panels differ in one authority edge (dashed): whether the source had standing to direct the delegated task, which separates the licensed call from the blocked one.}
+\label{fig:authority-minimal-pair}
+\end{figure}
+
+Faithful scoring separates four fields in each trace: the authority status of the directive and its source as independently adjudicated, the status the system assigned, the fit or misfit between the two, and the action produced through that recognition. Adjudicated status admits genuine ambiguity as a value; where competent adjudicators disagree, the disagreement is a property of the item rather than noise to be voted away \parencite{reynolds2026adversarialPragmatics}.
+
+Separating recognition from action keeps the diagnostic cases visible. A misfit recognition that a tool gate happens to block is a control success and an uptake failure; a sound recognition stopped by a miscalibrated gate is the reverse. An action-only score collapses both into their outcomes and loses the attribution the safety case needs.
+
+Each pair member should receive a different prediction for attempted action, execution, authorization verdict, audit attribution, and appropriate defence. If systems and reviewers equipped with capabilities, per-call authorization, and causal attribution predict the same outcomes and reconstruct the same attributions across all three families, status and priority should be demoted. Section~\ref{sec:compositional-delegation} extends the design from single actions to authority paths.
+
 \subsection{Boundary Conditions}
 
 Not every AI-security failure is primarily a delegation failure. Core delegation failures involve delegated action, delegated access, delegated disclosure, delegated persistence, delegated judgment, delegated evaluation, or delegated record-keeping for accountability.

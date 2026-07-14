@@ -1,5 +1,13 @@
 # Expert Evaluation Protocol
 
+## Scope Note
+
+This protocol documents the original author-pilot adjudication path. It remains
+part of the historical artifact and should not be handed to blind external
+Study A evaluators, because it presupposes expected behaviour and includes
+failure attribution. The role-separated first-pass Study A schema is in
+`benchmark/study-a/schema.md`.
+
 Human evaluators in this protocol are experts applying a stated rubric. The protocol does not collect ordinary-user labels, personal demographics, or data about evaluator populations.
 
 ## Evaluator Roles

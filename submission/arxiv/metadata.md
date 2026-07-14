@@ -8,7 +8,7 @@ Primary category: cs.AI
 
 Cross-list: cs.CL
 
-Comments: 15-page main paper plus 9-page supplementary material; 6 figures and 8 tables total; code/data artifact available in the linked repository.
+Comments: 18-page main paper plus 10-page supplementary material; code/data artifact available in the linked repository.
 
 Repository: https://github.com/BrettRey/adversarial-pragmatics-for-ai-safety-evaluation
 

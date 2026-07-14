@@ -1,5 +1,12 @@
 # Rater Training Guide
 
+## Scope Note
+
+This guide was written for the original author-pilot adjudication app, which
+shows expected behaviour and diagnostic context. It is not a blind Study A
+training document. Independent first-pass evaluators use only their assigned
+role form and `benchmark/study-a/schema.md`.
+
 This guide trains raters to label model outputs from the adversarial-pragmatics local pilot. The task is not to rank models. The task is to decide, row by row, what kind of language-control behavior the output shows.
 
 ## What You Are Rating
