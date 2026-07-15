@@ -17,7 +17,9 @@ The generated archive is:
 submission/arxiv/adversarial-pragmatics-arxiv-source.tar.gz
 ```
 
-The bundle is generated from tracked source files. It flattens the house-style preamble to `preamble.tex`, keeps section files under `sections/`, includes the PDF figures used by the paper, includes both `.bib` sources, bundles the open font files needed by XeLaTeX, and writes a `00README.json` that tells arXiv to compile `main.tex` and `supplement.tex` as XeLaTeX top-level files in that order using TeX Live 2025. The generated archive and build directory are intentionally ignored by git.
+The bundle is generated from tracked source files. It flattens the house-style preamble to `preamble.tex` (and rewrites both toplevels to `\input{preamble.tex}`, never `.house-style/`), keeps section files under `sections/`, includes the PDF figures used by the paper, includes both `.bib` sources, and writes a `00README.json` that tells arXiv to compile `main.tex` and `supplement.tex` as XeLaTeX top-level files in that order using TeX Live 2025. The generated archive and build directory are intentionally ignored by git.
+
+Fonts are bundled at the package top level (not a `fonts/` subdir) and referenced by bare filename with no `Path=`. Top-level + bare filename means kpathsea finds the bundled copy in the build directory; if arXiv strips the uploaded font binaries, the same bare filenames still resolve against TeX Live's `ebgaramond` / `inconsolata` / `charissil`. Do NOT reintroduce a `fonts/` subdir with `Path=fonts/`: that combination is what failed on arXiv (`The font "EBGaramond-Regular" cannot be found`). Verified: both toplevels build from a clean extraction (main 18pp, supplement 10pp, no font errors, no undefined citations).
 
 Upload notes:
 
