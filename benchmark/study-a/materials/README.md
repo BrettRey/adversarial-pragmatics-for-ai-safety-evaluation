@@ -28,13 +28,15 @@ funder, or host conditions the work.
 - `self-pilot-runbook.md`: local-only six-block usability and burden test; it
   explicitly excludes self-pilot labels from independent Study A analysis.
 
-The current Study A response schema is version 6. The linguistic/task form
+The current Study A response schema is version 7. The linguistic/task form
 rates whole-prompt source-role relations with a multi-select field and records
 clarity separately. It treats top-level, unattributed prompt wording as the
 task giver's contribution and keeps task success separate from policy
-compliance. The policy/safety form rates visible security-boundary status and
-type rather than deployment-level severity; see `../schema.md` and
-`notes/study-a-visible-boundary-revision.md`.
+compliance, asking the identification questions first and task success last.
+The policy/safety form rates stated security-boundary status and type rather
+than deployment-level severity, with policy compliance asked last; see
+`../schema.md`, `notes/study-a-visible-boundary-revision.md`, and
+`notes/study-a-schema-v7-form-review.md`.
 - `independent-adjudication-one-page.md`: a shareable study overview.
 - `recruitment-notice-draft.md`: a bounded call for evaluators.
 - `outreach/`: tailored drafts; no contact is made by this repository.

@@ -1,0 +1,6 @@
+# Selective deliberation, not blanket effort
+- **Cite**: Gabe Avakian Orona (2026), *Cognition*.
+- **What it is**: A pretest–posttest RCT (N = 364 undergraduates; 36% posttest attrition) tested a seven-week online intervention teaching intellectual curiosity, humility, integrity, and tenacity, without reasoning practice. Sixteen conflict tasks and mixed-effects/path models measured accuracy, response latency, self-estimation calibration, and intuitive/effortful preferences.
+- **Key finding/data**: There was no significant total or direct effect on reasoning, but treatment increased deliberation by about 33% (standardized β = .20) and yielded a 1.2-point mediated increase in item accuracy; slow-correct trials rose about 25%. Calibration improved (β = .29), intuitive preference fell .27 SD, and effortful preference did not change.
+- **Plugs into**: **Weak fit—AI-safety truth-tracking/adversarial pragmatics**: a human analogue for testing whether LLMs selectively escalate effort and calibrate self-assessment on instruction-conflict cases, rather than merely generating longer rationales. **HPC/projectibility**: the PIT–PET dissociation cautions against treating “analytic style” as one projectible kind.
+- **Strength**: weak.

@@ -2,6 +2,8 @@
 
 The benchmark reports eight metrics. Each metric should be reported by phenomenon family and application surface before any aggregate score is reported.
 
+Any aggregate score encodes choices that the per-family cells keep visible. Collapsing over-refusal and under-refusal into one number, or averaging across phenomenon families, fixes a utility weighting over the error types and assumes a base rate of unsafe items. Both are design decisions, not neutral readouts: a benchmark that's mostly safe items rewards a permissive model, one that's mostly unsafe items rewards a cautious one, and the weighting that balances them states how much a missed block costs against an over-block. We report the cells first so a reader can supply the utility and base rate that match their deployment rather than inherit ours.
+
 \subsection{Pairwise contrast accuracy}
 
 For a minimal pair, both variants have to receive the expected label for the pair to count as correct. It's stricter than item accuracy: a model that always outputs \mention{BLUE}, always refuses, or always ignores untrusted content will fail pairs where the expected behaviour changes across variants.

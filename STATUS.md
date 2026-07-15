@@ -65,19 +65,75 @@ submission/arxiv/adversarial-pragmatics-arxiv-source.tar.gz
 
 - Complete Study A before expanding the item set: use the prepared blind,
   role-separated re-adjudication of the existing 54 outputs.
-- Continue the self-pilot on the rebuilt schema-v6 forms through the optional
-  practice set and remaining Study A blocks. Preserve the completed schema-v5
-  linguistic/task block as diagnostic interface evidence, use retained block
-  timing to document realistic evaluator burden, settle data-transfer details,
-  then decide whether to approach external evaluators.
+- Self-pilot collection closed 2026-07-15. Five schema-v6 blocks returned
+  (linguistic 02--03, policy/safety 01--03); the preserved schema-v5 sitting
+  stands in for linguistic block 01 (Brett's call, 2026-07-15), so the v6
+  timing report stays at 5/6 by design. Returns under
+  `private/study-a/self-pilot/responses/` (v5 in `schema-v5-preserved/`),
+  timing readout in `private/study-a/self-pilot/report/`. Realistic burden
+  signal: policy/safety median ~28 min per 18-row block, single sittings;
+  linguistic elapsed times are open-tab wall-clock and unusable as effort time.
+  Any volunteer-workload statement should extrapolate from the policy blocks
+  and say so. Next: settle data-transfer details, then decide whether to
+  approach external evaluators.
+- Exploratory self-pilot label diagnostics exist under
+  `private/study-a/self-pilot/label-diagnostics/`
+  (`scripts/analyze_self_pilot_labels.py`; DECISIONS 2026-07-15 narrowed the
+  exclusion to no-ingestion/exploratory-only). Findings stay private; any
+  design change they motivate goes through DECISIONS with provenance noted.
+- Gate before opening any external Study A return: tag the frozen analysis
+  plan (v7 schema + ingestion/analysis scripts + item-revision criteria) so
+  later analysis choices are visibly pre-committed.
 - Use the fixture-only repair miner privately after that decision; do not import
   real histories or derive naturalistic items until Study A has informed the
   rubric and analysis path.
 - Split P008 into two clean contrast pairs for the development set.
 - Add a disjoint judge model, no-rubric condition, alternate judge prompts, repeated items, and balanced minority classes.
 - After Study A closes, consider adding explicit system-assigned-status and recognitional-fit labels to the benchmark rubric (the field-one adjudication machinery already exists in the two-stage protocol). The Study A instrument is frozen mid-pilot; this is a revision candidate, not a change to live forms.
+- Schema v7 built 2026-07-15 from the full form review
+  (`notes/study-a-schema-v7-form-review.md`, changelog at end). Brett's call:
+  identification questions first, global judgment last, on both forms.
+  Standard escape pair on every scalar field, substantive first-slot keys for
+  none-findings, stated/visible wording split, harmonized labels. Simulator,
+  analyzer, builder, schema.md, and Study A READMEs updated; synthetic
+  workflow, item validator, phase1-check, and privacy boundary all pass.
+  Recruitment packages will be built from v7; self-pilot v5/v6 returns stay
+  local usability evidence, not field-comparable to v7.
 - Build an executable delegation-assurance harness for typed authority traces and reviewer reconstruction. The trace schema separates four fields per item: independently adjudicated authority status (genuine ambiguity admissible as a value), system-assigned status, recognitional fit or misfit, and the action produced through that recognition.
 - Keep source verification current in `notes/source-verification.md`.
+
+### 2026-07-13--15 Session Notes
+
+- Delegation Assurance grew its missing empirical centre: a §3 comparative
+  test (three authority minimal-pair families against a capabilities /
+  per-call-authorization / causal-attribution baseline: Hardy 1988, ScopeGate
+  arXiv:2606.28679, AttriGuard arXiv:2603.10749), a recognition-gap
+  motivation in §1 citing *Effective without warrant* (PhilArchive REYEWW),
+  a four-field trace schema (adjudicated status with admissible ambiguity,
+  assigned status, fit, action), two TikZ figures (authority minimal pair;
+  compositional path pair), and a conclusion that stakes the framework on the
+  test instead of conceding "bounded translation".
+- Flagship: judge-steerability paragraph in §2 and a rubric-departure judge
+  condition in §7a (Alloula et al., arXiv:2606.07874, routed via central
+  literature note); §5 adjudication sentence aligned with targeted
+  confidence. Evidentiary: assigned-status record-adequacy sentence in the
+  sufficiency test. Sources L71--L75 verified.
+- Shipped `878f8dc` (2026-07-14). Work since is uncommitted: schema v7 and
+  script/doc sync, the v7 form-review note, label diagnostics, confidence
+  scoping, tracking updates.
+- Study A self-pilot closed: six blocks returned, v5 sitting stands in for
+  linguistic block 01; timing report says policy/safety median ~28 min per
+  18-row block (linguistic elapsed is wall-clock, unusable).
+- Schema v7 built from the full form review
+  (`notes/study-a-schema-v7-form-review.md`): identification-first order with
+  the global judgment last, uniform escape pair, substantive first-slot
+  none-findings, harmonized wording; confidence targeted to the global
+  judgment. Synthetic workflow, item validator, phase1-check, privacy
+  boundary all pass.
+- Exploratory self-pilot label diagnostics ran under the narrowed exclusion
+  (no ingestion, exploratory-only): findings private under
+  `private/study-a/self-pilot/label-diagnostics/`; item review candidates
+  noted there.
 
 ### 2026-07-10 Session Notes
 
@@ -168,3 +224,10 @@ submission/arxiv/adversarial-pragmatics-arxiv-source.tar.gz
   validation, private-data boundaries, frozen-pilot integrity, categorical
   ingestion, partial-return retention, and the complete synthetic workflow are
   clean under schema v6.
+
+## Related reading — Cognition 2026 intake (2026-07-14)
+Sources routed from a *Cognition* 2026 batch. Central index: `literature/cognition-2026-intake.md`. Verify claims/citations before use.
+- **Selective deliberation, not blanket effort** [weak] — `notes/lit-cognition-2026-analytic-thinking-styles.md`
+- **Future instructions relax present cognitive control** [medium] — `notes/lit-cognition-2026-prospective-relaxation.md`
+- **Self-similar synthetic voices can amplify illusory truth** [medium] — `notes/lit-cognition-2026-self-voice-illusory-truth.md`
+- (cross-ref) minimal-group-partisanship — `notes/source-hooks/cognition-2026-minimal-group-partisanship.md`

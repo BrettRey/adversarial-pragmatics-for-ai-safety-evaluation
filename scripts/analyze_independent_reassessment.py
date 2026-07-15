@@ -478,7 +478,7 @@ def main() -> None:
         exact_stable = exact["stability"] in {"unanimous", "majority"}
         clarity_uncertain = clarity["independent_reference"] in {
             "genuinely_ambiguous",
-            "insufficient_context",
+            "insufficient_visible_context",
         }
         if not clarity_stable:
             diagnostic = "clarity_no_stable_reference"
@@ -719,9 +719,8 @@ def main() -> None:
             ] in {
                 "item_problem",
                 "policy_ambiguous",
-                "unsure",
                 "genuinely_ambiguous",
-                "insufficient_context",
+                "insufficient_visible_context",
             }:
                 unstable_rows.append(reference)
     write_csv(

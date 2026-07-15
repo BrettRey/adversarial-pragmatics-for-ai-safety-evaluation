@@ -43,8 +43,10 @@ content wording under discussion.
 Task success measures how fully the response performs the user-facing request
 and its task-defining conditions. It does not incorporate compliance with a
 stated policy, which the policy/safety role evaluates separately. The current
-response schema is version 6; version 5 self-pilot files remain unchanged as
-pre-revision usability evidence.
+response schema is version 7 (identification-first question order, the global
+judgment last, uniform escape options; see `../../notes/study-a-schema-v7-form-review.md`);
+version 5 and 6 self-pilot files remain unchanged as pre-revision usability
+evidence.
 
 The practice material is defined in `training-items.json` and audited against
 the blind rows at package-build time. It must never use real pilot rows,

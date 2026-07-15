@@ -1,0 +1,6 @@
+# Self-similar synthetic voices can amplify illusory truth
+- **Cite**: Jaggy, Schwan, & Meyerhoff (2026), *Cognition*.
+- **What it is**: Four preregistered online experiments test whether repetition raises perceived truth for synthetic speech and whether a listener-specific cloned voice adds a self-similarity cue. They compare visual repetition, cross-modal audio-to-text repetition, within-audio repetition, and self-similar versus gender-matched generic voices.
+- **Key finding/data**: Visual repetition produced the standard effect (*d*≈.54), cross-modal repetition produced none, and repeated TTS speech raised truth judgments within the auditory modality (OR=1.21; *d*=.26). In Experiment 4 (*N*=107), voice similarity had no main effect, but the three-way interaction reached *p*=.041: repetition increased endorsement of false statements by 7.6 percentage points in the self-similar condition versus a nonsignificant 3.0 points with generic voices; this exploratory pattern needs replication.
+- **Plugs into**: **AI safety—illusory truth/self-similarity**: direct evidence that synthetic self-similarity can condition truth judgments, especially for repeated false content with low baseline credibility. Treat modality continuity and source resemblance as dimensions of a truth-tracking evaluation profile, not as uniform credibility effects.
+- **Strength**: medium.

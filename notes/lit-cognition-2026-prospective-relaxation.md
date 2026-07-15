@@ -1,0 +1,6 @@
+# Future instructions relax present cognitive control
+- **Cite**: Moretti & Spinelli (2026), *Cognition*.
+- **What it is**: Three online prime–probe experiments tested whether a perfectly valid cue about the second of two trials changes control during the intervening first trial. Experiment 2 preregistered a direct replication; Experiment 3 gave each participant a unique trial sequence.
+- **Key finding/data**: Across 156 analyzable participants, the first-trial congruency cost was 115 ms when the cued future trial was congruent versus 106 ms when it was incongruent, but only in informative-cue blocks, *F*(1,155)=19.19, *p*<.001, η²p=.11. The asymmetry mattered: future congruent cues sped Trial 2 by 22 ms and relaxed control in Trial 1, whereas future incongruent cues produced neither reliable benefit nor tightening.
+- **Plugs into**: **AI safety—adversarial pragmatics/instruction conflict**: a useful human analogue showing that an instruction scoped to a later task can alter processing of intervening material. Evaluation designs could insert diagnostic filler between instruction and target and score prospective relaxation separately from prospective tightening; transfer to LLMs remains untested.
+- **Strength**: medium.

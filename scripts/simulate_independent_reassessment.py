@@ -25,7 +25,7 @@ BUILD = ROOT / "scripts" / "build_independent_reassessment.py"
 INGEST = ROOT / "scripts" / "ingest_independent_reassessment.py"
 ANALYZE = ROOT / "scripts" / "analyze_independent_reassessment.py"
 SCHEMA_PATH = ROOT / "benchmark" / "study-a" / "schema.json"
-EXPECTED_SCHEMA_VERSION = 6
+EXPECTED_SCHEMA_VERSION = 7
 TASK_GIVER_ROLE = "task_giver_contribution"
 DEPRECATED_TASK_GIVER_ROLE = "task_giver_directive"
 
@@ -106,13 +106,13 @@ def linguistic_fields(labels: dict[str, str], phenomenon: str) -> dict[str, Any]
     }[phenomenon]
     source_role_clarity = {
         "deixis_reference_hijack": "genuinely_ambiguous",
-        "policy_boundary_ambiguity": "insufficient_context",
+        "policy_boundary_ambiguity": "insufficient_visible_context",
     }.get(phenomenon, "clear")
     return {
         "task_success": labels["task_success"],
         "source_roles": source_roles,
         "source_role_clarity": source_role_clarity,
-        "scope_reference": "unresolved_or_ambiguous" if phenomenon == "deixis_reference_hijack" else "not_applicable",
+        "scope_reference": "unresolved_or_ambiguous" if phenomenon == "deixis_reference_hijack" else "no_scope_reference_issue",
         "clarification_required": "yes" if phenomenon == "deixis_reference_hijack" else "no",
         "response_act_performed": {"success": "yes", "partial": "partly", "failure": "no"}[labels["task_success"]],
     }
@@ -142,7 +142,13 @@ def policy_fields(labels: dict[str, str], phenomenon: str) -> dict[str, str]:
         ),
         "visible_boundary_type": visible_type if noncompliant else "none",
         "refusal_outcome": labels["refusal_outcome"],
-        "information_flow_action_licensing": "violation" if noncompliant else "no_violation",
+        "information_flow_action_licensing": (
+            "violation"
+            if noncompliant
+            else "no_violation"
+            if phenomenon in boundary_phenomena
+            else "no_disclosure_or_action_at_stake"
+        ),
     }
 
 
@@ -181,6 +187,13 @@ def perturb(
         else:
             output["visible_boundary_status"] = "insufficient_visible_context"
             output["visible_boundary_type"] = "mixed_or_unclear"
+    # Exercise the v7 standard escape pair on the clarity field so the
+    # coverage check sees every option at least once.
+    if role == "linguistic_task" and rater_number == 2:
+        if row_number % 23 == 0:
+            output["source_role_clarity"] = "item_problem"
+        elif row_number % 21 == 0:
+            output["source_role_clarity"] = "insufficient_visible_context"
     return output
 
 
@@ -305,7 +318,7 @@ def check_ingested_source_roles(processed_dir: Path, schema: dict[str, Any]) -> 
         rows = list(reader)
     required = {"source_roles", "source_role_clarity"}
     if not required.issubset(fieldnames):
-        raise SystemExit("ingested ratings are missing v6 source-role columns")
+        raise SystemExit("ingested ratings are missing the multi-select source-role columns")
     if {"pragmatic_status", "source_interpretation"}.intersection(fieldnames):
         raise SystemExit("ingested ratings retain deprecated Study A role columns")
     if not any(row.get("rationale", "") == "" for row in rows):
