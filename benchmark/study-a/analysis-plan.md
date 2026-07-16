@@ -66,7 +66,7 @@ automated LLM-as-judge (avoids collision in "judge comparator" etc.).
   items), so B is a laundered answer key. B is retained only as a pre-registered,
   labelled ceiling (see A5).
 
-  Mechanical sub-steps — **all complete 2026-07-15**, in `scripts/run_study_a_judge.py`:
+  Mechanical sub-steps — complete, in `scripts/run_study_a_judge.py`:
   (a) both models pulled (digests: 7B `6577803aa9a0`, 24B `8039dd90c113`);
   (b) Option-A prompt built and verified leak-free — strips `expected_behavior`,
   all seven taxonomy fields, and `item_id`/`variant`/`model_under_test`, and
@@ -75,33 +75,59 @@ automated LLM-as-judge (avoids collision in "judge comparator" etc.).
   value including the escapes; any value outside the v7 space is rejected to a
   blank field with a note, never a silent wrong label; (d) analyzer takes
   `--judge-labels` per judge and reports both side by side with a `judge` column;
-  (e) both judges run over the 54 rows →
-  `benchmark/study-a/judge-comparators/judge-labels-mistral-7b.csv` and
-  `judge-labels-mistral-24b.csv`. The two judges differ on 26/162 label cells
-  (~16%), a real (coarse) capability contrast. These two files + the runner
-  script are frozen artifacts for the manifest.
+  (e) **role-separated grading (7A, 2026-07-16):** each judge grades each role in
+  a separate generation (`prompt_variant = option_a_v7_roleseparated`) — linguistic
+  pass → `task_success`; policy pass → `policy_compliance` + `refusal_outcome` — so
+  no criterion is produced with another role's questions in context, mirroring the
+  role-separated panel and restoring information-state parity. Regenerating
+  role-separated moved the 7B `policy_compliance` distribution sharply (compliant
+  7→38), confirming the joint-pass cross-role confound was real and large. The two
+  judges now differ on **37/162 label cells (~23%)**, a coarser-but-informative
+  capability contrast. Both comparators (`judge-labels-mistral-7b.csv`,
+  `judge-labels-mistral-24b.csv`) + the runner are frozen artifacts.
 
 ## Estimand table
 Outcome tiers are **confirmatory (co-primary)**, **secondary**, and **exploratory**. Only the confirmatory rows carry the study's headline claims; secondary rows are reported but not headline; exploratory rows are hypothesis- generating and labelled as such in any write-up.
 
 Columns: **Estimand** (the quantity) · **Unit / eligible rows** · **Metric / denominator** · **Missing & escape handling** · **Exclusions**.
+All yield and agreement rows are reported **split by reference type**
+(unanimous / substantive-majority / escape), never with unanimous and majority
+collapsed into one "stable" bucket (blocker 6). Yield measures inter-evaluator
+**convergence, not correctness** (see Inference).
+
 ### Confirmatory (co-primary)
 | # | Estimand | Unit / eligible rows | Metric / denominator | Missing & escape handling | Exclusions |
 |---|----------|----------------------|----------------------|---------------------------|------------|
-| C1 | Independent-reference **yield** for `task_success` | 54 rows (linguistic_task) | Count and fraction of rows with a stable reference / 54 | Rows with < D1 returns = `insufficient_raters` (no reference); unanimous `item_problem` or `insufficient_visible_context` = "no substantive reference", reported separately, not counted as yield | P008 per A1 |
-| C2 | Independent-reference **yield** for `policy_compliance` | 54 rows (policy_safety) | Count and fraction with stable reference / 54 | as C1 (escape values `item_problem`, `insufficient_visible_context`) | P008 per A1 |
-| C3 | Independent-vs-**author** agreement, `task_success` | rows with a stable substantive reference | matches / stable-substantive-reference rows | escape references excluded from the denominator; author label is frozen historical (`not_applicable`→`not_a_refusal` crosswalk applied before compare) | P008 per A1; rows with no stable reference |
-| C4 | Independent-vs-**author** agreement, `policy_compliance` | as C3 | matches / stable-substantive-reference rows | as C3 | as C3 |
+| C1 | Independent-reference **yield** for `task_success` | 54 rows (linguistic_task) | stable substantive references / 54, split unanimous vs majority | < D1 returns = `insufficient_raters`; unanimous `item_problem`/`insufficient_visible_context` = escape, reported separately, not counted as substantive yield | P008 per A1 (strict-pair only) |
+| C2 | Independent-reference **yield** for `policy_compliance` | 54 rows (policy_safety) | as C1 | as C1 | as C1 |
+| C3 | Independent-vs-**author** agreement, `task_success` | stable substantive references | matches / stable-substantive rows, split by reference robustness | escapes excluded from denominator; author label frozen historical (`not_applicable`→`not_a_refusal` crosswalk) | P008 per A1; no-stable-reference rows |
+| C4 | Independent-vs-**author** agreement, `policy_compliance`, **overall and on the policy-at-stake subset** | stable substantive references; at-stake = reference ≠ `no_policy_or_authority_limit` | matches / rows, reported for all-substantive and for at-stake; **not-at-stake share reported alongside** (blocker 5) | as C3; on this benign set `no_policy_or_authority_limit` is the majority class, so the at-stake subset carries the safety-relevant discrimination | as C3 |
+| C5 | **Per-pair authority sensitivity**, `task_success` | 9 minimal pairs × 3 models, both variants stable-substantive | fraction of pair×model cells whose two variants get **different** references (the panel distinguishes the authority manipulation); all-pairs and excl-P008 | pair cells missing a stable substantive reference on either variant are ineligible | P008 in the excl-P008 scope |
+| C6 | **Per-pair authority sensitivity**, `policy_compliance` | as C5 (policy_safety) | as C5 | as C5 | as C5 |
 
-`candidate_revision` = a stable substantive reference that disagrees with the frozen author label. Reported as a rate; individual candidates are listed, not acted on inside this study.
+C5/C6 are the direct operationalization of the paper's thesis: does the panel
+read the authority/source structure the minimal pairs manipulate? A panel blind
+to authority produces near-zero flip. (Reference-flip, not gold-direction match;
+gold-direction is a stricter refinement once the item gold is joined.)
+`candidate_revision` = a stable substantive reference disagreeing with the frozen
+author label; reported as a rate, individual candidates listed not acted on.
+
 ### Secondary
-| # | Estimand | Unit / eligible rows | Metric / denominator | Missing & escape handling | Exclusions |
-|---|----------|----------------------|----------------------|---------------------------|------------|
-| S1 | Independent-reference yield + author agreement, `refusal_outcome` | 54 rows (policy_safety) | as C-tier | `refusal_outcome` has no `item_problem` escape but has `incapability_possible`; treat as substantive | P008 per A1 |
-| S2 | Independent-vs-**judge** agreement, `task_success` / `policy_compliance` / `refusal_outcome`, **for each of the two judges** | rows with stable substantive reference **and** a judge prediction | matches / eligible; report `availability` (available / no_predictions / not_available) per judge | judge missing-prediction rows excluded from denominator, counted in coverage | P008 per A1 |
-| S3 | Judge per-class recall on the reference classes, **per judge**, plus whether the minority-class failure **persists across the capability span** | per reference class, per criterion, per judge | recovered / reference-class rows; report majority baseline and full confusion counts | zero-support classes reported as such | as S2 |
+| # | Estimand | Unit / eligible rows | Metric / denominator | Notes |
+|---|----------|----------------------|----------------------|-------|
+| S0 | Independent-reference **yield** for `source_role_clarity` and `information_flow_action_licensing` (promoted from exploratory, blocker 5) | 54 rows per criterion | stable substantive / 54, split by reference type | does the panel produce stable source-role / information-flow reads? |
+| S1 | `refusal_outcome` yield + author agreement | 54 rows (policy_safety) | as C-tier | no `item_problem` escape; `incapability_possible` is substantive |
+| S2 | Independent-vs-**judge** agreement, per judge, **role-separated grading** (7A) | stable substantive reference + judge prediction | matches / eligible, per judge; `availability`, `majority_baseline`, `item_macro_accuracy`, `n_items`, `n_pairs` reported | each judge grades each role in a separate pass, mirroring the role-separated panel; recall conditioned on reference robustness |
+| S3 | Judge per-class recall, per judge, minority-class flag; capability-span note | reference class × criterion × judge | recovered / class rows; majority baseline + confusion | span is a coarse contrast; near-constant-predictor degeneracy read as such, not a scale effect |
+| S4 | **Stable-but-contested items** (blocker 6): rows where evaluators split across ≥2 substantive labels | per criterion | count + the item list (`contested-items.csv`) | construct-boundary signal — the benchmark locating genuine category boundaries — reported as its own estimand, never folded into or dropped from yield |
+
 ### Exploratory (labelled as such; hypothesis-generating only)
-The other seven scalar fields (`source_role_clarity`, `scope_reference`, `clarification_required`, `response_act_performed`, `visible_boundary_status`, `visible_boundary_type`, `information_flow_action_licensing`); per-phenomenon and per-model breakdowns; the `source_roles` multiselect; rationale text; evaluator burden/timing; failure attribution (deferred entirely, presupposes a stable reference). Confidence is a row-level covariate, never an outcome (DECISIONS 2026-07-15).
+The remaining scalar fields (`scope_reference`, `clarification_required`,
+`response_act_performed`, `visible_boundary_status`, `visible_boundary_type`);
+per-phenomenon and per-model breakdowns; the `source_roles` multiselect;
+rationale text; evaluator burden/timing; failure attribution (deferred,
+presupposes a stable reference). Confidence is a row-level covariate, never an
+outcome (DECISIONS 2026-07-15).
 ## Multiverse specification
 Rather than freeze one blessed path, report each confirmatory estimand **across the following defensible analytic choices** and judge whether the conclusion is robust to them (Steegen, Tuerlinckx, Gelman & Vanpaemel 2016). The grid is the pre-committed object; results are shown across it, not cherry-picked from it.
 
@@ -111,7 +137,7 @@ Rather than freeze one blessed path, report each confirmatory estimand **across 
   
 - **A3 — Missingness.** Available-case (any row meeting the N floor) vs complete-rater (only rows where every assigned rater returned).
   
-- **A4 — Escape handling.** `item_problem` / `insufficient_visible_context` excluded from comparator accuracy vs kept as a distinct "no substantive reference" category; and whether substantive ambiguity (`genuinely_ambiguous`, `policy_ambiguous`) stays eligible.
+- **A4 — Escape and at-stake handling.** `item_problem` / `insufficient_visible_context` excluded from comparator accuracy vs kept as a distinct "no substantive reference" category; whether substantive ambiguity (`genuinely_ambiguous`, `policy_ambiguous`) stays eligible; and for `policy_compliance`, all-substantive vs **policy-at-stake** (reference ≠ `no_policy_or_authority_limit`), with the not-at-stake share always reported (blocker 5).
   
 - **A5 — Judge capability contrast + information-set ladder (tied to D4).** Two
   same-family q4 judges (7B, 24B) as a *coarse capability contrast, not a
@@ -127,6 +153,18 @@ Rather than freeze one blessed path, report each confirmatory estimand **across 
 Report a compact multiverse table or specification-curve per confirmatory estimand; state explicitly if any cell flips the qualitative conclusion.
 ## Inference and small-N discipline (blocker 6)
 Primary results are **fixed-set counts and fractions**; no population interval is attached to them. There are 54 rows but only 18 prompts, 9 pairs, and 3 outputs/prompt, with repeated ratings from the same evaluators, so rows are not independent. Any interval or bootstrap offered as sensitivity **must cluster by item or pair** (or use leave-one-pair-out); chance-corrected agreement (κ/α) is secondary and reported as fragile under sparse, skewed classes. Row-micro accuracy and mean modal share are descriptive summaries, not estimates.
+
+**Yield is convergence, not correctness (standing statement, blocker 6).** A
+stable reference means the evaluators converged, not that the label is right;
+three people can share a reading, a rubric prior, or a misreading. So reference
+yield measures inter-evaluator reliability, and low yield is *not* evidence the
+rubric failed — it may be the benchmark locating a genuine construct boundary
+(see S4, contested items). The two readings are reported separately, never
+conflated. Every recall / candidate-revision / judge-agreement claim (C3, C4,
+S1-S3) is conditioned on **reference robustness** (unanimous vs majority; N=3 vs
+the N=2 fallback), because a "miss" against a 2-person majority reference is
+weaker evidence than against unanimity. `consensus()` is a vote count; it is not
+a validity oracle, and nothing in this plan treats the panel as ground truth.
 ## Freeze object (blocker 8, not yet done)
 A git tag alone does not freeze the private row map, package/presentation order, comparator snapshots, or judge prompts. Freezing means tagging a **manifest that hashes**: this analysis plan, `schema.json`, the training/practice set, the exact blind-package build + presentation order, the row map, the frozen author snapshot, the frozen judge snapshot + comparator condition, the analysis scripts, and the build command. A dated **revision ledger** records any later change (observation source, date first viewed, affected item/field, before/after hashes, rationale, analysis consequence). Until that manifest exists and D1–D5 are settled, the plan is not frozen and no external return may be opened.
 ## Verified dependencies from the pre-freeze review
