@@ -16,6 +16,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import zipfile
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
@@ -25,11 +26,18 @@ ROOT = Path(__file__).resolve().parents[1]
 BUILD = ROOT / "scripts" / "build_independent_reassessment.py"
 INGEST = ROOT / "scripts" / "ingest_independent_reassessment.py"
 ANALYZE = ROOT / "scripts" / "analyze_independent_reassessment.py"
+ASSIGNMENTS = ROOT / "scripts" / "validate_study_a_assignments.py"
 SCHEMA_PATH = ROOT / "benchmark" / "study-a" / "schema.json"
 EXPECTED_SCHEMA_VERSION = 7
 TASK_GIVER_ROLE = "task_giver_contribution"
 DEPRECATED_TASK_GIVER_ROLE = "task_giver_directive"
 LEGACY_REFUSAL_AUTHOR_KEY = ("SYN-001", "synthetic-system-a")
+SUPPORT_PATTERNS = {
+    "support_2_of_2": "2/2",
+    "support_2_of_3": "2/3",
+    "support_3_of_3": "3/3",
+    "support_other": "other",
+}
 
 PHENOMENA = [
     "embedded_command",
@@ -63,6 +71,16 @@ def write_csv(path: Path, fields: list[str], rows: list[dict[str, Any]]) -> None
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=fields, extrasaction="ignore")
+        writer.writeheader()
+        writer.writerows(rows)
+
+
+def write_tsv(path: Path, fields: list[str], rows: list[dict[str, Any]]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(
+            handle, fieldnames=fields, delimiter="\t", extrasaction="ignore"
+        )
         writer.writeheader()
         writer.writerows(rows)
 
@@ -147,16 +165,19 @@ def policy_fields(labels: dict[str, str], phenomenon: str) -> dict[str, str]:
         "agent_transcript_interpretation",
         "policy_boundary_ambiguity",
     }
+    boundary_status = (
+        "visible_boundary_violation"
+        if noncompliant
+        else "boundary_stated_no_visible_violation"
+        if phenomenon in boundary_phenomena
+        else "no_boundary_stated"
+    )
     return {
         "policy_compliance": labels["policy_compliance"],
-        "visible_boundary_status": (
-            "visible_boundary_violation"
-            if noncompliant
-            else "boundary_stated_no_visible_violation"
-            if phenomenon in boundary_phenomena
-            else "no_boundary_stated"
+        "visible_boundary_status": boundary_status,
+        "visible_boundary_type": (
+            "none" if boundary_status == "no_boundary_stated" else visible_type
         ),
-        "visible_boundary_type": visible_type if noncompliant else "none",
         "refusal_outcome": labels["refusal_outcome"],
         "information_flow_action_licensing": (
             "violation"
@@ -210,6 +231,11 @@ def perturb(
             output["source_role_clarity"] = "item_problem"
         elif row_number % 21 == 0:
             output["source_role_clarity"] = "insufficient_visible_context"
+    # Preserve one deliberately incoherent raw status/type pair. Ingestion must
+    # flag this row without rewriting either answer.
+    if role == "policy_safety" and rater_number == 2 and row_number == 7:
+        output["visible_boundary_status"] = "no_boundary_stated"
+        output["visible_boundary_type"] = "policy_or_hierarchy"
     return output
 
 
@@ -228,12 +254,352 @@ def check_practice_assets(package_dir: Path) -> None:
     if audit.get("status") != "pass" or not audit.get("practice_only"):
         raise SystemExit("synthetic package training audit did not pass")
     for role in ("linguistic_task", "policy_safety"):
-        path = package_dir / "training" / role / "index.html"
+        path = package_dir / role / "training" / "index.html"
         if not path.exists():
             raise SystemExit(f"synthetic package is missing practice form for {role}")
         html = path.read_text(encoding="utf-8")
         if "Practice only" not in html or "This is not a study row" not in html:
             raise SystemExit(f"synthetic package practice form is incomplete for {role}")
+
+
+def check_package_contract(
+    package_dir: Path,
+    private_dir: Path,
+    source_path: Path,
+    author_path: Path,
+    judge_path: Path,
+) -> dict[str, str]:
+    """Lock the source-grid, order, isolation, and deterministic archive contract."""
+    metadata_path = private_dir / "study-private-metadata.json"
+    metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+    package_ids = metadata.get("package_ids", {})
+    build_fingerprint = metadata.get("package_build_fingerprint_sha256", "")
+    roles = {"linguistic_task", "policy_safety"}
+    if set(package_ids) != roles or any(
+        not str(package_ids[role]).startswith("PKG-") for role in roles
+    ):
+        raise SystemExit("synthetic package metadata has invalid role package IDs")
+    if (package_dir / "index.html").exists():
+        raise SystemExit("independent package exposes the combined role chooser")
+
+    order_audit = json.loads(
+        (private_dir / "presentation-order-audit.json").read_text(encoding="utf-8")
+    )
+    required_invariants = {
+        "exact_18_by_3_grid",
+        "one_response_per_item_per_block",
+        "six_responses_per_model_per_block",
+        "no_adjacent_same_item_including_boundaries",
+        "common_fixed_order_across_roles",
+    }
+    invariants = order_audit.get("invariants", {})
+    if order_audit.get("status") != "pass":
+        raise SystemExit("synthetic presentation-order audit did not pass")
+    if not all(invariants.get(name) is True for name in required_invariants):
+        raise SystemExit("synthetic presentation-order invariants are incomplete")
+    if order_audit.get("adjacent_same_item_pairs") != 0:
+        raise SystemExit("synthetic presentation order retained an item adjacency")
+
+    with (private_dir / "presentation-order.tsv").open(
+        encoding="utf-8", newline=""
+    ) as handle:
+        order_rows = list(csv.DictReader(handle, delimiter="\t"))
+    with (private_dir / "row_map.tsv").open(encoding="utf-8", newline="") as handle:
+        map_rows = list(csv.DictReader(handle, delimiter="\t"))
+    if len(order_rows) != 54 or len(map_rows) != 54:
+        raise SystemExit("synthetic order/map does not contain exactly 54 rows")
+    if [row["row_id"] for row in order_rows] != [row["row_id"] for row in map_rows]:
+        raise SystemExit("presentation-order.tsv and row_map.tsv disagree")
+    mapped_by_row = {row["row_id"]: row for row in map_rows}
+    ordered = [mapped_by_row[row["row_id"]] for row in order_rows]
+    if any(
+        left["item_id"] == right["item_id"]
+        for left, right in zip(ordered, ordered[1:])
+    ):
+        raise SystemExit("same-item responses are adjacent in the materialized order")
+    for block_index in range(3):
+        block = ordered[block_index * 18 : (block_index + 1) * 18]
+        if len({row["item_id"] for row in block}) != 18:
+            raise SystemExit("a synthetic block does not contain every item once")
+        model_counts = {
+            model: sum(row["model"] == model for row in block) for model in MODELS
+        }
+        if set(model_counts.values()) != {6}:
+            raise SystemExit(f"a synthetic block is not six-per-model: {model_counts!r}")
+
+    isolation = json.loads(
+        (package_dir / "role-package-isolation-audit.json").read_text(encoding="utf-8")
+    )
+    if (
+        isolation.get("status") != "pass"
+        or isolation.get("combined_role_chooser_distributed") is not False
+        or set(isolation.get("roles", {})) != roles
+    ):
+        raise SystemExit("synthetic role-package isolation audit did not pass")
+    for role in roles:
+        role_metadata = json.loads(
+            (package_dir / role / "package-metadata.json").read_text(encoding="utf-8")
+        )
+        if (
+            role_metadata.get("role") != role
+            or role_metadata.get("package_id") != package_ids[role]
+            or role_metadata.get("block_count") != 3
+            or role_metadata.get("block_size") != 18
+            or role_metadata.get("package_build_fingerprint_sha256")
+            != build_fingerprint
+        ):
+            raise SystemExit(f"synthetic metadata is inconsistent for {role}")
+        archive = package_dir / "distribution" / f"study-a-{role.replace('_', '-')}.zip"
+        if not archive.exists() or isolation["roles"][role].get("status") != "pass":
+            raise SystemExit(f"synthetic isolated archive is missing or failed for {role}")
+        with zipfile.ZipFile(archive) as zipped:
+            members = zipped.namelist()
+        if "index.html" not in members or "training/index.html" not in members:
+            raise SystemExit(f"synthetic role archive is incomplete for {role}")
+        if any(Path(member).is_absolute() or ".." in Path(member).parts for member in members):
+            raise SystemExit(f"synthetic role archive has an unsafe member for {role}")
+
+    # Rebuild from identical inputs and require byte-identical order and ZIPs.
+    with tempfile.TemporaryDirectory(prefix="study-a-determinism-") as temp_dir:
+        temp_root = Path(temp_dir)
+        second_package = temp_root / "package"
+        second_private = temp_root / "private"
+        run(
+            [
+                sys.executable,
+                str(BUILD),
+                "--source",
+                str(source_path),
+                "--out-dir",
+                str(second_package),
+                "--private-dir",
+                str(second_private),
+                "--author-labels",
+                str(author_path),
+                "--judge-labels",
+                str(judge_path),
+                "--row-salt",
+                "synthetic-study-a-salt-v1",
+            ]
+        )
+        if (private_dir / "presentation-order.tsv").read_bytes() != (
+            second_private / "presentation-order.tsv"
+        ).read_bytes():
+            raise SystemExit("identical synthetic builds produced different presentation order")
+        for role in roles:
+            name = f"study-a-{role.replace('_', '-')}.zip"
+            if (package_dir / "distribution" / name).read_bytes() != (
+                second_package / "distribution" / name
+            ).read_bytes():
+                raise SystemExit(f"identical synthetic builds produced different {role} ZIP bytes")
+
+    # The same salt must not identify changed prompt/response content as the
+    # same package; stale returns are bound to the exact build inputs.
+    with source_path.open(encoding="utf-8", newline="") as handle:
+        reader = csv.DictReader(handle)
+        source_fields = list(reader.fieldnames or [])
+        source_rows = list(reader)
+    changed_rows = [dict(row) for row in source_rows]
+    changed_rows[0]["prompt"] += " Changed-content sentinel."
+    with tempfile.TemporaryDirectory(prefix="study-a-content-binding-") as temp_dir:
+        temp_root = Path(temp_dir)
+        changed_source = temp_root / "changed-source.csv"
+        write_csv(changed_source, source_fields, changed_rows)
+        run(
+            [
+                sys.executable,
+                str(BUILD),
+                "--source",
+                str(changed_source),
+                "--out-dir",
+                str(temp_root / "package"),
+                "--private-dir",
+                str(temp_root / "private"),
+                "--row-salt",
+                "synthetic-study-a-salt-v1",
+            ]
+        )
+        changed_metadata = json.loads(
+            (temp_root / "private" / "study-private-metadata.json").read_text(
+                encoding="utf-8"
+            )
+        )
+    if changed_metadata.get("package_ids") == package_ids:
+        raise SystemExit("changed package content reused the prior package IDs")
+
+    # A missing source cell must fail before any package is treated as valid.
+    invalid_rows = source_rows[:-1]
+    with tempfile.TemporaryDirectory(prefix="study-a-invalid-grid-") as temp_dir:
+        temp_root = Path(temp_dir)
+        invalid_source = temp_root / "invalid-source.csv"
+        write_csv(invalid_source, source_fields, invalid_rows)
+        completed = subprocess.run(
+            [
+                sys.executable,
+                str(BUILD),
+                "--source",
+                str(invalid_source),
+                "--out-dir",
+                str(temp_root / "package"),
+                "--private-dir",
+                str(temp_root / "private"),
+                "--row-salt",
+                "synthetic-study-a-salt-v1",
+            ],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+    if completed.returncode == 0 or "invalid Study A source grid" not in (
+        completed.stdout + completed.stderr
+    ):
+        raise SystemExit("builder did not fail closed on an incomplete 18x3 source grid")
+    return {role: str(package_ids[role]) for role in roles}
+
+
+def write_synthetic_assignment_registry(
+    private_dir: Path, package_ids: dict[str, str]
+) -> None:
+    """Create and verify a private, person-disjoint synthetic assignment registry."""
+    rows = []
+    for role, prefix in (
+        ("linguistic_task", "LING"),
+        ("policy_safety", "POL"),
+    ):
+        for number in range(1, 5):
+            rows.append(
+                {
+                    "person_key": f"PERSON-{prefix}-{number:02d}",
+                    "rater_id": f"{prefix}-{number:02d}",
+                    "role": role,
+                    "package_id": package_ids[role],
+                }
+            )
+    registry_path = private_dir / "assignment-registry.csv"
+    attestation_path = private_dir / "assignment-attestation.json"
+    write_csv(
+        registry_path,
+        ["person_key", "rater_id", "role", "package_id"],
+        rows,
+    )
+    run(
+        [
+            sys.executable,
+            str(ASSIGNMENTS),
+            "--registry",
+            str(registry_path),
+            "--attestation",
+            str(attestation_path),
+            "--write",
+        ]
+    )
+    run(
+        [
+            sys.executable,
+            str(ASSIGNMENTS),
+            "--registry",
+            str(registry_path),
+            "--attestation",
+            str(attestation_path),
+        ]
+    )
+    attestation = json.loads(attestation_path.read_text(encoding="utf-8"))
+    if (
+        attestation.get("assignment_count") != 8
+        or attestation.get("counts_by_role")
+        != {"linguistic_task": 4, "policy_safety": 4}
+    ):
+        raise SystemExit("synthetic assignment attestation has the wrong scope")
+
+
+def check_assignment_package_rejection(
+    private_dir: Path, response_dir: Path
+) -> None:
+    """Require ingestion to reject a stale or wrong-package return."""
+    source_path = next(response_dir.glob("synthetic-linguistic_task-*.json"), None)
+    if source_path is None:
+        raise SystemExit("cannot test package rejection without a response")
+    payload = json.loads(source_path.read_text(encoding="utf-8"))
+    payload["package_id"] = "PKG-0000000000000000"
+    with tempfile.TemporaryDirectory(prefix="study-a-wrong-package-") as temp_dir:
+        temp_root = Path(temp_dir)
+        invalid_path = temp_root / "wrong-package.json"
+        invalid_path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+        completed = subprocess.run(
+            [
+                sys.executable,
+                str(INGEST),
+                "--private-dir",
+                str(private_dir),
+                "--responses",
+                str(invalid_path),
+                "--out-dir",
+                str(temp_root / "processed"),
+            ],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+    if completed.returncode == 0 or "package_id does not match" not in (
+        completed.stdout + completed.stderr
+    ):
+        raise SystemExit("ingestion did not reject a wrong-package synthetic return")
+
+
+def check_assignment_and_coherence_outputs(
+    private_dir: Path,
+    package_ids: dict[str, str],
+    *,
+    analysis_dir: Path | None = None,
+) -> None:
+    """Verify package binding and raw-preserving boundary-coherence artifacts."""
+    processed_dir = private_dir / "processed"
+    with (processed_dir / "ratings-long.csv").open(
+        encoding="utf-8", newline=""
+    ) as handle:
+        reader = csv.DictReader(handle)
+        fields = set(reader.fieldnames or [])
+        ratings = list(reader)
+    if not {"package_id", "cross_field_coherence_flags"}.issubset(fields):
+        raise SystemExit("ingested ratings are missing package/coherence fields")
+    if any(row["package_id"] != package_ids[row["role"]] for row in ratings):
+        raise SystemExit("ingested package IDs do not match evaluator roles")
+    summary = json.loads(
+        (processed_dir / "ingestion-summary.json").read_text(encoding="utf-8")
+    )
+    if (
+        summary.get("assignment_attestation_verified") is not True
+        or set(summary.get("package_ids", [])) != set(package_ids.values())
+    ):
+        raise SystemExit("ingestion summary did not record assignment/package verification")
+    coherence = summary.get("cross_field_coherence", {})
+    if (
+        coherence.get("flagged_ratings") != 1
+        or coherence.get("raw_answers_preserved") is not True
+        or coherence.get("flags") != {"no_boundary_stated_but_type_selected": 1}
+    ):
+        raise SystemExit(f"synthetic coherence summary changed: {coherence!r}")
+    coherence_path = processed_dir / "cross-field-coherence-flags.csv"
+    with coherence_path.open(encoding="utf-8", newline="") as handle:
+        coherence_rows = list(csv.DictReader(handle))
+    if len(coherence_rows) != 1:
+        raise SystemExit("synthetic fixture must contain exactly one coherence flag")
+    flagged = coherence_rows[0]
+    if (
+        flagged["visible_boundary_status"] != "no_boundary_stated"
+        or flagged["visible_boundary_type"] != "policy_or_hierarchy"
+        or flagged["cross_field_coherence_flags"]
+        != "no_boundary_stated_but_type_selected"
+    ):
+        raise SystemExit("coherence artifact did not preserve the contradictory raw answers")
+    if analysis_dir is not None:
+        analysis_path = analysis_dir / "cross-field-coherence-flags.csv"
+        with analysis_path.open(encoding="utf-8", newline="") as handle:
+            analysis_rows = list(csv.DictReader(handle))
+        if analysis_rows != coherence_rows:
+            raise SystemExit("analysis coherence artifact differs from ingestion evidence")
 
 
 def check_partial_coverage(processed_dir: Path) -> None:
@@ -244,7 +610,7 @@ def check_partial_coverage(processed_dir: Path) -> None:
     with coverage_path.open(encoding="utf-8", newline="") as handle:
         rows = list(csv.DictReader(handle))
     partial = [row for row in rows if row.get("coverage_status") == "partial"]
-    if len(partial) != 2:
+    if len(partial) != 4:
         raise SystemExit("synthetic partial returns were not retained as expected")
 
 
@@ -544,10 +910,10 @@ def check_analysis_pair_outputs(analysis_dir: Path) -> None:
     if not required_summary_fields.issubset(summary_fields):
         raise SystemExit("paired-divergence summary has the wrong output contract")
     expected_summary = {
-        ("linguistic_task", "task_success", "all_pairs"): (24, 13, "0.542"),
+        ("linguistic_task", "task_success", "all_pairs"): (25, 15, "0.600"),
         ("linguistic_task", "task_success", "excl_P008"): (22, 12, "0.545"),
-        ("policy_safety", "policy_compliance", "all_pairs"): (24, 7, "0.292"),
-        ("policy_safety", "policy_compliance", "excl_P008"): (22, 7, "0.318"),
+        ("policy_safety", "policy_compliance", "all_pairs"): (25, 7, "0.280"),
+        ("policy_safety", "policy_compliance", "excl_P008"): (22, 6, "0.273"),
     }
     observed_summary = {
         (row["role"], row["criterion"], row["scope"]): (
@@ -584,23 +950,22 @@ def check_analysis_pair_outputs(analysis_dir: Path) -> None:
     }
     if not required_transition_fields.issubset(transition_fields):
         raise SystemExit("paired transitions have the wrong output contract")
-    if len(transition_rows) != 92:
+    if len(transition_rows) != 94:
         raise SystemExit(
-            f"synthetic paired transitions should have 92 rows, got {len(transition_rows)}"
+            f"synthetic paired transitions should have 94 rows, got {len(transition_rows)}"
         )
 
     expected_transitions = {
         "all_pairs": {
             "task_success": {
                 ("failure", "success"): 2,
-                ("partial", "failure"): 1,
-                ("partial", "success"): 4,
+                ("partial", "success"): 5,
                 ("success", "failure"): 2,
-                ("success", "partial"): 4,
-                ("success", "success"): 11,
+                ("success", "partial"): 6,
+                ("success", "success"): 10,
             },
             "policy_compliance": {
-                ("compliant", "compliant"): 16,
+                ("compliant", "compliant"): 17,
                 ("compliant", "noncompliant"): 3,
                 ("noncompliant", "compliant"): 4,
                 ("noncompliant", "noncompliant"): 1,
@@ -609,15 +974,14 @@ def check_analysis_pair_outputs(analysis_dir: Path) -> None:
         "excl_P008": {
             "task_success": {
                 ("failure", "success"): 1,
-                ("partial", "failure"): 1,
                 ("partial", "success"): 4,
                 ("success", "failure"): 2,
-                ("success", "partial"): 4,
+                ("success", "partial"): 5,
                 ("success", "success"): 10,
             },
             "policy_compliance": {
-                ("compliant", "compliant"): 15,
-                ("compliant", "noncompliant"): 3,
+                ("compliant", "compliant"): 16,
+                ("compliant", "noncompliant"): 2,
                 ("noncompliant", "compliant"): 4,
             },
         },
@@ -821,6 +1185,143 @@ def check_analysis_agreement_split_outputs(analysis_dir: Path) -> None:
                 raise SystemExit(f"judge–panel {status} agreement rate is inconsistent")
 
 
+def check_support_pattern_outputs(analysis_dir: Path) -> None:
+    """Require realized-N support strata to reconcile across C1–C4 and S2/S3."""
+    known_patterns = set(SUPPORT_PATTERNS.values()) - {"other"}
+
+    def bucket(pattern: str) -> str:
+        return pattern if pattern in known_patterns else "other"
+
+    with (analysis_dir / "panel-modal-labels.csv").open(
+        encoding="utf-8", newline=""
+    ) as handle:
+        reader = csv.DictReader(handle)
+        fields = set(reader.fieldnames or [])
+        panel_rows = list(reader)
+    if not {"modal_support_n", "support_pattern"}.issubset(fields):
+        raise SystemExit("panel-modal-labels.csv is missing realized support")
+    seen_buckets = {
+        bucket(row["support_pattern"])
+        for row in panel_rows
+        if row["panel_agreement_status"] in {"unanimous", "majority"}
+        and row["panel_modal_label"]
+        not in {"item_problem", "insufficient_visible_context"}
+    }
+    if seen_buckets != set(SUPPORT_PATTERNS.values()):
+        raise SystemExit(
+            "synthetic fixture did not exercise all realized support strata: "
+            f"{sorted(seen_buckets)!r}"
+        )
+    for row in panel_rows:
+        numerator, denominator = row["support_pattern"].split("/", 1)
+        if (
+            int(numerator) != int(row["modal_support_n"])
+            or int(denominator) != int(row["rater_n"])
+        ):
+            raise SystemExit("panel support_pattern disagrees with support N/rater N")
+
+    for filename in (
+        "source-roles-exact-set-panel-label.csv",
+        "source-roles-per-label-panel-label.csv",
+    ):
+        with (analysis_dir / filename).open(encoding="utf-8", newline="") as handle:
+            reader = csv.DictReader(handle)
+            if not {"modal_support_n", "support_pattern"}.issubset(
+                set(reader.fieldnames or [])
+            ):
+                raise SystemExit(f"{filename} is missing realized support fields")
+
+    with (analysis_dir / "agreement-by-criterion.csv").open(
+        encoding="utf-8", newline=""
+    ) as handle:
+        agreement_rows = list(csv.DictReader(handle))
+    for row in agreement_rows:
+        pattern_total = sum(
+            int(row[f"{slug}_substantive"]) for slug in SUPPORT_PATTERNS
+        )
+        if pattern_total != int(row["supported_substantive_panel_labels"]):
+            raise SystemExit("C1/C2 support-pattern strata do not sum to the total")
+
+    with (analysis_dir / "author-vs-panel-summary.csv").open(
+        encoding="utf-8", newline=""
+    ) as handle:
+        author_rows = list(csv.DictReader(handle))
+    for row in author_rows:
+        comparable = int(row["supported_panel_label_rows"])
+        if sum(int(row[f"{slug}_panel_comparable"]) for slug in SUPPORT_PATTERNS) != comparable:
+            raise SystemExit("C3/C4 support-pattern comparables do not sum")
+        for slug in SUPPORT_PATTERNS:
+            denominator = int(row[f"{slug}_panel_comparable"])
+            matches = int(row[f"{slug}_author_panel_match"])
+            mismatches = int(row[f"{slug}_author_panel_mismatch"])
+            if matches + mismatches != denominator:
+                raise SystemExit(f"author support stratum {slug} does not reconcile")
+        if row["criterion"] == "policy_compliance":
+            at_stake_rows = int(row["at_stake_rows"])
+            if (
+                sum(
+                    int(row[f"at_stake_{slug}_panel_comparable"])
+                    for slug in SUPPORT_PATTERNS
+                )
+                != at_stake_rows
+            ):
+                raise SystemExit("C4 at-stake support-pattern strata do not sum")
+            if (
+                int(row["at_stake_unanimous_panel_comparable"])
+                + int(row["at_stake_majority_panel_comparable"])
+                != at_stake_rows
+            ):
+                raise SystemExit("C4 at-stake status strata do not sum")
+
+    with (analysis_dir / "judge-vs-panel-summary.csv").open(
+        encoding="utf-8", newline=""
+    ) as handle:
+        reader = csv.DictReader(handle)
+        judge_summary_fields = set(reader.fieldnames or [])
+        judge_rows = list(reader)
+    if not {
+        "comparator_parse_failure_rows",
+        "panel_rows_unscored_with_explicit_parse_error",
+    }.issubset(judge_summary_fields):
+        raise SystemExit("S2 is missing explicit comparator parse-failure fields")
+    for row in judge_rows:
+        scored = int(row["judge_scored_panel_label_rows"])
+        if sum(
+            int(row[f"eligible_{slug}_panel_labels"]) for slug in SUPPORT_PATTERNS
+        ) != scored:
+            raise SystemExit("S2 support-pattern strata do not sum")
+
+    with (analysis_dir / "judge-panel-class-agreement.csv").open(
+        encoding="utf-8", newline=""
+    ) as handle:
+        class_rows = list(csv.DictReader(handle))
+    for row in class_rows:
+        if sum(
+            int(row[f"{slug}_panel_class_rows"]) for slug in SUPPORT_PATTERNS
+        ) != int(row["panel_class_rows"]):
+            raise SystemExit("S3 class support-pattern strata do not sum")
+        if (
+            int(row["unanimous_panel_class_rows"])
+            + int(row["majority_panel_class_rows"])
+            != int(row["panel_class_rows"])
+        ):
+            raise SystemExit("S3 class support-status strata do not sum")
+
+    with (analysis_dir / "judge-vs-panel-confusion.csv").open(
+        encoding="utf-8", newline=""
+    ) as handle:
+        confusion_rows = list(csv.DictReader(handle))
+    for row in confusion_rows:
+        if sum(int(row[f"{slug}_rows"]) for slug in SUPPORT_PATTERNS) != int(
+            row["rows"]
+        ):
+            raise SystemExit("S3 confusion support-pattern strata do not sum")
+        if int(row["unanimous_rows"]) + int(row["majority_rows"]) != int(
+            row["rows"]
+        ):
+            raise SystemExit("S3 confusion support-status strata do not sum")
+
+
 def check_author_label_crosswalk(analysis_dir: Path) -> None:
     """Exercise the frozen legacy refusal-outcome author-label crosswalk."""
     comparison_path = analysis_dir / "author-vs-panel-comparison.csv"
@@ -870,8 +1371,57 @@ def check_analysis_evaluator_coverage(processed_dir: Path, analysis_dir: Path) -
     for row in analysis_rows:
         status = row["coverage_status"]
         status_counts[status] = status_counts.get(status, 0) + 1
-    if status_counts != {"complete": 4, "partial": 2}:
+    if status_counts != {"complete": 4, "partial": 4}:
         raise SystemExit(f"synthetic evaluator-role coverage changed: {status_counts!r}")
+
+
+def check_analyzer_provenance_guards(private_dir: Path) -> None:
+    """Reject a stale coverage sidecar and a merely prefix-shaped fixture map."""
+    with tempfile.TemporaryDirectory(prefix="study-a-coverage-guard-") as temp_dir:
+        candidate = Path(temp_dir) / "private"
+        shutil.copytree(private_dir, candidate)
+        coverage_path = candidate / "processed" / "rater-role-coverage.csv"
+        with coverage_path.open(encoding="utf-8", newline="") as handle:
+            reader = csv.DictReader(handle)
+            fields = list(reader.fieldnames or [])
+            rows = list(reader)
+        rows[0]["coverage_status"] = (
+            "partial" if rows[0]["coverage_status"] == "complete" else "complete"
+        )
+        write_csv(coverage_path, fields, rows)
+        completed = subprocess.run(
+            [sys.executable, str(ANALYZE), "--private-dir", str(candidate)],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        if completed.returncode == 0 or "coverage reconstructed" not in (
+            completed.stdout + completed.stderr
+        ):
+            raise SystemExit("analyzer accepted a stale rater-role coverage sidecar")
+
+    with tempfile.TemporaryDirectory(prefix="study-a-fixture-guard-") as temp_dir:
+        candidate = Path(temp_dir) / "private"
+        shutil.copytree(private_dir, candidate)
+        map_path = candidate / "row_map.tsv"
+        with map_path.open(encoding="utf-8", newline="") as handle:
+            reader = csv.DictReader(handle, delimiter="\t")
+            fields = list(reader.fieldnames or [])
+            rows = list(reader)
+        rows[0]["item_id"] = "SYN-999"
+        write_tsv(map_path, fields, rows)
+        completed = subprocess.run(
+            [sys.executable, str(ANALYZE), "--private-dir", str(candidate)],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        if completed.returncode == 0 or "restricted to the deterministic" not in (
+            completed.stdout + completed.stderr
+        ):
+            raise SystemExit("analyzer accepted a prefix-shaped synthetic fixture map")
 
 
 def check_panel_class_tie_helper() -> None:
@@ -1030,12 +1580,21 @@ def main() -> None:
             "--overwrite",
         ]
     )
+    package_ids = check_package_contract(
+        package_dir,
+        private_dir,
+        output_path,
+        author_path,
+        judge_path,
+    )
     metadata_path = private_dir / "study-private-metadata.json"
     metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
     metadata["synthetic"] = True
+    metadata["synthetic_fixture_kind"] = "study_a_deterministic_synthetic_v1"
     metadata["synthetic_notice"] = "All source rows, labels, and ratings in this run are synthetic test data."
     metadata_path.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
     check_practice_assets(package_dir)
+    write_synthetic_assignment_registry(private_dir, package_ids)
 
     schema = load_schema()
     with (private_dir / "row_map.tsv").open(encoding="utf-8", newline="") as handle:
@@ -1044,9 +1603,15 @@ def main() -> None:
     block_size = 18
     blocks = [row_map[index : index + block_size] for index in range(0, len(row_map), block_size)]
     for role, role_schema in schema["roles"].items():
-        for rater_number in (1, 2, 3):
+        for rater_number in (1, 2, 3, 4):
             rater_id = ("LING" if role == "linguistic_task" else "POL") + f"-{rater_number:02d}"
-            rater_blocks = blocks if rater_number in (1, 2) else blocks[:1]
+            rater_blocks = (
+                blocks
+                if rater_number in (1, 2)
+                else blocks[:2]
+                if rater_number == 3
+                else blocks[:1]
+            )
             for block_index, block in enumerate(rater_blocks, start=1):
                 responses: list[dict[str, Any]] = []
                 for offset, mapped in enumerate(block, start=1):
@@ -1069,6 +1634,7 @@ def main() -> None:
                 payload = {
                     "schema_version": schema["schema_version"],
                     "study_id": "AP-STUDY-A-INDEPENDENT-READJUDICATION",
+                    "package_id": package_ids[role],
                     "role": role,
                     "block_id": f"block-{block_index:02d}-of-{len(blocks):02d}",
                     "rater_id": rater_id,
@@ -1084,6 +1650,7 @@ def main() -> None:
                 )
     check_raw_source_role_responses(response_dir, schema)
     check_deprecated_source_role_rejection(private_dir, response_dir)
+    check_assignment_package_rejection(private_dir, response_dir)
     run(
         [
             sys.executable,
@@ -1094,6 +1661,7 @@ def main() -> None:
     )
     check_partial_coverage(private_dir / "processed")
     check_ingested_source_roles(private_dir / "processed", schema)
+    check_assignment_and_coherence_outputs(private_dir, package_ids)
     analysis_dir = private_dir / "analysis"
     analysis_dir.mkdir(parents=True, exist_ok=True)
     for name in RETIRED_ANALYSIS_ARTIFACTS:
@@ -1112,8 +1680,13 @@ def main() -> None:
     check_analysis_source_role_outputs(analysis_dir, schema)
     check_analysis_pair_outputs(analysis_dir)
     check_analysis_agreement_split_outputs(analysis_dir)
+    check_support_pattern_outputs(analysis_dir)
+    check_assignment_and_coherence_outputs(
+        private_dir, package_ids, analysis_dir=analysis_dir
+    )
     check_author_label_crosswalk(analysis_dir)
     check_analysis_evaluator_coverage(private_dir / "processed", analysis_dir)
+    check_analyzer_provenance_guards(private_dir)
     check_panel_class_tie_helper()
     check_zero_rating_criterion(private_dir)
     (out_dir / "SYNTHETIC-NOT-EMPIRICAL.md").write_text(

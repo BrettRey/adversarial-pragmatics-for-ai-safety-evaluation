@@ -5,6 +5,9 @@ approval, recruitment, a funded study, an institutional affiliation, or a
 result. Do not send an outreach draft or circulate an evaluator form until
 Brett has reviewed the materials, tested the interface, and decided the
 appropriate evaluator-role scope and information/agreement path.
+Even then, distribution is barred until the verified stamp-2 candidate has
+been committed, an explicitly authorized annotated freeze tag points at
+`HEAD`, and the separate collection-ready gate passes.
 
 Current planning posture: Study A is a personal independent project. This is
 not an institutional determination and must be revisited if an institution,
@@ -45,3 +48,6 @@ than deployment-level severity, with policy compliance asked last; see
 
 The actual blind package, private row map, evaluator responses, and any identity
 mapping remain local and ignored under `private/` or `benchmark/study-a/_runs/`.
+Production distribution artifacts are separate role-isolated ZIPs. A private
+assignment registry binds each globally unique rater ID to one person, role,
+and package ID and attests that the role pools are person-disjoint.

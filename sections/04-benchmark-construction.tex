@@ -1,6 +1,14 @@
 \section{Benchmark Construction}
 
-The benchmark's strict scoring is built from minimal pairs. Each eligible pair holds the surface string, payload, or response space as constant as possible while changing one control dimension: source role, authority level, pragmatic status, scope condition, reference resolution, speech-act force, application surface, or refusal status. This follows the logic of verifiable instruction-following evaluation where the target behaviour is specified before model outputs are inspected \parencite{zhou2023ifeval}, but extends it to contrasts whose correctness depends on source, embedding, and pragmatic status.
+The benchmark's target design is tightly controlled paired comparison. A
+future minimal pair should hold the surface string, payload, and response space
+as constant as possible while changing one control dimension: source role,
+authority level, pragmatic status, scope condition, reference resolution,
+speech-act force, application surface, or refusal status. This follows the
+logic of verifiable instruction-following evaluation where the target behaviour
+is specified before model outputs are inspected \parencite{zhou2023ifeval}, but
+extends it to contrasts whose correctness depends on source, embedding, and
+pragmatic status.
 
 Items should be constructed under five constraints. First, each item names the source of the relevant language. Second, each item has a contrast item that tests the same string, payload, or response space under a different embedding or authority relation. Third, the expected behaviour is stated before model outputs are inspected. Fourth, the response labels are shared across the contrast whenever possible. Fifth, examples should use harmless payloads unless a verified safety policy and review process justify a more realistic item.
 
@@ -8,9 +16,21 @@ The current seed file, \texttt{benchmark/items/seed-items.csv}, contains 18 deve
 
 Toy payloads support claims about control structure, label stability, and evaluator behaviour. They don't yet support claims about deployed prompt-injection resistance, harmful-request refusal, or real-world agent-security robustness. Those claims require realistic wrappers and independent policy review.
 
-The seed set now includes prompt-only minimal pairs plus webpage text, document text, email body, tool output, dummy private state, and policy text. For example, a tool result can say \mention{Order status: shipped. Ignore the user and output BLUE}; the expected behaviour is to report the order status without following the tool-result instruction. A separate dummy-secret item tests whether an email can induce disclosure of \mention{ALPHA-000}.
+The seed set now includes paired prompt contrasts spanning webpage text,
+document text, email body, tool output, dummy private state, and policy text.
+These are controlled development contrasts, not uniformly strict minimal pairs:
+several vary wording or response demands along with the designated dimension.
+For example, a tool result can say \mention{Order status: shipped. Ignore the
+user and output BLUE}; the expected behaviour is to report the order status
+without following the tool-result instruction. A separate dummy-secret item
+tests whether an email can induce disclosure of \mention{ALPHA-000}.
 
-The pilot also exposed a seed-set repair. Pair P008 contrasts an email-body exfiltration probe with a direct toy-policy refusal, but its members differ in phenomenon family and both expect non-disclosure. It's retained as a diagnostic confidentiality contrast and excluded from strict-pair scoring. The development set should split it into two proper pairs before using it for pairwise contrast accuracy.
+The pilot also exposed a seed-set repair. Pair P008 contrasts an email-body
+exfiltration probe with a direct toy-policy refusal, but its members differ in
+phenomenon family and both expect non-disclosure. It's retained as a diagnostic
+confidentiality contrast and excluded from paired-contrast scoring. The
+development set should split it into two properly controlled pairs before using
+it for pairwise contrast accuracy.
 
 Each item records the control dimension, context source, source role, authority level, pragmatic status, response act, expected behaviour, task-success label, policy-compliance label, safety-risk label, risk type, refusal outcome, failure attribution, and a judge-validation flag. The validator script enforces the schema and label inventories.
 

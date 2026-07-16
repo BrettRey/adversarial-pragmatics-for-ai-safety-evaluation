@@ -2,8 +2,8 @@
 
 Study A is a blind, role-separated re-adjudication of the existing 54 pilot
 outputs. It does not replace the original author labels; it creates an
-independent evidence layer against which those provisional labels and the
-automated judge can later be compared.
+independent evidence layer against which those provisional labels and two
+automated comparators can later be compared.
 
 The first pass has two separate forms:
 
@@ -22,8 +22,13 @@ into every first-pass rating.
 Each evaluator's intended assignment is full coverage of the 54 rows in their
 one role, divided into three 18-row blocks. The workflow retains any completed
 partial blocks and marks the rater-role coverage as partial. A modal panel label
-requires at least two ratings for the relevant criterion, and two ratings must
-agree.
+requires at least two ratings and a unique strict majority; with exactly two
+ratings, unanimity is required. Realized support is reported as `2/2`, `2/3`,
+`3/3`, or `other`, retaining valid late returns above three. Real assignments
+use person-disjoint role pools: one person may not
+serve in both roles. A private assignment registry binds one globally unique
+rater ID to one role and one package; ingestion rejects unregistered,
+role-mismatched, duplicate-person, or stale-package submissions.
 
 ## Evaluator Orientation
 
@@ -72,9 +77,18 @@ ignored paths in `private/`. `benchmark/study-a/_runs/` is also ignored so the
 synthetic workflow can exercise the same file shape without adding responses
 to the repository.
 
+The production builder creates separate deterministic distribution ZIPs for
+the two roles. An evaluator receives only the ZIP for their assigned role.
+Each package carries an opaque `package_id`, which is also embedded in every
+downloaded return. The source grid is exactly 18 items × 3 model responses.
+Within each of three 18-row blocks, every item appears once, each model appears
+six times, and the same item never appears in adjacent positions, including
+across block boundaries. `presentation-order.tsv` and a machine-readable order
+audit make these invariants checkable without revealing the private row map.
+
 ## Current State
 
-The repository currently supports only a synthetic end-to-end run:
+The repository supports a synthetic end-to-end regression:
 
 ```bash
 make study-a-synthetic
@@ -83,6 +97,14 @@ make study-a-synthetic
 This generates synthetic source rows and ratings, builds both blind offline
 forms, joins pseudonymous synthetic responses locally, and writes analysis
 tables. It does not constitute an empirical study result.
+
+The 54-row local-pilot source and response-level author snapshot also exist
+locally. They may be used to build a private stamp-2 candidate, but that
+candidate is not collection-ready until semantic verification passes, the
+operational fields are finalized, an annotated freeze tag is explicitly
+authorized and created at `HEAD`, and the post-tag collection gate passes.
+No role package may be distributed and no external return may be opened before
+that gate.
 
 To inspect and time the actual 54-row interface without creating an
 independent-rating submission, run:

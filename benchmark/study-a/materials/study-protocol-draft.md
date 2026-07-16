@@ -27,14 +27,26 @@ written scope determination before proceeding under that arrangement.
   
 3. Where do the two criteria diverge, and which rows remain ambiguous or lack a supported modal panel label?
   
-4. How often do the original provisional labels and automated-judge labels agree with the modal panel labels, especially on minority panel classes?
+4. How often do the original provisional labels and role-separated,
+   outcome-only automated comparators agree with supported modal panel labels,
+   especially on minority panel classes?
   
 ## Materials and Design
-The material consists of 18 benign seed prompts answered by three local models for 54 prompt-response rows. Each evaluator sees only opaque row IDs, the prompt, the response, and a role-specific rubric. The package hides model identity, item and phenomenon identifiers, expected behaviour, author labels and rationales, automated-judge labels, and derived diagnostics.
+The material consists of 18 benign seed prompts answered by three local models
+for a complete 18 × 3 grid of 54 prompt-response rows. Each evaluator sees only
+opaque row IDs, the prompt, the response, and a role-specific rubric. The
+package hides model identity, item and phenomenon identifiers, expected
+behaviour, author labels and rationales, automated-comparator labels, and
+derived diagnostics. Distribution ZIPs are role-isolated: an evaluator
+receives only the ZIP for the assigned role.
 
 The interface divides each role's 54 rows into three 18-row blocks. The target
 assignment is full 54-row coverage per evaluator, completed across the three
-blocks at the evaluator's own pace. Before recruitment, Brett should complete a
+blocks at the evaluator's own pace. Each block contains one response for each
+item and six responses from each model; adjacent rows never share an item,
+including at block boundaries. The fixed, deterministic order is shared within
+a role and therefore controls presentation rather than counterbalancing it.
+Before recruitment, Brett should complete a
 timed self-pilot using the actual form and record the median time per block. The
 invitation must state that observed time, not an aspirational estimate.
 Evaluators may stop between blocks without penalty. Any returned incomplete
@@ -72,22 +84,37 @@ attribution is withheld from first-pass forms because it presupposes supported
 task and policy panel labels. Any later attribution decision must identify its
 evidence, contributors, and unresolved disagreement in a separate record.
 ## Recruitment and Independence
-The initial goal is a small, deliberately mixed panel, not a representative sample. Linguistic/task evaluators should include at least two people with relevant language-analysis expertise. Policy/safety evaluators should include at least two people who can read a stated policy or instruction hierarchy. The panel should not be drawn exclusively from one AI-safety, EA-associated, or institutional network.
+The initial goal is a small, deliberately mixed panel, not a representative
+sample. Linguistic/task evaluators should include at least two people with
+relevant language-analysis expertise. Policy/safety evaluators should include
+at least two people who can read a stated policy or instruction hierarchy. The
+two role pools must be person-disjoint, and the panel should not be drawn
+exclusively from one AI-safety, EA-associated, or institutional network.
 
-People who materially develop, revise, or annotate the evaluated item set must not serve as independent first-pass evaluators for those same rows. Recruiters and evaluators should use pseudonymous study IDs in the data file; any mapping to real identities remains outside the research dataset.
+People who materially develop, revise, or annotate the evaluated item set must
+not serve as independent first-pass evaluators for those same rows. Before
+distribution, a private assignment registry binds each globally unique
+pseudonymous rater ID to one person, one role, and the current opaque
+`package_id`. A separate private attestation checks that no person or rater ID
+appears in both roles. Identity mappings and attestations remain outside the
+research dataset.
 ## Procedure
 1. Provide the evaluator information/agreement note adapted to the applicable setting.
   
-2. Assign a role and pseudonymous rater ID.
+2. Assign one role and a globally unique pseudonymous rater ID; record the
+   person, role, and current `package_id` in the private registry and pass the
+   assignment validator.
   
-3. Give the evaluator the optional role-specific practice page, then three
-   18-row blind blocks for the assigned role. The intended assignment is all
-   three blocks, but they may be completed in separate sittings.
+3. Give the evaluator only the distribution ZIP for the assigned role. It
+   contains the optional role-specific practice page and three 18-row blind
+   blocks. The intended assignment is all three blocks, but they may be
+   completed in separate sittings.
   
 4. Collect each completed block's downloaded offline JSON through the dedicated
    Study A email address. Move each attachment unchanged into the ignored local
-   study directory, keep identity/contact records separate, and mark incomplete
-   rater-role coverage as partial.
+   study directory, keep identity/contact records separate, and verify its
+   rater ID, role, and `package_id` against the private registry. Reject stale
+   or mismatched packages; mark incomplete valid rater-role coverage as partial.
   
 5. At collection close, record the exact analysis-start cutoff, process any
    deletion requests received before it, and regenerate local derived files
@@ -105,15 +132,26 @@ modal panel labels.
 
 For each scalar criterion, retain every rating and report the distribution,
 modal share, unanimous/majority/tied status, coverage status, and item-problem
-signals. For the multi-select source-role criterion, retain the complete set,
-report exact-set agreement, and separately report per-role binary agreement and
-selection prevalence. Never construct an exact-set panel label by combining
-separate per-role majorities. A modal panel label requires at least two ratings
-for that criterion, and two ratings must agree. Compare provisional author and
-automated-judge labels only with unanimous- or majority-supported substantive
-panel labels. Preserve linguistic-policy divergences as distinct observations.
-Rows without a supported substantive panel label remain unresolved; that fact
-alone neither withdraws the item nor forces it into a gold set.
+signals. Report realized support as `2/2`, `2/3`, `3/3`, or `other`; valid late
+returns above three remain in `other` rather than being discarded. For the
+multi-select source-role criterion, retain the complete set, report exact-set
+agreement, and separately report per-role binary agreement and selection
+prevalence. Never construct an exact-set panel label by combining separate
+per-role majorities. A modal panel label requires at least two ratings and a
+unique strict majority for that criterion; with exactly two ratings, unanimity
+is required. Compare provisional author labels and
+the two automated comparators only with unanimous- or majority-supported
+substantive panel labels, and always report their information/scaffold
+asymmetry: the comparators answer only the outcome questions, while humans use
+the full identification-first forms. Preserve linguistic-policy divergences as
+distinct observations. Rows without a supported substantive panel label remain
+unresolved; that fact alone neither withdraws the item nor forces it into a
+gold set.
+
+The visible-boundary status and boundary-type answers are both retained even
+when they conflict. Such rows receive an explicit coherence flag and are
+reported by coherence status; the pipeline does not silently rewrite one field
+from the other.
 
 The historical author pilot's `safety_risk` and `risk_type` labels are retained
 as frozen historical data. They are not directly compared with the revised
@@ -129,7 +167,8 @@ aggregate outputs, so deletion is not promised.
 
 Before recruiting, Brett must record the evaluator-role classification, confirm
 that no institution has jurisdiction over the work, finalize the evaluator
-information/agreement note, time the form, and confirm data transfer. The
+information/agreement note, time the form, validate the person-disjoint private
+assignment registry, and confirm data transfer. The
 contribution model is an unpaid, bounded volunteer assignment; no honorarium,
 authorship, employment benefit, or other material consideration is offered or
 implied. A formal ethics application is not assumed; a scope determination is
@@ -138,3 +177,13 @@ one into play. Before collection, Brett must also set and communicate the
 collection-close and analysis-start cutoff, retention period, deletion route,
 and local withdrawal procedure. This draft asserts that those remaining
 operational decisions have not yet been made.
+
+Methodological freeze readiness and permission to collect are separate gates. The
+stamp-2 candidate must first verify the 54-key source, author snapshot, package
+metadata, order audit, isolated ZIPs, analysis inputs, judge-comparator
+structure, and visible-rule sentinels. After commit, an explicitly authorized
+annotated tag must point at `HEAD`. Only then may the collection-ready gate
+confirm the tag, scoped cleanliness, current interface timing, and finalized
+return address, cutoff, retention, deletion, and withdrawal fields. Until both
+gates pass, role packages must not be distributed and external returns must not
+be opened.

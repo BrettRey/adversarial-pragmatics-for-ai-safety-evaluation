@@ -11,6 +11,8 @@ default:
 - candidate repair episodes, unredacted context, and provenance maps;
 - real evaluator response JSON, identity mappings, contact records, and
   evaluator-agreement administration;
+- the private assignment registry and person-disjoint-role attestation,
+  including rater-to-person, role, and package-ID bindings;
 - blind-package maps linking opaque rows to model/item metadata;
 - unredacted rationales that could identify a person, organization, or private
   task.

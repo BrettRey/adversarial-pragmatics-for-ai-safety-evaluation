@@ -17,7 +17,9 @@ majority-supported?
 Each evaluator sees only an opaque row ID, prompt, response, and one of two
 role-specific rubrics. The intended assignment covers all 54 rows in three
 18-row blocks rather than one 54-row sitting; blocks can be completed in
-separate sittings.
+separate sittings. Role pools are person-disjoint, each evaluator receives only
+the assigned role's ZIP, and a private registry binds each globally unique
+rater ID to one person, one role, and one package version.
 
 Linguistic/task evaluators judge task success, source-role relations across the
 prompt as a whole, source-role clarity, scope/reference, clarification need,
@@ -39,10 +41,13 @@ supported first-pass panel record to reason from.
 ## What the Study Can Establish
 
 The study can quantify observed within-panel agreement, compare historical
-author and automated-judge labels with modal panel labels, and show where
-linguistic and policy reasoning diverge. Those comparisons are panel-relative;
-they do not make the modal label ground truth or establish stability to a new
-panel or occasion.
+author labels and two role-separated outcome-only automated comparators with
+modal panel labels, and show where linguistic and policy reasoning diverge.
+Those comparisons are panel-relative; they do not make the modal label ground
+truth or establish stability to a new panel or occasion. The automated
+comparators use a compact scaffold rather than the humans' full
+identification-first forms, so no information-state or measurement parity is
+claimed.
 
 It cannot establish population prevalence, benchmark coverage, model rankings,
 or a general claim about all evaluators. It does not treat volunteers as a
@@ -64,7 +69,9 @@ Independent evaluation is an unpaid, bounded volunteer contribution; the
 project does not offer honoraria, authorship, employment benefit, or other
 material consideration for ratings.
 
-The workflow has been tested only with deterministic synthetic data. The
-evaluator-role scope, information/agreement note, recruitment, evaluator
-burden, and data-transfer details remain to be settled before anyone is invited
-to contribute.
+The end-to-end workflow has a deterministic synthetic regression, and the real
+54-row source is available locally for a private package candidate. No
+collection-ready freeze tag exists. The evaluator-role scope,
+information/agreement note, recruitment, evaluator burden, data-transfer
+details, retention/deletion terms, and post-tag gate remain to be settled
+before anyone is invited to contribute.

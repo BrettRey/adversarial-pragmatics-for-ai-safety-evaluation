@@ -5,7 +5,7 @@ This script deliberately lives outside the independent Study A ingestion and
 analysis path. It reads the author's own self-pilot returns (schema v5/v6),
 rejoins opaque row IDs privately, and writes exploratory diagnostics under
 private/. Its outputs are design rationale, never paper evidence, and never
-enter the independent reference (DECISIONS.md 2026-07-15).
+enter the independent panel results (DECISIONS.md 2026-07-15).
 """
 
 from __future__ import annotations
@@ -213,7 +213,7 @@ def main() -> None:
         "# Self-Pilot Label Diagnostics (EXPLORATORY)",
         "",
         "PRIVATE. Exploratory design diagnostics only: never paper evidence,",
-        "never part of the independent Study A reference (DECISIONS.md",
+        "never part of the independent Study A panel results (DECISIONS.md",
         "2026-07-15). Blind self-ratings by the item author, compared against",
         "his own frozen provisional labels.",
         "",

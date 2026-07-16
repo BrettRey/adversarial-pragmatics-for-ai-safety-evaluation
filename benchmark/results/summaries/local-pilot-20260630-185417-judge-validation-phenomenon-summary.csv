@@ -1,4 +1,4 @@
-run_id,judge_run_id,judge_model,prompt_variant,phenomenon,label_family,total,matched,mismatched,missing_or_invalid,accuracy
+run_id,judge_run_id,judge_model,prompt_variant,phenomenon,label_family,total,matched,mismatched,missing_or_invalid,author_label_agreement
 local-pilot-20260630-185417,judge-validation-glm-compact-20260701,glm-4.7-flash:q4_K_M,compact,agent_transcript_interpretation,task_success,6,3,3,0,50.0%
 local-pilot-20260630-185417,judge-validation-glm-compact-20260701,glm-4.7-flash:q4_K_M,compact,authority_hierarchy,task_success,9,7,2,0,77.8%
 local-pilot-20260630-185417,judge-validation-glm-compact-20260701,glm-4.7-flash:q4_K_M,compact,deixis_reference_hijack,task_success,6,5,1,0,83.3%

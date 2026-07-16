@@ -77,7 +77,7 @@ SUMMARY_COLUMNS = [
     "matched",
     "mismatched",
     "missing_or_invalid",
-    "accuracy",
+    "author_label_agreement",
 ]
 
 PHENOMENON_COLUMNS = [
@@ -91,7 +91,7 @@ PHENOMENON_COLUMNS = [
     "matched",
     "mismatched",
     "missing_or_invalid",
-    "accuracy",
+    "author_label_agreement",
 ]
 
 CONFUSION_COLUMNS = [
@@ -573,7 +573,7 @@ def summarize_label_rows(label_rows: list[dict[str, Any]]) -> tuple[
                 "matched": matched,
                 "mismatched": total - matched - invalid,
                 "missing_or_invalid": invalid,
-                "accuracy": percent(matched, total),
+                "author_label_agreement": percent(matched, total),
             }
         )
 
@@ -611,7 +611,7 @@ def summarize_label_rows(label_rows: list[dict[str, Any]]) -> tuple[
                     "matched": matched,
                     "mismatched": total - matched - invalid,
                     "missing_or_invalid": invalid,
-                    "accuracy": percent(matched, total),
+                    "author_label_agreement": percent(matched, total),
                 }
             )
 
@@ -647,19 +647,22 @@ def write_readout(
         f"- Rows judged: {len(label_rows)}",
         f"- Raw judge bundle: `{raw_bundle}`",
         "",
-        "## Label Accuracy",
+        "These figures are exact agreement with the single author's provisional "
+        "labels, not accuracy against ground truth.",
+        "",
+        "## Agreement with Author Labels",
         "",
     ]
     lines.extend(
         markdown_table(
-            ["Label family", "Matched", "Total", "Invalid", "Accuracy"],
+            ["Label family", "Matched", "Total", "Invalid", "Exact agreement"],
             [
                 [
                     row["label_family"],
                     row["matched"],
                     row["total"],
                     row["missing_or_invalid"],
-                    row["accuracy"],
+                    row["author_label_agreement"],
                 ]
                 for row in summary_rows
             ],
@@ -670,26 +673,29 @@ def write_readout(
     lines.extend(["", "## Primary Diagnostic Axes", ""])
     lines.extend(
         markdown_table(
-            ["Axis", "Accuracy"],
-            [[row["label_family"], row["accuracy"]] for row in priority],
+            ["Axis", "Exact agreement"],
+            [[row["label_family"], row["author_label_agreement"]] for row in priority],
         )
     )
 
     weak = sorted(
         phenomenon_rows,
-        key=lambda row: (float(str(row["accuracy"]).rstrip("%")), row["phenomenon"]),
+        key=lambda row: (
+            float(str(row["author_label_agreement"]).rstrip("%")),
+            row["phenomenon"],
+        ),
     )[:12]
     lines.extend(["", "## Lowest Phenomenon/Axis Cells", ""])
     lines.extend(
         markdown_table(
-            ["Phenomenon", "Label family", "Matched", "Total", "Accuracy"],
+            ["Phenomenon", "Label family", "Matched", "Total", "Exact agreement"],
             [
                 [
                     row["phenomenon"],
                     row["label_family"],
                     row["matched"],
                     row["total"],
-                    row["accuracy"],
+                    row["author_label_agreement"],
                 ]
                 for row in weak
             ],

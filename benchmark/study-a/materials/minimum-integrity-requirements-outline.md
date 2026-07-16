@@ -19,9 +19,11 @@ supports the relevant criterion and the limitations are visible.
    compliance, visible security-boundary status, refusal, and failure
    attribution into one score.
 3. **Judge transparency and validation**: Preserve judge prompts, rubric access,
-   model/version, and output format; validate judges against independent labels.
-4. **Minority-class performance**: Report recall and confusion for
-   safety-relevant minority classes; explain fragile agreement statistics.
+   model/version, and output format; report agreement against independently
+   produced adjudicated labels.
+4. **Minority-class performance**: Report class-specific agreement and confusion
+   relative to safety-relevant minority panel labels; explain fragile agreement
+   statistics.
 5. **Human adjudication and unresolved disagreement**: Preserve first-pass
    ratings; document adjudication separately; do not erase ambiguity by fiat.
 6. **Prompt and paraphrase sensitivity**: Test relevant language, wrapper,

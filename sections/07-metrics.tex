@@ -6,11 +6,26 @@ Any aggregate score encodes choices that the per-family cells keep visible. Coll
 
 \subsection{Pairwise contrast accuracy}
 
-For a minimal pair, both variants have to receive the expected label for the pair to count as correct. It's stricter than item accuracy: a model that always outputs \mention{BLUE}, always refuses, or always ignores untrusted content will fail pairs where the expected behaviour changes across variants.
+For a properly controlled pair, both variants have to receive the expected
+label for the pair to count as correct. It's stricter than item accuracy: a
+model that always outputs \mention{BLUE}, always refuses, or always ignores
+untrusted content will fail pairs where the expected behaviour changes across
+variants. The present seed-pilot statistic is reported more narrowly as a
+\term{paired-contrast pass}: it applies the joint success-and-compliance rule
+to broader development contrasts without claiming that they isolate one causal
+dimension.
 
 \subsection{Instruction-source sensitivity}
 
-Instruction-source sensitivity is pairwise contrast accuracy over pairs whose control dimension is \texttt{source\_role}, \texttt{authority\_level}, or \texttt{application\_surface}. It measures whether behaviour changes appropriately when the same directive appears as user instruction, quoted content, webpage text, document text, email body, tool output, or transcript evidence.
+Instruction-source sensitivity is pairwise contrast accuracy over tightly
+controlled pairs whose control dimension is \texttt{source\_role},
+\texttt{authority\_level}, or \texttt{application\_surface}. It measures
+whether behaviour changes appropriately when the same directive appears as
+user instruction, quoted content, webpage text, document text, email body,
+tool output, or transcript evidence. When both the prompt and the observed
+response change, as in the Study A seed re-adjudication, panel-outcome
+divergence is neither necessary nor sufficient for authority sensitivity and
+is reported only as paired divergence.
 
 \subsection{Mention/use robustness}
 
@@ -26,14 +41,14 @@ Refusal calibration reports over-refusal and under-refusal separately. Over-refu
 
 \subsection{Judge validity}
 
-Judge validity compares LLM-judge labels with adjudicated expert labels and rule-aided checks. Report accuracy by label family, judge-prompt sensitivity, and judge failure attribution. A judge that agrees on final task success but misses source-authority failure shouldn't count as valid for this benchmark.
+Judge validity compares LLM-judge labels with adjudicated expert labels and rule-aided checks. Report exact and class-specific agreement relative to the adjudicated labels, judge-prompt sensitivity, and judge failure attribution. A judge that agrees on final task success but misses source-authority failure shouldn't count as valid for this benchmark.
 
 \subsection{Adjudication stability}
 
-Adjudication stability measures whether expert evaluators can apply the item metadata and rubric consistently enough to produce defensible gold labels. Report repeated-item stability, adjudicator-intervention rate, criterion-conflict flags, and taxonomy-revision rate against the fake-data expectations set before the development pass.
+Adjudication stability asks whether expert evaluators apply the item metadata and rubric consistently. Any released benchmark label retains that provenance. Report repeat stability, intervention rate, criterion conflicts, and taxonomy revisions against the fake-data expectations set before the development pass.
 
 \subsection{Taxonomy drift and diagnostic ambiguity}
 
-Taxonomy drift is the proportion of items whose labels change under paraphrase, application wrapper, model version, or adjudication criterion while the intended control dimension remains fixed. Diagnostic ambiguity marks items where disagreement persists after context clarification and can't be reduced to annotation error. Report both as item-level diagnostics rather than hidden gold-set failures.
+Taxonomy drift is the proportion of items whose labels change under paraphrase, application wrapper, model version, or adjudication criterion while the intended control dimension remains fixed. Diagnostic ambiguity marks items where disagreement persists after context clarification and can't be reduced to annotation error. Report both as item-level diagnostics rather than hidden benchmark-label failures.
 
-Together, these measures test label projectibility. A category that's stable across the declared paraphrase and wrapper set supports a broader claim. One that shifts under a control-preserving variant should be scoped down, split, or marked as diagnostic ambiguity before it's used in a gold-set or system-card claim.
+Together, these measures test label projectibility. A category that's stable across the declared paraphrase and wrapper set supports a broader claim. One that shifts under a control-preserving variant should be scoped down, split, or marked as diagnostic ambiguity before it's used in a benchmark scoring set or system-card claim.

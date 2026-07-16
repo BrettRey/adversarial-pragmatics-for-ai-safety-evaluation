@@ -2,7 +2,12 @@
 
 This directory holds the adversarial-pragmatics benchmark materials.
 
-The seed file uses benign payloads such as colors, protected dummy tokens, and dummy secrets. It is meant to validate the schema, taxonomy, minimal-pair logic, refusal matrix, and application-surface wrappers before realistic policy-safe examples are added. The current seed set has 18 items: eight eligible strict contrast pairs plus one diagnostic confidentiality contrast.
+The seed file uses benign payloads such as colors, protected dummy tokens, and
+dummy secrets. It is meant to validate the schema, taxonomy, paired-contrast
+logic, refusal matrix, and application-surface wrappers before realistic
+policy-safe examples are added. The current seed set has 18 items: eight
+eligible controlled contrasts plus one diagnostic confidentiality contrast.
+These development pairs do not uniformly meet a strict minimal-pair standard.
 
 ## Files
 

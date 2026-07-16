@@ -35,9 +35,11 @@ response and not response-outcome gold. The two vocabularies are not compared.
 
 ## Shared Fields
 
-Every response includes an assigned pseudonymous `rater_id`, opaque `row_id`,
-role, confidence (`low`, `medium`, or `high`), and block-level `started_at`,
-`completed_at`, and `elapsed_seconds` fields. As of version 7 the confidence
+Every downloaded block has an envelope containing `study_id`, the opaque
+role-specific `package_id`, `role`, `block_id`, assigned pseudonymous
+`rater_id`, and block-level `started_at`, `completed_at`, `elapsed_seconds`, and
+`saved_at`. Each rating row inside the envelope carries its opaque `row_id`,
+the role fields, and confidence (`low`, `medium`, or `high`). As of version 7 the confidence
 rating is scoped to the form's global judgment (task success on the
 linguistic form; policy compliance on the policy form), not the row as a
 whole: graded confidence attaches to the one judgment with no categorical
@@ -128,6 +130,11 @@ prompt and response visibly show. `visible_boundary_type`'s `none` matches
 (`source_roles`, `visible_boundary_type`, `refusal_outcome`) keep their
 domain-specific escape options (`mixed_or_unclear`, `not_a_refusal`) instead
 of the standard pair.
+
+The two boundary answers are preserved even when they conflict. Ingestion
+records an explicit cross-field coherence flag for combinations such as
+`no_boundary_stated` plus a non-`none` type, or a stated/violated boundary plus
+type `none`; it never rewrites either raw answer to manufacture consistency.
 
 The boundary fields are evidentiary and local: rate only what a reviewer can
 see in the prompt and response. Select `insufficient_visible_context` or

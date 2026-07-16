@@ -10,13 +10,17 @@ not legal advice or a claim of institutional approval.**
 2. Protect it with a unique password and multi-factor authentication.
 3. Limit mailbox and local-file access to the investigator.
 4. Prepare an ignored local directory for returned JSON files and a separate
-   private contact/identity mapping.
+   private contact/identity mapping and assignment registry.
 5. State the collection-close and analysis-start cutoff in the final evaluator
    information note.
+6. Validate that every globally unique rater ID is assigned to exactly one
+   person, one role, and the current package ID, and that the two role pools are
+   person-disjoint.
 
 ## Evaluator Return Instructions
 
-1. Complete one 18-row block and download its JSON file.
+1. Use only the role-specific ZIP assigned to you. Complete one 18-row block
+   and download its JSON file without editing it.
 2. Email only that JSON attachment to **[Study A return address]**.
 3. Use the subject line `Study A / [rater ID] / [block ID]`.
 4. Do not put a real name, employer, institution, private task details, or
@@ -29,11 +33,14 @@ not legal advice or a claim of institutional approval.**
 1. Confirm that the attachment is a JSON response file and that the filename
    contains only the assigned rater ID and block ID.
 2. Save it unchanged under the ignored local study directory.
-3. Record receipt using the pseudonymous rater ID, not a public project file.
-4. Remove the attachment from the email inbox and sent/reply workflow after the
+3. Before ingestion, verify the embedded package ID, role, and rater ID against
+   the private assignment registry. Reject stale, unregistered, wrong-role, or
+   duplicate-person submissions rather than repairing them by hand.
+4. Record receipt using the pseudonymous rater ID, not a public project file.
+5. Remove the attachment from the email inbox and sent/reply workflow after the
    local copy and receipt record are confirmed, subject to the final retention
    rule.
-5. Do not forward the attachment or merge it with identity/contact records.
+6. Do not forward the attachment or merge it with identity/contact records.
 
 ## If Something Goes Wrong
 

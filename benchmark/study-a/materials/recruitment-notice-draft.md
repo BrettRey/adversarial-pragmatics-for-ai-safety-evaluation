@@ -19,7 +19,8 @@ I am seeking two kinds of evaluator:
 
 Evaluators would receive role-specific, blind, offline forms in three 18-row
 blocks, covering all 54 rows for their assigned role. The blocks can be
-completed in separate sittings.
+completed in separate sittings. Each person may serve in only one role and
+receives only that role's package.
 They would not see model identity, benchmark metadata, expected answers,
 author labels, or automated-judge labels. The study preserves uncertainty and
 item-problem judgments rather than forcing a single answer.

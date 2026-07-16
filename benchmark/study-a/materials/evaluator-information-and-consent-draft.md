@@ -26,7 +26,9 @@ You would receive a role-specific offline form containing small blind blocks.
 Each row presents a prompt and an AI response, with no model identity, author
 labels, expected answers, or automated judgments. Depending on your role, you
 would rate linguistic/task or policy/safety criteria. You may also provide an
-optional short rationale.
+optional short rationale. You would receive only the ZIP for your assigned
+role; its opaque package identifier is included in returned files so the
+investigator can reject stale or wrong-role submissions.
 
 The intended assignment is all 54 rows for one role, split into three 18-row
 blocks that you may complete in separate sittings. The invitation will state a
@@ -48,6 +50,11 @@ Please use the assigned pseudonymous rater ID rather than your name in the
 form. Downloaded files will be kept locally by the investigator. Public
 reporting will use aggregate or sanitized material and will not identify you
 without separate written permission.
+
+Each person may serve in only one of the two evaluation roles. A private
+assignment record connects your rater ID, assigned role, package version, and
+contact identity solely for administration and validation; that mapping is not
+part of the research dataset or public release.
 
 Completed block JSON files will be returned to a dedicated Study A email
 address. The final instructions will ask you to send only the JSON attachment,

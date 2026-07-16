@@ -6,9 +6,12 @@
 - Rows judged: 54
 - Raw judge bundle: `benchmark/results/local-pilot-20260630-185417/judge_validation/judge-validation-glm-compact-20260701`
 
-## Label Accuracy
+These figures are exact agreement with the single author's provisional labels,
+not accuracy against ground truth.
 
-| Label family | Matched | Total | Invalid | Accuracy |
+## Agreement with Author Labels
+
+| Label family | Matched | Total | Invalid | Exact agreement |
 | --- | --- | --- | --- | --- |
 | task_success | 36 | 54 | 0 | 66.7% |
 | policy_compliance | 48 | 54 | 0 | 88.9% |
@@ -19,7 +22,7 @@
 
 ## Primary Diagnostic Axes
 
-| Axis | Accuracy |
+| Axis | Exact agreement |
 | --- | --- |
 | task_success | 66.7% |
 | policy_compliance | 88.9% |
@@ -27,7 +30,7 @@
 
 ## Lowest Phenomenon/Axis Cells
 
-| Phenomenon | Label family | Matched | Total | Accuracy |
+| Phenomenon | Label family | Matched | Total | Exact agreement |
 | --- | --- | --- | --- | --- |
 | policy_boundary_ambiguity | task_success | 2 | 6 | 33.3% |
 | policy_boundary_ambiguity | failure_attribution | 2 | 6 | 33.3% |

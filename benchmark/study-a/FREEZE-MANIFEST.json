@@ -1,59 +1,422 @@
 {
-  "study": "A",
-  "purpose": "pre-registration freeze of the analysis path before any external return is opened",
-  "schema_version": 7,
-  "freeze_stamp": 1,
-  "model_digests": {
-    "mistral:7b-instruct-v0.3-q4_K_M": "6577803aa9a0",
-    "mistral-small:24b-instruct-2501-q4_K_M": "8039dd90c113"
-  },
-  "judge_run_command": "python3 scripts/run_study_a_judge.py --judge-model <model> --out benchmark/study-a/judge-comparators/judge-labels-<tag>.csv  # deterministic: temperature 0, seed 1",
-  "artifacts": {
-    "benchmark/study-a/analysis-plan.md": {
-      "sha256": "8fd6aa25a0d41ace0c6394605b59f7ded3dc4c2461285f96af14b4fe13d1b3d5",
-      "bytes": 20784
+  "checkpoint_1_inputs": {
+    "pilot_source_fingerprint_manifest": {
+      "bytes": 3040,
+      "path": "data/provisional/local-pilot-20260630-185417-freeze-manifest.json",
+      "sha256": "a6bbc2253cbad071e460dd43af90c20a5f286104af540586df980479f9dd34bb"
     },
-    "benchmark/study-a/schema.json": {
-      "sha256": "9c93bdd7ef2531d289818c9366f925c53a677ad78e7b566b6a8163308520e83f",
-      "bytes": 13483
-    },
-    "benchmark/study-a/training-items.json": {
-      "sha256": "2b44b14b9ed2a76020509b7492389bb2523c4652b33162a525adecd399bfc8e2",
-      "bytes": 7340
-    },
-    "benchmark/items/seed-items.csv": {
-      "sha256": "96e1ef4bd876f404d4efdecdf350286835877905335cb2dcb25c4ffd1db2971c",
-      "bytes": 7928
-    },
-    "benchmark/study-a/judge-comparators/judge-labels-mistral-7b.csv": {
-      "sha256": "d5a6e5d21f7b5cf00ba23ae2aaf33a562334a7b14148681059aa0152bc8249b1",
-      "bytes": 16523
-    },
-    "benchmark/study-a/judge-comparators/judge-labels-mistral-24b.csv": {
-      "sha256": "ba5ce66c4ae636e0ea9feed32bfb81d1388abd7686b615e2c7b03df43e283327",
-      "bytes": 17487
-    },
-    "scripts/run_study_a_judge.py": {
-      "sha256": "93340d4078283552497b4ba6df6700d1a4e95dd52227f57c032f5bccd07d6193",
-      "bytes": 11047
-    },
-    "scripts/analyze_independent_reassessment.py": {
-      "sha256": "4b088dc65eeb44f713c6e396aebf0cb8dc2ba2cee32b9ed79b3e5ebcb0751ba8",
-      "bytes": 60018
-    },
-    "scripts/ingest_independent_reassessment.py": {
-      "sha256": "24cd58575792c31684d8b3fc9099de0547dbb81dd0abcba25d3d87868b212ce4",
-      "bytes": 12521
-    },
-    "scripts/build_independent_reassessment.py": {
-      "sha256": "729d5145b439da4751a737c67d18c29aafad4cfae4bbbf98aae92e8602bbe099",
-      "bytes": 52921
+    "provisional_author_snapshot": {
+      "bytes": 15336,
+      "interpretation": "historical provisional author labels for comparison, not independent response-level gold",
+      "path": "data/provisional/local-pilot-20260630-185417-provisional-author-labels.csv",
+      "sha256": "078629308b3fa45dadf6f4020b7c2edc301034c4ab62193e17dd35bce716ac0c"
     }
   },
-  "not_yet_frozen": [
-    "row_map (built with real blind packages)",
-    "blind-package presentation order (real run)",
-    "frozen author snapshot (real run)"
-  ],
-  "deviations_recorded_in": "benchmark/study-a/revision-ledger.md"
+  "checkpoint_mutability": "candidate_pending_explicit_tag",
+  "commands": {
+    "analyze_returns": {
+      "argv": [
+        "python3",
+        "scripts/analyze_independent_reassessment.py",
+        "--private-dir",
+        "private/study-a/production/private",
+        "--ratings",
+        "private/study-a/production/private/processed/ratings-long.csv",
+        "--out-dir",
+        "private/study-a/production/private/analysis",
+        "--judge-labels",
+        "benchmark/study-a/judge-comparators/judge-labels-mistral-7b.csv",
+        "--judge-labels",
+        "benchmark/study-a/judge-comparators/judge-labels-mistral-24b.csv"
+      ]
+    },
+    "collection_ready": {
+      "argv": [
+        "python3",
+        "scripts/check_study_a_collection_ready.py",
+        "--production-root",
+        "private/study-a/production",
+        "--config",
+        "private/study-a/production/operational-config.json"
+      ]
+    },
+    "freeze_ready": {
+      "argv": [
+        "python3",
+        "scripts/check_study_a_freeze_ready.py",
+        "--production-root",
+        "private/study-a/production"
+      ]
+    },
+    "ingest_returns": {
+      "argv": [
+        "python3",
+        "scripts/ingest_independent_reassessment.py",
+        "--private-dir",
+        "private/study-a/production/private",
+        "--responses",
+        "private/study-a/production/private/responses",
+        "--out-dir",
+        "private/study-a/production/private/processed"
+      ]
+    },
+    "judge_comparators": [
+      {
+        "argv": [
+          "python3",
+          "scripts/run_study_a_judge.py",
+          "--judge-model",
+          "mistral:7b-instruct-v0.3-q4_K_M",
+          "--out",
+          "benchmark/study-a/judge-comparators/judge-labels-mistral-7b.csv",
+          "--outputs",
+          "benchmark/results/local-pilot-20260630-185417/outputs.csv",
+          "--keys-from",
+          "benchmark/results/local-pilot-20260630-185417/adjudication_responses.csv",
+          "--seed",
+          "1",
+          "--temperature",
+          "0",
+          "--num-predict",
+          "256",
+          "--timeout",
+          "180"
+        ],
+        "command_would_create_a_new_timestamped_run_id": true,
+        "expected_existing_run_id": "study-a-judge-20260716T095320Z",
+        "judge_model": "mistral:7b-instruct-v0.3-q4_K_M",
+        "rerun_required": false
+      },
+      {
+        "argv": [
+          "python3",
+          "scripts/run_study_a_judge.py",
+          "--judge-model",
+          "mistral-small:24b-instruct-2501-q4_K_M",
+          "--out",
+          "benchmark/study-a/judge-comparators/judge-labels-mistral-24b.csv",
+          "--outputs",
+          "benchmark/results/local-pilot-20260630-185417/outputs.csv",
+          "--keys-from",
+          "benchmark/results/local-pilot-20260630-185417/adjudication_responses.csv",
+          "--seed",
+          "1",
+          "--temperature",
+          "0",
+          "--num-predict",
+          "256",
+          "--timeout",
+          "180"
+        ],
+        "command_would_create_a_new_timestamped_run_id": true,
+        "expected_existing_run_id": "study-a-judge-20260716T095536Z",
+        "judge_model": "mistral-small:24b-instruct-2501-q4_K_M",
+        "rerun_required": false
+      }
+    ],
+    "production_package_build": {
+      "argv": [
+        "python3",
+        "scripts/build_independent_reassessment.py",
+        "--source",
+        "benchmark/results/local-pilot-20260630-185417/outputs.csv",
+        "--out-dir",
+        "private/study-a/production/package",
+        "--private-dir",
+        "private/study-a/production/private",
+        "--author-labels",
+        "data/provisional/local-pilot-20260630-185417-provisional-author-labels.csv",
+        "--block-size",
+        "18"
+      ],
+      "row_salt": "auto_generated_and_retained_only_in_private_metadata"
+    },
+    "verify_stamp_2": {
+      "argv": [
+        "python3",
+        "scripts/build_study_a_manifest.py",
+        "--verify",
+        "--require-stamp",
+        "2",
+        "--production-root",
+        "private/study-a/production"
+      ]
+    },
+    "write_stamp_2": {
+      "argv": [
+        "python3",
+        "scripts/build_study_a_manifest.py",
+        "--write",
+        "--stamp",
+        "2",
+        "--production-root",
+        "private/study-a/production"
+      ]
+    }
+  },
+  "deviations_recorded_in": "benchmark/study-a/revision-ledger.md",
+  "freeze_accomplished": false,
+  "freeze_stamp": 2,
+  "freeze_status": "ready_for_tag",
+  "judge_condition": {
+    "human_full_role_scaffold_matched": false,
+    "prompt_variant": "option_a_v7_roleseparated",
+    "role_separated": true,
+    "scaffold": "outcome_only",
+    "sentinel_mismatches_invalidate_comparators": false,
+    "sentinel_selection_timing": "post_comparator_output_pre_freeze",
+    "structural_audit": "benchmark/study-a/judge-comparators/judge-condition-audit.json",
+    "visible_rule_sentinels": "benchmark/study-a/judge-comparators/visible-rule-sentinels.json"
+  },
+  "manifest_version": 2,
+  "model_digests": {
+    "mistral-small:24b-instruct-2501-q4_K_M": "8039dd90c113",
+    "mistral:7b-instruct-v0.3-q4_K_M": "6577803aa9a0"
+  },
+  "not_yet_frozen": [],
+  "open_returns_authorized": false,
+  "production_candidate": {
+    "package_audits": {
+      "blind_package": {
+        "bytes": 389,
+        "path": "private/study-a/production/package/blind-package-audit.json",
+        "sha256": "0e51953d78c822ddfa0452ceb2952944da63821750f673f981e77599db879872",
+        "status": "pass"
+      },
+      "role_isolation": {
+        "bytes": 999,
+        "path": "private/study-a/production/package/role-package-isolation-audit.json",
+        "sha256": "45dbd24735ec64ce09e062e02d9baaec71c55d5438a67b7718a17f8c42b25f1f",
+        "status": "pass"
+      },
+      "training_package": {
+        "bytes": 222,
+        "path": "private/study-a/production/package/training-package-audit.json",
+        "sha256": "dc8ea89db317d7a3e1f6742adc1fa7d0884acf96908ef13d05d57ea34234eff1",
+        "status": "pass"
+      }
+    },
+    "package_build_fingerprint_sha256": "bd66affd66096fed6eae4e1cc67991a19fea54a44e0c31824fa5a8c79ff588b5",
+    "package_tree": {
+      "file_count": 30,
+      "sha256": "d40cbde45fb405c52d3c6629641e07d2201171500c0a11d06cace2555734e8bf",
+      "total_bytes": 334742
+    },
+    "presentation": {
+      "adjacent_same_item_pairs": 0,
+      "block_count": 3,
+      "block_size": 18,
+      "each_block_has_each_item_once": true,
+      "each_block_has_six_rows_per_model": true,
+      "row_count": 54,
+      "row_id_sequence_sha256": "6a4e59c00a914546d53b380bc8e3e70ca7020bb880a214ac5edea30e6763d0d1",
+      "same_order_across_roles": true
+    },
+    "private_artifacts": {
+      "author_snapshot": {
+        "bytes": 15336,
+        "path": "private/study-a/production/private/author_labels.csv",
+        "sha256": "078629308b3fa45dadf6f4020b7c2edc301034c4ab62193e17dd35bce716ac0c"
+      },
+      "presentation_order": {
+        "bytes": 2010,
+        "path": "private/study-a/production/private/presentation-order.tsv",
+        "row_count": 54,
+        "row_id_sequence_sha256": "6a4e59c00a914546d53b380bc8e3e70ca7020bb880a214ac5edea30e6763d0d1",
+        "sha256": "2e2013e5d2cf1c962eeab16f7ac3cca7128167641a61998b0facdb51b0b68651"
+      },
+      "presentation_order_audit": {
+        "bytes": 1093,
+        "path": "private/study-a/production/private/presentation-order-audit.json",
+        "sha256": "aed4290141e1e79b288a6dd0f4892d4dee784c165ffc355ecfecb8170ebf2c51",
+        "status": "pass"
+      },
+      "private_metadata": {
+        "bytes": 1810,
+        "contents_exposed_in_manifest": false,
+        "path": "private/study-a/production/private/study-private-metadata.json",
+        "sha256": "e7c8e3d76ce23e8f13ab6f63cfef93ec6e6c77787a10e4cc57047d69686f1e51"
+      },
+      "row_map": {
+        "bytes": 4782,
+        "path": "private/study-a/production/private/row_map.tsv",
+        "sha256": "d48072d4e093e55a54e494257c87b3c3ebd336dc8dffad3b4c98ca834aa61cdf"
+      }
+    },
+    "production_root": "private/study-a/production",
+    "responses_absent_or_empty": true,
+    "role_archives": {
+      "linguistic_task": {
+        "bytes": 44384,
+        "deterministic_zip_verified": true,
+        "member_count": 12,
+        "member_tree_sha256": "606c0b8d4c83806f4aa2272bffe76acc901faf8497dc0f1bc574169d80e59e64",
+        "package_id": "PKG-798427C7610B8D7D",
+        "path": "private/study-a/production/package/distribution/study-a-linguistic-task.zip",
+        "sha256": "18f276458e4f5e8d6b1fa80c090fa0a81bf202459d8c626267e05d3181719edc"
+      },
+      "policy_safety": {
+        "bytes": 42915,
+        "deterministic_zip_verified": true,
+        "member_count": 12,
+        "member_tree_sha256": "b9ce82e00f299c8fdd77688e4b280d0f320e3724204fa3bcfc2499a6644db88a",
+        "package_id": "PKG-033FCE910C496094",
+        "path": "private/study-a/production/package/distribution/study-a-policy-safety.zip",
+        "sha256": "e9ec4b7e63493c4deac45944e4df8404eee20b67a7072608ce58d1b6ac5376e7"
+      }
+    },
+    "source_output": {
+      "bytes": 33535,
+      "declared_in": "data/provisional/local-pilot-20260630-185417-freeze-manifest.json",
+      "path": "benchmark/results/local-pilot-20260630-185417/outputs.csv",
+      "records": 54,
+      "sha256": "6dedf8334f118df8388bdd3ed2120d17a46ce5759b553ca35cc141afb1ce408d",
+      "verified_locally": true
+    }
+  },
+  "public_artifacts": {
+    "Makefile": {
+      "bytes": 16167,
+      "sha256": "0bf9f3463a08d28bde94d64bf0e1fe5c858f7788b9291dca0726d1cabd1db23b"
+    },
+    "benchmark/items/seed-items.csv": {
+      "bytes": 7928,
+      "sha256": "96e1ef4bd876f404d4efdecdf350286835877905335cb2dcb25c4ffd1db2971c"
+    },
+    "benchmark/study-a/README.md": {
+      "bytes": 6722,
+      "sha256": "1fd10e848dddd5184ae2ee3ca6a275e4ebc8f9c9ec0fe8934d17bf272b761b40"
+    },
+    "benchmark/study-a/analysis-plan.md": {
+      "bytes": 22565,
+      "sha256": "49cec32b8a72a98ff8491aa0c08593486bf44306f7d72b5688cb333ef1caa394"
+    },
+    "benchmark/study-a/judge-comparators/judge-condition-audit.json": {
+      "bytes": 15279,
+      "sha256": "c8a09f7bd23d3fd5dde25f457ff20719b423bae04cbe8b629bffc1df8bac8f91"
+    },
+    "benchmark/study-a/judge-comparators/judge-labels-mistral-24b.csv": {
+      "bytes": 17487,
+      "sha256": "ba5ce66c4ae636e0ea9feed32bfb81d1388abd7686b615e2c7b03df43e283327"
+    },
+    "benchmark/study-a/judge-comparators/judge-labels-mistral-7b.csv": {
+      "bytes": 16523,
+      "sha256": "d5a6e5d21f7b5cf00ba23ae2aaf33a562334a7b14148681059aa0152bc8249b1"
+    },
+    "benchmark/study-a/judge-comparators/visible-rule-sentinels.json": {
+      "bytes": 2301,
+      "sha256": "602c977d3d0a2c34a4c687b472524c1c61a66a7f26518c81aade0926e97a0678"
+    },
+    "benchmark/study-a/materials/README.md": {
+      "bytes": 3196,
+      "sha256": "0bffcc6379fc89668c4d8aa40711ad48cd8a514823f6c3563937ea718ab25e3e"
+    },
+    "benchmark/study-a/materials/data-return-instructions-draft.md": {
+      "bytes": 3342,
+      "sha256": "45695c12e00f54c49c7893daba04da71dfbdef5ec6eb34b82fa5a1a6c7a9b7fb"
+    },
+    "benchmark/study-a/materials/evaluator-information-and-consent-draft.md": {
+      "bytes": 4300,
+      "sha256": "9c45534284caed70137566b53bc94ce7ffd66dea8a28e1854972b8eac7c22367"
+    },
+    "benchmark/study-a/materials/evaluator-quick-start-draft.md": {
+      "bytes": 4435,
+      "sha256": "de77447888a1b1b4573f93dd05371f666145fbc91e0d641b0a41a186dc5dce8e"
+    },
+    "benchmark/study-a/materials/independent-adjudication-one-page.md": {
+      "bytes": 4210,
+      "sha256": "087517573784a6441b0d61a806c131391cfbcb7c8a8111691656c4400ec36dfc"
+    },
+    "benchmark/study-a/materials/privacy-and-release-boundary-draft.md": {
+      "bytes": 2667,
+      "sha256": "7cdef749fe5ceae5cf64d3c50d3b757c9b15dd52ca4f76800e6ea51e4a43d0d6"
+    },
+    "benchmark/study-a/materials/recruitment-notice-draft.md": {
+      "bytes": 1985,
+      "sha256": "69fdfebbc1ff638c5b7ee5b1a55effbce4cd509c3185820366a26556e002d033"
+    },
+    "benchmark/study-a/materials/study-protocol-draft.md": {
+      "bytes": 12048,
+      "sha256": "0a2be8b2e0dd212ffe8b84f19e3259e5a8953b8e42051b3a7817756375180882"
+    },
+    "benchmark/study-a/materials/withdrawal-log-template.csv": {
+      "bytes": 118,
+      "sha256": "d5d7312fde69ef3533fa130616633ef43c90158655ce257548c7db36bdd1d48d"
+    },
+    "benchmark/study-a/materials/withdrawal-procedure-draft.md": {
+      "bytes": 1654,
+      "sha256": "3c534d4f3b8d937dd1494887e90f6af6378f66ffccf252d56ef761580dc23a2a"
+    },
+    "benchmark/study-a/revision-ledger.md": {
+      "bytes": 1584,
+      "sha256": "0ab767f1280445e010bba1978b90a1d8e3fdf9137dd1daa28d1c046d7b01afb9"
+    },
+    "benchmark/study-a/schema.json": {
+      "bytes": 13483,
+      "sha256": "9c93bdd7ef2531d289818c9366f925c53a677ad78e7b566b6a8163308520e83f"
+    },
+    "benchmark/study-a/schema.md": {
+      "bytes": 10527,
+      "sha256": "a1b88ce922f0d79b8d225741ec174fc9c1e05caef6a445044884b1ac3e0c2b26"
+    },
+    "benchmark/study-a/training-items.json": {
+      "bytes": 7340,
+      "sha256": "2b44b14b9ed2a76020509b7492389bb2523c4652b33162a525adecd399bfc8e2"
+    },
+    "data/provisional/local-pilot-20260630-185417-freeze-manifest.json": {
+      "bytes": 3040,
+      "sha256": "a6bbc2253cbad071e460dd43af90c20a5f286104af540586df980479f9dd34bb"
+    },
+    "data/provisional/local-pilot-20260630-185417-provisional-author-labels.csv": {
+      "bytes": 15336,
+      "sha256": "078629308b3fa45dadf6f4020b7c2edc301034c4ab62193e17dd35bce716ac0c"
+    },
+    "scripts/analyze_independent_reassessment.py": {
+      "bytes": 93959,
+      "sha256": "ce147b3d0dea2e1f035cb1e50dd84b45170c8585ae82eca6583fcaf6f21a96ea"
+    },
+    "scripts/audit_study_a_judge_condition.py": {
+      "bytes": 22578,
+      "sha256": "8cc184d7c50acb3938b86dc382c714afa429843ea1706758f407d0fa92ad3a32"
+    },
+    "scripts/build_independent_reassessment.py": {
+      "bytes": 76629,
+      "sha256": "c413eaa97b93ac23899f6bda2cc582395a632f645567a5b37e607886b94b5edb"
+    },
+    "scripts/build_study_a_manifest.py": {
+      "bytes": 61499,
+      "sha256": "26a2861e9fd6fadc32c08081ead3120f7f8b7fc0bec9a9472a0af5d44061e297"
+    },
+    "scripts/check_study_a_collection_ready.py": {
+      "bytes": 34736,
+      "sha256": "5479ee8f8457ed73d95e3d46df97dd9cc4a75c818d40d6113b30c36a9b2117d6"
+    },
+    "scripts/check_study_a_freeze_ready.py": {
+      "bytes": 3341,
+      "sha256": "6136d122518c7be552c5e49344d324c2708fc7b80601a8a620cccd7d02053b50"
+    },
+    "scripts/ingest_independent_reassessment.py": {
+      "bytes": 23435,
+      "sha256": "4853f5ca4ee9ae500130b3ce7877fd3e3324ff4f51d04830a8f3dd9a9c2d93ce"
+    },
+    "scripts/run_study_a_judge.py": {
+      "bytes": 10855,
+      "sha256": "aed97654885cfab78ab57cbefabb36684648be7909fc43fdc75972001ce9535e"
+    },
+    "scripts/simulate_independent_reassessment.py": {
+      "bytes": 75970,
+      "sha256": "c7191b7e8b465a1180bca80e3915e72e4cc3999eb9dfb99b3379d7def6375506"
+    },
+    "scripts/study_a_synthetic_fixture.py": {
+      "bytes": 2519,
+      "sha256": "9042fdef106e7f1e3b6f4d1038eacbfe1dba749c3934334c5d3ee57fd490a3d9"
+    },
+    "scripts/validate_study_a_assignments.py": {
+      "bytes": 9692,
+      "sha256": "4c082d8f5987def83d9c3621f47cf71c093a5fd619adee72fb1316971dc90cde"
+    }
+  },
+  "purpose": "two-stage pre-unblinding checkpoint record; no freeze is accomplished and collection remains closed until the annotated-tag and operational-config collection gate passes",
+  "schema_version": 7,
+  "study": "A"
 }

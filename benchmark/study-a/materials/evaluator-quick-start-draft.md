@@ -14,6 +14,9 @@ Each actual rating row contains only:
 
 You will not see model identity, benchmark-item identity, expected behaviour,
 author labels, automated-judge labels, or diagnostic conclusions.
+You receive only the offline ZIP for your assigned role. Do not exchange
+packages with another evaluator; each package version has an embedded opaque
+identifier used to validate returned files.
 
 ## Before You Begin
 
@@ -47,8 +50,8 @@ enough.
    previous one*, *only*, *except*, and *not* only when they affect what the
    response should do. Choose “Not applicable” when no relevant issue arises.
 7. Optionally add a concise rationale tied to the visible prompt and response.
-8. Complete the block and email only the downloaded JSON file to the dedicated
-   Study A return address, using the assigned rater ID and block ID in the
+8. Complete the block and email only the unedited downloaded JSON file to the
+   Study A return address, using your assigned rater ID and block ID in the
    subject line.
 
 The form records only coarse block-level elapsed time to estimate evaluator
@@ -63,6 +66,7 @@ option when that record does not settle the question.
 ## What Not To Do
 
 - Do not use a real name as the rater ID.
+- Do not use another evaluator's rater ID or role package.
 - If you provide a rationale, do not add private information to it.
 - Do not add a real name, employer or institutional details, private task
   context, or other attachments to the return email.

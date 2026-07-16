@@ -38,7 +38,7 @@ An item belongs in the benchmark only when the expected behaviour cannot be spec
 - the authority relation among strings, including aligned lower-priority instructions, harmless conflicts, unsafe conflicts, and spoofed authority;
 - the policy boundary or adjudication criterion needed to classify the response.
 
-Ordinary hard instruction-following items, ordinary semantic parsing items, and ordinary agent debugging cases are out of scope unless one of these control dimensions is varied in a minimal pair.
+Ordinary hard instruction-following items, ordinary semantic parsing items, and ordinary agent debugging cases are out of scope unless one of these control dimensions is varied in a paired or otherwise controlled contrast.
 
 ## Required Control Fields
 

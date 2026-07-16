@@ -7,7 +7,7 @@ This is an empirical AI-safety-evaluation paper. The project turns Brett's work 
 Core deliverables:
 
 - a taxonomy of safety-relevant pragmatic failure modes;
-- a seed minimal-pair benchmark;
+- a seed benchmark of paired, controlled contrasts;
 - an annotation protocol separating task success, policy compliance, safety risk, evaluator confidence, and failure attribution;
 - metrics for diagnostic ambiguity and taxonomy drift;
 - a local pilot and LLM-judge validation pass;
@@ -17,13 +17,17 @@ Core deliverables:
 
 The canonical repository state contains:
 
-- an 18-item seed benchmark with eight eligible strict contrast pairs plus one diagnostic confidentiality contrast;
+- an 18-item seed benchmark with eight eligible paired contrasts plus one diagnostic confidentiality contrast;
 - a 54-row local pilot over three Ollama models;
 - sanitized row-level and aggregate pilot summaries under `benchmark/results/summaries/`;
 - a judge-validation pass showing that a rubric-aided LLM judge missed the safety-relevant minority classes under favourable conditions;
 - LaTeX source for the main paper, supplement, and two related framework papers.
 
-Public-version note: arXiv v1 (`2607.01153v1`) reflects an earlier version of the pilot readout. The current repository state is the canonical source for the repaired strict-pair treatment: P008 is excluded from strict-pair scoring, leaving 12/24 eligible strict-pair passes.
+Public-version note: arXiv v1 (`2607.01153v1`) reflects an earlier version of
+the pilot readout. The current repository state is the canonical source for the
+repaired paired-contrast treatment: P008 is excluded, leaving 12/24 eligible
+paired-contrast passes. The seed pairs are controlled development contrasts,
+not uniformly strict minimal pairs.
 
 No source claims in setup prompts or review notes should be treated as verified until checked in `notes/source-verification.md`.
 
@@ -55,7 +59,7 @@ make all-papers
 ## Layout
 
 ```text
-benchmark/items/seed-items.csv       # first safe, benign minimal-pair seed set
+benchmark/items/seed-items.csv       # first safe, benign paired-contrast seed set
 benchmark/rubrics/taxonomy.md        # failure-mode taxonomy
 benchmark/rubrics/annotation-protocol.md
 notes/project-brief.md
@@ -70,7 +74,7 @@ Before using the project as a public job-market or citation artifact:
 
 - build clean PDFs with `make all-papers`;
 - rebuild the arXiv source bundle with `bash scripts/build_arxiv_bundle.sh`;
-- submit an arXiv revision matching the repaired strict-pair readout;
+- submit an arXiv revision matching the repaired paired-contrast readout;
 - tag a numbered GitHub release from the same commit;
 - archive the release with a DOI if the artifact will be cited externally;
 - keep raw model-output bundles ignored unless they are intentionally sanitized for release.

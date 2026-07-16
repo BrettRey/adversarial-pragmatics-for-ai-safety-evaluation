@@ -13,10 +13,13 @@ The current repository state supersedes arXiv v1 for project and job-market use.
 Current artifact:
 
 - 18 hand-authored seed items.
-- Eight eligible strict contrast pairs plus one diagnostic confidentiality contrast.
+- Eight eligible paired contrasts plus one diagnostic confidentiality contrast.
 - 54 item--model rows from a local Ollama pilot over `qwen3:8b`, `gemma3:12b`, and `glm-4.7-flash:q4_K_M`.
 - Adjudicated pilot totals: 36 full task successes, 11 partial successes, 7 failures, 46 policy-compliant outputs.
-- Strict-pair readout: 12/24 eligible pair--model cells. P008 is excluded from strict-pair scoring because its two rows differ in phenomenon family and both require non-disclosure.
+- Paired-contrast readout: 12/24 eligible pair--model cells. P008 is excluded
+  because its two rows differ in phenomenon family and both require
+  non-disclosure. The seed pairs are controlled development contrasts, not
+  uniformly strict minimal pairs.
 - Sanitized row-level and aggregate summaries under `benchmark/results/summaries/`.
 - LLM-judge validation showing that a rubric-aided judge missed the safety-relevant minority classes under favourable conditions.
 
@@ -29,7 +32,10 @@ Current paper stack in this repository:
 
 ## Public-Version Gap
 
-arXiv v1 currently reports the earlier nine-pair / 13/27 strict-pair readout. The repaired local version reports eight eligible strict pairs plus one diagnostic contrast and 12/24 eligible strict-pair passes.
+arXiv v1 currently reports the earlier nine-pair / 13/27 strict-pair readout.
+The repaired local version reports eight eligible paired contrasts plus one
+diagnostic contrast and 12/24 eligible paired-contrast passes; the new wording
+does not claim that the seed pairs are uniformly strict minimal pairs.
 
 Before circulating the project as a polished public artifact:
 
@@ -81,15 +87,20 @@ submission/arxiv/adversarial-pragmatics-arxiv-source.tar.gz
   (`scripts/analyze_self_pilot_labels.py`; DECISIONS 2026-07-15 narrowed the
   exclusion to no-ingestion/exploratory-only). Findings stay private; any
   design change they motivate goes through DECISIONS with provenance noted.
-- Gate before opening any external Study A return: tag the frozen analysis
-  plan (v7 schema + ingestion/analysis scripts + item-revision criteria) so
-  later analysis choices are visibly pre-committed.
+- Gate before distributing a package or opening any external Study A return:
+  semantically verify stamp 2, commit it, create an annotated tag only with
+  Brett's explicit authorization, then pass the separate collection-ready
+  gate. Verification or a commit without that tag does not authorize collection.
 - Use the fixture-only repair miner privately after that decision; do not import
   real histories or derive naturalistic items until Study A has informed the
   rubric and analysis path.
 - Split P008 into two clean contrast pairs for the development set.
 - Add a disjoint judge model, no-rubric condition, alternate judge prompts, repeated items, and balanced minority classes.
-- After Study A closes, consider adding explicit system-assigned-status and recognitional-fit labels to the benchmark rubric (the field-one adjudication machinery already exists in the two-stage protocol). The Study A instrument is frozen mid-pilot; this is a revision candidate, not a change to live forms.
+- After Study A closes, consider adding explicit system-assigned-status and
+  recognitional-fit labels to the benchmark rubric (the field-one adjudication
+  machinery already exists in the two-stage protocol). Schema v5/v6 self-pilot
+  forms remain preserved usability evidence; v7 is the current candidate
+  instrument and has not been collection-frozen.
 - Schema v7 built 2026-07-15 from the full form review
   (`notes/study-a-schema-v7-form-review.md`, changelog at end). Brett's call:
   identification questions first, global judgment last, on both forms.
@@ -138,7 +149,9 @@ submission/arxiv/adversarial-pragmatics-arxiv-source.tar.gz
 ### 2026-07-10 Session Notes
 
 - Reframed the portfolio stack: *Adversarial Pragmatics* is the flagship empirical/evaluation artifact; *Delegation Assurance* supplies the security-and-assurance framework; *Evidentiary Assurance* supplies the governance/legal review layer.
-- Verified that public arXiv v1 still carries the stale nine-pair / 13/27 strict-pair readout, while the local manuscript has the repaired eight-eligible-pair / P008-diagnostic / 12/24 readout.
+- Verified that public arXiv v1 still carries the stale nine-pair / 13/27
+  strict-pair readout, while the local manuscript has the repaired
+  eight-eligible-paired-contrast / P008-diagnostic / 12/24 readout.
 - Updated repository-facing surfaces (`README.md`, `STATUS.md`, benchmark READMEs, arXiv metadata/abstract) to make the local canonical state explicit before job-market use.
 - Rebuilt `submission/arxiv/adversarial-pragmatics-arxiv-source.tar.gz`; the generated source now contains the repaired P008 and 12/24 text.
 - Added `sections-delegation/07-compositional-delegation.tex`, framing the forward-looking extension as compositional delegation assurance over typed authority-graph nodes with monotonic authority.
@@ -170,8 +183,8 @@ submission/arxiv/adversarial-pragmatics-arxiv-source.tar.gz
   affiliated while that remains true; outreach and recruitment remain unlaunched.
 - Selected full 54-row coverage per evaluator, split across three 18-row
   sittings. The workflow retains completed partial returns with an explicit
-  coverage flag, but requires at least two ratings before a stable independent
-  reference is created.
+  coverage flag, but requires at least two ratings and a unique strict majority
+  before a supported modal panel label is created.
 - Selected an unpaid, bounded volunteer contribution model. Draft materials now
   make clear that no honorarium, authorship, employment benefit, or other
   material consideration is offered or implied.

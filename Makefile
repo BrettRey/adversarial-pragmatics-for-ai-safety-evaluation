@@ -23,6 +23,10 @@ STUDY_A_SELF_PILOT_SOURCE ?= benchmark/results/local-pilot-20260630-185417/outpu
 STUDY_A_SELF_PILOT_RUN ?= private/study-a/self-pilot
 STUDY_A_SELF_PILOT_RESPONSES ?= $(STUDY_A_SELF_PILOT_RUN)/responses
 STUDY_A_SELF_PILOT_REPORT ?= $(STUDY_A_SELF_PILOT_RUN)/report
+STUDY_A_PRODUCTION_ROOT ?= private/study-a/production
+STUDY_A_OPERATIONAL_CONFIG ?= $(STUDY_A_PRODUCTION_ROOT)/operational-config.json
+STUDY_A_MANIFEST ?= benchmark/study-a/FREEZE-MANIFEST.json
+STUDY_A_AUTHOR_SNAPSHOT ?= data/provisional/local-pilot-20260630-185417-provisional-author-labels.csv
 DISCOVERY_RUN ?= private/discovery/synthetic
 RUN_DIR ?=
 RESPONSES ?=
@@ -32,7 +36,7 @@ RESPONSES_ARG = $(if $(RESPONSES),--responses $(RESPONSES),)
 SUMMARY_DIR_ARG = $(if $(SUMMARY_DIR),--summary-dir $(SUMMARY_DIR),)
 
 # Targets
-.PHONY: all all-papers clean distclean view view-supplement view-delegation view-evidentiary delegation evidentiary help test validate-items privacy-check phase1-check pilot-local pilot-smoke pilot-diagnose pilot-review-app pilot-ingest-adjudication pilot-adjudication-report pilot-figures pilot-judge-validation fake-dev-calibration study-a-synthetic study-a-self-pilot study-a-self-pilot-report discovery-synthetic
+.PHONY: all all-papers clean distclean view view-supplement view-delegation view-evidentiary delegation evidentiary help test validate-items privacy-check phase1-check pilot-local pilot-smoke pilot-diagnose pilot-review-app pilot-ingest-adjudication pilot-adjudication-report pilot-figures pilot-judge-validation fake-dev-calibration study-a-synthetic study-a-self-pilot study-a-self-pilot-report study-a-judge-audit study-a-production-build study-a-manifest-stamp1 study-a-manifest-stamp2 study-a-manifest-verify study-a-freeze-ready study-a-collection-ready discovery-synthetic
 
 # Default target: build the paper and supplement PDFs
 all: $(MAIN).pdf $(SUPPLEMENT).pdf
@@ -215,6 +219,42 @@ study-a-self-pilot-report:
 	@echo "==> Summarizing local Study A self-pilot timing..."
 	python3 scripts/summarize_study_a_self_pilot.py --responses $(STUDY_A_SELF_PILOT_RESPONSES) --out-dir $(STUDY_A_SELF_PILOT_REPORT)
 
+# Verify the retained comparator files and their actual role-separated,
+# outcome-only prompt condition. Visible-rule mismatches remain diagnostics.
+study-a-judge-audit:
+	@echo "==> Verifying the Study A judge condition and diagnostic sentinels..."
+	python3 scripts/audit_study_a_judge_condition.py --verify-output
+
+# Build the ignored, local production package. The builder owns the two
+# deterministic role-isolated ZIPs and retains its random row salt privately.
+study-a-production-build: phase1-check study-a-judge-audit
+	@echo "==> Building local Study A production packages..."
+	python3 scripts/build_independent_reassessment.py --source $(STUDY_A_SELF_PILOT_SOURCE) --out-dir $(STUDY_A_PRODUCTION_ROOT)/package --private-dir $(STUDY_A_PRODUCTION_ROOT)/private --author-labels $(STUDY_A_AUTHOR_SNAPSHOT) --block-size 18
+
+# Stamp 1 is a mutable pre-freeze checkpoint, not a completed freeze.
+study-a-manifest-stamp1: study-a-judge-audit
+	@echo "==> Writing semantic Study A checkpoint 1 (returns remain closed)..."
+	python3 scripts/build_study_a_manifest.py --write --stamp 1 --manifest $(STUDY_A_MANIFEST) --production-root $(STUDY_A_PRODUCTION_ROOT)
+
+# Stamp 2 records an already-built production package and becomes ready for an
+# explicit commit/tag decision. It does not create that commit or tag.
+study-a-manifest-stamp2: study-a-judge-audit
+	@echo "==> Writing and verifying semantic Study A stamp-2 candidate..."
+	python3 scripts/build_study_a_manifest.py --write --stamp 2 --manifest $(STUDY_A_MANIFEST) --production-root $(STUDY_A_PRODUCTION_ROOT)
+	python3 scripts/check_study_a_freeze_ready.py --manifest $(STUDY_A_MANIFEST) --production-root $(STUDY_A_PRODUCTION_ROOT)
+
+study-a-manifest-verify:
+	@echo "==> Semantically verifying the active Study A manifest..."
+	python3 scripts/build_study_a_manifest.py --verify --manifest $(STUDY_A_MANIFEST) --production-root $(STUDY_A_PRODUCTION_ROOT)
+
+study-a-freeze-ready: study-a-judge-audit
+	@echo "==> Checking whether Study A is ready for an explicit commit/tag decision..."
+	python3 scripts/check_study_a_freeze_ready.py --manifest $(STUDY_A_MANIFEST) --production-root $(STUDY_A_PRODUCTION_ROOT)
+
+study-a-collection-ready: study-a-judge-audit
+	@echo "==> Checking annotated tag, assignments, evidence, and finalized operations..."
+	python3 scripts/check_study_a_collection_ready.py --manifest $(STUDY_A_MANIFEST) --production-root $(STUDY_A_PRODUCTION_ROOT) --config $(STUDY_A_OPERATIONAL_CONFIG)
+
 # Mine only the tracked synthetic conversation fixture and build an offline
 # review page. Real histories belong under private/ and are never read here.
 discovery-synthetic: privacy-check
@@ -255,5 +295,12 @@ help:
 	@echo "  make study-a-synthetic - Run the synthetic blinded re-adjudication workflow"
 	@echo "  make study-a-self-pilot - Build the local, non-ingestible 54-row interface self-pilot"
 	@echo "  make study-a-self-pilot-report - Summarize local self-pilot timing only"
+	@echo "  make study-a-judge-audit - Verify comparator structure and diagnostic sentinels"
+	@echo "  make study-a-production-build - Build ignored role-isolated production packages"
+	@echo "  make study-a-manifest-stamp1 - Write mutable semantic checkpoint 1"
+	@echo "  make study-a-manifest-stamp2 - Record an existing production build as stamp 2"
+	@echo "  make study-a-manifest-verify - Semantically verify the active manifest"
+	@echo "  make study-a-freeze-ready - Check stamp 2 before an explicit commit/tag decision"
+	@echo "  make study-a-collection-ready - Require tag, assignments, evidence, and finalized operations"
 	@echo "  make discovery-synthetic - Build the synthetic local repair-discovery workflow"
 	@echo "  make help     - Show this help message"

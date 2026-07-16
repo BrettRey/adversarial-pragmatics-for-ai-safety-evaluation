@@ -4,6 +4,8 @@
   "status": "frozen_provisional_author_labels",
   "created_at": "2026-07-10T14:55:23.895261+00:00",
   "reason": "Initial freeze before blind independent re-adjudication",
+  "amended_at": "2026-07-16T14:16:23+00:00",
+  "amendment_reason": "Terminology-only refresh of derived public summaries: strict-pair labels replaced with paired-contrast labels; source rows, labels, counts, and rates unchanged.",
   "label_interpretation": "Historical author adjudications preserved for comparison; not an independent reference standard or gold labels.",
   "expected": {
     "seed_items": 18,
@@ -26,14 +28,14 @@
     },
     {
       "path": "benchmark/results/summaries/local-pilot-20260630-185417-model-summary.csv",
-      "sha256": "65fd0b1576810fdba34235123524aed487c793bb622220d5fed3c859b6b2df2c",
-      "bytes": 591,
+      "sha256": "68bd458597ff001c4942a35260f9bec138b7fa38f1df8d3d938aad9d13077a38",
+      "bytes": 604,
       "records": 3
     },
     {
       "path": "benchmark/results/summaries/local-pilot-20260630-185417-pair-summary.csv",
-      "sha256": "d871577ad173f39c3700f86f88248fefeb613f4daf655bdcfdc2dff9cc13c6cb",
-      "bytes": 1448,
+      "sha256": "f1d7ca750a4fb6c9435b25efb9d098449e889aa7c6d1b6ca92a5dcf04eb3a3dd",
+      "bytes": 1461,
       "records": 9
     },
     {
@@ -50,8 +52,8 @@
     },
     {
       "path": "benchmark/results/summaries/local-pilot-20260630-185417-adjudication-readout.md",
-      "sha256": "d7758008b6a7a25c5d86ff8755478d60bf822c94d76de1951e39e74710e8c65c",
-      "bytes": 5345,
+      "sha256": "449d4658c2cd9f1860142ef746b3aac1d26121f60d51ce8e01252b0ce4583766",
+      "bytes": 5353,
       "records": null
     }
   ],

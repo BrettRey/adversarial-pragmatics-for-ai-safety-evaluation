@@ -231,8 +231,8 @@ def plot_model_outcomes(model_rows: list[dict[str, str]], out_dir: Path) -> None
     axes[1].set_xlabel("Rows (of 18)")
 
     y_values = list(range(len(model_rows)))
-    passes = [int(row["strict_pair_passes"]) for row in model_rows]
-    cells = [int(row["strict_pair_cells"]) for row in model_rows]
+    passes = [int(row["paired_contrast_passes"]) for row in model_rows]
+    cells = [int(row["paired_contrast_cells"]) for row in model_rows]
     axes[2].barh(
         y_values,
         cells,
@@ -262,7 +262,7 @@ def plot_model_outcomes(model_rows: list[dict[str, str]], out_dir: Path) -> None
             color=COLORS["dark"],
             fontsize=8,
         )
-    axes[2].set_title("Strict pairs")
+    axes[2].set_title("Paired contrasts")
     max_cells = max(cells) if cells else 0
     axes[2].set_xlabel(f"Eligible cells (of {max_cells})")
     axes[2].set_xlim(0, max_cells)
@@ -306,8 +306,8 @@ def plot_pair_accuracy(pair_rows: list[dict[str, str]], out_dir: Path) -> None:
     setup()
     labels = pair_axis_labels(pair_rows)
     y_values = list(range(len(pair_rows)))
-    passes = [int(row["strict_pair_passes"]) for row in pair_rows]
-    cells = [int(row["strict_pair_cells"]) for row in pair_rows]
+    passes = [int(row["paired_contrast_passes"]) for row in pair_rows]
+    cells = [int(row["paired_contrast_cells"]) for row in pair_rows]
 
     fig, ax = plt.subplots(figsize=(7.2, 4.35))
     ax.barh(
@@ -344,7 +344,7 @@ def plot_pair_accuracy(pair_rows: list[dict[str, str]], out_dir: Path) -> None:
     ax.set_yticklabels(labels)
     ax.set_xlim(0, 3.45)
     ax.set_xticks([0, 1, 2, 3])
-    ax.set_xlabel("Strict pair passes (of 3 eligible model cells)")
+    ax.set_xlabel("Paired-contrast passes (of 3 eligible model cells)")
     ax.invert_yaxis()
     add_grid(ax, axis="x")
     ax.set_axisbelow(True)
