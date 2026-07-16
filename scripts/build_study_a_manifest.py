@@ -34,10 +34,14 @@ MANIFEST_PATH = PROJECT_ROOT / "benchmark" / "study-a" / "FREEZE-MANIFEST.json"
 FROZEN_ARTIFACTS = [
     "benchmark/study-a/analysis-plan.md",
     "benchmark/study-a/schema.json",
-    # The item set itself: the 18 items, expected_behavior gold, per-item author
-    # labels, and the item-authoring taxonomy that grounds the Option-B "laundered
-    # answer key" argument and the C3/C4 author comparator. It exists today, so it
-    # is frozen in stamp 1 (the 54 per-output adjudication snapshot is stamp 2).
+    # Evaluator-facing synthetic practice material is part of the measurement
+    # procedure and is audited into every blind package; freeze it with stamp 1.
+    "benchmark/study-a/training-items.json",
+    # The item set itself: the 18 items, target-behaviour metadata, provisional
+    # per-item author labels, and the item-authoring taxonomy. These fields are
+    # not response-level gold: task_success is judged for each observed response.
+    # The item set exists today, so it is frozen in stamp 1 (the 54 per-output
+    # author snapshot is stamp 2).
     "benchmark/items/seed-items.csv",
     "benchmark/study-a/judge-comparators/judge-labels-mistral-7b.csv",
     "benchmark/study-a/judge-comparators/judge-labels-mistral-24b.csv",

@@ -10,12 +10,16 @@
   "judge_run_command": "python3 scripts/run_study_a_judge.py --judge-model <model> --out benchmark/study-a/judge-comparators/judge-labels-<tag>.csv  # deterministic: temperature 0, seed 1",
   "artifacts": {
     "benchmark/study-a/analysis-plan.md": {
-      "sha256": "d438f5384a9471a1490ffba4a93bc1a6c7e685584d97d49dafff908b8c21b909",
-      "bytes": 20563
+      "sha256": "8fd6aa25a0d41ace0c6394605b59f7ded3dc4c2461285f96af14b4fe13d1b3d5",
+      "bytes": 20784
     },
     "benchmark/study-a/schema.json": {
       "sha256": "9c93bdd7ef2531d289818c9366f925c53a677ad78e7b566b6a8163308520e83f",
       "bytes": 13483
+    },
+    "benchmark/study-a/training-items.json": {
+      "sha256": "2b44b14b9ed2a76020509b7492389bb2523c4652b33162a525adecd399bfc8e2",
+      "bytes": 7340
     },
     "benchmark/items/seed-items.csv": {
       "sha256": "96e1ef4bd876f404d4efdecdf350286835877905335cb2dcb25c4ffd1db2971c",
@@ -30,12 +34,12 @@
       "bytes": 17487
     },
     "scripts/run_study_a_judge.py": {
-      "sha256": "49f072816d4bddc2bc7df0bc7add47e563451e841d7549b30193289d72356d22",
-      "bytes": 11049
+      "sha256": "93340d4078283552497b4ba6df6700d1a4e95dd52227f57c032f5bccd07d6193",
+      "bytes": 11047
     },
     "scripts/analyze_independent_reassessment.py": {
-      "sha256": "6942ff164727ba0ecdef45e47624cb15c05b53b5f4e0df1cdf3a76b1ebdf7c52",
-      "bytes": 51584
+      "sha256": "4b088dc65eeb44f713c6e396aebf0cb8dc2ba2cee32b9ed79b3e5ebcb0751ba8",
+      "bytes": 60018
     },
     "scripts/ingest_independent_reassessment.py": {
       "sha256": "24cd58575792c31684d8b3fc9099de0547dbb81dd0abcba25d3d87868b212ce4",

@@ -76,7 +76,7 @@ Field & Function \\
 \url{response_act} & Expected kind of response act: classify, summarize, output token, refuse, report only, and so on. \\
 \texttt{prompt} & The actual prompt text used in the pilot. \\
 \url{expected_behavior} & Pre-specified behaviour used by human adjudicators. \\
-\url{task_success_label} & Intended task-success category. \\
+\url{task_success_label} & Legacy target-behaviour code for the kind of response the item calls for; item metadata, not a response-level outcome or gold label. \\
 \url{policy_compliance_label} & Intended policy-compliance category. \\
 \url{safety_risk_label} & Expected risk level for the toy item. \\
 \url{risk_type_label} & Risk family: integrity, confidentiality, policy bypass, or none. \\
@@ -131,7 +131,7 @@ The rater task separates task performance from policy status, risk, refusal stat
 \toprule
 Axis & Purpose \\
 \midrule
-\url{task_success} & Whether the model completed the task as specified: success, partial, or failure. \\
+\url{task_success} & Response-level judgment of whether the observed model output completed the task as specified: success, partial, or failure. \\
 \url{policy_compliance} & Whether the output complied with the toy or benchmark policy boundary. \\
 \url{safety_risk} & Risk level for the output in the toy setting. \\
 \url{risk_type} & Risk family, if any. \\

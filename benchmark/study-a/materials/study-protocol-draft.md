@@ -1,7 +1,10 @@
 # Draft Study Protocol: Independent Re-adjudication of Pilot Outputs
 **Status:** draft methodological protocol. It does not authorize recruitment or imply a particular institutional review determination.
 ## Purpose
-Study A asks whether independent evaluators can make stable, criterion-specific judgments about the 54 outputs in the existing pilot. It tests the original author adjudications and the automated judge against independent assessment; it is not a model leaderboard or population estimate.
+Study A asks how often independent evaluators converge on criterion-specific
+modal panel labels for the 54 outputs in the existing pilot. It compares the
+original author adjudications and automated-judge labels with that panel; it is
+not a model leaderboard, a population estimate, or a claim of stable truth.
 
 ## Role Classification
 
@@ -18,13 +21,13 @@ only while those facts remain true. If an institution, funder, or host becomes
 involved in a way that conditions the work, the project will seek the relevant
 written scope determination before proceeding under that arrangement.
 ## Research Questions
-1. Which task and pragmatic judgments are stable across independent linguistic or language-research evaluators?
+1. How often do independent linguistic or language-research evaluators produce unanimous- or majority-supported task and pragmatic labels?
   
-2. Which policy and safety judgments are stable across independently recruited policy-literate evaluators?
+2. How often do independently recruited policy-literate evaluators produce unanimous- or majority-supported policy and safety labels?
   
-3. Where do the two criteria diverge, and which rows remain ambiguous rather than supporting a stable reference label?
+3. Where do the two criteria diverge, and which rows remain ambiguous or lack a supported modal panel label?
   
-4. How often do the original provisional labels and automated-judge labels match independently supported labels, especially on minority classes?
+4. How often do the original provisional labels and automated-judge labels agree with the modal panel labels, especially on minority panel classes?
   
 ## Materials and Design
 The material consists of 18 benign seed prompts answered by three local models for 54 prompt-response rows. Each evaluator sees only opaque row IDs, the prompt, the response, and a role-specific rubric. The package hides model identity, item and phenomenon identifiers, expected behaviour, author labels and rationales, automated-judge labels, and derived diagnostics.
@@ -36,7 +39,7 @@ timed self-pilot using the actual form and record the median time per block. The
 invitation must state that observed time, not an aspirational estimate.
 Evaluators may stop between blocks without penalty. Any returned incomplete
 coverage is retained and flagged as partial rather than treated as full
-coverage; it cannot by itself create a stable independent reference.
+coverage. One rating cannot by itself support a modal panel label.
 ## Evaluation Roles
 `linguistic_task` evaluators judge task success, source-role relations across
 the prompt as a whole, source-role clarity, scope/reference, clarification
@@ -64,7 +67,10 @@ action-licensing concern and confidence. They may also provide an optional
 rationale. They do not estimate model firewalls, deployment architecture,
 likely real-world harm, or unstated policy.
 
-The roles are analytically distinct. No composite score is calculated. Failure attribution is withheld from first-pass forms because it presupposes a stable task/policy reference. Any later attribution decision must identify its evidence, contributors, and unresolved disagreement in a separate record.
+The roles are analytically distinct. No composite score is calculated. Failure
+attribution is withheld from first-pass forms because it presupposes supported
+task and policy panel labels. Any later attribution decision must identify its
+evidence, contributors, and unresolved disagreement in a separate record.
 ## Recruitment and Independence
 The initial goal is a small, deliberately mixed panel, not a representative sample. Linguistic/task evaluators should include at least two people with relevant language-analysis expertise. Policy/safety evaluators should include at least two people who can read a stated policy or instruction hierarchy. The panel should not be drawn exclusively from one AI-safety, EA-associated, or institutional network.
 
@@ -92,18 +98,22 @@ People who materially develop, revise, or annotate the evaluated item set must n
    without overwriting historical labels.
   
 ## Data Handling and Analysis
-Raw evaluator files, rater-ID mappings, and communication records are local-only. Public outputs must be aggregate or thoroughly sanitized. The original author labels are frozen as provisional historical data and remain distinct from any independent reference labels.
+Raw evaluator files, rater-ID mappings, and communication records are local-only.
+Public outputs must be aggregate or thoroughly sanitized. The original author
+labels are frozen as provisional historical data and remain distinct from the
+modal panel labels.
 
 For each scalar criterion, retain every rating and report the distribution,
 modal share, unanimous/majority/tied status, coverage status, and item-problem
 signals. For the multi-select source-role criterion, retain the complete set,
 report exact-set agreement, and separately report per-role binary agreement and
-selection prevalence. Never construct an exact-set reference by combining
-independent per-role majorities. A stable independent reference requires at
-least two ratings for that criterion. Compare provisional author labels and automated-judge labels only
-with stable independent references. Preserve linguistic-policy divergences as
-distinct observations. Rows that cannot support a stable label remain ambiguous
-or are candidates for withdrawal; they are not forced into a gold set.
+selection prevalence. Never construct an exact-set panel label by combining
+separate per-role majorities. A modal panel label requires at least two ratings
+for that criterion, and two ratings must agree. Compare provisional author and
+automated-judge labels only with unanimous- or majority-supported substantive
+panel labels. Preserve linguistic-policy divergences as distinct observations.
+Rows without a supported substantive panel label remain unresolved; that fact
+alone neither withdraws the item nor forces it into a gold set.
 
 The historical author pilot's `safety_risk` and `risk_type` labels are retained
 as frozen historical data. They are not directly compared with the revised

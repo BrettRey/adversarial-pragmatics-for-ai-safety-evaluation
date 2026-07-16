@@ -15,14 +15,15 @@ The first pass has two separate forms:
   concerns.
 
 `failure_attribution` is intentionally deferred. Assigning a cause requires a
-stable reference on both task and policy criteria and should occur, if needed,
-in a later documented adjudication stage rather than being forced into every
-first-pass rating.
+supported modal panel label on both task and policy criteria and should occur,
+if needed, in a later documented adjudication stage rather than being forced
+into every first-pass rating.
 
 Each evaluator's intended assignment is full coverage of the 54 rows in their
 one role, divided into three 18-row blocks. The workflow retains any completed
-partial blocks and marks the rater-role coverage as partial; a stable reference
-requires at least two ratings for the relevant criterion.
+partial blocks and marks the rater-role coverage as partial. A modal panel label
+requires at least two ratings for the relevant criterion, and two ratings must
+agree.
 
 ## Evaluator Orientation
 

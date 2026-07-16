@@ -1,5 +1,16 @@
 # Study A estimand-revision proposal (freeze blockers 5-7)
-Status: proposal for Brett to annotate. Nothing executed yet.
+
+> **SUPERSEDED — 2026-07-16.** This proposal is retained as a historical
+> decision record, but its Decision 5 premise and the resulting S5
+> gold-direction estimand are invalid. Seed `task_success_label` values encode
+> target behaviours, not response-level `success`/`partial`/`failure` outcomes;
+> C5/C6 also measure response-mediated paired panel-outcome divergence, not
+> authority sensitivity. The approved replacement is recorded in
+> `reviews/study-a-freeze-defect-audit-and-repair-2026-07-16.md`. Do not use this
+> document as the active Study A analysis contract.
+
+Historical status: proposal for Brett to annotate. Nothing had been executed
+when this document was written.
 
 The freeze-readiness board (unanimous NO-GO) left three blocks that are design decisions, not patches. Each below: the defect (verified), the options, my recommendation. Mark it up: pick an option, edit, or write "no" in the margin.
 

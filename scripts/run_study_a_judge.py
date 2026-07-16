@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Study A LLM judge, Option-A (realistic-deployment) information set.
 
-Grades the 54 pilot outputs for judge-vs-independent-reference validation
+Grades the 54 pilot outputs for judge-versus-panel agreement validation
 (Study A). One judge model per run. Writes a judge_labels.csv keyed by
 (item_id, model) with judge_<criterion> columns in the v7 value space, which is
 exactly what analyze_independent_reassessment.py reads.
@@ -17,9 +17,9 @@ information-state parity with the taxonomy-blind human panel
 B would introduce (the four design fields nearly determine expected_behavior).
 
 The label space is read live from benchmark/study-a/schema.json (v7), so the
-judge can emit every reference value including insufficient_visible_context,
+judge can emit every evaluator value including insufficient_visible_context,
 item_problem, no_policy_or_authority_limit, and not_a_refusal; a pre-v7 judge
-could not, which would have made judge-vs-reference disagreement partly a schema
+could not, which would have made judge-versus-panel disagreement partly a schema
 mismatch.
 
 Deterministic: temperature 0, fixed seed (default 1), matching the pilot's

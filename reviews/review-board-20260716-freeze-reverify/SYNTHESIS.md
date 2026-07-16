@@ -2,6 +2,14 @@
 
 <!-- SUMMARY: focused 3-reviewer re-board after the estimand revision; 2 FREEZE-NOW (Chen, hostile) + 1 narrow FIX-FIRST (Wallace); all narrow fixes now applied; freeze-ready pending fixes 3-4 + tag · status: fixes-applied · updated: 2026-07-16 -->
 
+> **SUPERSEDED — 2026-07-16.** This synthesis preserves what the reviewers
+> reported, but its post-board claim that S5 was computable and that no open
+> scientific defect remained is false. Seed target-behaviour codes and Study A
+> response-outcome labels have disjoint vocabularies, so S5 could never match;
+> C5/C6 are paired panel-outcome divergence, not authority sensitivity. See
+> `reviews/study-a-freeze-defect-audit-and-repair-2026-07-16.md` for the approved
+> correction. This file is historical evidence, not a freeze-readiness gate.
+
 Three reviewers who raised the deepest 2026-07-15 defects re-checked whether their
 defect is resolved and whether the revision broke anything, source-grounded.
 

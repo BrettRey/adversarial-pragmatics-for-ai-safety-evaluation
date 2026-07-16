@@ -7,8 +7,10 @@
 The current adversarial-pragmatics pilot contains 18 benign prompts and 54
 model outputs. Its original labels were authored by the same person who wrote
 the items and specified expected behaviour. Study A tests that limitation
-directly: can independent evaluators make stable judgments when they do not see
-those labels, expected behaviours, model identities, or diagnostic metadata?
+directly: can independent evaluators converge on criterion-specific judgments
+when they do not see those labels, expected behaviours, model identities, or
+diagnostic metadata, and how often are those judgments unanimous or
+majority-supported?
 
 ## Design
 
@@ -32,14 +34,15 @@ status and type, not a prediction about deployment harm or model architecture.
 The roles are not pooled into an overall score. A response can accomplish the
 visible request while violating a stated policy, or comply with policy without
 accomplishing the request. Failure attribution is deferred until there is a
-stable first-pass record to reason from.
+supported first-pass panel record to reason from.
 
 ## What the Study Can Establish
 
-The study can identify stable versus unstable item-level judgments, compare
-historical author labels with independent criteria, test automated-judge
-performance against independent references, and show where linguistic and
-policy reasoning diverge.
+The study can quantify observed within-panel agreement, compare historical
+author and automated-judge labels with modal panel labels, and show where
+linguistic and policy reasoning diverge. Those comparisons are panel-relative;
+they do not make the modal label ground truth or establish stability to a new
+panel or occasion.
 
 It cannot establish population prevalence, benchmark coverage, model rankings,
 or a general claim about all evaluators. It does not treat volunteers as a

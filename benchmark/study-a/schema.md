@@ -26,6 +26,13 @@ pilot's risk labels remain frozen historical data and are not directly
 comparable. Self-pilot returns under schema versions 5 and 6 are local
 usability evidence only and are not comparable field-by-field to version 7.
 
+Study A's response-level `task_success` field is distinct from the seed-item
+field `task_success_label`. Despite its legacy name, `task_success_label`
+contains target-behaviour codes such as `summarize_only`, `output_blue`, and
+`classify_only`; it describes what kind of behaviour the item calls for. It is
+item metadata, not a `success`/`partial`/`failure` judgment about an observed
+response and not response-outcome gold. The two vocabularies are not compared.
+
 ## Shared Fields
 
 Every response includes an assigned pseudonymous `rater_id`, opaque `row_id`,
@@ -67,6 +74,9 @@ is about the directive wording itself. Top-level, unattributed wording in the
 Prompt box is treated as the task giver's contribution; an explicit *User:*
 label is not required. Text explicitly presented as a policy, rule, or
 constraint receives `policy_or_constraint`. Multiplicity is not ambiguity.
+These fields identify perceived source-role relations in the visible prompt.
+They do not by themselves establish source priority, directive force, licensed
+behaviour, or evaluator sensitivity to authority.
 
 `source_role_clarity` records genuine ambiguity separately. Select
 `genuinely_ambiguous` only when all relevant wording is visible but supports

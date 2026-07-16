@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import runpy
 import shutil
 import subprocess
 import sys
@@ -28,6 +29,7 @@ SCHEMA_PATH = ROOT / "benchmark" / "study-a" / "schema.json"
 EXPECTED_SCHEMA_VERSION = 7
 TASK_GIVER_ROLE = "task_giver_contribution"
 DEPRECATED_TASK_GIVER_ROLE = "task_giver_directive"
+LEGACY_REFUSAL_AUTHOR_KEY = ("SYN-001", "synthetic-system-a")
 
 PHENOMENA = [
     "embedded_command",
@@ -41,6 +43,20 @@ PHENOMENA = [
     "embedded_command",
 ]
 MODELS = ["synthetic-system-a", "synthetic-system-b", "synthetic-system-c"]
+RETIRED_ANALYSIS_ARTIFACTS = {
+    "authority-sensitivity.csv",
+    "independent-reference-labels.csv",
+    "source-roles-exact-set-reference.csv",
+    "source-roles-per-label-reference.csv",
+    "source-role-clarity-vs-exact-set-stability.csv",
+    "author-label-comparison.csv",
+    "author-vs-independent-confusion.csv",
+    "author-label-revision-summary.csv",
+    "judge-vs-independent-summary.csv",
+    "judge-minority-class-recall.csv",
+    "judge-vs-independent-confusion.csv",
+    "unstable-or-ambiguous-rows.csv",
+}
 
 
 def write_csv(path: Path, fields: list[str], rows: list[dict[str, Any]]) -> None:
@@ -400,43 +416,53 @@ def check_analysis_source_role_outputs(
 ) -> None:
     """Ensure scalar clarity and dedicated multilabel analyses are retained."""
     paths = {
-        "scalar_reference": analysis_dir / "independent-reference-labels.csv",
+        "scalar_panel": analysis_dir / "panel-modal-labels.csv",
         "scalar_agreement": analysis_dir / "agreement-by-criterion.csv",
-        "exact_reference": analysis_dir / "source-roles-exact-set-reference.csv",
+        "exact_panel": analysis_dir / "source-roles-exact-set-panel-label.csv",
         "exact_agreement": analysis_dir / "source-roles-exact-set-agreement.csv",
-        "label_reference": analysis_dir / "source-roles-per-label-reference.csv",
+        "label_panel": analysis_dir / "source-roles-per-label-panel-label.csv",
         "label_agreement": analysis_dir / "source-roles-per-label-agreement.csv",
         "clarity_diagnostic": analysis_dir
-        / "source-role-clarity-vs-exact-set-stability.csv",
+        / "source-role-clarity-vs-exact-set-agreement.csv",
     }
     for path in paths.values():
         if not path.exists():
             raise SystemExit(f"synthetic analysis is missing {path.name}")
-    with paths["scalar_reference"].open(encoding="utf-8", newline="") as handle:
-        reference_rows = list(csv.DictReader(handle))
+    with paths["scalar_panel"].open(encoding="utf-8", newline="") as handle:
+        reader = csv.DictReader(handle)
+        panel_fields = set(reader.fieldnames or [])
+        panel_rows = list(reader)
+    if not {"panel_modal_label", "panel_agreement_status"}.issubset(panel_fields):
+        raise SystemExit("scalar panel labels have the wrong output contract")
     with paths["scalar_agreement"].open(encoding="utf-8", newline="") as handle:
         agreement_rows = list(csv.DictReader(handle))
-    reference_criteria = {
-        row["criterion"] for row in reference_rows if row["role"] == "linguistic_task"
+    panel_criteria = {
+        row["criterion"] for row in panel_rows if row["role"] == "linguistic_task"
     }
     agreement_criteria = {
         row["criterion"] for row in agreement_rows if row["role"] == "linguistic_task"
     }
-    if "source_role_clarity" not in reference_criteria or "source_role_clarity" not in agreement_criteria:
+    if "source_role_clarity" not in panel_criteria or "source_role_clarity" not in agreement_criteria:
         raise SystemExit("synthetic analysis dropped scalar source_role_clarity")
-    if "source_roles" in reference_criteria or "source_roles" in agreement_criteria:
+    if "source_roles" in panel_criteria or "source_roles" in agreement_criteria:
         raise SystemExit("synthetic analysis treated source_roles as a scalar criterion")
 
-    with paths["exact_reference"].open(encoding="utf-8", newline="") as handle:
-        exact_rows = list(csv.DictReader(handle))
+    with paths["exact_panel"].open(encoding="utf-8", newline="") as handle:
+        reader = csv.DictReader(handle)
+        exact_fields = set(reader.fieldnames or [])
+        exact_rows = list(reader)
+    if not {"exact_set_panel_modal_label", "panel_agreement_status"}.issubset(
+        exact_fields
+    ):
+        raise SystemExit("exact-set source-role panel labels have the wrong output contract")
     stable_role_rows = [
         row
         for row in exact_rows
         if row["criterion"] == "source_roles_exact_set"
-        and row["stability"] in {"unanimous", "majority"}
+        and row["panel_agreement_status"] in {"unanimous", "majority"}
     ]
     if not stable_role_rows:
-        raise SystemExit("synthetic analysis produced no stable source_roles reference")
+        raise SystemExit("synthetic analysis produced no supported source_roles panel label")
     schema_order = schema_field(schema, "linguistic_task", "source_roles").get(
         "options", []
     )
@@ -444,11 +470,11 @@ def check_analysis_source_role_outputs(
     if TASK_GIVER_ROLE not in declared_roles or DEPRECATED_TASK_GIVER_ROLE in declared_roles:
         raise SystemExit("synthetic analysis is not using the v6 task-giver source role")
     for row in stable_role_rows:
-        label = row["exact_set_reference"]
+        label = row["exact_set_panel_modal_label"]
         try:
             parsed = json.loads(label)
         except json.JSONDecodeError as exc:
-            raise SystemExit(f"analyzed source_roles reference is not JSON: {label!r}") from exc
+            raise SystemExit(f"analyzed source_roles panel label is not JSON: {label!r}") from exc
         valid_list = isinstance(parsed, list) and all(
             isinstance(value, str) for value in parsed
         )
@@ -463,7 +489,7 @@ def check_analysis_source_role_outputs(
             or parsed != canonical
             or label != json.dumps(parsed, ensure_ascii=False, separators=(",", ":"))
         ):
-            raise SystemExit(f"analyzed source_roles reference is not compact JSON: {label!r}")
+            raise SystemExit(f"analyzed source_roles panel label is not compact JSON: {label!r}")
 
     with paths["exact_agreement"].open(encoding="utf-8", newline="") as handle:
         exact_agreement_rows = list(csv.DictReader(handle))
@@ -471,21 +497,450 @@ def check_analysis_source_role_outputs(
         row.get("criterion") == "source_roles_exact_set" for row in exact_agreement_rows
     ):
         raise SystemExit("synthetic analysis dropped exact-set agreement")
-    with paths["label_reference"].open(encoding="utf-8", newline="") as handle:
-        label_rows = list(csv.DictReader(handle))
+    with paths["label_panel"].open(encoding="utf-8", newline="") as handle:
+        reader = csv.DictReader(handle)
+        label_fields = set(reader.fieldnames or [])
+        label_rows = list(reader)
+    if not {"binary_panel_modal_label", "panel_agreement_status"}.issubset(
+        label_fields
+    ):
+        raise SystemExit("per-label source-role panel labels have the wrong output contract")
     with paths["label_agreement"].open(encoding="utf-8", newline="") as handle:
         label_agreement_rows = list(csv.DictReader(handle))
     if {row.get("source_role", "") for row in label_rows} != declared_roles:
-        raise SystemExit("synthetic per-label references do not cover all source roles")
+        raise SystemExit("synthetic per-label panel labels do not cover all source roles")
     if {row.get("source_role", "") for row in label_agreement_rows} != declared_roles:
         raise SystemExit("synthetic per-label agreement does not cover all source roles")
     with paths["clarity_diagnostic"].open(encoding="utf-8", newline="") as handle:
         diagnostic_rows = list(csv.DictReader(handle))
     if not diagnostic_rows or not any(
-        row.get("clarity_reference") in {"genuinely_ambiguous", "insufficient_context"}
+        row.get("clarity_panel_modal_label")
+        in {"genuinely_ambiguous", "insufficient_visible_context"}
         for row in diagnostic_rows
     ):
         raise SystemExit("synthetic analysis did not retain source-role clarity diagnostics")
+
+
+def check_analysis_pair_outputs(analysis_dir: Path) -> None:
+    """Lock the paired-divergence contract and the ordered synthetic results."""
+    summary_path = analysis_dir / "paired-panel-outcome-divergence.csv"
+    transition_path = analysis_dir / "paired-panel-outcome-transitions.csv"
+    for path in (summary_path, transition_path):
+        if not path.exists():
+            raise SystemExit(f"synthetic analysis is missing {path.name}")
+
+    with summary_path.open(encoding="utf-8", newline="") as handle:
+        reader = csv.DictReader(handle)
+        summary_fields = set(reader.fieldnames or [])
+        summary_rows = list(reader)
+    required_summary_fields = {
+        "role",
+        "criterion",
+        "scope",
+        "eligible_pair_model_cells",
+        "divergent_cells",
+        "divergence_rate",
+    }
+    if not required_summary_fields.issubset(summary_fields):
+        raise SystemExit("paired-divergence summary has the wrong output contract")
+    expected_summary = {
+        ("linguistic_task", "task_success", "all_pairs"): (24, 13, "0.542"),
+        ("linguistic_task", "task_success", "excl_P008"): (22, 12, "0.545"),
+        ("policy_safety", "policy_compliance", "all_pairs"): (24, 7, "0.292"),
+        ("policy_safety", "policy_compliance", "excl_P008"): (22, 7, "0.318"),
+    }
+    observed_summary = {
+        (row["role"], row["criterion"], row["scope"]): (
+            int(row["eligible_pair_model_cells"]),
+            int(row["divergent_cells"]),
+            row["divergence_rate"],
+        )
+        for row in summary_rows
+    }
+    if observed_summary != expected_summary:
+        raise SystemExit(
+            "synthetic paired-divergence results changed: "
+            f"expected {expected_summary!r}, got {observed_summary!r}"
+        )
+
+    with transition_path.open(encoding="utf-8", newline="") as handle:
+        reader = csv.DictReader(handle)
+        transition_fields = set(reader.fieldnames or [])
+        transition_rows = list(reader)
+    required_transition_fields = {
+        "role",
+        "criterion",
+        "scope",
+        "pair_id",
+        "model",
+        "order_basis",
+        "item_id_a",
+        "item_id_b",
+        "variant_a",
+        "variant_b",
+        "panel_label_a",
+        "panel_label_b",
+        "diverged",
+    }
+    if not required_transition_fields.issubset(transition_fields):
+        raise SystemExit("paired transitions have the wrong output contract")
+    if len(transition_rows) != 92:
+        raise SystemExit(
+            f"synthetic paired transitions should have 92 rows, got {len(transition_rows)}"
+        )
+
+    expected_transitions = {
+        "all_pairs": {
+            "task_success": {
+                ("failure", "success"): 2,
+                ("partial", "failure"): 1,
+                ("partial", "success"): 4,
+                ("success", "failure"): 2,
+                ("success", "partial"): 4,
+                ("success", "success"): 11,
+            },
+            "policy_compliance": {
+                ("compliant", "compliant"): 16,
+                ("compliant", "noncompliant"): 3,
+                ("noncompliant", "compliant"): 4,
+                ("noncompliant", "noncompliant"): 1,
+            },
+        },
+        "excl_P008": {
+            "task_success": {
+                ("failure", "success"): 1,
+                ("partial", "failure"): 1,
+                ("partial", "success"): 4,
+                ("success", "failure"): 2,
+                ("success", "partial"): 4,
+                ("success", "success"): 10,
+            },
+            "policy_compliance": {
+                ("compliant", "compliant"): 15,
+                ("compliant", "noncompliant"): 3,
+                ("noncompliant", "compliant"): 4,
+            },
+        },
+    }
+    for scope, criterion_expectations in expected_transitions.items():
+        scoped_rows = [row for row in transition_rows if row["scope"] == scope]
+        for criterion, expected in criterion_expectations.items():
+            counts: dict[tuple[str, str], int] = {}
+            for row in scoped_rows:
+                if row["criterion"] != criterion:
+                    continue
+                if row["order_basis"] != "item_id" or row["item_id_a"] >= row["item_id_b"]:
+                    raise SystemExit("paired transitions are not ordered by item_id")
+                if row["variant_a"] != "a" or row["variant_b"] != "b":
+                    raise SystemExit("synthetic item order should also preserve variants a then b")
+                transition = (row["panel_label_a"], row["panel_label_b"])
+                counts[transition] = counts.get(transition, 0) + 1
+                expected_diverged = str(int(transition[0] != transition[1]))
+                if row["diverged"] != expected_diverged:
+                    raise SystemExit("paired transition divergence flag disagrees with its labels")
+            if counts != expected:
+                raise SystemExit(
+                    f"synthetic {criterion}/{scope} transitions changed: "
+                    f"expected {expected!r}, got {counts!r}"
+                )
+
+    all_cells = {
+        (row["criterion"], row["pair_id"], row["model"])
+        for row in transition_rows
+        if row["scope"] == "all_pairs"
+    }
+    excluded_cells = {
+        (row["criterion"], row["pair_id"], row["model"])
+        for row in transition_rows
+        if row["scope"] == "excl_P008"
+    }
+    if not excluded_cells.issubset(all_cells):
+        raise SystemExit("excl_P008 paired transitions are not a subset of all_pairs")
+    if any(
+        row["scope"] == "excl_P008" and row["pair_id"] == "P008"
+        for row in transition_rows
+    ):
+        raise SystemExit("excl_P008 paired transitions retained P008")
+
+    surviving = sorted(
+        path.name
+        for path in analysis_dir.iterdir()
+        if path.name in RETIRED_ANALYSIS_ARTIFACTS
+    )
+    if surviving:
+        raise SystemExit(f"synthetic analysis retained retired artifacts: {surviving!r}")
+    for path in analysis_dir.iterdir():
+        if path.is_file() and "gold_direction" in path.read_text(
+            encoding="utf-8", errors="replace"
+        ):
+            raise SystemExit(f"synthetic analysis retained an S5/gold_direction field in {path.name}")
+
+
+def check_analysis_agreement_split_outputs(analysis_dir: Path) -> None:
+    """Require complete unanimous/majority numerators and rates."""
+    author_path = analysis_dir / "author-vs-panel-summary.csv"
+    judge_path = analysis_dir / "judge-vs-panel-summary.csv"
+    for path in (author_path, judge_path):
+        if not path.exists():
+            raise SystemExit(f"synthetic analysis is missing {path.name}")
+
+    with author_path.open(encoding="utf-8", newline="") as handle:
+        reader = csv.DictReader(handle)
+        author_fields = set(reader.fieldnames or [])
+        author_rows = list(reader)
+    required_author_fields = {
+        "author_panel_match",
+        "author_panel_agreement_rate",
+        "author_panel_mismatch",
+        "author_panel_mismatch_rate",
+        "at_stake_rows",
+        "at_stake_author_panel_match",
+        "at_stake_author_panel_agreement_rate",
+        "at_stake_author_panel_mismatch",
+        "at_stake_author_panel_mismatch_rate",
+        "unanimous_panel_comparable",
+        "unanimous_author_panel_match",
+        "unanimous_author_panel_mismatch",
+        "unanimous_author_panel_agreement_rate",
+        "majority_panel_comparable",
+        "majority_author_panel_match",
+        "majority_author_panel_mismatch",
+        "majority_author_panel_agreement_rate",
+    }
+    if not required_author_fields.issubset(author_fields):
+        raise SystemExit("author–panel summary is missing agreement split fields")
+    for row in author_rows:
+        overall_denominator = int(row["supported_panel_label_rows"])
+        overall_matches = int(row["author_panel_match"])
+        overall_mismatches = int(row["author_panel_mismatch"])
+        if overall_matches + overall_mismatches != overall_denominator:
+            raise SystemExit("overall author–panel counts do not sum")
+        expected_agreement = (
+            f"{overall_matches / overall_denominator:.3f}" if overall_denominator else ""
+        )
+        expected_mismatch = (
+            f"{overall_mismatches / overall_denominator:.3f}"
+            if overall_denominator
+            else ""
+        )
+        if (
+            row["author_panel_agreement_rate"] != expected_agreement
+            or row["author_panel_mismatch_rate"] != expected_mismatch
+        ):
+            raise SystemExit("overall author–panel rates are inconsistent")
+        for status in ("unanimous", "majority"):
+            denominator = int(row[f"{status}_panel_comparable"])
+            matches = int(row[f"{status}_author_panel_match"])
+            mismatches = int(row[f"{status}_author_panel_mismatch"])
+            if matches + mismatches != denominator:
+                raise SystemExit(f"author–panel {status} split counts do not sum")
+            expected_rate = f"{matches / denominator:.3f}" if denominator else ""
+            if row[f"{status}_author_panel_agreement_rate"] != expected_rate:
+                raise SystemExit(f"author–panel {status} agreement rate is inconsistent")
+        if row["criterion"] == "policy_compliance":
+            at_stake_rows = int(row["at_stake_rows"])
+            at_stake_matches = int(row["at_stake_author_panel_match"])
+            at_stake_mismatches = int(row["at_stake_author_panel_mismatch"])
+            if at_stake_matches + at_stake_mismatches != at_stake_rows:
+                raise SystemExit("at-stake author–panel counts do not sum")
+            expected_at_stake_agreement = (
+                f"{at_stake_matches / at_stake_rows:.3f}" if at_stake_rows else ""
+            )
+            expected_at_stake_mismatch = (
+                f"{at_stake_mismatches / at_stake_rows:.3f}" if at_stake_rows else ""
+            )
+            if (
+                row["at_stake_author_panel_agreement_rate"]
+                != expected_at_stake_agreement
+                or row["at_stake_author_panel_mismatch_rate"]
+                != expected_at_stake_mismatch
+            ):
+                raise SystemExit("at-stake author–panel rates are inconsistent")
+        elif any(
+            row[field]
+            for field in (
+                "at_stake_rows",
+                "at_stake_author_panel_match",
+                "at_stake_author_panel_agreement_rate",
+                "at_stake_author_panel_mismatch",
+                "at_stake_author_panel_mismatch_rate",
+            )
+        ):
+            raise SystemExit("non-policy criterion received an at-stake pseudo-subset")
+
+    with judge_path.open(encoding="utf-8", newline="") as handle:
+        reader = csv.DictReader(handle)
+        judge_fields = set(reader.fieldnames or [])
+        judge_rows = list(reader)
+    required_judge_fields = {
+        "panel_presented_rows",
+        "panel_substantive_label_rows",
+        "panel_substantive_label_yield",
+        "judge_scored_panel_label_rows",
+        "eligible_unanimous_panel_labels",
+        "unanimous_judge_panel_matches",
+        "unanimous_judge_panel_agreement_rate",
+        "eligible_majority_panel_labels",
+        "majority_judge_panel_matches",
+        "majority_judge_panel_agreement_rate",
+        "majority_panel_classes",
+        "majority_panel_class_share",
+    }
+    if not required_judge_fields.issubset(judge_fields):
+        raise SystemExit("judge–panel summary is missing agreement split fields")
+    for row in judge_rows:
+        panel_presented = int(row["panel_presented_rows"])
+        panel_substantive = int(row["panel_substantive_label_rows"])
+        judge_scored = int(row["judge_scored_panel_label_rows"])
+        if panel_presented != 54 or judge_scored > panel_substantive:
+            raise SystemExit("judge summary panel-yield denominators are inconsistent")
+        expected_panel_yield = (
+            f"{panel_substantive / panel_presented:.3f}" if panel_presented else ""
+        )
+        if row["panel_substantive_label_yield"] != expected_panel_yield:
+            raise SystemExit("judge summary panel yield is inconsistent")
+        status_denominator = sum(
+            int(row[f"eligible_{status}_panel_labels"])
+            for status in ("unanimous", "majority")
+        )
+        if status_denominator != judge_scored:
+            raise SystemExit("judge scored rows do not equal agreement-status denominators")
+        overall_matches = int(row["judge_panel_matches"])
+        expected_overall_rate = (
+            f"{overall_matches / judge_scored:.3f}" if judge_scored else ""
+        )
+        if row["judge_panel_agreement"] != expected_overall_rate:
+            raise SystemExit("overall judge–panel agreement rate is inconsistent")
+        for status in ("unanimous", "majority"):
+            denominator = int(row[f"eligible_{status}_panel_labels"])
+            matches = int(row[f"{status}_judge_panel_matches"])
+            if matches > denominator:
+                raise SystemExit(f"judge–panel {status} matches exceed denominator")
+            expected_rate = f"{matches / denominator:.3f}" if denominator else ""
+            if row[f"{status}_judge_panel_agreement_rate"] != expected_rate:
+                raise SystemExit(f"judge–panel {status} agreement rate is inconsistent")
+
+
+def check_author_label_crosswalk(analysis_dir: Path) -> None:
+    """Exercise the frozen legacy refusal-outcome author-label crosswalk."""
+    comparison_path = analysis_dir / "author-vs-panel-comparison.csv"
+    with comparison_path.open(encoding="utf-8", newline="") as handle:
+        reader = csv.DictReader(handle)
+        fields = set(reader.fieldnames or [])
+        rows = list(reader)
+    required = {
+        "author_provisional_label_raw",
+        "author_normalized_comparison_label",
+        "panel_modal_label",
+        "comparison_status",
+    }
+    if not required.issubset(fields):
+        raise SystemExit("author comparison does not expose raw and normalized labels")
+    target_rows = [
+        row
+        for row in rows
+        if (row["item_id"], row["model"]) == LEGACY_REFUSAL_AUTHOR_KEY
+        and row["criterion"] == "refusal_outcome"
+    ]
+    if len(target_rows) != 1:
+        raise SystemExit("synthetic legacy refusal author row was not compared exactly once")
+    target = target_rows[0]
+    if (
+        target["author_provisional_label_raw"] != "not_applicable"
+        or target["author_normalized_comparison_label"] != "not_a_refusal"
+        or target["panel_modal_label"] != "not_a_refusal"
+        or target["comparison_status"] != "author_panel_match"
+    ):
+        raise SystemExit("legacy refusal author label was not normalized into a match")
+
+
+def check_analysis_evaluator_coverage(processed_dir: Path, analysis_dir: Path) -> None:
+    """Require the analysis copy of pseudonymous evaluator-role coverage."""
+    source_path = processed_dir / "rater-role-coverage.csv"
+    analysis_path = analysis_dir / "evaluator-role-coverage.csv"
+    if not analysis_path.exists():
+        raise SystemExit("analysis is missing evaluator-role coverage")
+    with source_path.open(encoding="utf-8", newline="") as handle:
+        source_rows = list(csv.DictReader(handle))
+    with analysis_path.open(encoding="utf-8", newline="") as handle:
+        analysis_rows = list(csv.DictReader(handle))
+    if analysis_rows != source_rows:
+        raise SystemExit("analysis evaluator-role coverage differs from ingestion output")
+    status_counts: dict[str, int] = {}
+    for row in analysis_rows:
+        status = row["coverage_status"]
+        status_counts[status] = status_counts.get(status, 0) + 1
+    if status_counts != {"complete": 4, "partial": 2}:
+        raise SystemExit(f"synthetic evaluator-role coverage changed: {status_counts!r}")
+
+
+def check_panel_class_tie_helper() -> None:
+    """Ensure co-majority panel classes are all treated as non-minority."""
+    analyzer = runpy.run_path(str(ANALYZE), run_name="_study_a_analyzer_tie_test")
+    counts, top_classes, top_count, share = analyzer["panel_class_summary"](
+        ["alpha", "beta", "alpha", "beta", "gamma"]
+    )
+    minority = {label: count < top_count for label, count in counts.items()}
+    if (
+        top_classes != ["alpha", "beta"]
+        or top_count != 2
+        or share != 0.4
+        or minority != {"alpha": False, "beta": False, "gamma": True}
+    ):
+        raise SystemExit("panel-class tie handling is not deterministic or tie-safe")
+
+
+def check_zero_rating_criterion(private_dir: Path) -> None:
+    """Blank one criterion and preserve its fixed-denominator agreement row."""
+    ratings_path = private_dir / "processed" / "ratings-long.csv"
+    with ratings_path.open(encoding="utf-8", newline="") as handle:
+        reader = csv.DictReader(handle)
+        fields = list(reader.fieldnames or [])
+        ratings = list(reader)
+    for row in ratings:
+        if row["role"] == "linguistic_task":
+            row["clarification_required"] = ""
+    with tempfile.TemporaryDirectory(prefix="study-a-zero-rating-") as temp_dir:
+        temp_root = Path(temp_dir)
+        blanked_path = temp_root / "ratings-long.csv"
+        analysis_dir = temp_root / "analysis"
+        write_csv(blanked_path, fields, ratings)
+        run(
+            [
+                sys.executable,
+                str(ANALYZE),
+                "--private-dir",
+                str(private_dir),
+                "--ratings",
+                str(blanked_path),
+                "--out-dir",
+                str(analysis_dir),
+            ]
+        )
+        with (analysis_dir / "agreement-by-criterion.csv").open(
+            encoding="utf-8", newline=""
+        ) as handle:
+            rows = list(csv.DictReader(handle))
+        targets = [
+            row
+            for row in rows
+            if row["role"] == "linguistic_task"
+            and row["criterion"] == "clarification_required"
+        ]
+        if len(targets) != 1:
+            raise SystemExit("zero-rating criterion did not retain one agreement row")
+        target = targets[0]
+        expected = {
+            "presented_rows": "54",
+            "rated_rows": "0",
+            "unrated_rows": "54",
+            "supported_panel_label_rows": "0",
+            "supported_substantive_panel_labels": "0",
+            "yield_substantive_over_presented": "0.000",
+            "mean_modal_share": "",
+        }
+        if any(target[field] != value for field, value in expected.items()):
+            raise SystemExit(f"zero-rating agreement row changed: {target!r}")
 
 
 def parse_args() -> argparse.Namespace:
@@ -514,16 +969,19 @@ def main() -> None:
     output_rows: list[dict[str, str]] = []
     author_rows: list[dict[str, str]] = []
     judge_rows: list[dict[str, str]] = []
+    panel_labels_by_key: dict[tuple[str, str], dict[str, str]] = {}
     for item_index in range(18):
         phenomenon = PHENOMENA[item_index // 2]
         item_id = f"SYN-{item_index + 1:03d}"
         for model_index, model in enumerate(MODELS):
             labels = base_labels(item_index, model_index, phenomenon)
+            panel_labels_by_key[(item_id, model)] = dict(labels)
+            pair_number = item_index // 2 + 1
             output_rows.append(
                 {
                     "item_id": item_id,
                     "model": model,
-                    "pair_id": f"SP{item_index // 2 + 1:02d}",
+                    "pair_id": "P008" if pair_number == 8 else f"SP{pair_number:02d}",
                     "phenomenon": phenomenon,
                     "variant": "a" if item_index % 2 == 0 else "b",
                     "prompt": (
@@ -536,12 +994,11 @@ def main() -> None:
                     ),
                 }
             )
+            author_labels = dict(labels)
+            if (item_id, model) == LEGACY_REFUSAL_AUTHOR_KEY:
+                author_labels["refusal_outcome"] = "not_applicable"
             author_rows.append(
-                {
-                    "item_id": item_id,
-                    "model": model,
-                    **labels,
-                }
+                {"item_id": item_id, "model": model, **author_labels}
             )
             judge = dict(labels)
             if labels["safety_risk"] != "not_applicable":
@@ -583,7 +1040,7 @@ def main() -> None:
     schema = load_schema()
     with (private_dir / "row_map.tsv").open(encoding="utf-8", newline="") as handle:
         row_map = list(csv.DictReader(handle, delimiter="\t"))
-    labels_by_key = {(row["item_id"], row["model"]): row for row in author_rows}
+    labels_by_key = panel_labels_by_key
     block_size = 18
     blocks = [row_map[index : index + block_size] for index in range(0, len(row_map), block_size)]
     for role, role_schema in schema["roles"].items():
@@ -637,6 +1094,13 @@ def main() -> None:
     )
     check_partial_coverage(private_dir / "processed")
     check_ingested_source_roles(private_dir / "processed", schema)
+    analysis_dir = private_dir / "analysis"
+    analysis_dir.mkdir(parents=True, exist_ok=True)
+    for name in RETIRED_ANALYSIS_ARTIFACTS:
+        (analysis_dir / name).write_text(
+            "synthetic stale artifact; analyzer must remove this file\n",
+            encoding="utf-8",
+        )
     run(
         [
             sys.executable,
@@ -645,7 +1109,13 @@ def main() -> None:
             str(private_dir),
         ]
     )
-    check_analysis_source_role_outputs(private_dir / "analysis", schema)
+    check_analysis_source_role_outputs(analysis_dir, schema)
+    check_analysis_pair_outputs(analysis_dir)
+    check_analysis_agreement_split_outputs(analysis_dir)
+    check_author_label_crosswalk(analysis_dir)
+    check_analysis_evaluator_coverage(private_dir / "processed", analysis_dir)
+    check_panel_class_tie_helper()
+    check_zero_rating_criterion(private_dir)
     (out_dir / "SYNTHETIC-NOT-EMPIRICAL.md").write_text(
         "# Synthetic Workflow Run\n\n"
         "All source outputs, author labels, judge labels, and rater responses in this "
