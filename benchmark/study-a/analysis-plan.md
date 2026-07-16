@@ -149,7 +149,14 @@ A git tag alone does not freeze the private row map, package/presentation order,
   the judge result as a small-N secondary finding, not an estimate with
   resolving power. If yield is low, say so and downweight the claim in text; do
   not silently drop it.
-- **Build the freeze manifest + revision ledger** (blocker 8): hash the artifacts
-  listed under "Freeze object" (including both frozen judge snapshots + the
-  migrated label space) and tag the manifest, not just the commit.
+- ~~Build the freeze manifest + revision ledger~~ **done 2026-07-15**:
+  `scripts/build_study_a_manifest.py` hashes the 8 frozen artifacts (plan, schema,
+  both judge comparators, the four analysis-path scripts) + the two model digests
+  into `benchmark/study-a/FREEZE-MANIFEST.json`; `--verify` detects drift (tested).
+  `benchmark/study-a/revision-ledger.md` logs post-freeze deviations. This is
+  freeze **stamp 1** (analysis path); stamp 2 adds the row map, blind-package
+  order, and author snapshot when the real packages are built.
+- **Create the freeze tag** (Brett's gate): tag the commit that carries the
+  manifest. This is the pre-registration commitment — after it, opening the first
+  external evaluator return is permitted.
 - Then, and only then: open the first external evaluator return.
