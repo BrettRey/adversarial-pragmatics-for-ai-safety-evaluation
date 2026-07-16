@@ -66,17 +66,20 @@ automated LLM-as-judge (avoids collision in "judge comparator" etc.).
   items), so B is a laundered answer key. B is retained only as a pre-registered,
   labelled ceiling (see A5).
 
-  Mechanical sub-steps (design + models fixed): (a) pull both models [done];
-  (b) build a genuinely non-leaking prompt — strip `expected_behavior`, **all
-  seven taxonomy fields, and the `item_id`/`variant`/`model_under_test`
-  identifiers** (both prompt variants currently emit the full facts list, so
-  dropping only `expected_behavior` would still be Option B), and include the
-  full codebook definitions; (c) **migrate the judge label space to v7** — the
-  producer cannot currently emit `insufficient_visible_context`, `item_problem`,
-  `no_policy_or_authority_limit`, or `not_a_refusal`, so judge-vs-reference
-  disagreement would be partly schema mismatch; apply the
-  `not_applicable`→`not_a_refusal` crosswalk; (d) extend the runner/analyzer to a
-  named judge file per judge; (e) run each judge to its own `judge_labels.csv`.
+  Mechanical sub-steps — **all complete 2026-07-15**, in `scripts/run_study_a_judge.py`:
+  (a) both models pulled (digests: 7B `6577803aa9a0`, 24B `8039dd90c113`);
+  (b) Option-A prompt built and verified leak-free — strips `expected_behavior`,
+  all seven taxonomy fields, and `item_id`/`variant`/`model_under_test`, and
+  carries the full v7 codebook (field label + help + allowed values); (c) label
+  space read live from `schema.json` v7, so the judge can emit every reference
+  value including the escapes; any value outside the v7 space is rejected to a
+  blank field with a note, never a silent wrong label; (d) analyzer takes
+  `--judge-labels` per judge and reports both side by side with a `judge` column;
+  (e) both judges run over the 54 rows →
+  `benchmark/study-a/judge-comparators/judge-labels-mistral-7b.csv` and
+  `judge-labels-mistral-24b.csv`. The two judges differ on 26/162 label cells
+  (~16%), a real (coarse) capability contrast. These two files + the runner
+  script are frozen artifacts for the manifest.
 
 ## Estimand table
 Outcome tiers are **confirmatory (co-primary)**, **secondary**, and **exploratory**. Only the confirmatory rows carry the study's headline claims; secondary rows are reported but not headline; exploratory rows are hypothesis- generating and labelled as such in any write-up.
@@ -136,9 +139,9 @@ A git tag alone does not freeze the private row map, package/presentation order,
   majority, fallback to 2-as-unanimity).
 
 ## Remaining before freeze
-- **D4 sub-steps (b)-(e):** non-leaking Option-A prompt (strip taxonomy +
-  identifiers, add codebook), **migrate judge label space to v7 + crosswalk**,
-  per-judge file, run both judges.
+- ~~D4 sub-steps (b)-(e)~~ **done 2026-07-15**: Option-A prompt, v7 labels,
+  per-judge analyzer, both judges run. Comparators frozen under
+  `benchmark/study-a/judge-comparators/`.
 - **Judge tier: kept as a reported secondary result (Brett, 2026-07-15).** Not
   demoted. The hostile reviewer's power concern becomes a mandatory **reporting
   caveat**, not a kill switch: report reference yield alongside every judge-vs-

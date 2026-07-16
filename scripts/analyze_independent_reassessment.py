@@ -164,12 +164,23 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--private-dir", required=True, type=Path)
     parser.add_argument("--ratings", type=Path, default=None)
     parser.add_argument("--out-dir", type=Path, default=None)
+    parser.add_argument(
+        "--judge-labels",
+        type=Path,
+        action="append",
+        default=None,
+        help=(
+            "Path to a frozen judge comparator judge_labels.csv (repeatable, one "
+            "per judge). Defaults to <private-dir>/judge_labels.csv."
+        ),
+    )
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args()
     private_dir = args.private_dir.resolve()
+    judge_label_paths = [path.resolve() for path in (args.judge_labels or [])]
     ratings_path = (args.ratings or private_dir / "processed" / "ratings-long.csv").resolve()
     if not ratings_path.exists():
         raise SystemExit(f"missing ingested Study A ratings: {ratings_path}")
@@ -631,103 +642,111 @@ def main() -> None:
         revision_summary,
     )
 
-    judge_rows = load_optional_rows(private_dir / "judge_labels.csv")
-    judge_by_key = build_judge_lookup(judge_rows)
+    # One frozen comparator per judge (D4: two same-family Mistral judges span a
+    # capability contrast). Default to the private single-file location for
+    # backward compatibility; each output row is tagged with the judge so the two
+    # judges are reported side by side, not merged.
+    judge_files = judge_label_paths or [private_dir / "judge_labels.csv"]
     judge_summary_rows: list[dict[str, Any]] = []
     judge_class_rows: list[dict[str, Any]] = []
-    judge_confusion = Counter()
-    for role, criteria in comparable.items():
-        for criterion in criteria:
-            # Predictions present for this criterion, independent of whether a
-            # stable independent reference exists. This drives an honest
-            # availability flag: a judge that produced labels but has no stable
-            # reference to score against is "available" with zero eligible rows,
-            # which is different from a judge column that is missing entirely.
-            predictions_present = sum(
-                1
-                for row in reference_rows
-                if row["role"] == role
-                and row["criterion"] == criterion
-                and judge_value(judge_by_key.get((row["item_id"], row["model"]), {}), criterion)
-            )
-            eligible = [
-                row
-                for row in reference_rows
-                if row["role"] == role
-                and row["criterion"] == criterion
-                and row["stability"] in {"unanimous", "majority"}
-                and judge_value(judge_by_key.get((row["item_id"], row["model"]), {}), criterion)
-            ]
-            matched = sum(
-                judge_value(judge_by_key[(row["item_id"], row["model"])], criterion)
-                == row["independent_reference"]
-                for row in eligible
-            )
-            for row in eligible:
-                judge_confusion[
-                    (
-                        role,
-                        criterion,
-                        row["independent_reference"],
-                        judge_value(judge_by_key[(row["item_id"], row["model"])], criterion),
-                    )
-                ] += 1
-            if not judge_rows:
-                availability = "not_available"
-            elif predictions_present:
-                availability = "available"
-            else:
-                availability = "no_predictions"
-            judge_summary_rows.append(
-                {
-                    "role": role,
-                    "criterion": criterion,
-                    "stable_reference_rows": len(eligible),
-                    "matched": matched,
-                    "accuracy": f"{matched / len(eligible):.3f}" if eligible else "",
-                    "availability": availability,
-                }
-            )
-            labels = sorted({row["independent_reference"] for row in eligible})
-            for label in labels:
-                cases = [row for row in eligible if row["independent_reference"] == label]
-                recovered = sum(
-                    judge_value(judge_by_key[(row["item_id"], row["model"])], criterion) == label
-                    for row in cases
+    judge_confusion_rows: list[dict[str, Any]] = []
+    for judge_file in judge_files:
+        judge_rows = load_optional_rows(judge_file)
+        if not judge_rows:
+            continue
+        judge_by_key = build_judge_lookup(judge_rows)
+        judge_name = judge_rows[0].get("judge_model") or Path(judge_file).stem
+        judge_confusion: Counter = Counter()
+        for role, criteria in comparable.items():
+            for criterion in criteria:
+                # Predictions present for this criterion, independent of whether a
+                # stable independent reference exists. Drives an honest
+                # availability flag: a judge that produced labels but has no stable
+                # reference to score against is "available" with zero eligible
+                # rows, different from a judge column that is missing entirely.
+                predictions_present = sum(
+                    1
+                    for row in reference_rows
+                    if row["role"] == role
+                    and row["criterion"] == criterion
+                    and judge_value(judge_by_key.get((row["item_id"], row["model"]), {}), criterion)
                 )
-                judge_class_rows.append(
+                eligible = [
+                    row
+                    for row in reference_rows
+                    if row["role"] == role
+                    and row["criterion"] == criterion
+                    and row["stability"] in {"unanimous", "majority"}
+                    and judge_value(judge_by_key.get((row["item_id"], row["model"]), {}), criterion)
+                ]
+                matched = sum(
+                    judge_value(judge_by_key[(row["item_id"], row["model"])], criterion)
+                    == row["independent_reference"]
+                    for row in eligible
+                )
+                for row in eligible:
+                    judge_confusion[
+                        (
+                            role,
+                            criterion,
+                            row["independent_reference"],
+                            judge_value(judge_by_key[(row["item_id"], row["model"])], criterion),
+                        )
+                    ] += 1
+                availability = "available" if predictions_present else "no_predictions"
+                judge_summary_rows.append(
                     {
+                        "judge": judge_name,
                         "role": role,
                         "criterion": criterion,
-                        "reference_class": label,
-                        "reference_rows": len(cases),
-                        "judge_recovered": recovered,
-                        "class_recall": f"{recovered / len(cases):.3f}" if cases else "",
+                        "stable_reference_rows": len(eligible),
+                        "matched": matched,
+                        "accuracy": f"{matched / len(eligible):.3f}" if eligible else "",
+                        "availability": availability,
                     }
                 )
+                labels = sorted({row["independent_reference"] for row in eligible})
+                for label in labels:
+                    cases = [row for row in eligible if row["independent_reference"] == label]
+                    recovered = sum(
+                        judge_value(judge_by_key[(row["item_id"], row["model"])], criterion) == label
+                        for row in cases
+                    )
+                    judge_class_rows.append(
+                        {
+                            "judge": judge_name,
+                            "role": role,
+                            "criterion": criterion,
+                            "reference_class": label,
+                            "reference_rows": len(cases),
+                            "judge_recovered": recovered,
+                            "class_recall": f"{recovered / len(cases):.3f}" if cases else "",
+                        }
+                    )
+        for (role, criterion, reference, judge), count in sorted(judge_confusion.items()):
+            judge_confusion_rows.append(
+                {
+                    "judge": judge_name,
+                    "role": role,
+                    "criterion": criterion,
+                    "independent_reference": reference,
+                    "judge_label": judge,
+                    "rows": count,
+                }
+            )
     write_csv(
         out_dir / "judge-vs-independent-summary.csv",
-        list(judge_summary_rows[0]) if judge_summary_rows else ["role", "criterion"],
+        list(judge_summary_rows[0]) if judge_summary_rows else ["judge", "role", "criterion"],
         judge_summary_rows,
     )
     write_csv(
         out_dir / "judge-minority-class-recall.csv",
-        list(judge_class_rows[0]) if judge_class_rows else ["role", "criterion"],
+        list(judge_class_rows[0]) if judge_class_rows else ["judge", "role", "criterion"],
         judge_class_rows,
     )
-    judge_confusion_rows = [
-        {
-            "role": role,
-            "criterion": criterion,
-            "independent_reference": reference,
-            "judge_label": judge,
-            "rows": count,
-        }
-        for (role, criterion, reference, judge), count in sorted(judge_confusion.items())
-    ]
     write_csv(
         out_dir / "judge-vs-independent-confusion.csv",
-        list(judge_confusion_rows[0]) if judge_confusion_rows else ["role", "criterion", "rows"],
+        list(judge_confusion_rows[0]) if judge_confusion_rows else ["judge", "role", "criterion", "rows"],
         judge_confusion_rows,
     )
 
