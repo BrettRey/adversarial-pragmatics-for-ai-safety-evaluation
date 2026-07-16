@@ -108,6 +108,33 @@ def source_key(row: dict[str, str]) -> tuple[str, str]:
     return row.get("item_id", ""), row.get("model", "")
 
 
+def judge_value(row: dict[str, str], criterion: str) -> str:
+    # The real judge producer (run_llm_judge_validation.py) writes columns as
+    # judge_<criterion> alongside human_<criterion>/match_<criterion>; the
+    # synthetic fixture and simulate_* path write the bare <criterion>. Accept
+    # either so the analyzer reads real producer output and synthetic fixtures
+    # alike, and does not silently score zero rows on prefixed files.
+    if f"judge_{criterion}" in row:
+        return row.get(f"judge_{criterion}", "")
+    return row.get(criterion, "")
+
+
+def build_judge_lookup(judge_rows: list[dict[str, str]]) -> dict[tuple[str, str], dict[str, str]]:
+    lookup: dict[tuple[str, str], dict[str, str]] = {}
+    for row in judge_rows:
+        key = source_key(row)
+        if key in lookup:
+            raise SystemExit(
+                "Duplicate judge row for item_id/model "
+                f"{key}: judge_labels.csv holds more than one comparator "
+                "condition (e.g. multiple prompt_variant or judge runs). Filter "
+                "it to a single frozen comparator before analysis instead of "
+                "letting rows overwrite silently."
+            )
+        lookup[key] = row
+    return lookup
+
+
 def load_optional_rows(path: Path) -> list[dict[str, str]]:
     return read_csv(path) if path.exists() else []
 
@@ -605,22 +632,34 @@ def main() -> None:
     )
 
     judge_rows = load_optional_rows(private_dir / "judge_labels.csv")
-    judge_by_key = {source_key(row): row for row in judge_rows}
+    judge_by_key = build_judge_lookup(judge_rows)
     judge_summary_rows: list[dict[str, Any]] = []
     judge_class_rows: list[dict[str, Any]] = []
     judge_confusion = Counter()
     for role, criteria in comparable.items():
         for criterion in criteria:
+            # Predictions present for this criterion, independent of whether a
+            # stable independent reference exists. This drives an honest
+            # availability flag: a judge that produced labels but has no stable
+            # reference to score against is "available" with zero eligible rows,
+            # which is different from a judge column that is missing entirely.
+            predictions_present = sum(
+                1
+                for row in reference_rows
+                if row["role"] == role
+                and row["criterion"] == criterion
+                and judge_value(judge_by_key.get((row["item_id"], row["model"]), {}), criterion)
+            )
             eligible = [
                 row
                 for row in reference_rows
                 if row["role"] == role
                 and row["criterion"] == criterion
                 and row["stability"] in {"unanimous", "majority"}
-                and judge_by_key.get((row["item_id"], row["model"]), {}).get(criterion, "")
+                and judge_value(judge_by_key.get((row["item_id"], row["model"]), {}), criterion)
             ]
             matched = sum(
-                judge_by_key[(row["item_id"], row["model"])][criterion]
+                judge_value(judge_by_key[(row["item_id"], row["model"])], criterion)
                 == row["independent_reference"]
                 for row in eligible
             )
@@ -630,9 +669,15 @@ def main() -> None:
                         role,
                         criterion,
                         row["independent_reference"],
-                        judge_by_key[(row["item_id"], row["model"])][criterion],
+                        judge_value(judge_by_key[(row["item_id"], row["model"])], criterion),
                     )
                 ] += 1
+            if not judge_rows:
+                availability = "not_available"
+            elif predictions_present:
+                availability = "available"
+            else:
+                availability = "no_predictions"
             judge_summary_rows.append(
                 {
                     "role": role,
@@ -640,14 +685,14 @@ def main() -> None:
                     "stable_reference_rows": len(eligible),
                     "matched": matched,
                     "accuracy": f"{matched / len(eligible):.3f}" if eligible else "",
-                    "availability": "available" if judge_rows else "not_available",
+                    "availability": availability,
                 }
             )
             labels = sorted({row["independent_reference"] for row in eligible})
             for label in labels:
                 cases = [row for row in eligible if row["independent_reference"] == label]
                 recovered = sum(
-                    judge_by_key[(row["item_id"], row["model"])][criterion] == label
+                    judge_value(judge_by_key[(row["item_id"], row["model"])], criterion) == label
                     for row in cases
                 )
                 judge_class_rows.append(
