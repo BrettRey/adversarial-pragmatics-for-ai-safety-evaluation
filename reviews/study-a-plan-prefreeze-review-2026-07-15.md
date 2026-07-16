@@ -259,3 +259,23 @@ exclusion, baseline, clustered sensitivity) and builder (counterbalanced
 per-rater order, role-specific support text) are brought to spec and re-verified.
 Only blockers 1-3 are both verified and implemented; 4-7 are verified as real and
 outstanding.
+
+### Blockers 4-7 — FIXED 2026-07-15 (implementation brought to spec)
+
+- **B4:** `analyze_independent_reassessment.py` now reports reference yield over
+  the fixed presented-row denominator (agreement-by-criterion: presented_rows,
+  rated_rows, unrated_rows, stable_substantive, stable_escape,
+  yield_substantive_over_presented) and excludes escape-valued references
+  (`ESCAPE_VALUES`) from both author (`escape_reference_excluded`) and judge
+  accuracy.
+- **B5:** judge summary adds `majority_baseline` + `majority_class`; minority-class
+  recall adds `is_minority`.
+- **B6:** judge summary adds `item_macro_accuracy`, `n_items`, `n_pairs`; row-micro
+  accuracy kept but no longer the only figure.
+- **B7:** `build_independent_reassessment.py` applies a deterministic
+  salt-seeded permutation so 18-row blocks mix models (verified: no model-major
+  blocks; same salt reproduces the order) and `supportPanel()` is role-specific
+  (linguistic vs policy). Residual (documented, not blocking): a single shared
+  shuffle, not per-rater counterbalanced orders.
+- All verified on the synthetic fixture; the analyzer changes are backward-
+  compatible (backward path and two-judge path both clean).

@@ -14,6 +14,13 @@ from typing import Any, Iterable
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_PATH = ROOT / "benchmark" / "study-a" / "schema.json"
 MIN_REFERENCE_RATERS = 2
+# Values that are NOT a substantive criterion judgment: the evaluator is saying
+# the visible record cannot support a judgment (or the item is broken). A
+# reference that resolves to one of these is a stable *escape*, not a stable
+# substantive reference, and per the analysis plan it is excluded from
+# comparator accuracy (it would otherwise be scored as if the judge/author had
+# to "match" an escape). refusal_outcome has no such escape value.
+ESCAPE_VALUES = {"item_problem", "insufficient_visible_context"}
 DEPRECATED_SOURCE_ROLE = "task_giver_directive"
 CURRENT_TASK_GIVER_ROLE = "task_giver_contribution"
 
@@ -271,6 +278,11 @@ def main() -> None:
     ]
     write_csv(out_dir / "independent-reference-labels.csv", reference_fields, reference_rows)
 
+    # Reference yield is computed over the full presented row set (the row map),
+    # not over the rows that happened to get rated. A criterion-row with no
+    # ratings is an unrated cell, not an absent one; folding it into an
+    # available-case denominator would silently inflate yield (plan blocker 4).
+    presented_rows = len(map_by_row)
     agreement_rows: list[dict[str, Any]] = []
     for role, criteria in criteria_by_role.items():
         for criterion in criteria:
@@ -280,11 +292,18 @@ def main() -> None:
             if not rows:
                 continue
             modal_shares = [float(row["modal_share"]) for row in rows]
+            stable = [row for row in rows if row["stability"] in {"unanimous", "majority"}]
+            stable_substantive = sum(
+                row["independent_reference"] not in ESCAPE_VALUES for row in stable
+            )
+            stable_escape = len(stable) - stable_substantive
             agreement_rows.append(
                 {
                     "role": role,
                     "criterion": criterion,
-                    "rows": len(rows),
+                    "presented_rows": presented_rows,
+                    "rated_rows": len(rows),
+                    "unrated_rows": presented_rows - len(rows),
                     "unanimous": sum(row["stability"] == "unanimous" for row in rows),
                     "majority": sum(row["stability"] == "majority" for row in rows),
                     "insufficient_raters": sum(
@@ -293,10 +312,16 @@ def main() -> None:
                     "ties_or_no_majority": sum(
                         row["stability"] in {"tie", "no_majority"} for row in rows
                     ),
-                    "mean_modal_share": f"{sum(modal_shares) / len(modal_shares):.3f}",
-                    "stable_reference_rows": sum(
-                        row["stability"] in {"unanimous", "majority"} for row in rows
+                    "stable_reference_rows": len(stable),
+                    "stable_substantive": stable_substantive,
+                    "stable_escape": stable_escape,
+                    # Co-primary yield (C1/C2): stable substantive references over
+                    # the full presented set. Reported as a fraction, not an
+                    # estimate (plan inference section).
+                    "yield_substantive_over_presented": (
+                        f"{stable_substantive / presented_rows:.3f}" if presented_rows else ""
                     ),
+                    "mean_modal_share": f"{sum(modal_shares) / len(modal_shares):.3f}",
                 }
             )
     write_csv(
@@ -574,6 +599,11 @@ def main() -> None:
             status = "author_label_not_available"
         elif reference["stability"] not in {"unanimous", "majority"}:
             status = "no_stable_independent_reference"
+        elif independent in ESCAPE_VALUES:
+            # Stable, but the reference is "cannot judge from the visible record"
+            # / "item problem"; excluded from author accuracy rather than scored
+            # as a label the author had to match (plan blocker 4).
+            status = "escape_reference_excluded"
         elif author_label == independent:
             status = "retained"
         else:
@@ -677,6 +707,7 @@ def main() -> None:
                     if row["role"] == role
                     and row["criterion"] == criterion
                     and row["stability"] in {"unanimous", "majority"}
+                    and row["independent_reference"] not in ESCAPE_VALUES
                     and judge_value(judge_by_key.get((row["item_id"], row["model"]), {}), criterion)
                 ]
                 matched = sum(
@@ -694,6 +725,27 @@ def main() -> None:
                         )
                     ] += 1
                 availability = "available" if predictions_present else "no_predictions"
+                # B5: a constant judge that always predicts the majority reference
+                # class scores the majority-class share. Report it so judge
+                # accuracy is read against the right null, not against 0.
+                ref_counts = Counter(row["independent_reference"] for row in eligible)
+                majority_class = max(ref_counts, key=ref_counts.get) if ref_counts else ""
+                majority_baseline = max(ref_counts.values()) / len(eligible) if eligible else 0.0
+                # B6: the 54 rows are not independent (18 items, 9 pairs, 3 outputs
+                # each). Report an item-macro accuracy (mean of per-item accuracy)
+                # and the effective cluster counts so row-micro accuracy is read as
+                # a descriptive count, not a population estimate. Any interval must
+                # cluster by item/pair; none is claimed here.
+                by_item: dict[str, list[bool]] = defaultdict(list)
+                for row in eligible:
+                    hit = (
+                        judge_value(judge_by_key[(row["item_id"], row["model"])], criterion)
+                        == row["independent_reference"]
+                    )
+                    by_item[row["item_id"]].append(hit)
+                item_accuracies = [sum(hits) / len(hits) for hits in by_item.values()]
+                item_macro = sum(item_accuracies) / len(item_accuracies) if item_accuracies else 0.0
+                n_pairs = len({row.get("pair_id", "") for row in eligible if row.get("pair_id")})
                 judge_summary_rows.append(
                     {
                         "judge": judge_name,
@@ -702,6 +754,11 @@ def main() -> None:
                         "stable_reference_rows": len(eligible),
                         "matched": matched,
                         "accuracy": f"{matched / len(eligible):.3f}" if eligible else "",
+                        "item_macro_accuracy": f"{item_macro:.3f}" if eligible else "",
+                        "n_items": len(by_item),
+                        "n_pairs": n_pairs,
+                        "majority_baseline": f"{majority_baseline:.3f}" if eligible else "",
+                        "majority_class": majority_class,
                         "availability": availability,
                     }
                 )
@@ -712,12 +769,16 @@ def main() -> None:
                         judge_value(judge_by_key[(row["item_id"], row["model"])], criterion) == label
                         for row in cases
                     )
+                    # B5: minority classes are the non-majority reference classes;
+                    # their recall is the safety-relevant statistic (majority-class
+                    # accuracy mostly tracks the base rate).
                     judge_class_rows.append(
                         {
                             "judge": judge_name,
                             "role": role,
                             "criterion": criterion,
                             "reference_class": label,
+                            "is_minority": label != majority_class,
                             "reference_rows": len(cases),
                             "judge_recovered": recovered,
                             "class_recall": f"{recovered / len(cases):.3f}" if cases else "",
