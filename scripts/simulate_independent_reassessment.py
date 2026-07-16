@@ -38,6 +38,26 @@ SUPPORT_PATTERNS = {
     "support_3_of_3": "3/3",
     "support_other": "other",
 }
+ADMINISTRATIVE_TIMESTAMP_FIELDS = {
+    "started_at",
+    "completed_at",
+    "elapsed_seconds",
+    "saved_at",
+}
+PROHIBITED_ANALYSIS_FIELDS = ADMINISTRATIVE_TIMESTAMP_FIELDS | {
+    "rater_id",
+    "rater_ids",
+    "source_file",
+    "block_id",
+    "package_id",
+    "rater_role_coverage",
+    "coverage_status",
+    "completed_blocks",
+    "missing_rows",
+    "target_rows",
+    "confidence",
+    "rationale",
+}
 
 PHENOMENA = [
     "embedded_command",
@@ -64,6 +84,8 @@ RETIRED_ANALYSIS_ARTIFACTS = {
     "judge-minority-class-recall.csv",
     "judge-vs-independent-confusion.csv",
     "unstable-or-ambiguous-rows.csv",
+    "evaluator-burden.csv",
+    "evaluator-role-coverage.csv",
 }
 
 
@@ -564,6 +586,12 @@ def check_assignment_and_coherence_outputs(
         ratings = list(reader)
     if not {"package_id", "cross_field_coherence_flags"}.issubset(fields):
         raise SystemExit("ingested ratings are missing package/coherence fields")
+    retained_administrative_fields = sorted(fields & ADMINISTRATIVE_TIMESTAMP_FIELDS)
+    if retained_administrative_fields:
+        raise SystemExit(
+            "ingested analysis table retained administrative timestamp fields: "
+            f"{retained_administrative_fields!r}"
+        )
     if any(row["package_id"] != package_ids[row["role"]] for row in ratings):
         raise SystemExit("ingested package IDs do not match evaluator roles")
     summary = json.loads(
@@ -574,6 +602,16 @@ def check_assignment_and_coherence_outputs(
         or set(summary.get("package_ids", [])) != set(package_ids.values())
     ):
         raise SystemExit("ingestion summary did not record assignment/package verification")
+    if (
+        summary.get("administrative_timestamp_fields_validated") is not True
+        or summary.get("administrative_timestamp_fields_retained_in_analysis_table")
+        is not False
+        or "timing_fields_retained" in summary
+    ):
+        raise SystemExit(
+            "ingestion summary did not record validation and exclusion of "
+            "administrative timestamp fields"
+        )
     coherence = summary.get("cross_field_coherence", {})
     if (
         coherence.get("flagged_ratings") != 1
@@ -597,9 +635,37 @@ def check_assignment_and_coherence_outputs(
     if analysis_dir is not None:
         analysis_path = analysis_dir / "cross-field-coherence-flags.csv"
         with analysis_path.open(encoding="utf-8", newline="") as handle:
-            analysis_rows = list(csv.DictReader(handle))
-        if analysis_rows != coherence_rows:
-            raise SystemExit("analysis coherence artifact differs from ingestion evidence")
+            reader = csv.DictReader(handle)
+            analysis_fields = set(reader.fieldnames or [])
+            analysis_rows = list(reader)
+        required_analysis_fields = {
+            "role",
+            "row_id",
+            "item_id",
+            "model",
+            "visible_boundary_status",
+            "visible_boundary_type",
+            "cross_field_coherence_flags",
+            "flagged_vote_n",
+        }
+        if not required_analysis_fields.issubset(analysis_fields):
+            raise SystemExit("analysis coherence artifact is not object-level")
+        if len(analysis_rows) != 1:
+            raise SystemExit("synthetic analysis coherence aggregation changed")
+        analyzed = analysis_rows[0]
+        if any(
+            analyzed[field] != flagged[field]
+            for field in (
+                "role",
+                "row_id",
+                "item_id",
+                "model",
+                "visible_boundary_status",
+                "visible_boundary_type",
+                "cross_field_coherence_flags",
+            )
+        ) or analyzed["flagged_vote_n"] != "1":
+            raise SystemExit("analysis coherence artifact changed the flagged object vote")
 
 
 def check_partial_coverage(processed_dir: Path) -> None:
@@ -612,6 +678,47 @@ def check_partial_coverage(processed_dir: Path) -> None:
     partial = [row for row in rows if row.get("coverage_status") == "partial"]
     if len(partial) != 4:
         raise SystemExit("synthetic partial returns were not retained as expected")
+
+
+def check_object_only_analysis_outputs(analysis_dir: Path) -> None:
+    """Keep evaluator provenance and optional free text out of analysis outputs."""
+    retired = {
+        "evaluator-burden.csv",
+        "evaluator-role-coverage.csv",
+    }
+    emitted_retired = sorted(
+        filename for filename in retired if (analysis_dir / filename).exists()
+    )
+    if emitted_retired:
+        raise SystemExit(
+            f"synthetic analysis emitted retired evaluator artifacts: {emitted_retired!r}"
+        )
+    readout = (analysis_dir / "analysis-readout.md").read_text(encoding="utf-8")
+    prohibited_readout_phrases = (
+        "timing",
+        "burden",
+        "rater disagreement",
+        "evaluator-role coverage",
+        "per-evaluator coverage",
+        "rater coverage",
+        "rationale",
+        "confidence calibration",
+    )
+    found = [phrase for phrase in prohibited_readout_phrases if phrase in readout.lower()]
+    if found:
+        raise SystemExit(
+            "synthetic analysis readout reintroduced evaluator-level framing: "
+            f"{found!r}"
+        )
+    for path in analysis_dir.glob("*.csv"):
+        with path.open(encoding="utf-8", newline="") as handle:
+            fields = set(csv.DictReader(handle).fieldnames or [])
+        retained = sorted(fields & PROHIBITED_ANALYSIS_FIELDS)
+        if retained:
+            raise SystemExit(
+                f"synthetic analysis output {path.name} retained evaluator-level, "
+                f"administrative, or free-text fields: {retained!r}"
+            )
 
 
 def check_raw_source_role_responses(response_dir: Path, schema: dict[str, Any]) -> None:
@@ -872,11 +979,45 @@ def check_analysis_source_role_outputs(
     ):
         raise SystemExit("per-label source-role panel labels have the wrong output contract")
     with paths["label_agreement"].open(encoding="utf-8", newline="") as handle:
-        label_agreement_rows = list(csv.DictReader(handle))
+        reader = csv.DictReader(handle)
+        label_agreement_fields = set(reader.fieldnames or [])
+        label_agreement_rows = list(reader)
     if {row.get("source_role", "") for row in label_rows} != declared_roles:
         raise SystemExit("synthetic per-label panel labels do not cover all source roles")
     if {row.get("source_role", "") for row in label_agreement_rows} != declared_roles:
         raise SystemExit("synthetic per-label agreement does not cover all source roles")
+    required_object_summary_fields = {
+        "presented_objects",
+        "rated_objects",
+        "unrated_objects",
+        "supported_selected_panel_label_objects",
+        "supported_selected_panel_label_fraction",
+        "supported_not_selected_panel_label_objects",
+        "unresolved_objects",
+    }
+    retired_rating_summary_fields = {
+        "selected_ratings",
+        "total_ratings",
+        "selection_prevalence",
+    }
+    if not required_object_summary_fields.issubset(label_agreement_fields):
+        raise SystemExit("source-role summary is missing fixed-object fields")
+    if label_agreement_fields & retired_rating_summary_fields:
+        raise SystemExit("source-role summary retained rating-prevalence fields")
+    for row in label_agreement_rows:
+        presented = int(row["presented_objects"])
+        rated = int(row["rated_objects"])
+        selected = int(row["supported_selected_panel_label_objects"])
+        not_selected = int(row["supported_not_selected_panel_label_objects"])
+        unresolved = int(row["unresolved_objects"])
+        if (
+            presented != 54
+            or rated + int(row["unrated_objects"]) != presented
+            or selected + not_selected + unresolved != presented
+            or row["supported_selected_panel_label_fraction"]
+            != f"{selected / presented:.3f}"
+        ):
+            raise SystemExit("source-role fixed-object summary does not reconcile to 54")
     with paths["clarity_diagnostic"].open(encoding="utf-8", newline="") as handle:
         diagnostic_rows = list(csv.DictReader(handle))
     if not diagnostic_rows or not any(
@@ -1355,26 +1496,6 @@ def check_author_label_crosswalk(analysis_dir: Path) -> None:
         raise SystemExit("legacy refusal author label was not normalized into a match")
 
 
-def check_analysis_evaluator_coverage(processed_dir: Path, analysis_dir: Path) -> None:
-    """Require the analysis copy of pseudonymous evaluator-role coverage."""
-    source_path = processed_dir / "rater-role-coverage.csv"
-    analysis_path = analysis_dir / "evaluator-role-coverage.csv"
-    if not analysis_path.exists():
-        raise SystemExit("analysis is missing evaluator-role coverage")
-    with source_path.open(encoding="utf-8", newline="") as handle:
-        source_rows = list(csv.DictReader(handle))
-    with analysis_path.open(encoding="utf-8", newline="") as handle:
-        analysis_rows = list(csv.DictReader(handle))
-    if analysis_rows != source_rows:
-        raise SystemExit("analysis evaluator-role coverage differs from ingestion output")
-    status_counts: dict[str, int] = {}
-    for row in analysis_rows:
-        status = row["coverage_status"]
-        status_counts[status] = status_counts.get(status, 0) + 1
-    if status_counts != {"complete": 4, "partial": 4}:
-        raise SystemExit(f"synthetic evaluator-role coverage changed: {status_counts!r}")
-
-
 def check_analyzer_provenance_guards(private_dir: Path) -> None:
     """Reject a stale coverage sidecar and a merely prefix-shaped fixture map."""
     with tempfile.TemporaryDirectory(prefix="study-a-coverage-guard-") as temp_dir:
@@ -1681,11 +1802,11 @@ def main() -> None:
     check_analysis_pair_outputs(analysis_dir)
     check_analysis_agreement_split_outputs(analysis_dir)
     check_support_pattern_outputs(analysis_dir)
+    check_object_only_analysis_outputs(analysis_dir)
     check_assignment_and_coherence_outputs(
         private_dir, package_ids, analysis_dir=analysis_dir
     )
     check_author_label_crosswalk(analysis_dir)
-    check_analysis_evaluator_coverage(private_dir / "processed", analysis_dir)
     check_analyzer_provenance_guards(private_dir)
     check_panel_class_tie_helper()
     check_zero_rating_criterion(private_dir)

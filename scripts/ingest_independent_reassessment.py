@@ -331,10 +331,6 @@ def main() -> None:
         "rater_id",
         "rater_role_coverage",
         "source_file",
-        "started_at",
-        "completed_at",
-        "elapsed_seconds",
-        "saved_at",
         "row_id",
         "item_id",
         "model",
@@ -416,7 +412,9 @@ def main() -> None:
             errors.append(str(exc))
             continue
         if completed_time < started_time or elapsed_seconds < 0:
-            errors.append(f"{path.name}: missing or invalid block timing fields")
+            errors.append(
+                f"{path.name}: missing or invalid administrative timestamp fields"
+            )
             continue
         role_fields = roles[role]["fields"]
         fields_by_name = {field["name"]: field for field in role_fields}
@@ -470,10 +468,6 @@ def main() -> None:
                 "package_id": package_id,
                 "rater_id": rater_id,
                 "source_file": path.name,
-                "started_at": started_at,
-                "completed_at": completed_at,
-                "elapsed_seconds": elapsed_seconds,
-                "saved_at": saved_at,
                 "row_id": row_id,
                 "item_id": source["item_id"],
                 "model": source["model"],
@@ -569,7 +563,8 @@ def main() -> None:
         "assignment_attestation_verified": assignment_registry is not None,
         **assignment_binding,
         "package_metadata_verified": True,
-        "timing_fields_retained": True,
+        "administrative_timestamp_fields_validated": True,
+        "administrative_timestamp_fields_retained_in_analysis_table": False,
     }
     (out_dir / "ingestion-summary.json").write_text(
         json.dumps(summary, indent=2) + "\n", encoding="utf-8"

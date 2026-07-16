@@ -22,4 +22,4 @@ evidence, and must be provenance-logged here).
 
 | date_first_viewed | observation_source | affected_artifact_or_field | before_sha256 | after_sha256 | rationale | analysis_consequence |
 |-------------------|--------------------|----------------------------|---------------|--------------|-----------|----------------------|
-| _(none yet — no annotated freeze tag has been created)_ | | | | | | |
+| 2026-07-16 | Full re-read of the local expert-evaluator paper; TCPS 2/PRE role cases; Humber scope pages; Brett review | Analysis-plan RQs and evaluator-role guardrails; protocol and launch materials; collection gate v3 | pre-freeze candidate; not applicable | to be recorded in regenerated stamp 2 | Keep the design's substantive evaluator role distinct from Humber's binding institutional-scope decision; remove people-level outcomes and unnecessary transfer/timing evidence | All estimands are object/procedure indexed; evaluator timing, traits, subgroups, confidence calibration, and reasoning styles are barred; written Humber determination required before collection |

@@ -1,22 +1,30 @@
-# Study A Materials: Drafts Only
+# Study A Materials
 
-Every document in this directory is a preparation draft. None represents ethics
-approval, recruitment, a funded study, an institutional affiliation, or a
-result. Do not send an outreach draft or circulate an evaluator form until
-Brett has reviewed the materials, tested the interface, and decided the
-appropriate evaluator-role scope and information/agreement path.
+Operational status is controlled by the stamp-2 manifest and operational
+config, not by historical `-draft` filename suffixes. At the current stage,
+every document in this directory is a preparation draft; none represents ethics
+approval, recruitment, a funded study, or a result. To pass the collection
+gate, the nine designated operational materials
+must be finalized, free of draft or placeholder status language, complete under
+their required sections and local dependency closure, and hash-bound to stamp
+2. Internal planning notes, outreach drafts, and the self-pilot runbook remain
+non-operational. Do not send an outreach draft or circulate an evaluator form
+until Brett has reviewed the materials, tested the interface, obtained a
+written Humber scope determination, and selected the information/agreement path
+that determination permits.
 Even then, distribution is barred until the verified stamp-2 candidate has
 been committed, an explicitly authorized annotated freeze tag points at
 `HEAD`, and the separate collection-ready gate passes.
 
-Current planning posture: Study A is a personal independent project. This is
-not an institutional determination and must be revisited if an institution,
-funder, or host conditions the work.
+Current planning posture: Study A is an unfunded project led by Brett Reynolds,
+a Humber Polytechnic employee. HREB scope and review status remain pending.
+Recruitment and collection are paused pending HREB's written response and
+compliance with any conditions it imposes.
 
 ## Contents
 
-- `study-protocol-draft.md`: protocol suitable for methodological review and,
-  where needed, an institutional scope determination.
+- `study-protocol-draft.md`: protocol suitable for methodological review and
+  the pending institutional scope determination.
 - `private-discovery-corpus-statement-draft.md`: limits on private histories as
   a discovery corpus.
 - `privacy-and-release-boundary-draft.md`: storage and release rules.
@@ -26,8 +34,9 @@ funder, or host conditions the work.
   the generated forms link to a separate optional practice set.
 - `withdrawal-procedure-draft.md` and `withdrawal-log-template.csv`: draft-only
   pre-analysis deletion workflow; any populated log remains local and ignored.
-- `data-return-instructions-draft.md`: dedicated-study-email return procedure;
-  it remains incomplete until Brett creates the address and sets the cutoff.
+- `data-return-instructions-draft.md`: channel-neutral return procedure; it
+  remains incomplete until the written determination/data plan permits a
+  specific access-controlled channel and Brett sets the cutoff.
 - `self-pilot-runbook.md`: local-only six-block usability and burden test; it
   explicitly excludes self-pilot labels from independent Study A analysis.
 
@@ -49,5 +58,7 @@ than deployment-level severity, with policy compliance asked last; see
 The actual blind package, private row map, evaluator responses, and any identity
 mapping remain local and ignored under `private/` or `benchmark/study-a/_runs/`.
 Production distribution artifacts are separate role-isolated ZIPs. A private
-assignment registry binds each globally unique rater ID to one person, role,
-and package ID and attests that the role pools are person-disjoint.
+assignment registry binds internal person and rater keys to one role and
+package ID. Its attestation proves byte integrity and identifier coherence only;
+a separate investigator review of the identity-side roster establishes unique
+eligible real people and person-disjoint role pools.

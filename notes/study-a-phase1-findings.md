@@ -5,13 +5,13 @@
 The current 18-item, 54-output pilot is reproducible from the local ignored
 run bundle. Its public-safe provisional-label snapshot and freeze manifest are
 under `data/provisional/`. The freeze records that these are author-provisional
-labels before independent re-adjudication; it does not promote them to gold.
+labels before external re-adjudication; it does not promote them to gold.
 
 ## Resolved Preparation Gaps
 
 1. The original browser app is deliberately unblinded. It shows expected
    behaviour, model identity, diagnostic metadata, and historical labels, so it
-   cannot be used for independent Study A evaluation. A separate blind package
+   cannot be used for external Study A evaluation. A separate blind package
    now exists.
 2. Historical source labels lived only in the ignored local run bundle. A
    public-safe label-only snapshot now preserves comparison fields without
@@ -33,10 +33,11 @@ labels before independent re-adjudication; it does not promote them to gold.
 - Existing `annotation-protocol.md` and `rater-training.md` describe the
   original author-pilot path. Blind Study A evaluators must use only the new
   role-specific schema and form.
-- The 18-row block size reduces burden, but its actual time has not been timed
-  with a human self-pilot. The generated forms now retain coarse block timing
-  and include optional role-specific practice pages, but do not promise a
-  duration until Brett has completed a self-pilot.
+- A full local self-pilot tested the interface and burden without creating
+  Study A outcomes. The policy/safety blocks had a median of about 28 minutes;
+  linguistic elapsed times were unusable open-tab wall clock. Evaluator-facing
+  materials therefore use a conservative administrative estimate of 30--40
+  minutes per 18-row block and exclude timing from research claims.
 - Practice pages use six separate synthetic examples (three per role), show
   immediate explanations, and are audited to ensure that they do not duplicate
   blind study rows. They are orientation only: no score, gate, or study data.
@@ -47,9 +48,10 @@ labels before independent re-adjudication; it does not promote them to gold.
   risk. This responds to pre-recruitment usability feedback without changing
   the frozen historical pilot.
 - Study A is designed as expert evaluation of outputs, not research about the
-  evaluators. If any institution becomes the project's sponsor, host, or access
-  gatekeeper, obtain a written scope determination rather than assuming either
-  a full REB application or an exemption.
+  evaluators. HREB was asked on 16 July 2026 whether it regards the proposed
+  experts as human research participants. External recruitment, package
+  distribution, and return opening remain closed pending its written response
+  and the collection gate.
 - The synthetic workflow validates data flow, not judge validity, item
   stability, evaluator reliability, or any model result.
 - Real source exports, real evaluator files, and identity mappings have not

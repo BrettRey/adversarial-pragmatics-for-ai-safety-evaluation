@@ -2,14 +2,15 @@
 
 **Do not send before the study materials are ready for external discussion.**
 
-Subject: Short presentation request: independent evaluation of language-mediated agent control
+Subject: Short presentation request: external evaluation of language-mediated agent control
 
 Hello [Name],
 
-I am developing an independent research programme on AI evaluation and
-assurance. The immediate empirical project is a small adversarial-pragmatics
-pilot: it tests whether models and evaluators preserve distinctions among
-instruction, quotation, source authority, scope, reference, and refusal.
+I am a Humber Polytechnic employee developing an unfunded research programme
+on AI evaluation and assurance. The immediate empirical project is a small
+adversarial-pragmatics pilot: it tests whether models and evaluators preserve
+distinctions among instruction, quotation, source authority, scope, reference,
+and refusal.
 
 The next step is deliberately modest: a blind, role-separated re-adjudication
 of 54 existing outputs. I am looking for methodological feedback and, if the

@@ -13,7 +13,6 @@ from typing import Any, Iterable
 
 from study_a_synthetic_fixture import validate_synthetic_fixture
 from validate_study_a_assignments import verify_assignment_attestation
-from validate_study_a_assignments import verify_assignment_attestation
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -24,8 +23,6 @@ ASSIGNMENT_ATTESTATION_NAME = "assignment-attestation.json"
 MIN_PANEL_RATERS = 2
 EXPECTED_SOURCE_ROWS = 54
 COHERENCE_FLAG_FIELD = "cross_field_coherence_flags"
-ASSIGNMENT_REGISTRY_NAME = "assignment-registry.csv"
-ASSIGNMENT_ATTESTATION_NAME = "assignment-attestation.json"
 SUPPORT_PATTERN_STRATA = (
     ("support_2_of_2", "2/2"),
     ("support_2_of_3", "2/3"),
@@ -81,6 +78,8 @@ RETIRED_ANALYSIS_OUTPUTS = frozenset(
         "judge-minority-class-recall.csv",
         "judge-vs-independent-confusion.csv",
         "unstable-or-ambiguous-rows.csv",
+        "evaluator-burden.csv",
+        "evaluator-role-coverage.csv",
     }
 )
 EVALUATOR_COVERAGE_FIELDS = [
@@ -638,10 +637,6 @@ def validate_ratings_input(
         "rater_id",
         "rater_role_coverage",
         "source_file",
-        "started_at",
-        "completed_at",
-        "elapsed_seconds",
-        "saved_at",
         "row_id",
         "item_id",
         "model",
@@ -911,51 +906,14 @@ def main() -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
     remove_retired_analysis_outputs(out_dir)
 
+    # Coverage is private administrative QC. Reconstruct it here only to verify
+    # the ingestion sidecar; do not copy per-evaluator rows into analysis output.
     coverage_rows = derive_evaluator_coverage_rows(ratings, map_rows)
     coverage_path = ratings_path.parent / "rater-role-coverage.csv"
     validate_coverage_sidecar(
         coverage_path,
         load_optional_rows(coverage_path),
         coverage_rows,
-    )
-    write_csv(
-        out_dir / "evaluator-role-coverage.csv",
-        EVALUATOR_COVERAGE_FIELDS,
-        coverage_rows,
-    )
-
-    sessions: dict[tuple[str, str, str, str], list[dict[str, str]]] = defaultdict(list)
-    for row in ratings:
-        sessions[
-            (row["role"], row["rater_id"], row["block_id"], row["source_file"])
-        ].append(row)
-    burden_rows: list[dict[str, Any]] = []
-    for (role, rater_id, block_id, source_file), rows in sorted(sessions.items()):
-        timing = {
-            (row.get("started_at", ""), row.get("completed_at", ""), row.get("elapsed_seconds", ""))
-            for row in rows
-        }
-        if len(timing) != 1:
-            raise SystemExit(f"inconsistent timing metadata within {source_file}")
-        started_at, completed_at, elapsed_seconds = timing.pop()
-        seconds = int(elapsed_seconds)
-        burden_rows.append(
-            {
-                "role": role,
-                "rater_id": rater_id,
-                "block_id": block_id,
-                "source_file": source_file,
-                "started_at": started_at,
-                "completed_at": completed_at,
-                "elapsed_seconds": seconds,
-                "rated_rows": len(rows),
-                "seconds_per_rated_row": f"{seconds / len(rows):.1f}" if rows else "",
-            }
-        )
-    write_csv(
-        out_dir / "evaluator-burden.csv",
-        list(burden_rows[0]) if burden_rows else ["role", "rater_id", "block_id"],
-        burden_rows,
     )
 
     grouped: dict[tuple[str, str, str], list[dict[str, str]]] = defaultdict(list)
@@ -973,8 +931,9 @@ def main() -> None:
         )
         source = map_by_row[row_id]
         # Flag rows where panelists split across two or more substantive labels.
-        # This is a candidate locus of construct, rubric, or rater disagreement;
-        # modal aggregation alone should not hide it.
+        # This is a candidate object--criterion locus of construct, rubric, or
+        # measurement-procedure disagreement; modal aggregation alone should
+        # not hide it or turn it into a claim about evaluator traits.
         distinct = set(values)
         substantive_distinct = sorted(distinct - ESCAPE_VALUES)
         substantive_contested = len(substantive_distinct) >= 2
@@ -999,7 +958,6 @@ def main() -> None:
             "variant": source.get("variant", ""),
             "criterion": criterion,
             "rater_n": len(rows),
-            "rater_ids": ";".join(sorted({row["rater_id"] for row in rows})),
             "label_counts": counts_text(row[criterion] for row in rows),
             "panel_modal_label": label,
             "panel_agreement_status": agreement_status,
@@ -1026,21 +984,45 @@ def main() -> None:
     ]
     write_csv(out_dir / "panel-modal-labels.csv", panel_fields, panel_rows)
 
-    coherence_audit_fields = [
-        "role",
-        "rater_id",
-        "row_id",
-        "item_id",
-        "model",
-        "block_id",
-        "source_file",
-        "visible_boundary_status",
-        "visible_boundary_type",
-        COHERENCE_FLAG_FIELD,
-    ]
-    coherence_audit_rows = [
-        row for row in ratings if split_coherence_flags(row.get(COHERENCE_FLAG_FIELD, ""))
-    ]
+    # The private ratings table retains provenance needed for validation. The
+    # analysis artifact is object-level: identical flagged votes at a cell are
+    # counted without exposing rater, source-file, or block identifiers.
+    coherence_vote_counts = Counter(
+        (
+            row["role"],
+            row["row_id"],
+            row.get("visible_boundary_status", ""),
+            row.get("visible_boundary_type", ""),
+            row.get(COHERENCE_FLAG_FIELD, ""),
+        )
+        for row in ratings
+        if split_coherence_flags(row.get(COHERENCE_FLAG_FIELD, ""))
+    )
+    coherence_audit_rows = []
+    for (role, row_id, status, boundary_type, flags), flagged_vote_n in sorted(
+        coherence_vote_counts.items()
+    ):
+        source = map_by_row[row_id]
+        coherence_audit_rows.append(
+            {
+                "role": role,
+                "row_id": row_id,
+                "item_id": source["item_id"],
+                "model": source["model"],
+                "pair_id": source.get("pair_id", ""),
+                "phenomenon": source.get("phenomenon", ""),
+                "variant": source.get("variant", ""),
+                "visible_boundary_status": status,
+                "visible_boundary_type": boundary_type,
+                COHERENCE_FLAG_FIELD: flags,
+                "flagged_vote_n": flagged_vote_n,
+            }
+        )
+    coherence_audit_fields = (
+        list(coherence_audit_rows[0])
+        if coherence_audit_rows
+        else ["role", "row_id", COHERENCE_FLAG_FIELD, "flagged_vote_n"]
+    )
     write_csv(
         out_dir / "cross-field-coherence-flags.csv",
         coherence_audit_fields,
@@ -1115,7 +1097,8 @@ def main() -> None:
                     **support_pattern_fields,
                     "supported_escape_panel_labels": supported_escape,
                     # Rows where evaluators split across >=2 substantive labels:
-                    # a candidate locus of construct, rubric, or rater disagreement,
+                    # a candidate object--criterion locus of construct, rubric,
+                    # or measurement-procedure disagreement,
                     # reported separately and never hidden by the modal label.
                     "substantive_contested": sum(row["substantive_contested"] for row in rows),
                     "coherence_flagged_panel_rows": sum(
@@ -1301,7 +1284,6 @@ def main() -> None:
             "variant": source.get("variant", ""),
             "criterion": "source_roles_exact_set",
             "rater_n": len(rated_sets),
-            "rater_ids": ";".join(sorted({row["rater_id"] for row, _, _ in rated_sets})),
             "set_counts": source_role_set_counts(signatures),
             "exact_set_panel_modal_label": exact_panel_label,
             "panel_agreement_status": exact_agreement_status,
@@ -1336,9 +1318,6 @@ def main() -> None:
                     "variant": source.get("variant", ""),
                     "source_role": source_role,
                     "rater_n": len(rated_sets),
-                    "rater_ids": ";".join(
-                        sorted({row["rater_id"] for row, _, _ in rated_sets})
-                    ),
                     "selected_n": selected_n,
                     "not_selected_n": len(binary_values) - selected_n,
                     "selection_share": f"{selected_n / len(binary_values):.3f}",
@@ -1360,7 +1339,6 @@ def main() -> None:
         "variant",
         "criterion",
         "rater_n",
-        "rater_ids",
         "set_counts",
         "exact_set_panel_modal_label",
         "panel_agreement_status",
@@ -1423,7 +1401,6 @@ def main() -> None:
         "variant",
         "source_role",
         "rater_n",
-        "rater_ids",
         "selected_n",
         "not_selected_n",
         "selection_share",
@@ -1444,44 +1421,57 @@ def main() -> None:
     for row in source_binary_rows:
         binary_groups[(row["role"], row["source_role"])].append(row)
     for (role, source_role), rows in sorted(binary_groups.items()):
-        selected_ratings = sum(int(row["selected_n"]) for row in rows)
-        total_ratings = sum(int(row["rater_n"]) for row in rows)
+        supported_selected = sum(
+            row["panel_agreement_status"] in {"unanimous", "majority"}
+            and row["binary_panel_modal_label"] == "selected"
+            for row in rows
+        )
+        supported_not_selected = sum(
+            row["panel_agreement_status"] in {"unanimous", "majority"}
+            and row["binary_panel_modal_label"] == "not_selected"
+            for row in rows
+        )
+        unresolved = presented_rows - supported_selected - supported_not_selected
+        if unresolved < 0:
+            raise SystemExit(
+                f"source-role object counts exceed the fixed presented set for "
+                f"{role}/{source_role}"
+            )
         modal_shares = [float(row["modal_share"]) for row in rows]
         source_binary_agreement_rows.append(
             {
                 "role": role,
                 "source_role": source_role,
-                "rows": len(rows),
-                "selected_ratings": selected_ratings,
-                "total_ratings": total_ratings,
-                "selection_prevalence": f"{selected_ratings / total_ratings:.3f}"
-                if total_ratings
-                else "",
-                "unanimous": sum(
+                "presented_objects": presented_rows,
+                "rated_objects": len(rows),
+                "unrated_objects": presented_rows - len(rows),
+                "supported_selected_panel_label_objects": supported_selected,
+                "supported_selected_panel_label_fraction": (
+                    f"{supported_selected / presented_rows:.3f}"
+                    if presented_rows
+                    else ""
+                ),
+                "supported_not_selected_panel_label_objects": supported_not_selected,
+                "supported_not_selected_panel_label_fraction": (
+                    f"{supported_not_selected / presented_rows:.3f}"
+                    if presented_rows
+                    else ""
+                ),
+                "unresolved_objects": unresolved,
+                "unresolved_fraction": (
+                    f"{unresolved / presented_rows:.3f}" if presented_rows else ""
+                ),
+                "unanimous_objects": sum(
                     row["panel_agreement_status"] == "unanimous" for row in rows
                 ),
-                "majority": sum(
+                "majority_objects": sum(
                     row["panel_agreement_status"] == "majority" for row in rows
                 ),
-                "insufficient_raters": sum(
+                "insufficient_rater_objects": sum(
                     row["panel_agreement_status"] == "insufficient_raters" for row in rows
                 ),
-                "ties_or_no_majority": sum(
+                "tie_or_no_majority_objects": sum(
                     row["panel_agreement_status"] in {"tie", "no_majority"}
-                    for row in rows
-                ),
-                "supported_selected_panel_label_rows": sum(
-                    row["panel_agreement_status"] in {"unanimous", "majority"}
-                    and row["binary_panel_modal_label"] == "selected"
-                    for row in rows
-                ),
-                "supported_not_selected_panel_label_rows": sum(
-                    row["panel_agreement_status"] in {"unanimous", "majority"}
-                    and row["binary_panel_modal_label"] == "not_selected"
-                    for row in rows
-                ),
-                "supported_panel_label_rows": sum(
-                    row["panel_agreement_status"] in {"unanimous", "majority"}
                     for row in rows
                 ),
                 "mean_modal_share": f"{sum(modal_shares) / len(modal_shares):.3f}",
@@ -1491,7 +1481,7 @@ def main() -> None:
         out_dir / "source-roles-per-label-agreement.csv",
         list(source_binary_agreement_rows[0])
         if source_binary_agreement_rows
-        else ["role", "source_role", "rows"],
+        else ["role", "source_role", "presented_objects", "unresolved_objects"],
         source_binary_agreement_rows,
     )
 
@@ -2155,21 +2145,21 @@ def main() -> None:
         row["panel_agreement_status"] in {"unanimous", "majority"}
         for row in source_exact_rows
     )
-    coverage_counts = Counter(row["coverage_status"] for row in coverage_rows)
     coherence_counts = Counter(
-        flag
-        for row in coherence_audit_rows
-        for flag in split_coherence_flags(row.get(COHERENCE_FLAG_FIELD, ""))
+        {
+            flag: sum(
+                int(row["flagged_vote_n"])
+                for row in coherence_audit_rows
+                if flag in split_coherence_flags(row.get(COHERENCE_FLAG_FIELD, ""))
+            )
+            for flag in {
+                flag
+                for row in coherence_audit_rows
+                for flag in split_coherence_flags(row.get(COHERENCE_FLAG_FIELD, ""))
+            }
+        }
     )
-    coverage_line = (
-        "- Evaluator-role coverage: "
-        + "; ".join(
-            f"{status}={coverage_counts[status]}" for status in sorted(coverage_counts)
-        )
-        + "; see `evaluator-role-coverage.csv`."
-        if coverage_rows
-        else "- Evaluator-role coverage was unavailable beside the ratings input."
-    )
+    flagged_vote_total = sum(int(row["flagged_vote_n"]) for row in coherence_audit_rows)
     source_role_lines = (
         [
             "- Source-role exact-set panel-label rows: "
@@ -2195,7 +2185,6 @@ def main() -> None:
             f"- Ratings ingested: {len(ratings)}.",
             f"- Criterion-level panel-label rows: {len(panel_rows)}; unanimous- or "
             f"majority-supported: {supported_panel_labels}.",
-            coverage_line,
             *source_role_lines,
             "- Minimum panel ratings required for a unanimous- or "
             f"majority-supported panel label: {MIN_PANEL_RATERS}.",
@@ -2203,8 +2192,8 @@ def main() -> None:
             "compared to the revised visible-boundary fields.",
             f"- Author–panel mismatches: {author_panel_mismatches}.",
             f"- Rows requiring panel-disagreement or ambiguity review: {len(panel_review_rows)}.",
-            "- Raw ratings carrying boundary status/type coherence flags: "
-            f"{len(coherence_audit_rows)}"
+            "- Object-linked rating votes carrying boundary status/type coherence "
+            f"flags: {flagged_vote_total}"
             + (
                 " (" + "; ".join(
                     f"{flag}={coherence_counts[flag]}" for flag in sorted(coherence_counts)
@@ -2212,13 +2201,12 @@ def main() -> None:
                 if coherence_counts
                 else "."
             ),
-            f"- Completed rating blocks with retained burden timing: {len(burden_rows)}.",
             "",
-            "Author–panel mismatch identifies a candidate locus of construct, "
-            "rubric, or rater disagreement; it does not make the panel label "
-            "ground truth or overwrite the frozen author snapshot. Failure "
-            "attribution remains out of first-pass analysis. Timing estimates "
-            "describe form burden, not evaluator performance or representativeness.",
+            "Author–panel mismatch identifies a candidate object–criterion locus "
+            "of construct, rubric, or measurement-procedure disagreement; it does "
+            "not make the panel label ground truth or overwrite the frozen author "
+            "snapshot. Failure "
+            "attribution remains out of first-pass analysis.",
         ],
     )
     print(f"Wrote Study A analysis to {out_dir}")

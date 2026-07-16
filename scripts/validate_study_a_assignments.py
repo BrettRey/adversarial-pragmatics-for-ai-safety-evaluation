@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
-"""Validate Study A's private person-disjoint assignment registry.
+"""Validate Study A's private assignment registry at the identifier level.
 
 The registry is deliberately private and contains only investigator-assigned
 keys.  Real names and contact details belong in a separate identity-side file.
 Independent-response ingestion imports the validation functions below and
-requires an attestation whose digest matches the exact registry bytes.
+requires an attestation whose digest matches the exact registry bytes. Registry
+validation cannot establish that keys denote unique real people, that people
+are role-eligible, or that the role pools are disjoint; those claims require a
+separate investigator review of the identity-side roster.
 """
 
 from __future__ import annotations
@@ -20,7 +23,7 @@ from pathlib import Path
 
 
 STUDY_ID = "AP-STUDY-A-INDEPENDENT-READJUDICATION"
-ATTESTATION_SCHEMA_VERSION = 1
+ATTESTATION_SCHEMA_VERSION = 2
 DEFAULT_ROLES = frozenset({"linguistic_task", "policy_safety"})
 REGISTRY_FIELDS = ("person_key", "rater_id", "role", "package_id")
 SAFE_LOCAL_ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$")
@@ -97,7 +100,7 @@ def load_assignment_registry(
         raise ValueError("assignment registry has no assignments")
 
     assignments: list[Assignment] = []
-    seen_people: set[str] = set()
+    seen_person_keys: set[str] = set()
     seen_raters: set[str] = set()
     package_role: dict[str, str] = {}
     for row_number, row in enumerate(source_rows, start=2):
@@ -118,9 +121,10 @@ def load_assignment_registry(
             raise ValueError(f"row {row_number}: unknown role {role!r}")
         if not OPAQUE_PACKAGE_ID.fullmatch(package_id):
             raise ValueError(f"row {row_number}: invalid opaque package_id")
-        if person_key in seen_people:
+        if person_key in seen_person_keys:
             raise ValueError(
-                f"row {row_number}: person_key {person_key!r} has more than one assignment"
+                f"row {row_number}: person_key {person_key!r} has more than one "
+                "identifier-level assignment"
             )
         if rater_id in seen_raters:
             raise ValueError(
@@ -131,7 +135,7 @@ def load_assignment_registry(
             raise ValueError(
                 f"row {row_number}: package_id {package_id!r} is assigned across roles"
             )
-        seen_people.add(person_key)
+        seen_person_keys.add(person_key)
         seen_raters.add(rater_id)
         assignments.append(Assignment(person_key, rater_id, role, package_id))
 
@@ -167,9 +171,9 @@ def assignment_attestation(
         "counts_by_role": registry.counts_by_role,
         "package_ids_by_role": registry.package_ids_by_role,
         "invariants": {
-            "one_assignment_per_person_key": True,
+            "one_assignment_per_person_key_identifier": True,
             "globally_unique_rater_ids": True,
-            "person_disjoint_role_pools": True,
+            "person_keys_unique_across_roles": True,
             "one_package_id_per_role": True,
             "package_ids_not_shared_across_roles": True,
         },
@@ -257,7 +261,7 @@ def main() -> None:
     except ValueError as exc:
         raise SystemExit(f"assignment validation failed: {exc}") from exc
     print(
-        f"{action} person-disjoint assignment attestation for "
+        f"{action} identifier-level assignment attestation for "
         f"{len(registry.assignments)} assignment(s): {args.attestation}"
     )
 

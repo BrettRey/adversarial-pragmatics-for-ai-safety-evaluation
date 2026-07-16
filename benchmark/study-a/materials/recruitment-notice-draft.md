@@ -1,14 +1,16 @@
 # Draft Recruitment Notice: Independent Evaluators for AI Evaluation Study
 
-**Draft only. Do not circulate until the study protocol, evaluator-role scope,
-timing, and data-handling arrangements are finalized.**
+**Draft only. Do not circulate until Humber has supplied a written scope
+determination, any required review is complete, and the protocol, workload,
+and data-handling arrangements are finalized.**
 
-I am preparing a small independent study of how evaluators assess AI outputs
+I am preparing a small, unfunded study of how evaluators assess AI outputs
 where task interpretation, stated policy, refusal, and action scope must be
 kept separate. The study is not a general survey or model ranking exercise. It
 uses a blind, role-specific re-adjudication of an existing 54-output pilot.
-It is currently a personal independent project, not an institutionally
-sponsored or affiliated study.
+The project is led by Brett Reynolds, a Humber Polytechnic employee. The final
+notice will describe HREB's written response and any applicable conditions;
+this draft claims neither HREB approval nor exemption.
 
 I am seeking two kinds of evaluator:
 
@@ -28,7 +30,8 @@ item-problem judgments rather than forcing a single answer.
 This is a bounded methodological study, not a request for long-term volunteer
 lab work. It is an unpaid volunteer contribution; no honorarium, employment
 benefit, authorship, or other material consideration is offered or implied. The
-final notice will state the tested time per block, the total expected workload,
+final notice will state the conservative 30--40 minute estimate per block
+(90--120 minutes total),
 privacy and retention terms, and contact details. People who help write or
 revise the evaluated items will not serve as independent first-pass evaluators
 for those items.

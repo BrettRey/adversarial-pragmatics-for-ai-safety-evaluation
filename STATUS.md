@@ -76,21 +76,51 @@ submission/arxiv/adversarial-pragmatics-arxiv-source.tar.gz
   stands in for linguistic block 01 (Brett's call, 2026-07-15), so the v6
   timing report stays at 5/6 by design. Returns under
   `private/study-a/self-pilot/responses/` (v5 in `schema-v5-preserved/`),
-  timing readout in `private/study-a/self-pilot/report/`. Realistic burden
-  signal: policy/safety median ~28 min per 18-row block, single sittings;
-  linguistic elapsed times are open-tab wall-clock and unusable as effort time.
-  Any volunteer-workload statement should extrapolate from the policy blocks
-  and say so. Next: settle data-transfer details, then decide whether to
-  approach external evaluators.
+  timing readout in `private/study-a/self-pilot/report/`. These are historical
+  usability records, not Study A outcomes: policy/safety median was ~28 min per
+  18-row block, while linguistic elapsed times are unusable open-tab wall
+  clock. Evaluator-facing materials now use a conservative administrative
+  estimate of 30--40 minutes per block and exclude timing from research claims.
 - Exploratory self-pilot label diagnostics exist under
   `private/study-a/self-pilot/label-diagnostics/`
   (`scripts/analyze_self_pilot_labels.py`; DECISIONS 2026-07-15 narrowed the
   exclusion to no-ingestion/exploratory-only). Findings stay private; any
   design change they motivate goes through DECISIONS with provenance noted.
-- Gate before distributing a package or opening any external Study A return:
-  semantically verify stamp 2, commit it, create an annotated tag only with
-  Brett's explicit authorization, then pass the separate collection-ready
-  gate. Verification or a commit without that tag does not authorize collection.
+- Project policy bars evaluator invitations until a written Humber scope
+  determination permits them. The executable gate cannot detect prior contact
+  or distribution; before distributing a package or opening any external Study
+  A return, retain separate hash-bound copies of the sent request and response,
+  bind the current plan and protocol as the scope basis, complete the
+  identity-side roster review, implement any required review or agreement path,
+  finalize operational config v3, semantically verify stamp 2, commit it,
+  create an annotated tag after response receipt only with Brett's explicit
+  authorization, and pass the collection-ready gate. Verification or a commit
+  without the written determination and tag does not authorize collection. The
+  sanitized inquiry record is
+  `notes/study-a-hreb-inquiry-record-2026-07-16.md`; the design rationale is
+  `notes/study-a-evaluator-role-justification-2026-07-16.md`.
+- Brett sent the shortened inquiry to HREB from his Humber account on
+  2026-07-16 at 19:10:41 UTC. The byte-exact `.eml` is preserved, mode 0600 and
+  Git-ignored, at
+  `private/study-a/production/evidence/hreb-scope-inquiry-sent-2026-07-16.eml`
+  (SHA-256 `b61f8f59c237b1cc3bac3a83fb8ee853fe69f93d1bfd5b99c21554ae7b767589`).
+  The message describes the unfunded fixed-object study and asks whether HREB
+  regards the experts as human research participants. It does not describe the
+  project as independent and does not separately ask a jurisdiction/auspices
+  question. Any HREB reply must either settle that second issue as inapplicable
+  or prompt a follow-up before the current collection gate can pass. Proposed
+  paper-affiliation wording remains a later manuscript decision. Humber's
+  published calendar delays formal applications until HREB activity resumes in
+  September; it does not say whether a narrow scope inquiry will be answered
+  during the closure. External collection remains paused, but non-collection
+  development can continue.
+- A fresh local stamp-2 production candidate was rebuilt and semantically
+  verified on 2026-07-16 after the object-only and gate-v3 repairs. Freeze
+  readiness passes. Collection readiness fails closed as intended because the
+  corrected files are not committed/tagged and no operational config, Humber
+  evidence, real assignment registry/attestation, or identity-side roster
+  review exists. Rebuild and re-stamp after implementing any Humber conditions;
+  no tag or external opening has been authorized.
 - Use the fixture-only repair miner privately after that decision; do not import
   real histories or derive naturalistic items until Study A has informed the
   rubric and analysis path.
@@ -178,9 +208,10 @@ submission/arxiv/adversarial-pragmatics-arxiv-source.tar.gz
 - Added draft-only evaluator-scope, recruitment, outreach, and policy-translation
   materials. No evaluator or organization has been contacted and no institutional
   determination is claimed.
-- Selected the independent personal-project posture for Study A. Draft materials
-  now state that the work is not institutionally sponsored, hosted, funded, or
-  affiliated while that remains true; outreach and recruitment remain unlaunched.
+- **Superseded 2026-07-16:** selected the independent personal-project posture
+  for Study A. The current description is an unfunded project led by a Humber
+  Polytechnic employee; HREB has been asked for a written participant-status
+  determination, and external recruitment remains closed.
 - Selected full 54-row coverage per evaluator, split across three 18-row
   sittings. The workflow retains completed partial returns with an explicit
   coverage flag, but requires at least two ratings and a unique strict majority
@@ -200,6 +231,9 @@ submission/arxiv/adversarial-pragmatics-arxiv-source.tar.gz
 - Selected a dedicated Study A email address as the proportionate return channel.
   Draft instructions require MFA, pseudonymous JSON-only attachments, separate
   identity/contact records, and prompt transfer into the local private store.
+  **Superseded 2026-07-16:** neither a dedicated address nor MFA is a hard
+  requirement. Operational config v3 accepts any investigator-only, non-public,
+  access-controlled transfer channel that is not used as long-term storage.
 - Revised the unlaunched policy/safety form after pre-recruitment usability
   feedback: schema version 3 replaces deployment-severity `safety_risk` and
   `risk_type` judgments with visible security-boundary status and type. The

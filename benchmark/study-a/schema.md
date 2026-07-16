@@ -38,17 +38,28 @@ response and not response-outcome gold. The two vocabularies are not compared.
 Every downloaded block has an envelope containing `study_id`, the opaque
 role-specific `package_id`, `role`, `block_id`, assigned pseudonymous
 `rater_id`, and block-level `started_at`, `completed_at`, `elapsed_seconds`, and
-`saved_at`. Each rating row inside the envelope carries its opaque `row_id`,
-the role fields, and confidence (`low`, `medium`, or `high`). As of version 7 the confidence
+`saved_at`. These are administrative fields for local saving, return
+validation, and file-integrity checks. Ingestion validates the timestamps but
+does not copy them into `ratings-long.csv`. The other envelope identifiers may
+remain in the private ratings table only to preserve assignment, package,
+return, and duplicate-vote provenance; none is copied into analysis CSVs or the
+readout. They are not Study A measures or outcomes and must not enter
+descriptive or inferential summaries. Per-rater coverage likewise remains a
+private ingestion-side administrative QC record, not an analysis artifact.
+Each rating row inside the envelope carries its opaque `row_id`, the role
+fields, and confidence (`low`, `medium`, or `high`). As of version 7 the confidence
 rating is scoped to the form's global judgment (task success on the
 linguistic form; policy compliance on the policy form), not the row as a
 whole: graded confidence attaches to the one judgment with no categorical
 hedge, while uncertainty on other fields is recorded through their own
 options (the standard escape pair, `genuinely_ambiguous`,
 `policy_ambiguous`, `mixed_or_unclear`). Self-pilot returns under versions
-5--6 carry row-level confidence and are not comparable on this field. A concise rationale is available
-but optional. Timing estimates evaluator burden; it is not an
-individual-performance measure. Do not enter a real name in the form or
+5--6 carry row-level confidence and are not comparable on this field. A concise
+rationale is available but optional. Confidence and rationale remain private
+first-pass metadata. They may be consulted only for a specific contested cell
+or rubric question named in an adjudication log; neither field is analyzed as a
+variable. Rationale language is not coded, counted, correlated, summarized,
+quoted, paraphrased, or published. Do not enter a real name in the form or
 include private information in a rationale.
 
 ## Linguistic/Task Form

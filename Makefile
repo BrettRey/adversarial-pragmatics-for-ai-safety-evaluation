@@ -36,7 +36,7 @@ RESPONSES_ARG = $(if $(RESPONSES),--responses $(RESPONSES),)
 SUMMARY_DIR_ARG = $(if $(SUMMARY_DIR),--summary-dir $(SUMMARY_DIR),)
 
 # Targets
-.PHONY: all all-papers clean distclean view view-supplement view-delegation view-evidentiary delegation evidentiary help test validate-items privacy-check phase1-check pilot-local pilot-smoke pilot-diagnose pilot-review-app pilot-ingest-adjudication pilot-adjudication-report pilot-figures pilot-judge-validation fake-dev-calibration study-a-synthetic study-a-self-pilot study-a-self-pilot-report study-a-judge-audit study-a-production-build study-a-manifest-stamp1 study-a-manifest-stamp2 study-a-manifest-verify study-a-freeze-ready study-a-collection-ready discovery-synthetic
+.PHONY: all all-papers clean distclean view view-supplement view-delegation view-evidentiary delegation evidentiary help test validate-items privacy-check public-check phase1-check pilot-local pilot-smoke pilot-diagnose pilot-review-app pilot-ingest-adjudication pilot-adjudication-report pilot-figures pilot-judge-validation fake-dev-calibration study-a-synthetic study-a-self-pilot study-a-self-pilot-report study-a-judge-audit study-a-production-build study-a-manifest-stamp1 study-a-manifest-stamp2 study-a-manifest-verify study-a-freeze-ready study-a-collection-ready discovery-synthetic
 
 # Default target: build the paper and supplement PDFs
 all: $(MAIN).pdf $(SUPPLEMENT).pdf
@@ -153,6 +153,11 @@ privacy-check:
 	@echo "==> Checking private-data boundaries..."
 	python3 scripts/check_private_boundaries.py
 
+# Verify only tracked artifacts so this target works from a fresh clone.
+public-check: test privacy-check
+	@echo "==> Verifying tracked pilot artifact integrity..."
+	python3 scripts/check_pilot_integrity.py --public-only
+
 phase1-check: test privacy-check
 	@echo "==> Verifying frozen local pilot..."
 	python3 scripts/check_pilot_integrity.py
@@ -252,7 +257,7 @@ study-a-freeze-ready: study-a-judge-audit
 	python3 scripts/check_study_a_freeze_ready.py --manifest $(STUDY_A_MANIFEST) --production-root $(STUDY_A_PRODUCTION_ROOT)
 
 study-a-collection-ready: study-a-judge-audit
-	@echo "==> Checking annotated tag, assignments, evidence, and finalized operations..."
+	@echo "==> Checking tag-after-scope, stamp-2 bytes, assignments, identity-side roster review, finalized materials, and operational config v3..."
 	python3 scripts/check_study_a_collection_ready.py --manifest $(STUDY_A_MANIFEST) --production-root $(STUDY_A_PRODUCTION_ROOT) --config $(STUDY_A_OPERATIONAL_CONFIG)
 
 # Mine only the tracked synthetic conversation fixture and build an offline
@@ -282,6 +287,7 @@ help:
 	@echo "  make all-papers - Build all three paper PDFs"
 	@echo "  make test     - Validate benchmark seed items"
 	@echo "  make privacy-check - Verify local-only research paths are Git-protected"
+	@echo "  make public-check - Verify tracked benchmark and pilot artifacts from a fresh clone"
 	@echo "  make phase1-check - Verify the frozen historical 54-row pilot"
 	@echo "  make pilot-local - Run seed items on local Ollama models"
 	@echo "  make pilot-smoke - Run two-item local Ollama smoke test"
@@ -301,6 +307,6 @@ help:
 	@echo "  make study-a-manifest-stamp2 - Record an existing production build as stamp 2"
 	@echo "  make study-a-manifest-verify - Semantically verify the active manifest"
 	@echo "  make study-a-freeze-ready - Check stamp 2 before an explicit commit/tag decision"
-	@echo "  make study-a-collection-ready - Require tag, assignments, evidence, and finalized operations"
+	@echo "  make study-a-collection-ready - Require tag-after-scope, stamp-2 bytes, assignments/roster review, finalized materials, and config v3"
 	@echo "  make discovery-synthetic - Build the synthetic local repair-discovery workflow"
 	@echo "  make help     - Show this help message"

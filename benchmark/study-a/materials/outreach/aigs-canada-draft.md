@@ -6,7 +6,7 @@ Subject: Possible circulation of a bounded independent-evaluator opportunity
 
 Hello [Name],
 
-I am preparing a small independent study of how evaluators assess AI outputs
+I am preparing a small, unfunded study of how evaluators assess AI outputs
 where task interpretation, stated policy, refusal, and action scope must be
 kept separate. The study is not a general survey or model-ranking exercise. It
 uses a blind, role-specific re-adjudication of an existing 54-output pilot.

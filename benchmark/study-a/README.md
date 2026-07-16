@@ -21,14 +21,18 @@ into every first-pass rating.
 
 Each evaluator's intended assignment is full coverage of the 54 rows in their
 one role, divided into three 18-row blocks. The workflow retains any completed
-partial blocks and marks the rater-role coverage as partial. A modal panel label
+partial blocks and marks assignment coverage only in private administrative
+QC. A modal panel label
 requires at least two ratings and a unique strict majority; with exactly two
 ratings, unanimity is required. Realized support is reported as `2/2`, `2/3`,
 `3/3`, or `other`, retaining valid late returns above three. Real assignments
 use person-disjoint role pools: one person may not
-serve in both roles. A private assignment registry binds one globally unique
-rater ID to one role and one package; ingestion rejects unregistered,
-role-mismatched, duplicate-person, or stale-package submissions.
+serve in both roles. A private assignment registry binds internal person and
+rater keys to one role and one package. Its byte attestation checks only those
+identifiers; a separate hash-bound investigator review of the identity-side
+roster confirms unique eligible real people and cross-role disjointness.
+Ingestion rejects unregistered, role-mismatched, duplicate-identifier, or
+stale-package submissions.
 
 ## Evaluator Orientation
 
@@ -36,8 +40,11 @@ Generated packages include an optional practice page for each role. Each page
 uses three separate synthetic examples, gives immediate explanations, records
 no study data, and has no pass threshold. The actual forms use plain-language
 option labels and short field help, while retaining the corresponding
-machine-readable values in downloaded JSON. They also retain coarse
-block-level timing solely to estimate evaluator burden.
+machine-readable values in downloaded JSON. They also retain coarse block-level
+timestamps for saving and administration. Those timestamps are not Study A
+outcomes and will not be used to characterize evaluators. Evaluator-facing
+materials instead disclose a conservative 30--40 minute workload estimate per
+18-row block.
 
 The source-role question is multi-select and applies to the prompt as a whole.
 Several clear roles may be selected without marking the prompt ambiguous;
@@ -100,9 +107,12 @@ tables. It does not constitute an empirical study result.
 
 The 54-row local-pilot source and response-level author snapshot also exist
 locally. They may be used to build a private stamp-2 candidate, but that
-candidate is not collection-ready until semantic verification passes, the
-operational fields are finalized, an annotated freeze tag is explicitly
-authorized and created at `HEAD`, and the post-tag collection gate passes.
+candidate is not collection-ready until semantic verification passes, a written
+Humber scope determination is recorded and followed, its sent request and
+response are hash-bound to the current analysis plan and protocol, the
+operational fields and identity-side roster review are finalized, an annotated
+freeze tag is explicitly authorized and created at `HEAD` after the response is
+received, and the post-tag collection gate passes.
 No role package may be distributed and no external return may be opened before
 that gate.
 
@@ -115,7 +125,8 @@ make study-a-self-pilot
 
 This writes a local-only package under `private/study-a/self-pilot/` with a
 distinct study ID that the independent-rating ingestion script rejects. It is
-for usability and burden testing only, not author re-adjudication or evidence.
+for usability testing and administrative workload planning only, not author
+re-adjudication or Study A evidence.
 
 After the six local blocks are complete, place the downloaded self-pilot JSON
 files under `private/study-a/self-pilot/responses/` and run:
@@ -124,8 +135,9 @@ files under `private/study-a/self-pilot/responses/` and run:
 make study-a-self-pilot-report
 ```
 
-This report reads only timing and completion metadata; self-pilot labels remain
-local and excluded from independent Study A analysis.
+This report reads only timing and completion metadata from the earlier
+usability exercise; neither timing nor self-pilot labels enter independent Study
+A analysis.
 
 The private discovery fixture workflow can be tested separately with:
 
@@ -137,5 +149,5 @@ It mines synthetic repair turns, builds the offline review page, simulates
 private decisions, and exercises the retained-candidate queue. It does not
 import any real interaction history.
 
-See `schema.md` for the study criteria and `materials/` for draft-only scope,
-recruitment, and policy-translation documents.
+See `schema.md` for the study criteria and `materials/` for the current
+preparation status of scope, recruitment, and policy-translation documents.

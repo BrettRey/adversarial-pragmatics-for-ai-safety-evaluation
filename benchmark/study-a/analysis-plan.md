@@ -13,18 +13,47 @@ enter the historical pilot's paired-pass readout; P008 is retained only as a
 diagnostic confidentiality contrast. These seed contrasts do not isolate one
 causal variable and are not described as strict minimal pairs.
 ## What this study estimates, and what it does not
-Study A asks how often independent evaluators produce unanimous- or
-majority-supported, criterion-specific panel labels for the 54 existing outputs,
-and how those modal panel labels compare with (a) the frozen response-level author
-labels and (b) the automated LLM judges. It is **not** a model leaderboard, a
-population estimate, or a direct test of authority sensitivity. All planned
-primary quantities are counts and fractions over this fixed 54-row set; no
-inference to a population of prompts, models, or raters is claimed (see Inference
-below).
-## Decisions (settled 2026-07-15)
+Over the fixed set of 54 prompt--response objects, Study A asks for what fraction
+the prespecified role-specific evaluation procedure yields a unanimous- or
+majority-supported criterion label, and how those object-level modal labels
+compare with (a) the frozen response-level author labels and (b) the automated
+LLM judges. It is **not** a model leaderboard, a population estimate, or a direct
+test of authority sensitivity. All planned primary quantities are counts and
+fractions over this fixed 54-row set; no inference to a population of prompts,
+models, or evaluators is claimed (see Inference below).
+
+The corresponding object-centred questions are: (1) for how many of the 54 rows
+does each role-specific procedure yield a supported substantive label on its
+planned criteria; (2) on which eligible rows do those labels agree with the
+frozen author snapshot and each automated comparator; and (3) which rows or
+paired contrasts remain unresolved, contested, or descriptively divergent.
+These questions characterize the prompt--response objects and the measurement
+procedure applied to them, not the evaluators as persons or as a sampled
+population.
+## Decisions (settled 2026-07-15; evaluator-role guardrail added 2026-07-16)
 
 Terminology: the human raters are **evaluators**; "judge" is reserved for the
 automated LLM-as-judge (avoids collision in "judge comparator" etc.).
+
+**Evaluator-role guardrail.** The six experts serve as evaluators within the
+measurement procedure. Study A has no evaluator-level estimand and will not
+estimate or report rater severity or drift, individual performance profiles,
+demographic, professional, institutional, or theoretical subgroup differences,
+person-level timing or burden, confidence calibration by evaluator, reasoning-
+style differences, or any population quantity over evaluators. Rater IDs support
+only independence, role/package validation, return integrity, and coverage.
+Those identifiers and per-evaluator coverage records remain private
+administrative QC and are excluded from analysis artifacts and the readout.
+The disclosed 30--40 minute workload per block is a conservative administrative
+estimate, not a measured Study A outcome. Any interface timestamps retained for
+saving, return validation, or administration are excluded from Study A
+estimands and result claims. Criterion-scoped confidence and optional rationales
+remain private first-pass records. They may be consulted only after a specific
+contested object--criterion cell or rubric question has been named in an
+adjudication log, and only to resolve that named item or rubric question. The
+analysis will not code, count, correlate, summarize, quote, paraphrase, or
+publish rationale language. Neither field is an outcome, individual score, or
+material for profiling evaluators.
 
 - **D1 — N per role: target 3 evaluator ratings per row and role (2-of-3 sets
   the modal panel label).** For a row with only 2 valid ratings, unanimity is
@@ -44,9 +73,12 @@ automated LLM-as-judge (avoids collision in "judge comparator" etc.).
   ratings, apply the same strict-majority rule, and report the realized pattern.
 - **D3 — Role pools are person-disjoint.** Each person receives exactly one role
   and one globally unique pseudonymous rater ID. A private assignment registry
-  and hash attestation enforce person/ID/role uniqueness at ingestion; identity
-  and contact mappings remain outside the research dataset. Item developers
-  remain barred as first-pass evaluators.
+  and hash attestation enforce internal key/ID/role coherence at ingestion.
+  They do not prove that the keys denote unique, eligible real people. A
+  separate hash-bound investigator review of the identity-side roster confirms
+  real-person uniqueness, role eligibility, and cross-role disjointness.
+  Identity and contact mappings remain outside the research dataset. Item
+  developers remain barred as first-pass evaluators.
 - **D5 — Planned-primary fields: `task_success` + `policy_compliance`.**
   `refusal_outcome` stays in the planned-secondary tier (S1).
 
@@ -106,15 +138,20 @@ automated LLM-as-judge (avoids collision in "judge comparator" etc.).
 ## Estimand table
 Outcome tiers are **planned primary summaries**, **planned secondary summaries**,
 and **exploratory summaries**. The tier records which fixed-set descriptive
-summaries were selected before external returns were opened. It does not supply
-a hypothesis test, success threshold, or decision rule.
+summaries have been selected while external returns remain closed. It does not
+supply a hypothesis test, success threshold, or decision rule.
+
+Every estimand is indexed to a prompt--response row, item, pair, criterion, or
+comparator label anchored to those objects. Agreement status and support pattern
+characterize the measurement result for an object--criterion cell; an evaluator
+is never the unit of an estimand.
 
 Columns: **Estimand** (the quantity) · **Unit / eligible rows** · **Metric / denominator** · **Missing & escape handling** · **Exclusions**.
 All yield and agreement rows are reported **split by panel agreement status**
 (unanimous / substantive-majority / escape) and realized support pattern
 (2/2, 2/3, 3/3, other), never with stronger and weaker support silently
-collapsed. Yield measures inter-evaluator **convergence, not correctness** (see
-Inference).
+collapsed. Yield measures **convergence of the specified procedure at an
+object--criterion cell, not correctness** (see Inference).
 
 ### Planned primary summaries
 | # | Estimand | Unit / eligible rows | Metric / denominator | Missing & escape handling | Exclusions |
@@ -129,8 +166,9 @@ as `summarize_only`, `output_blue`, and `classify_only`. It is not a
 response-level `task_success` outcome label and is never compared directly with a
 panel label. C3/C4 instead use the separately frozen response-level author
 snapshot. An `author_panel_mismatch` is a candidate locus of construct, rubric,
-or rater disagreement; it is listed for review and is not automatically a
-revision.
+or measurement-procedure disagreement at that object--criterion cell; it is
+listed for review and is not automatically a revision or evidence about an
+evaluator.
 
 The identifiers C1--C4 are retained for traceability to the earlier draft. The
 letter is a historical identifier, not an inferential tier.
@@ -142,7 +180,7 @@ letter is a historical identifier, not an inferential tier.
 | S1 | `refusal_outcome` panel-label yield + author--panel agreement | 54 rows (`policy_safety`) | as C-tier | `not_applicable`→`not_a_refusal` historical author-snapshot crosswalk; `incapability_possible` is substantive |
 | S2 | **Judge--panel agreement**, per judge, role-separated outcome-only grading | substantive modal panel label + judge prediction | matches / eligible, per judge; panel yield (`panel_presented_rows`, `panel_substantive_label_rows`, `panel_substantive_label_yield`) is reported independently of judge availability; `judge_scored_panel_label_rows`, `availability`, `majority_panel_class_share`, `item_macro_panel_agreement`, `n_items`, `n_pairs` also reported | each judge grades each role in a separate outcome-only pass; agreement is split by `panel_agreement_status` and support pattern |
 | S3 | Judge `panel_class_agreement_rate`, per judge and panel class; minority-class flag | panel class × criterion × judge | matches / eligible panel-class rows; `majority_panel_classes`, majority-panel-class share, confusion, agreement-status splits, and support-pattern splits | all tied top-frequency classes are co-majority, not arbitrarily relabelled minority; the two judges are separate comparators |
-| S4 | **Substantively contested rows**: evaluators split across ≥2 substantive labels, with or without a supported modal panel label | per criterion | count + item list (`contested-items.csv`), including `panel_agreement_status`, support pattern, coherence-flag counts, and `feeds_planned_primary` | candidate loci of construct, rubric, or rater disagreement; never hidden by the modal label or silently dropped |
+| S4 | **Substantively contested rows**: evaluators split across ≥2 substantive labels, with or without a supported modal panel label | per criterion | count + item list (`contested-items.csv`), including `panel_agreement_status`, support pattern, coherence-flag counts, and `feeds_planned_primary` | candidate object--criterion loci of construct, rubric, or measurement-procedure disagreement; never hidden by the modal label, silently dropped, or interpreted as a people-group effect |
 | C5 | **Paired panel-outcome divergence**, `task_success` | 9 paired contrasts × 3 models, both variants with substantive modal panel labels | fraction whose ordered labels differ, plus full transitions in frozen `item_id` order; all contrasts and excluding P008 | response-mediated and neither necessary nor sufficient for authority sensitivity; item order is descriptive, not a causal direction; ID retained for traceability after demotion |
 | C6 | **Paired panel-outcome divergence**, `policy_compliance` | as C5 (`policy_safety`) | as C5 | same limitation as C5; ID retained for traceability after demotion |
 
@@ -154,16 +192,24 @@ model that repeats one response can produce a label transition. The summary is
 therefore descriptive pairwise outcome divergence. Near-zero divergence is not
 evidence that the panel or model is blind to authority.
 
+Any comparison across linguistic/task and policy/safety summaries is likewise
+an object--criterion comparison under two different rubrics. It is not an
+estimand of differences between the people assigned to the two evaluator roles.
+
 ### Exploratory (labelled as such; hypothesis-generating only)
 The remaining scalar fields (`scope_reference`, `clarification_required`,
 `response_act_performed`, `visible_boundary_status`, `visible_boundary_type`);
 per-phenomenon and per-model breakdowns; the `source_roles` multiselect;
-rationale text; evaluator burden/timing; failure attribution (deferred,
-presupposes a substantive modal panel label). `source_roles` records perceived
-prompt source-role categories; without a frozen item-to-evaluator crosswalk it
-does not test priority, directive force, or licensed behaviour. Confidence is a
-covariate for the role's global judgment (`task_success` or
-`policy_compliance`), never an outcome (DECISIONS 2026-07-15).
+failure attribution (deferred, presupposes a substantive modal panel label).
+`source_roles` records perceived prompt source-role categories; without a frozen
+item-to-evaluator crosswalk it does not test priority, directive force, or
+licensed behaviour. Criterion-scoped confidence and optional rationale text are
+not exploratory variables. They may be consulted only for a specific contested
+cell or rubric question named in an adjudication log. They will not be coded,
+counted, correlated, summarized, quoted, paraphrased, or published, and they do
+not enter person-level estimands, confidence-calibration analyses,
+reasoning-style analyses, or evaluator profiles (confidence scope: DECISIONS
+2026-07-15; evaluator-role limits: 2026-07-16).
 ## Executable reporting contract
 
 This contract replaces the earlier A1--A5 multiverse proposal. The analyzer
@@ -175,9 +221,10 @@ decision endpoint.
    modal-panel rule, and retain the fixed 54-row denominator for yield. Report
    unanimous and substantive-majority support plus 2/2, 2/3, 3/3, and other
    realized support patterns separately.
-2. **Missing ratings.** Report rated and unrated cells plus evaluator-role
-   coverage. Do not posit an N=2 versus N=3 counterfactual or filter to complete
-   evaluators.
+2. **Missing ratings.** Report rated and unrated object--criterion cells. Keep
+   per-evaluator coverage only in the private ingestion-side administrative QC
+   file; do not copy it into analysis artifacts or the readout. Do not posit an
+   N=2 versus N=3 counterfactual or filter to complete evaluators.
 3. **Escapes and substantive ambiguity.** Report escapes separately and exclude
    them from author--panel and judge--panel agreement denominators. Values such
    as `genuinely_ambiguous` and `policy_ambiguous` remain substantive.
@@ -202,13 +249,15 @@ decision endpoint.
    Do not add an unimplemented multiverse, specification curve, or binary
    qualitative-conclusion claim.
 ## Inference and small-N discipline (blocker 6)
-Primary results are **fixed-set counts and fractions**; no population interval is attached to them. There are 54 rows but only 18 prompts, 9 pairs, and 3 outputs/prompt, with repeated ratings from the same evaluators, so rows are not independent. Any interval or bootstrap offered as sensitivity has to cluster by item or pair (or use leave-one-pair-out); chance-corrected agreement (κ/α) is secondary and reported as fragile under sparse, skewed classes. Row-micro panel agreement and mean modal share are descriptive summaries, not estimates.
+Primary results are **fixed-set counts and fractions**; no population interval is attached to them. There are 54 rows but only 18 prompts, 9 pairs, and 3 outputs/prompt, with repeated ratings from the same evaluators, so rows are not independent. No interval, bootstrap, or chance-corrected agreement coefficient is part of the executable Study A analysis. Adding one would require a dated plan revision before returns are opened, with its unit and dependence structure specified. Row-micro panel agreement and mean modal share are descriptive summaries, not estimates.
 
 **Yield is convergence, not correctness (standing statement, blocker 6).** A
 modal panel label means the evaluators converged, not that the label is right;
 three people can share a reading, a rubric prior, or a misreading. Panel-label
-yield therefore measures inter-evaluator convergence. Low yield can mark an item,
-construct, rubric, or rater disagreement, but does not identify which one. Every
+yield therefore measures convergence of the procedure at an object--criterion
+cell. Low yield marks an unresolved cell and may reflect the item, construct,
+rubric, or measurement procedure, but the design does not identify evaluator
+traits or people-group effects. Every
 author--panel and judge--panel agreement claim (C3, C4, S1--S3) is split by
 `panel_agreement_status` (unanimous versus majority), because disagreement with
 a majority-backed modal label is weaker evidence than disagreement with
@@ -256,10 +305,16 @@ package metadata/audits, and the two deterministic role-isolated distribution
 ZIPs. It records exact non-secret build/ingest/analyze commands and validates
 model digests and manifest semantics, not file hashes alone.
 
-The sequence is: build package → write stamp-2 candidate → semantic verify →
-commit → Brett-authorized annotated tag → collection-ready gate. The separate
-collection gate also requires the tag at HEAD, no scoped drift, current interface
-timing, and finalized return address/cutoff/retention/deletion fields. A dated
+The sequence is: obtain and record the written Humber scope determination and
+implement any conditions → build package → write stamp-2 candidate → semantic
+verify → commit → Brett-authorized annotated tag → collection-ready gate.
+The separate collection gate also requires the tag at HEAD, no scoped drift, a
+hash-bound sent request and Humber response, current analysis-plan and protocol
+hashes, manual confirmation that the request represented those artifacts and
+that the response's provenance and meaning were reviewed, a hash-bound
+identity-side roster review, and finalized return-channel, cutoff, retention,
+deletion, and withdrawal fields. The tag must postdate receipt of the Humber
+response and the recorded determination. A dated
 revision ledger records every later change. No package may be distributed and no
 external return may be opened before the tag and collection gate both pass.
 ## Verified dependencies from the pre-freeze review
@@ -286,7 +341,8 @@ external return may be opened before the tag and collection gate both pass.
   not silently drop it.
 - Complete and verify stamp 2, including isolated packages, order, map, metadata,
   audits, and commands.
-- Finalize the operational collection fields and time the final interface.
+- Finalize the operational collection fields and run a final interface-integrity
+  check; interface timing is not Study A evidence.
 - Commit, then create the annotated freeze tag only with Brett's explicit
   authorization.
 - Pass the post-tag collection-ready gate. Then, and only then, distribute a

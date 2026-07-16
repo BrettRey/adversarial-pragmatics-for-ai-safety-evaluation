@@ -3,9 +3,12 @@
 
 The gate requires a verified stamp 2, a byte-identical tracked manifest at
 HEAD, an annotated freeze tag at that exact commit, at least three strictly
-pre-attested and person-disjoint assignments per role, exact finalized
-material hashes, and content-valid transfer/timing evidence bound to the
-realized role packages. It never creates or changes any of them.
+registered assignments per role, exact finalized material hashes, an
+access-controlled return channel, and a hash-bound written Humber scope
+determination or REB approval. The assignment attestation binds the registry's
+bytes and checks its internal IDs; it does not establish the real-world
+identity or disjointness of the people behind those IDs. It never creates or
+changes any of these records.
 """
 
 from __future__ import annotations
@@ -24,18 +27,25 @@ from check_study_a_freeze_ready import check_freeze_ready
 from validate_study_a_assignments import verify_assignment_attestation
 
 
-CONFIG_VERSION = 2
-EVIDENCE_SCHEMA_VERSION = 1
+CONFIG_VERSION = 3
 EVIDENCE_DIRECTORY = "evidence"
+PRIVATE_EVIDENCE_DIRECTORY = Path("private") / "evidence"
+HUMBER_SCOPE_AUTHORITY = "Humber Research Ethics Board"
+SCOPE_STATUSES = frozenset({"no_reb_review_required", "reb_approved"})
+SCOPE_DOCUMENT_EXTENSIONS = frozenset(
+    {".docx", ".eml", ".html", ".md", ".msg", ".pdf", ".txt"}
+)
 ASSIGNMENT_REGISTRY_NAME = "assignment-registry.csv"
 ASSIGNMENT_ATTESTATION_NAME = "assignment-attestation.json"
+INVESTIGATOR_ROSTER_REVIEW_NAME = "investigator-roster-review.json"
+INVESTIGATOR_ROSTER_REVIEW_SCHEMA_VERSION = 1
 MIN_ASSIGNMENTS_PER_ROLE = 3
+MIN_SENT_REQUEST_BYTES = 500
+MIN_HUMBER_RESPONSE_BYTES = 100
+MIN_ROSTER_REVIEW_BYTES = 200
 FINALIZATION_FLAGS = (
-    "data_transfer_tested",
     "evaluator_information_finalized",
     "recruitment_notice_finalized",
-    "final_interface_timed",
-    "institutional_posture_confirmed",
 )
 PLACEHOLDER_MARKERS = (
     "todo",
@@ -115,40 +125,68 @@ CONFIG_KEYS = {
     "study",
     "freeze_tag",
     "role_pool_policy",
-    "dedicated_return_address",
+    "return_channel",
     "investigator_contact",
-    "deletion_route",
+    "withdrawal_route",
     "collection_close_at",
     "analysis_start_at",
     "retention_until",
     *FINALIZATION_FLAGS,
-    "timing_minutes_per_block",
-    "data_transfer_test_evidence",
-    "final_interface_timing_evidence",
+    "workload_estimate_minutes_per_block",
+    "institutional_scope",
+    "investigator_roster_review",
     "finalized_materials",
-    "institutional_posture_basis",
-    "institutional_posture_confirmed_at",
     "external_returns_opened",
 }
-TRANSFER_EVIDENCE_KEYS = {
-    "evidence_schema_version",
-    "study",
-    "test_result",
-    "tested_at",
-    "package_build_fingerprint_sha256",
-    "package_ids_by_role",
-    "method",
-    "synthetic_payload_only",
+RETURN_CHANNEL_KEYS = {
+    "description",
+    "access_control",
+    "investigator_access_only",
+    "public_link",
+    "not_long_term_store",
 }
-TIMING_EVIDENCE_KEYS = {
-    "evidence_schema_version",
-    "study",
-    "timed_at",
-    "package_build_fingerprint_sha256",
-    "observed_minutes_per_block",
-    "sample_size_blocks_by_role",
-    "method",
+WORKLOAD_ESTIMATE_KEYS = {"minimum", "maximum", "basis"}
+EVIDENCE_FILE_KEYS = {"path", "sha256"}
+SCOPE_BASIS_ARTIFACTS = {
+    "analysis_plan": "benchmark/study-a/analysis-plan.md",
+    "study_protocol": "benchmark/study-a/materials/study-protocol-draft.md",
 }
+INSTITUTIONAL_SCOPE_KEYS = {
+    "status",
+    "authority",
+    "request_sent_at",
+    "response_received_at",
+    "determined_at",
+    "reference_id",
+    "sent_request",
+    "humber_response",
+    "scope_basis_artifacts",
+    "scope_basis_accurately_represented_in_sent_request",
+    "humber_response_provenance_manually_verified",
+    "scope_meaning_manually_reviewed",
+    "participant_role_question_addressed_or_inapplicable",
+    "humber_jurisdiction_question_addressed_or_inapplicable",
+    "scope_conditions_implemented",
+    "approval_expires_at",
+}
+ROSTER_REVIEW_REFERENCE_KEYS = {"path", "sha256"}
+ROSTER_REVIEW_PAYLOAD_KEYS = {
+    "review_schema_version",
+    "study",
+    "reviewed_at",
+    "reviewer",
+    "assignment_registry_sha256",
+    "checks",
+}
+ROSTER_REVIEW_CHECK_KEYS = {
+    "unique_real_people_confirmed",
+    "role_eligibility_confirmed",
+    "cross_role_disjointness_confirmed",
+}
+HASH_LIMITATION = (
+    "file hashes prove byte integrity only; they do not establish a response's "
+    "provenance, authority, or meaning"
+)
 
 
 def git(args: list[str]) -> subprocess.CompletedProcess[bytes]:
@@ -202,51 +240,55 @@ def require_exact_keys(
         )
 
 
-def role_mapping(
-    value: Any,
-    label: str,
-    errors: list[str],
-) -> dict[str, Any]:
-    if not isinstance(value, dict):
-        errors.append(f"{label} must be an object")
-        return {}
-    expected_roles = set(freeze_manifest.ROLE_ARCHIVES)
-    if set(value) != expected_roles:
-        errors.append(f"{label} must contain exactly the two Study A roles")
-    return value
-
-
-def resolve_evidence_path(
+def resolve_confined_evidence_path(
     config_path: Path,
     value: Any,
+    *,
     field: str,
+    relative_directory: Path,
+    allowed_extensions: frozenset[str],
+    minimum_bytes: int,
     errors: list[str],
 ) -> Path | None:
-    """Resolve only a real, non-symlink JSON file under private evidence/."""
+    """Resolve a non-symlink evidence file confined beneath ``config_path``."""
     if not isinstance(value, str) or not value.strip():
-        errors.append(f"operational config {field}.path is missing")
+        errors.append(f"operational config {field} is missing")
         return None
     raw = Path(value)
-    if raw.is_absolute() or ".." in raw.parts or not raw.parts or raw.parts[0] != EVIDENCE_DIRECTORY:
+    prefix = relative_directory.parts
+    if (
+        raw.is_absolute()
+        or ".." in raw.parts
+        or not raw.parts
+        or raw.parts[: len(prefix)] != prefix
+        or len(raw.parts) <= len(prefix)
+    ):
         errors.append(
-            f"operational config {field}.path must be relative and confined to {EVIDENCE_DIRECTORY}/"
+            f"operational config {field} must be relative and confined to "
+            f"{relative_directory.as_posix()}/"
         )
         return None
-    if raw.suffix.lower() != ".json":
-        errors.append(f"operational config {field}.path must name a JSON evidence file")
+    if raw.suffix.lower() not in allowed_extensions:
+        allowed = ", ".join(sorted(allowed_extensions))
+        errors.append(
+            f"operational config {field} must name an evidence file "
+            f"with one of these extensions: {allowed}"
+        )
         return None
 
     base = config_path.parent.absolute()
-    evidence_root = base / EVIDENCE_DIRECTORY
+    evidence_root = base / relative_directory
     lexical = base / raw
     current = base
     for part in raw.parts:
         current = current / part
         if current.is_symlink():
-            errors.append(f"operational config {field}.path traverses a symlink")
+            errors.append(f"operational config {field} traverses a symlink")
             return None
     if not evidence_root.is_dir() or evidence_root.is_symlink():
-        errors.append(f"private {EVIDENCE_DIRECTORY}/ directory is missing or unsafe")
+        errors.append(
+            f"private {relative_directory.as_posix()}/ directory is missing or unsafe"
+        )
         return None
     try:
         resolved_root = evidence_root.resolve(strict=True)
@@ -254,146 +296,323 @@ def resolve_evidence_path(
         resolved.relative_to(resolved_root)
     except (FileNotFoundError, OSError, ValueError):
         errors.append(
-            f"operational config {field} evidence file is missing, unsafe, or escapes {EVIDENCE_DIRECTORY}/"
+            f"operational config {field} evidence file is missing, unsafe, or escapes "
+            f"{relative_directory.as_posix()}/"
         )
         return None
     if not resolved.is_file() or resolved.is_symlink():
-        errors.append(f"operational config {field} evidence file is missing or unsafe")
+        errors.append(f"operational config {field} is missing or unsafe")
+        return None
+    try:
+        size = resolved.stat().st_size
+    except OSError:
+        errors.append(f"operational config {field} cannot be inspected")
+        return None
+    if size < minimum_bytes:
+        errors.append(
+            f"operational config {field} is empty or implausibly small "
+            f"({size} bytes; minimum {minimum_bytes})"
+        )
         return None
     return resolved
 
 
-def load_strict_evidence(
-    config: dict[str, Any],
+def validate_evidence_file_reference(
+    value: Any,
     config_path: Path,
+    *,
     field: str,
-    payload_keys: set[str],
+    relative_directory: Path,
+    allowed_extensions: frozenset[str],
+    minimum_bytes: int,
     errors: list[str],
-) -> dict[str, Any]:
-    reference = config.get(field)
-    if not isinstance(reference, dict):
-        errors.append(f"operational config {field} is missing")
-        return {}
-    require_exact_keys(reference, {"path", "sha256", *payload_keys}, f"operational config {field}", errors)
-    evidence_path = resolve_evidence_path(config_path, reference.get("path"), field, errors)
-    digest = reference.get("sha256")
+) -> Path | None:
+    if not isinstance(value, dict):
+        errors.append(f"operational config {field} must be an object")
+        return None
+    require_exact_keys(value, EVIDENCE_FILE_KEYS, f"operational config {field}", errors)
+    path = resolve_confined_evidence_path(
+        config_path,
+        value.get("path"),
+        field=f"{field}.path",
+        relative_directory=relative_directory,
+        allowed_extensions=allowed_extensions,
+        minimum_bytes=minimum_bytes,
+        errors=errors,
+    )
+    digest = value.get("sha256")
     if not is_sha256(digest):
         errors.append(f"operational config {field}.sha256 is invalid")
-    if evidence_path is None:
-        return {}
-    if is_sha256(digest) and freeze_manifest.sha256_file(evidence_path) != str(digest).lower():
-        errors.append(f"operational config {field} evidence hash does not match")
-    try:
-        payload = json.loads(evidence_path.read_text(encoding="utf-8"))
-    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
-        errors.append(f"operational config {field} evidence is not a JSON object: {exc}")
-        return {}
-    if not isinstance(payload, dict):
-        errors.append(f"operational config {field} evidence is not a JSON object")
-        return {}
-    require_exact_keys(payload, payload_keys, f"{field} evidence payload", errors)
-    for key in payload_keys:
-        if reference.get(key) != payload.get(key):
-            errors.append(f"operational config {field}.{key} does not equal the evidence file")
-    return payload
+    if (
+        path is not None
+        and is_sha256(digest)
+        and freeze_manifest.sha256_file(path) != str(digest).lower()
+    ):
+        errors.append(
+            f"operational config {field} hash does not match; {HASH_LIMITATION}"
+        )
+    return path
 
 
-def validate_transfer_evidence(
-    config: dict[str, Any],
-    config_path: Path,
-    *,
-    expected_build_fingerprint: str,
-    expected_package_ids: dict[str, str],
-    now: datetime,
+def validate_return_channel(value: Any, errors: list[str]) -> None:
+    label = "operational config return_channel"
+    if not isinstance(value, dict):
+        errors.append(f"{label} must be an object")
+        return
+    require_exact_keys(value, RETURN_CHANNEL_KEYS, label, errors)
+    if not valid_final_text(value.get("description")):
+        errors.append(f"{label}.description is missing or still a placeholder")
+    if not valid_final_text(value.get("access_control")):
+        errors.append(f"{label}.access_control is missing or still a placeholder")
+    for field in ("investigator_access_only", "not_long_term_store"):
+        if value.get(field) is not True:
+            errors.append(f"{label}.{field} must be explicitly true")
+    if value.get("public_link") is not False:
+        errors.append(f"{label}.public_link must be explicitly false")
+
+
+def validate_workload_estimate(value: Any, errors: list[str]) -> None:
+    label = "operational config workload_estimate_minutes_per_block"
+    if not isinstance(value, dict):
+        errors.append(f"{label} must be an object")
+        return
+    require_exact_keys(value, WORKLOAD_ESTIMATE_KEYS, label, errors)
+    if value.get("minimum") != 30:
+        errors.append(f"{label}.minimum must equal 30")
+    if value.get("maximum") != 40:
+        errors.append(f"{label}.maximum must equal 40")
+    if value.get("basis") != "planning_estimate_only":
+        errors.append(f"{label}.basis must equal 'planning_estimate_only'")
+
+
+def validate_scope_basis_artifacts(
+    value: Any,
+    manifest_payload: Any,
     errors: list[str],
 ) -> None:
-    field = "data_transfer_test_evidence"
-    payload = load_strict_evidence(config, config_path, field, TRANSFER_EVIDENCE_KEYS, errors)
-    if not payload:
+    label = "operational config institutional_scope.scope_basis_artifacts"
+    if not isinstance(value, dict):
+        errors.append(f"{label} must be an object")
         return
-    if payload.get("evidence_schema_version") != EVIDENCE_SCHEMA_VERSION:
-        errors.append("data transfer evidence has the wrong evidence_schema_version")
-    if payload.get("study") != "A":
-        errors.append("data transfer evidence study must equal 'A'")
-    if payload.get("test_result") != "pass":
-        errors.append("data transfer evidence test_result must equal 'pass'")
-    tested_at = parse_aware_datetime(payload.get("tested_at"), "data transfer evidence tested_at", errors)
-    if tested_at and tested_at > now:
-        errors.append("data transfer evidence tested_at is in the future")
-    if payload.get("package_build_fingerprint_sha256") != expected_build_fingerprint:
-        errors.append("data transfer evidence is not bound to the current package-build fingerprint")
-    package_ids = role_mapping(payload.get("package_ids_by_role"), "data transfer evidence package_ids_by_role", errors)
-    if package_ids != expected_package_ids:
-        errors.append("data transfer evidence package IDs do not match the current role packages")
-    if not valid_final_text(payload.get("method")):
-        errors.append("data transfer evidence method is missing or a placeholder")
-    if payload.get("synthetic_payload_only") is not True:
-        errors.append("data transfer evidence must attest that only a synthetic payload was used")
+    require_exact_keys(value, set(SCOPE_BASIS_ARTIFACTS), label, errors)
+    public = (
+        manifest_payload.get("public_artifacts")
+        if isinstance(manifest_payload, dict)
+        else None
+    )
+    if not isinstance(public, dict):
+        errors.append(
+            "stamp-2 public artifact hashes are unavailable for the institutional "
+            "scope basis"
+        )
+        public = {}
+    for key, expected_path in SCOPE_BASIS_ARTIFACTS.items():
+        record = value.get(key)
+        record_label = f"{label}.{key}"
+        if not isinstance(record, dict):
+            errors.append(f"{record_label} must be an object")
+            continue
+        require_exact_keys(record, {"path", "sha256"}, record_label, errors)
+        if record.get("path") != expected_path:
+            errors.append(f"{record_label}.path must equal {expected_path!r}")
+        digest = record.get("sha256")
+        if not is_sha256(digest):
+            errors.append(f"{record_label}.sha256 is invalid")
+        manifest_record = public.get(expected_path)
+        manifest_digest = (
+            manifest_record.get("sha256")
+            if isinstance(manifest_record, dict)
+            else None
+        )
+        if digest != manifest_digest:
+            errors.append(
+                f"{record_label}.sha256 does not equal the current stamp-2 manifest hash"
+            )
+        path = freeze_manifest.ROOT / expected_path
+        if not path.is_file() or freeze_manifest.has_symlink_component(path):
+            errors.append(f"institutional scope-basis artifact is missing or unsafe: {expected_path}")
+            continue
+        if is_sha256(digest) and freeze_manifest.sha256_file(path) != str(digest).lower():
+            errors.append(
+                f"{record_label}.sha256 does not equal the current artifact bytes"
+            )
 
 
-def validate_timing_evidence(
-    config: dict[str, Any],
+def validate_institutional_scope(
+    value: Any,
     config_path: Path,
     *,
-    expected_build_fingerprint: str,
-    timing_minutes_per_block: Any,
     now: datetime,
+    manifest_payload: Any = None,
+    required_active_through: datetime | None = None,
     errors: list[str],
-) -> None:
-    field = "final_interface_timing_evidence"
-    payload = load_strict_evidence(config, config_path, field, TIMING_EVIDENCE_KEYS, errors)
-    if not payload:
-        return
-    if payload.get("evidence_schema_version") != EVIDENCE_SCHEMA_VERSION:
-        errors.append("interface timing evidence has the wrong evidence_schema_version")
-    if payload.get("study") != "A":
-        errors.append("interface timing evidence study must equal 'A'")
-    timed_at = parse_aware_datetime(payload.get("timed_at"), "interface timing evidence timed_at", errors)
-    if timed_at and timed_at > now:
-        errors.append("interface timing evidence timed_at is in the future")
-    if payload.get("package_build_fingerprint_sha256") != expected_build_fingerprint:
-        errors.append("interface timing evidence is not bound to the current package-build fingerprint")
-    observed = role_mapping(
-        payload.get("observed_minutes_per_block"),
-        "interface timing evidence observed_minutes_per_block",
-        errors,
+) -> datetime | None:
+    label = "operational config institutional_scope"
+    if not isinstance(value, dict):
+        errors.append(f"{label} must be an object")
+        return None
+    require_exact_keys(value, INSTITUTIONAL_SCOPE_KEYS, label, errors)
+
+    status = value.get("status")
+    if status not in SCOPE_STATUSES:
+        errors.append(
+            f"{label}.status must be 'no_reb_review_required' or 'reb_approved'"
+        )
+    if value.get("authority") != HUMBER_SCOPE_AUTHORITY:
+        errors.append(f"{label}.authority must equal {HUMBER_SCOPE_AUTHORITY!r}")
+    request_sent_at = parse_aware_datetime(
+        value.get("request_sent_at"), f"{label}.request_sent_at", errors
     )
-    for role in freeze_manifest.ROLE_ARCHIVES:
-        value = observed.get(role)
-        if isinstance(value, bool) or not isinstance(value, (int, float)) or value <= 0:
-            errors.append(f"interface timing evidence observed minutes for {role} must be positive")
-    if observed != timing_minutes_per_block:
-        errors.append("operational timing_minutes_per_block does not equal the timing evidence")
-    sample_sizes = role_mapping(
-        payload.get("sample_size_blocks_by_role"),
-        "interface timing evidence sample_size_blocks_by_role",
-        errors,
+    response_received_at = parse_aware_datetime(
+        value.get("response_received_at"), f"{label}.response_received_at", errors
     )
-    for role in freeze_manifest.ROLE_ARCHIVES:
-        value = sample_sizes.get(role)
-        if isinstance(value, bool) or not isinstance(value, int) or value < 1:
-            errors.append(f"interface timing evidence sample size for {role} must be a positive integer")
-    if not valid_final_text(payload.get("method")):
-        errors.append("interface timing evidence method is missing or a placeholder")
+    determined_at = parse_aware_datetime(
+        value.get("determined_at"), f"{label}.determined_at", errors
+    )
+    for field, timestamp in (
+        ("request_sent_at", request_sent_at),
+        ("response_received_at", response_received_at),
+        ("determined_at", determined_at),
+    ):
+        if timestamp and timestamp > now:
+            errors.append(f"{label}.{field} is in the future")
+    if request_sent_at and response_received_at and response_received_at <= request_sent_at:
+        errors.append(f"{label}.response_received_at must follow request_sent_at")
+    if request_sent_at and determined_at and determined_at <= request_sent_at:
+        errors.append(f"{label}.determined_at must follow request_sent_at")
+    if not valid_final_text(value.get("reference_id")):
+        errors.append(f"{label}.reference_id is missing or still a placeholder")
+
+    sent_request = validate_evidence_file_reference(
+        value.get("sent_request"),
+        config_path,
+        field="institutional_scope.sent_request",
+        relative_directory=Path(EVIDENCE_DIRECTORY),
+        allowed_extensions=SCOPE_DOCUMENT_EXTENSIONS,
+        minimum_bytes=MIN_SENT_REQUEST_BYTES,
+        errors=errors,
+    )
+    humber_response = validate_evidence_file_reference(
+        value.get("humber_response"),
+        config_path,
+        field="institutional_scope.humber_response",
+        relative_directory=Path(EVIDENCE_DIRECTORY),
+        allowed_extensions=SCOPE_DOCUMENT_EXTENSIONS,
+        minimum_bytes=MIN_HUMBER_RESPONSE_BYTES,
+        errors=errors,
+    )
+    if sent_request is not None and humber_response is not None:
+        if sent_request == humber_response:
+            errors.append(
+                f"{label} must retain separate sent-request and Humber-response files"
+            )
+        elif freeze_manifest.sha256_file(sent_request) == freeze_manifest.sha256_file(
+            humber_response
+        ):
+            errors.append(
+                f"{label} sent-request and Humber-response files must not have identical bytes"
+            )
+
+    validate_scope_basis_artifacts(
+        value.get("scope_basis_artifacts"), manifest_payload, errors
+    )
+    for field, meaning in {
+        "scope_basis_accurately_represented_in_sent_request": (
+            "whether the hash-bound analysis plan and protocol were accurately "
+            "represented in the sent request"
+        ),
+        "humber_response_provenance_manually_verified": "response provenance and Humber authority",
+        "scope_meaning_manually_reviewed": "the response's substantive meaning",
+        "participant_role_question_addressed_or_inapplicable": (
+            "whether the participant-role question was addressed or expressly deemed inapplicable"
+        ),
+        "humber_jurisdiction_question_addressed_or_inapplicable": (
+            "whether the Humber-jurisdiction question was addressed or expressly deemed inapplicable"
+        ),
+        "scope_conditions_implemented": "all stated scope or approval conditions",
+    }.items():
+        if value.get(field) is not True:
+            errors.append(
+                f"{label}.{field} must be explicitly true after manual review of {meaning}; "
+                f"{HASH_LIMITATION}"
+            )
+
+    expires_value = value.get("approval_expires_at")
+    if status == "no_reb_review_required":
+        if expires_value is not None:
+            errors.append(
+                f"{label}.approval_expires_at must be null for no_reb_review_required"
+            )
+    elif status == "reb_approved":
+        approval_expires_at = parse_aware_datetime(
+            expires_value, f"{label}.approval_expires_at", errors
+        )
+        if approval_expires_at and approval_expires_at <= now:
+            errors.append(f"{label}.approval_expires_at must be in the future")
+        if determined_at and approval_expires_at and approval_expires_at <= determined_at:
+            errors.append(f"{label}.approval_expires_at must follow determined_at")
+        if (
+            required_active_through
+            and approval_expires_at
+            and approval_expires_at < required_active_through
+        ):
+            errors.append(
+                f"{label}.approval_expires_at must cover analysis_start_at"
+            )
+    return determined_at
 
 
-def local_material_dependencies(path: Path, text: str) -> set[str]:
+def local_material_dependencies(
+    path: Path, text: str
+) -> tuple[set[str], list[str]]:
     candidates = re.findall(r"\]\(([^)]+)\)", text) + re.findall(
         r"`([^`]+\.(?:csv|json|md))`", text
     )
     dependencies: set[str] = set()
+    errors: list[str] = []
     for candidate in candidates:
         target_text = candidate.split("#", 1)[0].split("?", 1)[0].strip()
-        if not target_text or "://" in target_text or target_text.startswith("mailto:"):
+        if (
+            not target_text
+            or target_text.startswith("#")
+            or "://" in target_text
+            or target_text.startswith("mailto:")
+        ):
             continue
-        target = (path.parent / target_text).resolve()
+        raw = Path(target_text)
+        if raw.is_absolute():
+            errors.append(
+                f"finalized material has an unsafe absolute local dependency: "
+                f"{path.relative_to(freeze_manifest.ROOT).as_posix()} -> {target_text}"
+            )
+            continue
+        lexical = path.parent / raw
         try:
-            relative = target.relative_to(freeze_manifest.ROOT).as_posix()
-        except ValueError:
+            resolved = lexical.resolve(strict=True)
+            relative = resolved.relative_to(freeze_manifest.ROOT.resolve()).as_posix()
+        except FileNotFoundError:
+            errors.append(
+                f"finalized material has a missing local dependency: "
+                f"{path.relative_to(freeze_manifest.ROOT).as_posix()} -> {target_text}"
+            )
             continue
-        if target.is_file():
-            dependencies.add(relative)
-    return dependencies
+        except (OSError, ValueError):
+            errors.append(
+                f"finalized material has an unsafe local dependency outside the repository: "
+                f"{path.relative_to(freeze_manifest.ROOT).as_posix()} -> {target_text}"
+            )
+            continue
+        if (
+            not resolved.is_file()
+            or freeze_manifest.has_symlink_component(lexical)
+        ):
+            errors.append(
+                f"finalized material has a missing or symlinked local dependency: "
+                f"{path.relative_to(freeze_manifest.ROOT).as_posix()} -> {target_text}"
+            )
+            continue
+        dependencies.add(relative)
+    return dependencies, errors
 
 
 def validate_finalized_materials(
@@ -473,7 +692,9 @@ def validate_finalized_materials(
         matched = [pattern.pattern for pattern in UNFINALIZED_MATERIAL_PATTERNS if pattern.search(text)]
         if matched:
             errors.append(f"finalized material still contains draft/placeholder status markers: {expected_path}")
-        dependencies.update(local_material_dependencies(path, text))
+        material_dependencies, dependency_errors = local_material_dependencies(path, text)
+        dependencies.update(material_dependencies)
+        errors.extend(dependency_errors)
     if declared_paths != expected_paths:
         errors.append("operational config finalized_materials must use the exact canonical order and set")
     missing_dependencies = sorted(dependencies - set(expected_paths))
@@ -483,21 +704,80 @@ def validate_finalized_materials(
         )
 
 
+def validate_config_location(config_path: Path, production_root: Path) -> list[str]:
+    """Require the config to be a regular file on a non-symlink path in production."""
+    errors: list[str] = []
+    root = production_root.absolute()
+    candidate = config_path.absolute()
+    if not root.is_dir() or root.is_symlink():
+        return [f"Study A production root is missing or unsafe: {production_root}"]
+    try:
+        root.relative_to(freeze_manifest.ROOT.absolute())
+    except ValueError:
+        try:
+            if root.resolve(strict=True) != root:
+                return [
+                    f"Study A production root traverses a symlink: {production_root}"
+                ]
+        except (FileNotFoundError, OSError):
+            return [f"Study A production root is missing or unsafe: {production_root}"]
+    else:
+        if freeze_manifest.has_symlink_component(root):
+            return [f"Study A production root traverses a symlink: {production_root}"]
+    try:
+        relative = candidate.relative_to(root)
+    except ValueError:
+        return ["final operational config must be confined beneath the production root"]
+    if not relative.parts or ".." in relative.parts:
+        return ["final operational config must be confined beneath the production root"]
+    current = root
+    for part in relative.parts:
+        current = current / part
+        if current.is_symlink():
+            errors.append(f"final operational config traverses a symlink: {current}")
+            return errors
+    try:
+        resolved_root = root.resolve(strict=True)
+        resolved_candidate = candidate.resolve(strict=True)
+        resolved_candidate.relative_to(resolved_root)
+    except (FileNotFoundError, OSError, ValueError):
+        return ["final operational config is missing, unsafe, or escapes the production root"]
+    if not resolved_candidate.is_file():
+        errors.append(f"final operational config is not a regular file: {config_path}")
+    return errors
+
+
+def has_symlink_component_beneath(path: Path, root: Path) -> bool:
+    """Return true if ``path`` escapes ``root`` or traverses a link below it."""
+    base = root.absolute()
+    candidate = path.absolute()
+    try:
+        relative = candidate.relative_to(base)
+    except ValueError:
+        return True
+    current = base
+    if current.is_symlink():
+        return True
+    for part in relative.parts:
+        current = current / part
+        if current.is_symlink():
+            return True
+    return False
+
+
 def validate_operational_config(
     config_path: Path,
     *,
-    expected_build_fingerprint: str = "",
-    expected_package_ids: dict[str, str] | None = None,
+    production_root: Path | None = None,
     manifest_payload: dict[str, Any] | None = None,
     now: datetime | None = None,
 ) -> tuple[dict[str, Any], list[str]]:
     errors: list[str] = []
     current_time = now or datetime.now(timezone.utc)
-    package_ids = expected_package_ids or {}
-    if config_path.is_symlink():
-        return {}, [f"final operational config is a symlink: {config_path}"]
-    if not config_path.is_file():
-        return {}, [f"final operational config is missing: {config_path}"]
+    scoped_root = (production_root or config_path.parent).absolute()
+    location_errors = validate_config_location(config_path, scoped_root)
+    if location_errors:
+        return {}, location_errors
     try:
         config = json.loads(config_path.read_text(encoding="utf-8"))
     except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
@@ -516,22 +796,35 @@ def validate_operational_config(
     tag = config.get("freeze_tag")
     if not isinstance(tag, str) or not tag.strip() or any(ch.isspace() for ch in tag):
         errors.append("operational config freeze_tag is missing or invalid")
-    for field in ("dedicated_return_address", "investigator_contact", "deletion_route"):
+    validate_return_channel(config.get("return_channel"), errors)
+    for field in ("investigator_contact", "withdrawal_route"):
         if not valid_final_text(config.get(field)):
             errors.append(f"operational config {field} is missing or still a placeholder")
     for field in FINALIZATION_FLAGS:
         if config.get(field) is not True:
             errors.append(f"operational config {field} must be explicitly true")
-
-    timing = role_mapping(
-        config.get("timing_minutes_per_block"),
-        "operational config timing_minutes_per_block",
-        errors,
-    )
-    for role in freeze_manifest.ROLE_ARCHIVES:
-        value = timing.get(role)
-        if isinstance(value, bool) or not isinstance(value, (int, float)) or value <= 0:
-            errors.append(f"operational config timing_minutes_per_block.{role} must be positive")
+    validate_workload_estimate(config.get("workload_estimate_minutes_per_block"), errors)
+    roster_reference = config.get("investigator_roster_review")
+    if not isinstance(roster_reference, dict):
+        errors.append("operational config investigator_roster_review must be an object")
+    else:
+        require_exact_keys(
+            roster_reference,
+            ROSTER_REVIEW_REFERENCE_KEYS,
+            "operational config investigator_roster_review",
+            errors,
+        )
+        if roster_reference.get("path") != (
+            PRIVATE_EVIDENCE_DIRECTORY / INVESTIGATOR_ROSTER_REVIEW_NAME
+        ).as_posix():
+            errors.append(
+                "operational config investigator_roster_review.path must equal "
+                f"{(PRIVATE_EVIDENCE_DIRECTORY / INVESTIGATOR_ROSTER_REVIEW_NAME).as_posix()!r}"
+            )
+        if not is_sha256(roster_reference.get("sha256")):
+            errors.append(
+                "operational config investigator_roster_review.sha256 is invalid"
+            )
 
     close_at = parse_aware_datetime(
         config.get("collection_close_at"), "operational config collection_close_at", errors
@@ -549,37 +842,15 @@ def validate_operational_config(
     if analysis_at and retention_at and retention_at <= analysis_at:
         errors.append("retention_until must be after analysis_start_at")
 
-    if not expected_build_fingerprint:
-        errors.append("stamp-2 package-build fingerprint is unavailable")
-    if set(package_ids) != set(freeze_manifest.ROLE_ARCHIVES) or not all(package_ids.values()):
-        errors.append("current role package IDs are unavailable")
-    validate_transfer_evidence(
-        config,
+    validate_institutional_scope(
+        config.get("institutional_scope"),
         config_path,
-        expected_build_fingerprint=expected_build_fingerprint,
-        expected_package_ids=package_ids,
         now=current_time,
-        errors=errors,
-    )
-    validate_timing_evidence(
-        config,
-        config_path,
-        expected_build_fingerprint=expected_build_fingerprint,
-        timing_minutes_per_block=timing,
-        now=current_time,
+        manifest_payload=manifest_payload,
+        required_active_through=analysis_at,
         errors=errors,
     )
     validate_finalized_materials(config, manifest_payload or {}, errors)
-
-    if not valid_final_text(config.get("institutional_posture_basis")):
-        errors.append("operational config institutional_posture_basis is missing or a placeholder")
-    posture_at = parse_aware_datetime(
-        config.get("institutional_posture_confirmed_at"),
-        "operational config institutional_posture_confirmed_at",
-        errors,
-    )
-    if posture_at and posture_at > current_time:
-        errors.append("institutional_posture_confirmed_at is in the future")
     return config, errors
 
 
@@ -596,6 +867,9 @@ def current_package_ids(production_root: Path) -> tuple[dict[str, str], list[str
         except (OSError, UnicodeDecodeError, json.JSONDecodeError):
             errors.append(f"current package metadata is invalid for role {role}")
             continue
+        if not isinstance(metadata, dict):
+            errors.append(f"current package metadata is not a JSON object for role {role}")
+            continue
         package_id = metadata.get("package_id")
         if metadata.get("role") != role or not isinstance(package_id, str) or not package_id:
             errors.append(f"current package metadata has an invalid role/package_id for {role}")
@@ -604,19 +878,131 @@ def current_package_ids(production_root: Path) -> tuple[dict[str, str], list[str
     return package_ids, errors
 
 
+def validate_investigator_roster_review(
+    reference: Any,
+    config_path: Path,
+    registry_path: Path,
+    *,
+    attestation_validated_at: datetime | None,
+    now: datetime,
+    errors: list[str],
+) -> None:
+    label = "investigator_roster_review"
+    if isinstance(reference, dict):
+        require_exact_keys(
+            reference,
+            ROSTER_REVIEW_REFERENCE_KEYS,
+            f"operational config {label}",
+            errors,
+        )
+        if reference.get("path") != (
+            PRIVATE_EVIDENCE_DIRECTORY / INVESTIGATOR_ROSTER_REVIEW_NAME
+        ).as_posix():
+            errors.append(
+                f"operational config {label}.path must equal "
+                f"{(PRIVATE_EVIDENCE_DIRECTORY / INVESTIGATOR_ROSTER_REVIEW_NAME).as_posix()!r}"
+            )
+    review_path = validate_evidence_file_reference(
+        reference,
+        config_path,
+        field=label,
+        relative_directory=PRIVATE_EVIDENCE_DIRECTORY,
+        allowed_extensions=frozenset({".json"}),
+        minimum_bytes=MIN_ROSTER_REVIEW_BYTES,
+        errors=errors,
+    )
+    if review_path is None:
+        return
+    try:
+        payload = json.loads(review_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        errors.append(f"private investigator roster review is invalid JSON: {exc}")
+        return
+    if not isinstance(payload, dict):
+        errors.append("private investigator roster review must be a JSON object")
+        return
+    require_exact_keys(
+        payload,
+        ROSTER_REVIEW_PAYLOAD_KEYS,
+        "private investigator roster review",
+        errors,
+    )
+    if payload.get("review_schema_version") != INVESTIGATOR_ROSTER_REVIEW_SCHEMA_VERSION:
+        errors.append(
+            "private investigator roster review review_schema_version must equal "
+            f"{INVESTIGATOR_ROSTER_REVIEW_SCHEMA_VERSION}"
+        )
+    if payload.get("study") != "A":
+        errors.append("private investigator roster review study must equal 'A'")
+    if not valid_final_text(payload.get("reviewer")):
+        errors.append("private investigator roster review reviewer is missing or a placeholder")
+    reviewed_at = parse_aware_datetime(
+        payload.get("reviewed_at"),
+        "private investigator roster review reviewed_at",
+        errors,
+    )
+    if reviewed_at and reviewed_at > now:
+        errors.append("private investigator roster review reviewed_at is in the future")
+    if (
+        reviewed_at
+        and attestation_validated_at
+        and reviewed_at < attestation_validated_at
+    ):
+        errors.append(
+            "private investigator roster review must not predate the assignment attestation"
+        )
+    registry_digest = payload.get("assignment_registry_sha256")
+    if not is_sha256(registry_digest):
+        errors.append(
+            "private investigator roster review assignment_registry_sha256 is invalid"
+        )
+    elif freeze_manifest.sha256_file(registry_path) != str(registry_digest).lower():
+        errors.append(
+            "private investigator roster review is not bound to the current assignment "
+            f"registry bytes; {HASH_LIMITATION}"
+        )
+    checks = payload.get("checks")
+    if not isinstance(checks, dict):
+        errors.append("private investigator roster review checks must be an object")
+        return
+    require_exact_keys(
+        checks,
+        ROSTER_REVIEW_CHECK_KEYS,
+        "private investigator roster review checks",
+        errors,
+    )
+    for field in sorted(ROSTER_REVIEW_CHECK_KEYS):
+        if checks.get(field) is not True:
+            errors.append(
+                f"private investigator roster review checks.{field} must be explicitly "
+                "true based on the investigator's identity-side roster review; "
+                f"{HASH_LIMITATION}"
+            )
+
+
 def validate_assignment_contract(
     production_root: Path,
     *,
     expected_package_ids: dict[str, str] | None = None,
+    roster_review_reference: Any = None,
+    config_path: Path | None = None,
     now: datetime | None = None,
 ) -> list[str]:
     errors: list[str] = []
     private_dir = production_root / "private"
     registry_path = private_dir / ASSIGNMENT_REGISTRY_NAME
     attestation_path = private_dir / ASSIGNMENT_ATTESTATION_NAME
-    if not registry_path.is_file() or registry_path.is_symlink():
+    if (
+        not registry_path.is_file()
+        or registry_path.is_symlink()
+        or has_symlink_component_beneath(registry_path, production_root)
+    ):
         errors.append("private assignment registry is missing or unsafe")
-    if not attestation_path.is_file() or attestation_path.is_symlink():
+    if (
+        not attestation_path.is_file()
+        or attestation_path.is_symlink()
+        or has_symlink_component_beneath(attestation_path, production_root)
+    ):
         errors.append("private assignment attestation is missing or unsafe")
     if errors:
         return errors
@@ -628,12 +1014,18 @@ def validate_assignment_contract(
             study_id=freeze_manifest.STUDY_ID,
         )
     except ValueError:
-        return ["private assignment registry/attestation failed strict verification"]
+        return [
+            "private assignment registry/attestation failed strict byte-integrity and "
+            "internal-ID verification; attestation does not establish real-world "
+            "identity or role-pool disjointness"
+        ]
 
     try:
         attestation = json.loads(attestation_path.read_text(encoding="utf-8"))
     except (OSError, UnicodeDecodeError, json.JSONDecodeError):
         return ["private assignment attestation became unreadable after verification"]
+    if not isinstance(attestation, dict):
+        return ["private assignment attestation became a non-object after verification"]
     validated_at_errors: list[str] = []
     validated_at = parse_aware_datetime(
         attestation.get("validated_at"),
@@ -644,6 +1036,15 @@ def validate_assignment_contract(
     if validated_at and validated_at > (now or datetime.now(timezone.utc)):
         errors.append("assignment attestation validated_at is in the future")
 
+    validate_investigator_roster_review(
+        roster_review_reference,
+        config_path or (production_root / "operational-config.json"),
+        registry_path,
+        attestation_validated_at=validated_at,
+        now=now or datetime.now(timezone.utc),
+        errors=errors,
+    )
+
     package_ids = expected_package_ids
     if package_ids is None:
         package_ids, metadata_errors = current_package_ids(production_root)
@@ -652,8 +1053,11 @@ def validate_assignment_contract(
         if registry.counts_by_role.get(role, 0) < MIN_ASSIGNMENTS_PER_ROLE:
             errors.append(
                 f"assignment registry has fewer than {MIN_ASSIGNMENTS_PER_ROLE} "
-                f"pre-attested assignments for role {role}"
+                f"registered assignments for role {role}"
             )
+        if not isinstance(package_ids, dict):
+            errors.append("current role package ID mapping is unavailable")
+            break
         if registry.package_ids_by_role.get(role) != [package_ids.get(role, "")]:
             errors.append(f"assignment registry package_id does not match current role package for {role}")
     return errors
@@ -741,7 +1145,9 @@ def check_manifest_at_head(
     return errors
 
 
-def check_annotated_tag_at_head(tag: str) -> list[str]:
+def check_annotated_tag_at_head(
+    tag: str, *, after_scope_recorded_at: datetime | None = None
+) -> list[str]:
     errors: list[str] = []
     valid = git(["check-ref-format", f"refs/tags/{tag}"])
     if valid.returncode != 0:
@@ -767,6 +1173,33 @@ def check_annotated_tag_at_head(tag: str) -> list[str]:
     lines = set(pointed.stdout.decode("utf-8", errors="replace").splitlines())
     if f"{tag}|tag" not in lines:
         errors.append("configured annotated freeze_tag is not reported as pointing at HEAD")
+    tagger_result = git(
+        [
+            "for-each-ref",
+            "--format=%(taggerdate:iso-strict)",
+            f"refs/tags/{tag}",
+        ]
+    )
+    tagger_text = tagger_result.stdout.decode("utf-8", errors="replace").strip()
+    tagger_errors: list[str] = []
+    tagger_at = parse_aware_datetime(
+        tagger_text,
+        "configured annotated freeze_tag tagger date",
+        tagger_errors,
+    )
+    if tagger_result.returncode != 0:
+        errors.append("configured annotated freeze_tag tagger date cannot be read")
+    else:
+        errors.extend(tagger_errors)
+    if (
+        after_scope_recorded_at
+        and tagger_at
+        and tagger_at <= after_scope_recorded_at
+    ):
+        errors.append(
+            "configured annotated freeze_tag must be created after the written Humber "
+            "response was received and its determination recorded"
+        )
     return errors
 
 
@@ -800,12 +1233,20 @@ def main() -> None:
         if manifest_path.is_file()
         else []
     )
-    production_candidate = manifest_payload.get("production_candidate", {})
-    expected_build_fingerprint = str(
-        production_candidate.get("package_build_fingerprint_sha256", "")
+    production_candidate_value = manifest_payload.get("production_candidate")
+    production_candidate = (
+        production_candidate_value
+        if isinstance(production_candidate_value, dict)
+        else {}
     )
+    role_archives_value = production_candidate.get("role_archives")
+    role_archives = role_archives_value if isinstance(role_archives_value, dict) else {}
     manifest_package_ids = {
-        role: str(production_candidate.get("role_archives", {}).get(role, {}).get("package_id", ""))
+        role: str(
+            role_archives.get(role, {}).get("package_id", "")
+            if isinstance(role_archives.get(role), dict)
+            else ""
+        )
         for role in freeze_manifest.ROLE_ARCHIVES
     }
     package_ids, package_id_errors = current_package_ids(production_root)
@@ -814,15 +1255,45 @@ def main() -> None:
         errors.append("current role package IDs do not equal the stamp-2 manifest")
     config, config_errors = validate_operational_config(
         config_path,
-        expected_build_fingerprint=expected_build_fingerprint,
-        expected_package_ids=package_ids,
+        production_root=production_root,
         manifest_payload=manifest_payload,
     )
     errors.extend(config_errors)
-    errors.extend(validate_assignment_contract(production_root, expected_package_ids=package_ids))
+    errors.extend(
+        validate_assignment_contract(
+            production_root,
+            expected_package_ids=package_ids,
+            roster_review_reference=config.get("investigator_roster_review"),
+            config_path=config_path,
+        )
+    )
     tag = config.get("freeze_tag")
     if isinstance(tag, str) and tag.strip():
-        errors.extend(check_annotated_tag_at_head(tag.strip()))
+        scope = config.get("institutional_scope")
+        scope_recorded_at: datetime | None = None
+        if isinstance(scope, dict):
+            timestamp_errors: list[str] = []
+            determined_at = parse_aware_datetime(
+                scope.get("determined_at"),
+                "operational config institutional_scope.determined_at",
+                timestamp_errors,
+            )
+            response_received_at = parse_aware_datetime(
+                scope.get("response_received_at"),
+                "operational config institutional_scope.response_received_at",
+                timestamp_errors,
+            )
+            recorded_times = [
+                timestamp
+                for timestamp in (determined_at, response_received_at)
+                if timestamp is not None
+            ]
+            scope_recorded_at = max(recorded_times) if recorded_times else None
+        errors.extend(
+            check_annotated_tag_at_head(
+                tag.strip(), after_scope_recorded_at=scope_recorded_at
+            )
+        )
     if errors:
         print("Study A is not collection-ready:")
         for error in dict.fromkeys(errors):
@@ -830,7 +1301,11 @@ def main() -> None:
         raise SystemExit(1)
     print(
         "OK: Study A collection gate passes for the annotated freeze tag and finalized "
-        "operational config. This check made no changes."
+        "operational config. The assignment attestation binds registry bytes and internal "
+        "IDs only; the hash-bound investigator roster review remains the basis for "
+        "real-world identity, role eligibility, and cross-role disjointness. Scope and "
+        f"roster hashes prove byte integrity only, not authority or meaning. "
+        "This check made no changes."
     )
 
 

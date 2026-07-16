@@ -11,18 +11,20 @@ default:
 - candidate repair episodes, unredacted context, and provenance maps;
 - real evaluator response JSON, identity mappings, contact records, and
   evaluator-agreement administration;
-- the private assignment registry and person-disjoint-role attestation,
-  including rater-to-person, role, and package-ID bindings;
+- the private assignment registry, identifier-only byte attestation, and
+  identity-side roster review, including rater-to-person, role, and package-ID
+  bindings;
 - blind-package maps linking opaque rows to model/item metadata;
-- unredacted rationales that could identify a person, organization, or private
-  task.
+- every individual first-pass vote, confidence value, and rationale, whether or
+  not it appears identifying in isolation.
 
 ## Potentially Shareable Material
 
 Only after manual review may the project share benign hand-authored prompts,
 synthetic fixtures, public-safe schemas and protocols, aggregate results, and
-sanitized row-level records that create no reasonable privacy, security, or
-re-identification concern.
+sanitized object-level panel aggregates that create no reasonable privacy,
+security, or re-identification concern. Individual-vote rows, confidence
+values, and rationale language are not release candidates.
 
 ## Release Review Questions
 
@@ -39,10 +41,11 @@ synthetic derivative. Authenticity is not a reason to publish a private record.
 
 Any real study should set a retention period, access roles, encrypted storage
 practice, secure transfer route, deletion procedure, and role-based review path
-before collecting outside ratings. Study A's planned transfer route is a
-dedicated MFA-protected email address used only to receive pseudonymous JSON
-attachments. Attachments are moved promptly to the local private study store;
-the mailbox is not the long-term record store.
+before collecting outside ratings. Study A's transfer route will be the
+access-controlled channel permitted by the final written scope determination
+and data plan. Returned JSON files will be moved promptly and unchanged to the
+local private study store; the transfer channel will not be the long-term
+record store.
 
 For Study A, the planned deletion rule is: a returned block is retained unless
 the evaluator asks, through the stated contact route and pseudonymous rater ID,

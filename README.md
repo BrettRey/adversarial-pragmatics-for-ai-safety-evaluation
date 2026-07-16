@@ -2,13 +2,33 @@
 
 Title: **Adversarial Pragmatics for AI Safety Evaluation: A Benchmark for Instruction Conflict, Embedded Commands, and Policy Ambiguity**.
 
-This is an empirical AI-safety-evaluation paper. The project turns Brett's work on linguistic judgment, unstable categories, annotation, grammaticality, and evaluation kinds into a concrete benchmark and protocol for language-mediated safety cases.
+This is an empirical AI-safety-evaluation paper and executable evaluation
+artifact. It turns difficult judgments about instruction status, source
+authority, policy scope, refusal, and failure attribution into a benchmark,
+annotation protocol, judge audit, and fail-closed expert-evaluation workflow.
+
+## Portfolio Walkthrough
+
+For the shortest path through the project:
+
+1. Read the [evaluation brief](EVALUATION-MEMO.md) for the decision problem,
+   current evidence, operational recommendations, and explicit limits.
+2. Inspect the [18-item benchmark](benchmark/items/seed-items.csv),
+   [taxonomy](benchmark/rubrics/taxonomy.md), and
+   [annotation protocol](benchmark/rubrics/annotation-protocol.md).
+3. Review the sanitized 54-row pilot
+   [adjudication readout](benchmark/results/summaries/local-pilot-20260630-185417-adjudication-readout.md)
+   and negative [LLM-judge validation readout](benchmark/results/summaries/local-pilot-20260630-185417-judge-validation-readout.md).
+4. Run `make public-check` and `make study-a-synthetic` to verify tracked pilot
+   artifacts and exercise the blind build-to-analysis path without external
+   data.
 
 Core deliverables:
 
 - a taxonomy of safety-relevant pragmatic failure modes;
 - a seed benchmark of paired, controlled contrasts;
-- an annotation protocol separating task success, policy compliance, safety risk, evaluator confidence, and failure attribution;
+- annotation and expert-evaluation protocols separating task success, policy
+  compliance, visible safety boundaries, refusal, and failure attribution;
 - metrics for diagnostic ambiguity and taxonomy drift;
 - a local pilot and LLM-judge validation pass;
 - supplementary documentation for model-policy, red-team, system-card, and external-assurance audiences.
@@ -21,7 +41,16 @@ The canonical repository state contains:
 - a 54-row local pilot over three Ollama models;
 - sanitized row-level and aggregate pilot summaries under `benchmark/results/summaries/`;
 - a judge-validation pass showing that a rubric-aided LLM judge missed the safety-relevant minority classes under favourable conditions;
+- a semantically verified Study A stamp-2 candidate with role-isolated expert
+  packages, object-level analysis, synthetic regression tests, and a separate
+  fail-closed collection gate;
 - LaTeX source for the main paper, supplement, and two related framework papers.
+
+No external Study A ratings have been collected. HREB was asked on 16 July
+2026 whether it regards the proposed expert evaluators as human research
+participants. Recruitment, package distribution, and return opening remain
+closed pending its written response and the collection gate. The completed
+local pilot and judge audit remain available for inspection and job-market use.
 
 Public-version note: arXiv v1 (`2607.01153v1`) reflects an earlier version of
 the pilot readout. The current repository state is the canonical source for the
@@ -39,16 +68,21 @@ make
 make test
 ```
 
-Verify the frozen pilot and exercise the new preparation workflows with:
+Verify tracked artifacts and exercise the synthetic preparation workflows with:
 
 ```bash
-make phase1-check
+make public-check
 make study-a-synthetic
 make discovery-synthetic
 ```
 
-The latter two commands use deterministic synthetic fixtures only. They do not
-run an external study or import private interaction history.
+The Study A and discovery commands use deterministic synthetic fixtures only.
+They do not run an external study or import private interaction history.
+
+Maintainers with the ignored local-pilot and Study A production artifacts can
+also run `make phase1-check` and `make study-a-freeze-ready`. Freeze readiness
+verifies the pre-collection artifact; it does not create a tag or authorize
+external returns.
 
 Build the main paper, supplement, and two related framework papers with:
 
