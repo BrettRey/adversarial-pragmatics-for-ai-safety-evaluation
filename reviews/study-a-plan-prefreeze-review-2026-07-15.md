@@ -218,3 +218,44 @@ floored, not pinned.**
   counterbalanced blinded packages) — settle before recruiting evaluators.
 - Blockers 1, 2, 4–8 still need independent verification before being treated as
   established; only blocker 3 is confirmed.
+
+---
+
+## Blockers 4-7 — VERIFIED 2026-07-15 (before the freeze tag)
+
+Verified against the code. The headline: **blockers 4, 5, 6 are one coherent
+plan-vs-code gap** — the frozen analysis plan specifies estimands and handling
+the analyzer does not yet implement — and **blocker 7 is a real blinding/ordering
+gap in the package builder.**
+
+- **B4 — CONFIRMED (plan↔code gap).** `analyze_independent_reassessment.py:242-244`
+  builds references only from non-empty ratings (available-case), and reports
+  "reference rows: len(reference_rows)" (line ~841), never yield over a fixed
+  54-row denominator. Escape-valued references (`item_problem`,
+  `insufficient_visible_context`) are NOT excluded from author/judge comparator
+  accuracy. No strict-pair endpoint / explicit P008 rule exists. The estimand
+  table (C1-C4, A1, A4) specifies all of these; none is implemented.
+- **B5 — CONFIRMED (plan↔code gap).** `judge-minority-class-recall.csv` reports
+  per-class recall but has no majority-baseline column and no frozen
+  minority-class definition; plan S3 requires baseline + confusion (confusion
+  exists, baseline does not).
+- **B6 — PARTIAL.** The analyzer emits fractions with no false confidence
+  intervals (good — no overclaim), but implements none of the item/pair-clustered
+  or leave-one-pair-out sensitivity the plan's inference section requires. A
+  missing sensitivity analysis, not a wrong one.
+- **B7 — CONFIRMED (builder blinding gap).** Verified: pilot `outputs.csv` is
+  model-major (first 18 rows all `qwen3:8b`); `build_independent_reassessment.py:554`
+  slices consecutive 18-row blocks with no per-rater shuffle, so each 18-row
+  block is exactly one model — a rater rates one model, and the three blocks map
+  to the three models. `supportPanel()` is a single hardcoded task/source-role
+  string rendered for all roles, so the policy form carries task-flavoured
+  support text.
+
+**Freeze implication.** The PLAN is design-complete and correct (board-verified),
+but the analyzer and the package builder do not yet implement it. Freezing the
+plan now = freezing a spec ahead of its implementation; the "pre-registered
+analysis" cannot be run as written until the analyzer (yield/54, escape
+exclusion, baseline, clustered sensitivity) and builder (counterbalanced
+per-rater order, role-specific support text) are brought to spec and re-verified.
+Only blockers 1-3 are both verified and implemented; 4-7 are verified as real and
+outstanding.
