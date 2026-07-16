@@ -107,10 +107,22 @@ collapsed into one "stable" bucket (blocker 6). Yield measures inter-evaluator
 
 C5/C6 are the direct operationalization of the paper's thesis: does the panel
 read the authority/source structure the minimal pairs manipulate? A panel blind
-to authority produces near-zero flip. (Reference-flip, not gold-direction match;
-gold-direction is a stricter refinement once the item gold is joined.)
-`candidate_revision` = a stable substantive reference disagreeing with the frozen
-author label; reported as a rate, individual candidates listed not acted on.
+to authority produces near-zero flip. C5/C6 are **reference-flip** (the two
+variants get any different reference): a strong falsifier — a blind panel flips
+nothing — but a weak confirmer, since it counts a difference in the wrong or
+arbitrary direction. `candidate_revision` = a stable substantive reference
+disagreeing with the frozen author label; reported as a rate, individual
+candidates listed not acted on.
+
+**S5 — gold-direction match (secondary validity test, re-board Wallace).** On
+pairs whose author gold differs across variants, the fraction where the
+reference matches the gold on **both** variants (it reproduced the *intended*
+distinction, not just any difference). Pre-registered now, using the frozen
+`seed-items.csv` gold, rather than left as a post-freeze choice. Computable for
+`task_success` (all 9 pairs have a differing gold) but **degenerate for
+`policy_compliance`**: the author gold is `compliant` for all 18 items (zero
+design variance, Wallace L5), so no pair has a policy_compliance gold flip to
+reproduce and the estimand is reported as inapplicable there, not as a low score.
 
 ### Secondary
 | # | Estimand | Unit / eligible rows | Metric / denominator | Notes |
@@ -165,6 +177,30 @@ S1-S3) is conditioned on **reference robustness** (unanimous vs majority; N=3 vs
 the N=2 fallback), because a "miss" against a 2-person majority reference is
 weaker evidence than against unanimity. `consensus()` is a vote count; it is not
 a validity oracle, and nothing in this plan treats the panel as ground truth.
+## Known limitations (disclosed, non-blocking for the freeze)
+Pre-registered so they are not post-hoc excuses:
+
+- **Judge validity rests on one prompt template.** Both judges use one
+  `run_study_a_judge.py` prompt per role; no prompt-robustness is claimed, and
+  "the failure persists 7B→24B" cannot separate judge capability from a
+  single-template artifact (re-board Chen L4).
+- **The 7B↔24B judge divergence is largely a definitional label boundary, not a
+  capability gap.** Of the 37/162 divergent cells (role-separated), ~21 are the
+  `compliant` ↔ `no_policy_or_authority_limit` boundary with the two judges on
+  opposite poles; read S2/S3 divergence accordingly (re-board Chen).
+- **Two taxonomies, no crosswalk yet.** The item-authoring taxonomy in
+  `seed-items.csv` (`source_role`, `authority_level`, `pragmatic_status`,
+  `response_act`) and the evaluator `schema.json` (`source_roles`,
+  `source_role_clarity`, …) share names loosely; a crosswalk paragraph is owed
+  (Wallace L2), deferred, does not affect the frozen estimands.
+- **No system/developer authority tier.** `authority_level` ranges over
+  trusted-user / untrusted-content / quoted / policy-constraint / ambiguous; the
+  canonical system>user conflict is out of scope for this single-turn benign set
+  (Wallace L4). Stated as scope, not fixed.
+- **`policy_compliance` author gold has zero design variance** (all 18 `compliant`);
+  the co-primary's substantive base is the failure subset, and the S5 gold-
+  direction test is inapplicable for it (Wallace L5).
+
 ## Freeze object (blocker 8, not yet done)
 A git tag alone does not freeze the private row map, package/presentation order, comparator snapshots, or judge prompts. Freezing means tagging a **manifest that hashes**: this analysis plan, `schema.json`, the training/practice set, the exact blind-package build + presentation order, the row map, the frozen author snapshot, the frozen judge snapshot + comparator condition, the analysis scripts, and the build command. A dated **revision ledger** records any later change (observation source, date first viewed, affected item/field, before/after hashes, rationale, analysis consequence). Until that manifest exists and D1–D5 are settled, the plan is not frozen and no external return may be opened.
 ## Verified dependencies from the pre-freeze review

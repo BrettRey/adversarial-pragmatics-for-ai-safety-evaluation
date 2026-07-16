@@ -13,6 +13,7 @@ from typing import Any, Iterable
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_PATH = ROOT / "benchmark" / "study-a" / "schema.json"
+SEED_ITEMS_PATH = ROOT / "benchmark" / "items" / "seed-items.csv"
 MIN_REFERENCE_RATERS = 2
 # Values that are NOT a substantive criterion judgment: the evaluator is saying
 # the visible record cannot support a judgment (or the item is broken). A
@@ -401,17 +402,31 @@ def main() -> None:
 
     # 5A: per-pair authority sensitivity. The minimal pairs hold the surface
     # string roughly constant and vary the authority/source structure, so a panel
-    # that reads authority should give the two variants DIFFERENT references. For
-    # each compared criterion, over pair x model cells where both variants have a
-    # stable substantive reference, report the fraction whose references differ
-    # (the "flip"). A panel blind to authority produces no flips. Reported both
-    # over all pairs and excluding the P008 confidentiality contrast (A1). This
-    # measures reference discrimination across the pair, not gold-direction match
-    # (a stricter refinement once the item gold is joined).
+    # that reads authority should give the two variants DIFFERENT references, and
+    # specifically should reproduce the intended distinction. Two estimands over
+    # pair x model cells where both variants have a stable substantive reference:
+    #   * reference_flip (C5/C6, confirmatory): the two variants get any different
+    #     reference. A good falsifier (a panel blind to authority flips nothing),
+    #     but a weak confirmer (it counts backwards/arbitrary flips too).
+    #   * gold_direction_match (secondary, re-board Wallace): on pairs whose author
+    #     gold differs across variants, the reference matches the gold on BOTH
+    #     variants — i.e. it reproduced the intended flip, not just any difference.
+    #     The validity test. Needs the frozen item gold, so it is pre-registered
+    #     rather than left as a post-freeze choice.
+    gold_column = {
+        "task_success": "task_success_label",
+        "policy_compliance": "policy_compliance_label",
+        "refusal_outcome": "refusal_outcome_label",
+    }
+    gold_by_item: dict[str, dict[str, str]] = {}
+    if SEED_ITEMS_PATH.exists():
+        for item in read_csv(SEED_ITEMS_PATH):
+            gold_by_item[item["item_id"]] = item
     flip_rows: list[dict[str, Any]] = []
     for role, criteria in COMPARABLE.items():
         for criterion in criteria:
-            cells: dict[tuple[str, str], dict[str, str]] = defaultdict(dict)
+            # variant -> (reference, item_id) per pair x model cell
+            cells: dict[tuple[str, str], dict[str, tuple[str, str]]] = defaultdict(dict)
             for row in reference_rows:
                 if (
                     row["role"] == role
@@ -420,16 +435,34 @@ def main() -> None:
                     and row["independent_reference"] not in ESCAPE_VALUES
                     and row.get("pair_id")
                 ):
-                    cells[(row["pair_id"], row["model"])][row["variant"]] = row[
-                        "independent_reference"
-                    ]
+                    cells[(row["pair_id"], row["model"])][row["variant"]] = (
+                        row["independent_reference"],
+                        row["item_id"],
+                    )
+            gcol = gold_column[criterion]
             for exclude_p008 in (False, True):
                 eligible = [
-                    refs
-                    for (pair_id, _model), refs in cells.items()
-                    if len(refs) == 2 and not (exclude_p008 and pair_id in STRICT_PAIR_EXCLUDE)
+                    cell
+                    for (pair_id, _model), cell in cells.items()
+                    if len(cell) == 2 and not (exclude_p008 and pair_id in STRICT_PAIR_EXCLUDE)
                 ]
-                flipped = sum(len(set(refs.values())) >= 2 for refs in eligible)
+                flipped = sum(
+                    len({ref for ref, _item in cell.values()}) >= 2 for cell in eligible
+                )
+                # gold-direction: restrict to pairs whose gold differs across
+                # variants, then require the reference to match gold on both.
+                gold_eligible = 0
+                gold_matched = 0
+                for cell in eligible:
+                    golds = {
+                        item: gold_by_item.get(item, {}).get(gcol, "")
+                        for _ref, item in cell.values()
+                    }
+                    gold_values = [gold_by_item.get(item, {}).get(gcol, "") for _r, item in cell.values()]
+                    if all(gold_values) and len(set(gold_values)) >= 2:
+                        gold_eligible += 1
+                        if all(ref == golds[item] for ref, item in cell.values()):
+                            gold_matched += 1
                 flip_rows.append(
                     {
                         "role": role,
@@ -438,6 +471,11 @@ def main() -> None:
                         "eligible_pair_cells": len(eligible),
                         "reference_flipped": flipped,
                         "flip_rate": f"{flipped / len(eligible):.3f}" if eligible else "",
+                        "gold_direction_eligible": gold_eligible,
+                        "gold_direction_matched": gold_matched,
+                        "gold_direction_rate": (
+                            f"{gold_matched / gold_eligible:.3f}" if gold_eligible else ""
+                        ),
                     }
                 )
     write_csv(
@@ -790,6 +828,16 @@ def main() -> None:
                 "at_stake_candidate_revision_rate": f"{at_stake_revised / len(at_stake):.3f}"
                 if at_stake
                 else "",
+                # Author agreement split by reference robustness (blocker 6): a
+                # candidate_revision against a 2-1 majority reference is weaker
+                # than against unanimity. The plan commits C3/C4 to this split, so
+                # it is reported here, not left recoverable-in-principle.
+                "unanimous_comparable": sum(row["stability"] == "unanimous" for row in comparable_rows),
+                "majority_comparable": sum(row["stability"] == "majority" for row in comparable_rows),
+                "unanimous_candidate_revision": sum(
+                    row["stability"] == "unanimous" and row["comparison_status"] == "candidate_revision"
+                    for row in comparable_rows
+                ),
                 "no_stable_reference": sum(
                     row["comparison_status"] == "no_stable_independent_reference" for row in rows
                 ),

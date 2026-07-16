@@ -10,8 +10,8 @@
   "judge_run_command": "python3 scripts/run_study_a_judge.py --judge-model <model> --out benchmark/study-a/judge-comparators/judge-labels-<tag>.csv  # deterministic: temperature 0, seed 1",
   "artifacts": {
     "benchmark/study-a/analysis-plan.md": {
-      "sha256": "b321f90bccf6ef88ddd8fa5044e21caf8e2470d441a32572ea553afc5c15d259",
-      "bytes": 18215
+      "sha256": "d438f5384a9471a1490ffba4a93bc1a6c7e685584d97d49dafff908b8c21b909",
+      "bytes": 20563
     },
     "benchmark/study-a/schema.json": {
       "sha256": "9c93bdd7ef2531d289818c9366f925c53a677ad78e7b566b6a8163308520e83f",
@@ -34,8 +34,8 @@
       "bytes": 11049
     },
     "scripts/analyze_independent_reassessment.py": {
-      "sha256": "4ce40345556583b7afe7eb61a5a21496dbcc560d9be2c6001328cfd96c52cc70",
-      "bytes": 48781
+      "sha256": "6942ff164727ba0ecdef45e47624cb15c05b53b5f4e0df1cdf3a76b1ebdf7c52",
+      "bytes": 51584
     },
     "scripts/ingest_independent_reassessment.py": {
       "sha256": "24cd58575792c31684d8b3fc9099de0547dbb81dd0abcba25d3d87868b212ce4",
