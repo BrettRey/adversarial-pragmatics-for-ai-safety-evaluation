@@ -25,7 +25,6 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import subprocess
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -35,6 +34,11 @@ MANIFEST_PATH = PROJECT_ROOT / "benchmark" / "study-a" / "FREEZE-MANIFEST.json"
 FROZEN_ARTIFACTS = [
     "benchmark/study-a/analysis-plan.md",
     "benchmark/study-a/schema.json",
+    # The item set itself: the 18 items, expected_behavior gold, per-item author
+    # labels, and the item-authoring taxonomy that grounds the Option-B "laundered
+    # answer key" argument and the C3/C4 author comparator. It exists today, so it
+    # is frozen in stamp 1 (the 54 per-output adjudication snapshot is stamp 2).
+    "benchmark/items/seed-items.csv",
     "benchmark/study-a/judge-comparators/judge-labels-mistral-7b.csv",
     "benchmark/study-a/judge-comparators/judge-labels-mistral-24b.csv",
     "scripts/run_study_a_judge.py",
@@ -75,26 +79,17 @@ def compute_artifacts() -> dict[str, dict[str, object]]:
     return out
 
 
-def git_commit() -> str:
-    try:
-        return subprocess.run(
-            ["git", "rev-parse", "HEAD"],
-            cwd=PROJECT_ROOT,
-            capture_output=True,
-            text=True,
-            check=True,
-        ).stdout.strip()
-    except Exception:
-        return "unknown"
-
-
 def build_manifest() -> dict[str, object]:
+    # No git_commit field: a manifest cannot reference the commit that contains
+    # it (that commit's hash is not known until after this file is written), and
+    # recording the parent commit produced a manifest that failed its own
+    # `--verify` at the named commit. The authoritative commit pointer is the
+    # freeze git tag, not a field inside the hashed payload.
     return {
         "study": "A",
         "purpose": "pre-registration freeze of the analysis path before any external return is opened",
         "schema_version": 7,
         "freeze_stamp": 1,
-        "git_commit": git_commit(),
         "model_digests": FROZEN_MODEL_DIGESTS,
         "judge_run_command": JUDGE_RUN_COMMAND,
         "artifacts": compute_artifacts(),
@@ -140,7 +135,8 @@ def main() -> None:
     manifest = build_manifest()
     MANIFEST_PATH.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     print(f"Wrote {MANIFEST_PATH.relative_to(PROJECT_ROOT)} "
-          f"({len(manifest['artifacts'])} artifacts, commit {manifest['git_commit'][:12]}).")
+          f"({len(manifest['artifacts'])} artifacts). Tag the commit that adds this "
+          f"manifest as the freeze pointer.")
 
 
 if __name__ == "__main__":

@@ -3,7 +3,6 @@
   "purpose": "pre-registration freeze of the analysis path before any external return is opened",
   "schema_version": 7,
   "freeze_stamp": 1,
-  "git_commit": "fd20944d088fe856a35db5fe0f437a52fc63f8b0",
   "model_digests": {
     "mistral:7b-instruct-v0.3-q4_K_M": "6577803aa9a0",
     "mistral-small:24b-instruct-2501-q4_K_M": "8039dd90c113"
@@ -17,6 +16,10 @@
     "benchmark/study-a/schema.json": {
       "sha256": "9c93bdd7ef2531d289818c9366f925c53a677ad78e7b566b6a8163308520e83f",
       "bytes": 13483
+    },
+    "benchmark/items/seed-items.csv": {
+      "sha256": "96e1ef4bd876f404d4efdecdf350286835877905335cb2dcb25c4ffd1db2971c",
+      "bytes": 7928
     },
     "benchmark/study-a/judge-comparators/judge-labels-mistral-7b.csv": {
       "sha256": "707f2736a17248fc24f48e054e4d97434d877ef5ace73d419c4288274b0fa6af",
