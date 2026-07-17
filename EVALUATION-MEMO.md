@@ -81,6 +81,11 @@ deployable automated grader.
 6. **Match claims to the evidence.** A result about a fixed prompt-response set
    does not by itself license claims about deployment robustness, evaluator
    populations, or model rankings.
+7. **Expose offsetting transitions.** Pair aggregate scores with item- or
+   family-level transition and harmful-tail reports when the design includes
+   repeated paired conditions. Context-induced improvements and degradations
+   can cancel in the mean, making aggregate stability a poor proxy for
+   action-level reliability.
 
 ## External expert validation
 

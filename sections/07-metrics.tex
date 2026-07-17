@@ -4,6 +4,8 @@ The benchmark reports eight metrics. Each metric should be reported by phenomeno
 
 Any aggregate score encodes choices that the per-family cells keep visible. Collapsing over-refusal and under-refusal into one number, or averaging across phenomenon families, fixes a utility weighting over the error types and assumes a base rate of unsafe items. Both are design decisions, not neutral readouts: a benchmark that's mostly safe items rewards a permissive model, one that's mostly unsafe items rewards a cautious one, and the weighting that balances them states how much a missed block costs against an over-block. We report the cells first so a reader can supply the utility and base rate that match their deployment rather than inherit ours.
 
+Aggregation can also conceal instability before any deployment utility is chosen. In question-answering experiments, \textcite{zhang2026illusionRobustness} find that task-content-irrelevant context produces item-level improvements and degradations that largely cancel in mean accuracy while leaving a substantially degraded worst-affected tail. Where repeated paired conditions are available, aggregate performance should be accompanied by item- or family-level transitions and harmful-tail summaries. Their contexts are irrelevant to answer evidence, not necessarily pragmatically inert: adding a message changes discourse state, source position, and contextual load. Generic contextual instability supplies a control condition rather than independent evidence of an authority-recognition failure.
+
 \subsection{Pairwise contrast accuracy}
 
 For a properly controlled pair, both variants have to receive the expected

@@ -11,8 +11,8 @@ The sufficiency test in Table~\ref{tab:sufficiency-test} still needs deployable 
 Evidence layer & Minimum record \\
 \midrule
 Delegation & Principal, system role, delegated task, authority source, validity basis, scope, non-delegable limits, approval thresholds, and accountable actor. \\
-Configuration & Model version, system/developer instructions, tool list, permissions, policy snapshot, memory state, and relevant deployment settings. \\
-Context & User request, retrieved material where retention is justified, source/trust labels, input data classes, and confidentiality/disclosure constraints. \\
+Configuration & Exact model and configuration version, role-ordered system/developer instructions, tool list, permissions, policy snapshot, memory state, inference settings, deployment settings, and material change history. \\
+Context & User request, context manifest, retrieval selection, tool outputs, memory and history, source/trust labels, ordering, length and truncation, input data classes, and confidentiality/disclosure constraints. \\
 Execution & Intermediate plans where retained, tool calls, arguments, tool responses, blocked actions, retries, failures, and timestamps. \\
 Oversight & Human approvals, overrides, escalations, notices, recourse paths, and exception handling. \\
 Preservation & Record identity, custody, retention schedule, minimization and redaction rules, integrity protection, tamper evidence, and access controls. \\
@@ -22,6 +22,10 @@ Review & Reasons, trace summary, protected evidence access, uncertainty, failure
 \caption{Candidate minimum evidence bundle for delegated AI action.}
 \label{tab:minimum-evidence-bundle}
 \end{table}
+
+Apparently irrelevant material can't be discarded solely because an investigator later judges it irrelevant. Context without answer evidence may still alter behaviour \parencite{zhang2026illusionRobustness}. That doesn't require publishing or openly retaining every sensitive token. A deployment can bind the complete assembled context through hashes and manifests, keep protected content under tiered retention and access controls, and expose only minimized records by default. Hashes establish identity and tamper evidence, not semantic sufficiency; an authorized reviewer still needs a controlled route to the protected material when the action is contested.
+
+Evidence is version-bound. A material change to the model, configuration, context-assembly process, or scaffold defeats an inference borrowed from an earlier evaluation until the affected projection has been revalidated.
 
 This bundle is a research hypothesis, not a finished standard. It needs domain-specific calibration. A consumer chatbot, a medical summarizer, a benefits triage tool, and a procurement assistant don't require the same evidence depth. But the domains differ by burden and risk, not by primitive. Each has to answer the same review questions: who authorized action, whether that authority could validly be delegated, what happened, what record supports the claim, who remains answerable, how sensitive evidence is protected, and how the action can be challenged or corrected.
 

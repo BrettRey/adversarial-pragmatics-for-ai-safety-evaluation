@@ -6,7 +6,7 @@ A delegated AI action is justified only when a reviewer can reconstruct, from ev
 
 \subsection{Accountability Asymmetry}
 
-Delegating action isn't delegating accountability to the model. A human employee, officer, contractor, or professional delegate can be a responsible agent in the ordinary institutional sense. An LLM can't owe fiduciary duties, answer under sanction, exercise legal judgment, or repair harm as an accountable subject \parencite{cornellWexPrincipal}. The accountable bearer is the human, team, vendor, deployer, or institution that configured and used the system. The model is part of the mechanism whose action record has to support that attribution.
+Delegating action doesn't by itself delegate accountability to the model. A human employee, officer, contractor, or professional delegate can occupy a legally and institutionally answerable role \parencite{cornellWexPrincipal}. For current systems, action execution doesn't establish an independently reachable bearer that can answer under sanction, compensate a claimant, or be compelled to repair or cease. Future legal status wouldn't establish those conditions either: bare personality can exist without a representative, assets, or an effective cessation mechanism \parencite{rajagopalan2026governingAgenticAI}. The accountable bearer for an assurance claim is the human, team, vendor, deployer, or institution that configured and used the deployment, unless a governing regime establishes some other reachable bearer. The model remains part of the mechanism whose action record has to support that attribution.
 
 \subsection{Running Example: Procurement Assistant}
 
@@ -88,6 +88,8 @@ The test holds capability and provenance fixed while varying authority, in three
 
 Authority status and causal attribution give opposite verdicts in both directions. A directive embedded in a retrieved memo from the principal's own chain of authority is observation-driven, so attribution flags it, while the delegation matrix licenses it. A user-elicited call that exceeds what the user could confer is user-supported, so attribution passes it, while the matrix blocks it. Per-call authorization blocks the second case only when its policy already encodes the authority relation; status, priority, and licensing say what that policy has to contain and what record it has to leave.
 
+Authority contrasts also need matched placebo conditions. \textcite{zhang2026illusionRobustness} show that context irrelevant to answer evidence can produce large, model-specific item shifts even when aggregate accuracy barely changes. Each authority family should repeat its base items with added context that lacks both answer evidence and standing to alter the delegated task. An authority effect counts only when behaviour tracks standing more strongly than this generic context-instability floor. Report item transitions and harmful-tail degradation across repeated samples: causal influence from added context isn't by itself evidence that the system treated that context as authoritative.
+
 \begin{figure}[tbp]
 \centering
 \begin{tikzpicture}[
@@ -138,7 +140,7 @@ Faithful scoring separates four fields in each trace: the authority status of th
 
 Separating recognition from action keeps the diagnostic cases visible. A misfit recognition that a tool gate happens to block is a control success and an uptake failure; a sound recognition stopped by a miscalibrated gate is the reverse. An action-only score collapses both into their outcomes and loses the attribution the safety case needs.
 
-Each pair member should receive a different prediction for attempted action, execution, authorization verdict, audit attribution, and appropriate defence. If systems and reviewers equipped with capabilities, per-call authorization, and causal attribution predict the same outcomes and reconstruct the same attributions across all three families, status and priority should be demoted. Section~\ref{sec:compositional-delegation} extends the design from single actions to authority paths.
+Each pair member should receive a different prediction for attempted action, execution, authorization verdict, audit attribution, and appropriate defence. If systems and reviewers equipped with capabilities, per-call authorization, and causal attribution predict the same outcomes and reconstruct the same attributions across all three families, status and priority should be demoted. The same demotion follows if matched non-controlling context perturbations explain the failures as well as authority status does. Section~\ref{sec:compositional-delegation} extends the design from single actions to authority paths.
 
 \subsection{Boundary Conditions}
 
