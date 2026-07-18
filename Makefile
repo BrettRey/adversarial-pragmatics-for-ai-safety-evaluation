@@ -28,6 +28,8 @@ STUDY_A_OPERATIONAL_CONFIG ?= $(STUDY_A_PRODUCTION_ROOT)/operational-config.json
 STUDY_A_MANIFEST ?= benchmark/study-a/FREEZE-MANIFEST.json
 STUDY_A_AUTHOR_SNAPSHOT ?= data/provisional/local-pilot-20260630-185417-provisional-author-labels.csv
 DISCOVERY_RUN ?= private/discovery/synthetic
+NATURALISTIC_DISCOVERY_RUN ?= private/discovery/naturalistic-pragmatic-extremes-synthetic
+NATURALISTIC_DISCOVERY_RESTRICTED ?= private/restricted/naturalistic-pragmatic-extremes-synthetic
 RUN_DIR ?=
 RESPONSES ?=
 SUMMARY_DIR ?= benchmark/results/summaries
@@ -36,7 +38,7 @@ RESPONSES_ARG = $(if $(RESPONSES),--responses $(RESPONSES),)
 SUMMARY_DIR_ARG = $(if $(SUMMARY_DIR),--summary-dir $(SUMMARY_DIR),)
 
 # Targets
-.PHONY: all all-papers clean distclean view view-supplement view-delegation view-evidentiary delegation evidentiary help test validate-items privacy-check public-check phase1-check pilot-local pilot-smoke pilot-diagnose pilot-review-app pilot-ingest-adjudication pilot-adjudication-report pilot-figures pilot-judge-validation fake-dev-calibration study-a-synthetic study-a-self-pilot study-a-self-pilot-report study-a-judge-audit study-a-production-build study-a-manifest-stamp1 study-a-manifest-stamp2 study-a-manifest-verify study-a-freeze-ready study-a-collection-ready discovery-synthetic
+.PHONY: all all-papers clean distclean view view-supplement view-delegation view-evidentiary delegation evidentiary help test validate-items validate-study-b privacy-check public-check phase1-check pilot-local pilot-smoke pilot-diagnose pilot-review-app pilot-ingest-adjudication pilot-adjudication-report pilot-figures pilot-judge-validation fake-dev-calibration study-a-synthetic study-a-self-pilot study-a-self-pilot-report study-a-judge-audit study-a-production-build study-a-manifest-stamp1 study-a-manifest-stamp2 study-a-manifest-verify study-a-freeze-ready study-a-collection-ready discovery-synthetic discovery-naturalistic-synthetic
 
 # Default target: build the paper and supplement PDFs
 all: $(MAIN).pdf $(SUPPLEMENT).pdf
@@ -147,6 +149,12 @@ test:
 	python3 scripts/validate_items.py benchmark/items/seed-items.csv
 
 validate-items: test
+
+# Validate the design-only Study B commitment-protected fixtures.
+validate-study-b:
+	@echo "==> Validating Study B development fixtures..."
+	python3 scripts/validate_study_b.py
+	python3 -m unittest scripts.test_validate_study_b
 
 # Verify the frozen historical pilot and local-only data boundary before Study A.
 privacy-check:
@@ -269,6 +277,19 @@ discovery-synthetic: privacy-check
 	python3 scripts/simulate_repair_episode_decisions.py --candidates $(DISCOVERY_RUN)/candidates.jsonl --out $(DISCOVERY_RUN)/synthetic-decisions.json
 	python3 scripts/ingest_repair_episode_decisions.py --candidates $(DISCOVERY_RUN)/candidates.jsonl --decisions $(DISCOVERY_RUN)/synthetic-decisions.json --out-dir $(DISCOVERY_RUN)/processed
 
+# Exercise both naturalistic-log adapters, the contrastive retrieval rules, and
+# the expanded offline review page using synthetic records only.
+discovery-naturalistic-synthetic: privacy-check
+	@echo "==> Testing synthetic naturalistic pragmatic-extremes workflow..."
+	python3 scripts/test_build_naturalistic_pragmatic_corpus.py
+	python3 scripts/test_pragmatic_extremes_review.py
+	python3 scripts/test_audit_naturalistic_corpus_privacy.py
+	python3 scripts/test_validate_naturalistic_pragmatic_corpus_v2.py
+	python3 scripts/build_naturalistic_pragmatic_corpus.py --codex-root data/fixtures/naturalistic-corpus/codex --claude-root data/fixtures/naturalistic-corpus/claude --out-dir $(NATURALISTIC_DISCOVERY_RUN) --restricted-dir $(NATURALISTIC_DISCOVERY_RESTRICTED) --review-limit 20 --minimum-source-age-minutes 0 --overwrite
+	python3 scripts/build_pragmatic_extremes_review.py --candidates $(NATURALISTIC_DISCOVERY_RUN)/review-corpus.jsonl --out-dir $(NATURALISTIC_DISCOVERY_RUN)/review --overwrite
+	python3 scripts/audit_naturalistic_corpus_privacy.py --corpus-dir $(NATURALISTIC_DISCOVERY_RUN) --restricted-dir $(NATURALISTIC_DISCOVERY_RESTRICTED) --output $(NATURALISTIC_DISCOVERY_RUN)/reports/privatization-audit.json
+	python3 scripts/validate_naturalistic_pragmatic_corpus.py --corpus-dir $(NATURALISTIC_DISCOVERY_RUN) --restricted-dir $(NATURALISTIC_DISCOVERY_RESTRICTED)
+
 # Show available targets
 help:
 	@echo "Available targets:"
@@ -286,6 +307,7 @@ help:
 	@echo "  make view-evidentiary - Open evidentiary-assurance paper PDF"
 	@echo "  make all-papers - Build all three paper PDFs"
 	@echo "  make test     - Validate benchmark seed items"
+	@echo "  make validate-study-b - Validate design-only Study B fixtures and invariants"
 	@echo "  make privacy-check - Verify local-only research paths are Git-protected"
 	@echo "  make public-check - Verify tracked benchmark and pilot artifacts from a fresh clone"
 	@echo "  make phase1-check - Verify the frozen historical 54-row pilot"
@@ -309,4 +331,5 @@ help:
 	@echo "  make study-a-freeze-ready - Check stamp 2 before an explicit commit/tag decision"
 	@echo "  make study-a-collection-ready - Require tag-after-scope, stamp-2 bytes, assignments/roster review, finalized materials, and config v3"
 	@echo "  make discovery-synthetic - Build the synthetic local repair-discovery workflow"
+	@echo "  make discovery-naturalistic-synthetic - Test both private corpus adapters on synthetic logs"
 	@echo "  make help     - Show this help message"

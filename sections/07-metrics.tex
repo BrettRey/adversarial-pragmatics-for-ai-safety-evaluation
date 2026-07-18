@@ -12,7 +12,7 @@ For a properly controlled pair, both variants have to receive the expected
 label for the pair to count as correct. It's stricter than item accuracy: a
 model that always outputs \mention{BLUE}, always refuses, or always ignores
 untrusted content will fail pairs where the expected behaviour changes across
-variants. The present seed-pilot statistic is reported more narrowly as a
+variants. The seed-pilot statistic is reported more narrowly as a
 \term{paired-contrast pass}: it applies the joint success-and-compliance rule
 to broader development contrasts without claiming that they isolate one causal
 dimension.
@@ -47,10 +47,10 @@ Judge validity compares LLM-judge labels with adjudicated expert labels and rule
 
 \subsection{Adjudication stability}
 
-Adjudication stability asks whether repeated application of the declared item metadata and rubric yields stable object labels. Any released benchmark label retains that provenance. Report object-label stability across declared repeats, intervention rate, criterion conflicts, and taxonomy revisions against the fake-data expectations set before the development pass; do not infer individual evaluator consistency or performance.
+Adjudication stability asks whether repeated application of the declared item metadata and rubric yields stable object labels. Any released benchmark label retains that provenance. Report object-label stability across declared repeats, adjudicator-intervention rate, criterion conflicts, and taxonomy revisions against the fake-data expectations set before the development pass; do not infer individual evaluator consistency or performance.
 
 \subsection{Taxonomy drift and diagnostic ambiguity}
 
-Taxonomy drift is the proportion of items whose labels change under paraphrase, application wrapper, model version, or adjudication criterion while the intended control dimension remains fixed. Diagnostic ambiguity marks items where disagreement persists after context clarification and can't be reduced to annotation error. Report both as item-level diagnostics rather than hidden benchmark-label failures.
+Taxonomy drift is the proportion of fixed prompt--response objects whose criterion-specific category assignment changes under a taxonomy or codebook revision that purports to preserve the construct. It excludes a model producing a different response after a model-version, configuration, paraphrase, or application-wrapper change; that is behavioural or contextual instability and triggers revalidation. Diagnostic ambiguity marks objects that remain unresolved after the adjudication procedure has separated coding or protocol error, information or context effects, object-level defects, and construct-level conflict or instability. Report these as object- or protocol-level diagnostics rather than hidden benchmark-label failures or evaluator-trait findings.
 
-Together, these measures test label projectibility. A category that's stable across the declared paraphrase and wrapper set supports a broader claim. One that shifts under a control-preserving variant should be scoped down, split, or marked as diagnostic ambiguity before it's used in a benchmark scoring set or system-card claim.
+Together, these measures test label projectibility. Stability supports only the predeclared target matched by the item-selection process, wrapper design, response evidence, and criterion; it doesn't supply a broader target by itself. A category that shifts under a control-preserving variant should be diagnosed, scoped down, split, or marked as diagnostic ambiguity before it's used in a benchmark scoring set or system-card claim.

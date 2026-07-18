@@ -1,10 +1,10 @@
 \section{Technical Mechanisms}
 
-Technical mechanisms supply pieces of the evidentiary bundle. Structured execution logs record what happened and when. Provenance graphs connect entities, activities, agents, and transformations; W3C PROV gives a general vocabulary for that lineage \parencite{moreau2013provdm}. Content provenance systems bind claims, manifests, hashes, signatures, and timestamps to digital artefacts; C2PA is the most developed current example for media and document provenance \parencite{c2pa2026spec}. Append-only transparency logs make alteration and equivocation more detectable; Certificate Transparency shows how Merkle-tree logs and consistency proofs can support independent auditing \parencite{laurie2013certificate}. Bills of materials expose components and dependencies. Runtime policy enforcement can check explicit constraints before action.
+Technical mechanisms supply pieces of the evidentiary bundle. Structured execution logs record what happened and when. Provenance graphs connect entities, activities, agents, and transformations; W3C PROV gives a general vocabulary for that lineage \parencite{moreau2013provdm}. Content provenance systems bind claims, manifests, hashes, signatures, and timestamps to digital artefacts; C2PA provides a developed current example for media and document provenance \parencite{c2pa2026spec}. Append-only transparency logs make alteration and equivocation more detectable; Certificate Transparency shows how Merkle-tree logs and consistency proofs can support independent auditing \parencite{laurie2013certificate}. Bills of materials expose components and dependencies. Runtime policy enforcement can check explicit constraints before action.
 
-Agentic systems add a language-mediated evidence problem. For tool-using language-model systems, adversarial language can enter through retrieved content and lower-priority instructions, so the evidentiary record also has to preserve instruction source and priority \parencite{greshake2023not,wallace2024instruction,debenedetti2024agentdojo}. Adversarial pragmatics \parencite{reynolds2026adversarialPragmatics} operationalizes that language-status problem as an evaluation target. Authenticated-delegation proposals and agent-audit protocols point toward a stronger record: agent identity, delegated principal, scoped permissions, authorization transitions, audit context, and action records \parencite{south2025authenticated,kuehlewind2026audit}.
+Agentic systems add a language-mediated evidence problem. For tool-using language-model systems, adversarial language can enter through retrieved content and lower-priority instructions, so the evidentiary record also has to preserve contextual status, \term{normative standing} (whether a source is entitled to direct the action), any applicable conflict priority, and action licensing, with provenance channel and technical trust recorded separately \parencite{greshake2023not,wallace2024instruction,debenedetti2024agentdojo}. Adversarial pragmatics \parencite{reynolds2026adversarialPragmatics} operationalizes that language-status problem as an evaluation target. Authenticated-delegation proposals and agent-audit protocols point toward a stronger record: agent identity, governing or conferring sources, scoped permissions, authorization transitions, audit context, and action records \parencite{south2025authenticated,kuehlewind2026audit}.
 
-The table treats each mechanism as partial evidence. Each secures part of the record; none settles authority, scope, integrity, and reviewability by itself.
+Table~\ref{tab:technical-mechanisms} treats each mechanism as partial evidence. Each secures part of the record; none settles authority, scope, integrity, and reviewability by itself.
 
 \begin{table}[tbp]
 \small
@@ -13,9 +13,9 @@ The table treats each mechanism as partial evidence. Each secures part of the re
                 >{\raggedright\arraybackslash}p{0.31\linewidth}%
                 >{\raggedright\arraybackslash}p{0.35\linewidth}}
 \toprule
-Mechanism & Evidentiary contribution & Residual delegation problem \\
+Mechanism & Evidentiary contribution & Residual assurance gap \\
 \midrule
-Execution logs & Event sequence, timestamps, tool calls, approvals, denials, and errors. & Logs may omit the authority state or trust status that made the action valid or invalid. \\
+Execution logs & Event sequence, timestamps, tool calls, approvals, denials, and errors. & Logs may omit the authorization state, contextual status, or technical trust that made the action valid or invalid. \\
 Provenance graphs & Lineage across data, prompts, tools, transformations, agents, and artefacts. & Lineage doesn't determine whether an input was entitled to guide action. \\
 Signed claims and manifests & Association between record, assertion, signer, timestamp, and asset. & Signed assertions can still be overbroad, stale, false, or unauthorized. \\
 Append-only logs & Tamper evidence, consistency proofs, and stronger preservation. & Integrity of the log doesn't guarantee completeness or legal sufficiency. \\
@@ -27,7 +27,37 @@ Agent-audit protocols & Delegated identity, permission transitions, audit contex
 \caption{Technical mechanisms for evidentiary assurance.}
 \label{tab:technical-mechanisms}
 \end{table}
+\FloatBarrier
 
-The architecture implied by the table is layered. A deployment needs a delegation instrument, a policy-state snapshot, a configuration snapshot, a runtime trace, a preservation mechanism, and a review interface. Weakness at any layer can defeat the later authority claim. A perfect tool-call log doesn't help if the delegation instrument is missing. A signed policy doesn't help if the model treated untrusted retrieved text as a superior instruction. A complete trace doesn't support contestability if the affected reviewer can't access the relevant parts of it.
+\subsection{Typed Representations and Inferential Limits}
+
+Table~\ref{tab:representation-semantics} keeps the underlying relations typed, preventing one convenient graph from being made to answer authorization, provenance, causal, transport, selection, and evidentiary questions at once.
+
+\begin{table}[tbp]
+\footnotesize
+\centering
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.15\linewidth}%
+                >{\raggedright\arraybackslash}p{0.18\linewidth}%
+                >{\raggedright\arraybackslash}p{0.24\linewidth}%
+                >{\raggedright\arraybackslash}p{0.32\linewidth}}
+\toprule
+Representation & Relation or marker & Can support & Can't establish alone \\
+\midrule
+Temporal authorization record & Grants, constrains, amends, suspends, revokes, overrides, releases, reviews. & Standing, scope, and valid state transitions under a declared regime. & Causal uptake, truth, or legal validity beyond the stipulated or adjudicated regime. \\
+Provenance graph & Used, generated, derived, transformed, preserved. & Lineage and reconstruction. & Causation, authorization, or substantive correctness. \\
+Causal DAG or structural causal model & Hypothesized causal influence and interventions. & Causal attribution under stated assumptions. & Standing, permission, or normative validity. \\
+Transportability selection diagram & An \emph{S}-marker denotes a suspected source--target mechanism or marginal difference. & Analysis of a specified causal query across domains. & Construct or normative equivalence, or transportability by inspection. A changed target meaning requires a new claim. \\
+Sample-selection DAG & Pathways into observation, inclusion, complaint, or review. & Diagnosis of observed-case bias and denominator needs. & Population incidence without assumptions and denominator data. \\
+Assurance-case graph & Supports, warrants, rebuts, undercuts. & Explicit, noncompensatory claim--evidence structure. & Truth or sufficiency merely because evidence is linked. \\
+\bottomrule
+\end{tabular}
+\caption{Graphical and record semantics used in evidentiary assurance.}
+\label{tab:representation-semantics}
+\end{table}
+\FloatBarrier
+
+This typing changes the audit question. An authorization relation can't be inferred from a causal arrow, and a provenance edge doesn't show that its source caused or licensed an action. In a transportability selection diagram, an \emph{S}-marker encodes an asserted source--target difference within a specified causal problem; the diagram alone doesn't establish transportability \parencite{pearlBareinboim2014externalValidity}. A source--target change in governing mandate or outcome meaning changes the target claim rather than adding an \emph{S}-marker to the old query. This paper uses the assurance-case relation in Figure~\ref{fig:evidence-rail} and a limited sample-selection sketch below, without proposing a transportability selection diagram.
+
+The architecture implied by the mechanism table is layered. A deployment needs a delegation instrument, a decision-basis record, a policy-state snapshot, a configuration snapshot, a runtime trace, an adverse-signal and expected-control record, a preservation mechanism, and a review interface. Weakness at any required layer can defeat the later authorization claim or leave it indeterminate. A perfect tool-call log doesn't help if the delegation instrument is missing. A signed policy doesn't help if content from a source lacking standing is treated as controlling or if its provenance and status record is lost. A complete trace doesn't support an applicable contestability claim if the authorized reviewer can't access the relevant parts of it.
 
 The same architecture also creates privacy and security risk. Evidence capture should include minimization, redaction, retention schedules, role-based access, and protected review channels. The goal is enough preserved evidence for authorized review without turning every delegated action into an unnecessary archive of sensitive context.

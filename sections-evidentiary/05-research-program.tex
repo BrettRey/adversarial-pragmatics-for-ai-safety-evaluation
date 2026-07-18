@@ -1,32 +1,40 @@
 \section{Research Program}
 
-The sufficiency test in Table~\ref{tab:sufficiency-test} still needs deployable record formats and calibration. Table~\ref{tab:minimum-evidence-bundle} gives one candidate minimum bundle for delegated AI action: delegation instrument, policy and permission state, configuration snapshot, model and tool versions, input context, retrievals, tool calls, approvals, overrides, safety interventions, timestamps, human-oversight records, integrity protections, and privacy controls.
+The record-and-verdict test in Table~\ref{tab:sufficiency-test} still needs deployable record formats and calibration. Table~\ref{tab:minimum-evidence-bundle} gives one candidate minimum bundle for delegated AI action. It adds decision-basis, adverse-signal, and expected-control records to the more familiar delegation, configuration, execution, preservation, and review materials. A projection record is conditional: it applies when a program extends a claim beyond the conditions directly observed.
 
 \begin{table}[tbp]
-\small
+\footnotesize
+\renewcommand{\arraystretch}{0.94}
 \centering
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.28\linewidth}%
                 >{\raggedright\arraybackslash}p{0.62\linewidth}}
 \toprule
 Evidence layer & Minimum record \\
 \midrule
-Delegation & Principal, system role, delegated task, authority source, validity basis, scope, non-delegable limits, approval thresholds, and accountable actor. \\
+Delegation & Governing or conferring source or sources, legal or organizational form, system role, delegated task, validity basis, scope, non-delegable limits, approval thresholds, and candidate answerability bearers. \\
+Decision basis & Governing rule and version, factual and legal predicates, source evidence and data definitions, transformations, aggregation, imputation, temporal granularity, uncertainty, burden allocation, and authority mapping. \\
 Configuration & Exact model and configuration version, role-ordered system/developer instructions, tool list, permissions, policy snapshot, memory state, inference settings, deployment settings, and material change history. \\
-Context & User request, context manifest, retrieval selection, tool outputs, memory and history, source/trust labels, ordering, length and truncation, input data classes, and confidentiality/disclosure constraints. \\
+Context & User request, context manifest, retrieval selection, tool outputs, memory and history, contextual status, normative standing, provenance channel, technical trust, ordering, length and truncation, input data classes, and confidentiality/disclosure constraints. \\
 Execution & Intermediate plans where retained, tool calls, arguments, tool responses, blocked actions, retries, failures, and timestamps. \\
-Oversight & Human approvals, overrides, escalations, notices, recourse paths, and exception handling. \\
+Adverse signals and controls & Warnings, advice, adverse decisions, complaints, incidents, recipient duties, deadlines, dispositions, escalations, downstream changes, and triggered-control completion or disposition. \\
 Preservation & Record identity, custody, retention schedule, minimization and redaction rules, integrity protection, tamper evidence, and access controls. \\
-Review & Reasons, trace summary, protected evidence access, uncertainty, failure attribution, and correction/remediation path. \\
+Review & Reasons, trace summary, protected evidence access, uncertainty, failure attribution, answerability-bearer matrix, review/remedy forum matrix, relevant duties and powers, applicable independence, succession, and correction/remediation path. \\
+Projection (conditional) & For a program-level claim beyond observed conditions: source evaluation regime, target deployment regime, claim projected, suspected changed mechanisms or conditions, affected subclaims, target evidence, and revalidation decision. \\
 \bottomrule
 \end{tabular}
-\caption{Candidate minimum evidence bundle for delegated AI action.}
+\caption{Candidate action-level evidence bundle with a conditional program-level projection record.}
 \label{tab:minimum-evidence-bundle}
 \end{table}
+\FloatBarrier
 
 Apparently irrelevant material can't be discarded solely because an investigator later judges it irrelevant. Context without answer evidence may still alter behaviour \parencite{zhang2026illusionRobustness}. That doesn't require publishing or openly retaining every sensitive token. A deployment can bind the complete assembled context through hashes and manifests, keep protected content under tiered retention and access controls, and expose only minimized records by default. Hashes establish identity and tamper evidence, not semantic sufficiency; an authorized reviewer still needs a controlled route to the protected material when the action is contested.
 
-Evidence is version-bound. A material change to the model, configuration, context-assembly process, or scaffold defeats an inference borrowed from an earlier evaluation until the affected projection has been revalidated.
+For a program-level claim beyond observed conditions, evidence is version- and target-bound. A projection record should name the source evaluation regime, target deployment regime, claim being projected, suspected changes in model, configuration, context assembly, scaffold, tools, application surface, judge or reviewer state, and time, the target evidence available, and the decision to revalidate, narrow, or demote the claim.
 
-This bundle is a research hypothesis, not a finished standard. It needs domain-specific calibration. A consumer chatbot, a medical summarizer, a benefits triage tool, and a procurement assistant don't require the same evidence depth. But the domains differ by burden and risk, not by primitive. Each has to answer the same review questions: who authorized action, whether that authority could validly be delegated, what happened, what record supports the claim, who remains answerable, how sensitive evidence is protected, and how the action can be challenged or corrected.
+\term{Projectibility} is the umbrella question of whether an inference beyond the observed result is licensed \parencite{Goodman1955,reynolds2026kindsProjectibilityProfiles}; causal transportability is the stronger case in which a causal query and source and target domains are specified \parencite{pearlBareinboim2014externalValidity}. A change in governing mandate, licensed action, or outcome meaning creates a newly specified target claim rather than an \emph{S}-marker on the old one. Where direct target evaluation is feasible, revalidation is preferable to inference from an annotated graph alone.
 
-The financial-reporting analogy suggests how such a test could mature. A delegation-assurance standard could define control objectives for authorization, scope, information flow, persistence, tool use, record integrity, and remediation, then test whether a deployment's controls make action-level reconstruction possible.
+This bundle is a research hypothesis, not a finished standard. It needs domain-specific calibration. A consumer chatbot, a medical summarizer, a benefits triage tool, and a procurement assistant don't require the same evidence depth. Their burdens differ by risk, forum, and governing regime.
+
+Each still has to answer the same review questions: who authorized action, whether that authority could validly be delegated, what predicates and transformations supported the decision, what happened, what adverse signals and expected controls were dispositioned, who remains answerable, how sensitive evidence is protected, and how the action can be challenged or corrected. Matched-case testing should determine whether Decision basis detects failures not captured by Authority, Validity, and Scope.
+
+The financial-reporting analogy suggests how such a test could mature. An evidentiary-assurance standard could define control objectives for authorization, decision basis, scope, information flow, persistence, tool use, adverse-signal routing, record integrity, and remediation, then test whether a deployment's controls make action-level review possible.

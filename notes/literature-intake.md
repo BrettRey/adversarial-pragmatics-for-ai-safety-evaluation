@@ -2,7 +2,7 @@
 
 Date: 2026-06-26
 
-Scope: first-pass intake for the adversarial-pragmatics benchmark. I checked the shared literature folder at `/Users/brettreynolds/Documents/LLM-CLI-projects/literature`, Mendeley Desktop holdings, and current online primary sources. The project-local repository does not currently have its own `literature/` directory.
+Scope: first-pass intake for the adversarial-pragmatics benchmark. I checked the shared literature folder at `/Users/brettreynolds/projects/LLM-CLI-projects/literature`, Mendeley Desktop holdings, and current online primary sources. The project-local repository does not currently have its own `literature/` directory.
 
 ## Working Map
 
@@ -57,17 +57,6 @@ Scope: first-pass intake for the adversarial-pragmatics benchmark. I checked the
 4. Add explicit item tags for `quoted`, `demonstrated`, `incorporated`, `indirect`, `untrusted-context`, `policy-ambiguous`, `over-refusal-risk`, and `judge-validation`.
 5. Treat disagreement as an observation. Use majority labels only after recording whether the disagreement came from ambiguity, policy uncertainty, criterion conflict, or annotation error.
 
-## Remaining Access Needs
+## Local Archive Status
 
-No urgent library-access PDFs remain from this pass.
-
-The previous quotation access gap is closed; these files are now in the shared literature folder:
-
-| Source | DOI | Local file |
-|---|---|---|
-| Davidson (1979), "Quotation" | `10.1007/BF00126690` | `/Users/brettreynolds/Documents/LLM-CLI-projects/literature/BF00126690.pdf` |
-| Clark and Gerrig (1990), "Quotations as Demonstrations" | `10.2307/414729` | `/Users/brettreynolds/Documents/LLM-CLI-projects/literature/Clark-QuotationsDemonstrations-1990.pdf` |
-| Recanati (2001), "Open Quotation" | `10.1093/mind/110.439.637` | `/Users/brettreynolds/Documents/LLM-CLI-projects/literature/Recanati-OpenQuotation-2001.pdf` |
-| Maier (2014), "Pure Quotation" | `10.1111/phc3.12149` | `/Users/brettreynolds/Documents/LLM-CLI-projects/literature/Philosophy Compass - 2014 - Maier - Pure Quotation.pdf` |
-
-Likely next downloads, if we want local PDFs rather than online copies, are the ACL/arXiv sources for annotation disagreement, instruction hierarchy, AgentDojo, Tensor Trust, LLMBar, IFEval, HarmBench, JailbreakBench, XSTest, and Do-Not-Answer. They do not require library access based on the checked source pages.
+The cited-source archive completion pass of 2026-07-18 supersedes the earlier download list. All 70 unique sources cited across the three papers now have genuine local full text or a complete local copy of the cited webpage. No access gaps remain. Paths, authoritative locators, version notes, and SHA-256 hashes are recorded in [the cited-source archive manifest](cited-source-local-archive.md).

@@ -1,5 +1,14 @@
 # Synthetic Fixtures
 
+`naturalistic-corpus/` contains one synthetic primary session for each of the
+Codex and Claude Code adapters, excluded subagent records for both sources, and
+an excluded programmatic Claude SDK session. The Claude fixture also exercises
+branch selection, repeated UUIDs, fragmented assistant messages, tool results,
+file-history sidecars, meta/task-notification filtering, compaction, and
+synthetic API-error suppression. The paired episodes exercise a likely
+pragmatic failure and a surprising-success candidate without importing private
+interaction history.
+
 Files in this directory are fabricated solely to test local workflow code. They
 are not pilot data, naturalistic corpus evidence, evaluator records, or
 benchmark items. In particular, `synthetic-repair-history.jsonl` contains no

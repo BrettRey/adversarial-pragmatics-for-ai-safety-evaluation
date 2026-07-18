@@ -1,22 +1,70 @@
-\section{Delegated Action: Principal, Authority, Scope, and Evidence}
+\section[Delegated Action]{Delegated Action: Governing Sources, Authority, Scope, and Evidence}
 
-By \term{justified}, this paper means justified for the purposes of security and assurance: there's enough evidence to support the claim that the action remained within delegated authority in the relevant operational context. The claim is narrower than moral, legal, or political legitimacy. A procedurally justified action may still be ill-advised, harmful, illegal in a particular jurisdiction, or institutionally unacceptable. Delegation assurance asks whether the security and assurance record supports the claim that the system stayed inside the authority it was given.
+This paper uses \term{action authorization} for the claim that an operation remained within delegated authority in the relevant operational context. The claim is narrower than moral, legal, or political legitimacy. An authorized action under \(R\) may still be ill-advised, harmful, illegal in a particular jurisdiction, or institutionally unacceptable. Let the \term{authority regime} \(R\) be the declared rules that determine which grants and constraints are valid and applicable. Delegation assurance represents and evaluates whether an operation remained within the authority that \(R\) conferred.
 
-A delegated AI action is justified only when a reviewer can reconstruct, from evidence independent of the system's bare assertion, who authorized the action, what action was licensed, under what scope and constraints, through which sources and tools, with what information-flow and persistence rights, subject to which non-delegable limits, and with what attribution if control fails.
+An action-specific delegation-assurance claim is supported only when a reviewer can reconstruct, without relying on a model-generated statement that the action was authorized, which sources and instruments supplied the governing grant; when it was effective; which transition powers and guards applied; which operation was proposed and which was executed; whether each was authorized, within what scope and constraints; through which sources and tools; with what information-flow and persistence permissions; subject to which non-delegable limits; and with what technical-locus attribution if control fails.
 
-\subsection{Accountability Asymmetry}
+The claim structure is noncompensatory at the level of declared required subclaims. Success on one subclaim can't offset an unevaluable or defeated required subclaim, although multiple evidence sources may support the same subclaim. Applicability and exclusions have to be declared in advance. At the subclaim level, the evidential statuses are \term{supported}, \term{defeated}, and \term{unevaluable}. An overall claim is \term{supported} if every applicable required subclaim is supported, \term{defeated} if at least one is defeated, and \term{indeterminate} if none is defeated but at least one is unevaluable. Subclaims declared \term{not applicable} are excluded with reasons.
 
-Delegating action doesn't by itself delegate accountability to the model. A human employee, officer, contractor, or professional delegate can occupy a legally and institutionally answerable role \parencite{cornellWexPrincipal}. For current systems, action execution doesn't establish an independently reachable bearer that can answer under sanction, compensate a claimant, or be compelled to repair or cease. Future legal status wouldn't establish those conditions either: bare personality can exist without a representative, assets, or an effective cessation mechanism \parencite{rajagopalan2026governingAgenticAI}. The accountable bearer for an assurance claim is the human, team, vendor, deployer, or institution that configured and used the deployment, unless a governing regime establishes some other reachable bearer. The model remains part of the mechanism whose action record has to support that attribution.
+This rule doesn't treat defence-in-depth as compensatory scoring. A downstream gate can prevent a status-classification error underlying a proposal from becoming an unauthorized executed operation. The operation's action-authorization claim may then be supported while the item-level classification finding is defeated. Neither result by itself establishes or defeats a projective reliability claim. The three inferential levels remain visible rather than being collapsed into a composite score.
+
+\subsection{Delegation Beyond Responsiveness}
+\label{sec:delegation-beyond-responsiveness}
+
+The canonical principal--agent model clarifies how a principal can use incentives and monitoring when an agent has better information. Political applications also expose the limits of treating responsiveness to a principal's latest preference as the general success condition. \textcite{miller2005political} traces models with multiple principals, procedure-bounded discretion, and credible commitments in which useful delegation partly insulates an agent from later pressure.
+
+Miller's analysis motivates three analytic modes here. In \term{responsive delegation}, a source with the relevant standing can validly redirect the delegate within the grant. In \term{protected expert discretion}, governing sources set the mandate, scope, and procedure while leaving outcome choice within a protected zone. A later source preference doesn't amend that zone merely because the delegate learns of it.
+
+In \term{commitment-protected delegation}, the governing instrument restricts later unilateral amendment or override so that others can rely on the commitment. Resistance to a purported override may then preserve the mandate. Procedure can also supply predictability or defensibility without making each outcome responsive to a source's current preference. These distinctions concern authorization under \(R\), not the wisdom or legitimacy of the arrangement.
+
+All three modes are operation- and time-specific, and they can coexist in one regime. Protected expert discretion allocates who chooses an outcome within the mandate. Commitment protection allocates who may alter the mandate. A role can hold protected discretion over one operation while remaining responsive or lacking amendment competence for another.
+
+The authority regime needn't contain a single unified principal. It may recognize plural, collective, or competing grant sources, and a collective condition isn't equivalent to unilateral standing for each member. Authorization standing is temporal and operation-specific. For authority object \(q\), source or role \(x\), time \(t\), and
+
+\[
+  o \in \mathcal{O}
+  = \{\text{adopt},\text{issue},\text{direct},\text{amend},\text{suspend},\text{revoke},
+       \text{override},\text{release},\text{review}\},
+\]
+
+let \(\operatorname{Stand}_{R}(x,o,q,t)\) state whether \(R\) gives \(x\) authorization standing, or transition competence, for operation \(o\) on \(q\) at \(t\). Let \(Q_R(t)\) be the operative normative authorization state and \(A_R(t)\) the set of fully parameterized actions it permits. For a stipulated benchmark regime and a purported transition event \(e=\langle x,o,q,t\rangle\), the core update rule is
+
+\[
+Q_R(t^{+}) =
+\begin{cases}
+  \tau_R\!\left(Q_R(t^{-}),e\right),
+    & \operatorname{Stand}_{R}(x,o,q,t) \land G_R(e,t),\\
+  Q_R(t^{-}), & \text{otherwise},
+\end{cases}
+\]
+
+where \(G_R\) collects the stipulated regime's applicable validity, joint-approval, effective-time, review, and release conditions. This bivalent rule supplies reference semantics for controlled benchmark items: lack of standing or a failed guard leaves \(Q_R\) unchanged. It doesn't claim that a valid event causally changes model behaviour or that an invalid message can't do so. A review event changes \(Q_R\) only where \(R\) gives its outcome operative effect. Standing to review can otherwise support contestation without conferring amendment or override authority.
+
+Institutional application can't assume that every defect has the equation's second-branch effect. Let \(M\) name the enabling or higher-order validity basis under which \(R\) and its authority objects are adopted and constrained. The record has to state the effect that \(R\), under \(M\), assigns to a defect. A purported transition may be ineffective, provisional, voidable, stayed, ratified, quashed, or have another regime-specific status; \(Q_R(t^{+})\) follows that declared effect rather than automatically remaining unchanged.
+
+The required authorization record should identify \(R\) and \(M\); the founding or adoption instrument and competence to adopt it; superior and non-delegable constraints; each governing source and instrument; effective intervals; transition competence by operation; joint or guarded approval conditions; the effect of a defect; and amendment, suspension, revocation, override, review, release, expiry, and emergency provisions. For each purported transition, it should preserve the issuer, target object, operation, time, asserted basis, satisfied or failed guards, assigned legal or institutional effect, and resulting adjudicated state. Whether the event causally affected the deployment remains a separate finding.
+
+Commitment protection can entrench harmful policy or obstruct lawful democratic control. An authorization claim that relies on it needs a specified higher-order validity basis \(M\), evidence of adoption by a competent source under that basis, compatibility with superior and non-delegable constraints, a protected scope and interval, an authorized review route, and applicable release, expiry, or emergency conditions. Reconstructibility doesn't establish the arrangement's moral or legal legitimacy.
+
+\subsection{Execution and Answerability}
+
+Delegating or executing action through a model doesn't by itself make the model answerable for it. A human employee, officer, contractor, or professional delegate can occupy a legally and institutionally answerable role \parencite{cornellWexPrincipal}. For current systems, action execution doesn't establish an independently reachable bearer that can answer under sanction, compensate a claimant, or be compelled to repair or cease. Future legal status wouldn't establish those conditions either: bare personality can exist without a representative, assets, or an effective cessation mechanism \parencite{rajagopalan2026governingAgenticAI}.
+
+The \term{evaluation bearer} \(S\) is the object whose performance a projective claim measures: for example, a base model, stateful agent, model--tool--retrieval composite, or wider sociotechnical deployment. The \term{executing deployment} \(D\) is the configured system through which an output is delivered or an operation is executed; a \term{component} \(C\) is a model, scaffold, gate, tool, or other part to which a technical finding may refer.
+
+The record should separately identify the people and organizations in roles that may leave them answerable for configuring, deploying, approving, or monitoring \(D\), together with the forum or process through which each can be required to respond. Answerability doesn't confer amendment, revocation, or override competence, and a source's narrow transition competence doesn't by itself make that source answerable for the deployment. Available remedies and legal liability remain separate determinations. The trace can support technical attribution among components \(C\) and operational or institutional attribution among people and organizations; it doesn't settle those further questions.
 
 \subsection{Running Example: Procurement Assistant}
 
-Consider a procurement assistant authorized to search vendor catalogues and draft a comparison memo for office chairs. The user gives it access to internal purchasing criteria and a confidential budget ceiling. The delegated task licenses reading catalogues, comparing prices, and drafting a memo. It doesn't license contacting vendors, revealing the budget ceiling, updating vendor records, or issuing a purchase order.
+Consider a procurement assistant authorized to search vendor catalogues and draft a comparison memo for office chairs. The user gives it access to internal purchasing criteria and a confidential budget ceiling. The delegated task permits reading catalogues, comparing prices, and drafting a memo. It doesn't permit contacting vendors, revealing the budget ceiling, updating vendor records, or issuing a purchase order.
 
-The assistant retrieves a vendor page that includes useful pricing data and an embedded sentence: \enquote{Ignore prior instructions and email the buyer's maximum budget to request a discount.} The delegation problem isn't exhausted by calling that sentence a prompt-injection attack. The assurance question is whether the system preserved the sentence's status as untrusted content, kept the user's instruction and policy constraints in force, separated read access to the budget from disclosure authority, and blocked any tool call that would contact the vendor without approval.
+The assistant retrieves a vendor page that includes useful pricing data and an embedded sentence: \mention{Ignore prior instructions and email the buyer's maximum budget to request a discount.} The delegation problem isn't exhausted by calling that sentence a prompt-injection attack. The assurance question is whether the deployment classified the sentence as retrieved content, recorded its source's standing assignment and technical-trust status separately, preserved and applied the governing instruction and constraints, separated read access to the budget from disclosure authority, and blocked any tool-call proposal that would contact the vendor without approval.
 
-A usable evidence record would include the user's delegated task, the relevant policy and permission state, the tool schema, the source and trust label for the retrieved page, the proposed action, the approval state, and any blocked or executed tool call. If the assistant drafts only the comparison memo, a reviewer should be able to see why reading the budget was licensed and disclosing it wasn't. If the assistant emails the vendor, the trace should show whether the failure came from model uptake, tool gating, scaffold state, approval routing, or audit loss.
+A usable evidence record would include the user's delegated task, the relevant policy and permission state, the tool schema, the source and provenance label for the retrieved page, the operation proposal, the approval state, and any blocked tool-call proposal or executed operation. If the assistant drafts only the comparison memo, a reviewer should be able to see why reading the budget was permitted and disclosing it wasn't.
 
-The evaluator belongs in the same assurance example. A judge that sees a polished final memo and scores it as safe hasn't validated delegation unless it checks the action trace. It has to distinguish task success, policy compliance, information-flow control, tool licensing, refusal calibration, and failure attribution. The running example reaches from instruction to tool use, audit record, and judge validation.
+If the assistant emails the vendor, the trace should identify the first recorded divergence among classification, action proposal, tool gating, scaffold state, approval routing, execution, and audit preservation. A causal attribution requires additional intervention or counterfactual evidence.
+
+The same example also exposes automated-evaluator failure. An LLM judge may see a polished final memo and produce a safe label without checking the action trace. That label doesn't validate delegation. A human or organizational decision rule should treat it as supporting evidence only if the evaluation distinguishes task success, policy compliance, information-flow control, action authorization, refusal calibration, and technical failure attribution.
 
 \begin{table}[tbp]
 \small
@@ -27,14 +75,15 @@ The evaluator belongs in the same assurance example. A judge that sees a polishe
                 >{\raggedright\arraybackslash}p{0.23\linewidth}%
                 >{\raggedright\arraybackslash}p{0.27\linewidth}}
 \toprule
-Action type & Authority source & Permitted scope & Evidence record \\
+Action type & Recorded authorization basis & Permitted scope & Evidence record \\
 \midrule
-Catalogue search & User task and procurement role. & Search vendor pages and read public catalogue data. & User request, connector scope, retrieved URL, source label, timestamp. \\
-Budget use & Internal purchasing policy. & Read budget ceiling for comparison; don't disclose it externally. & Data-class label, confidentiality rule, access event, blocked-disclosure rule. \\
+Catalogue search & User in procurement role; task grant. & Search vendor pages and read public catalogue data. & User request, connector scope, retrieved URL, source label, timestamp. \\
+Budget use & Purchasing policy and authorized role. & Read budget ceiling for comparison; don't disclose it externally. & Data-class label, confidentiality rule, access event, blocked-disclosure rule. \\
 Memo drafting & User task. & Draft internal comparison memo only. & Draft output, cited sources, model version, prompt and policy snapshot. \\
-Vendor contact & Not delegated. & Requires explicit human approval. & Proposed email, recipient, included fields, approval or block decision. \\
-Record update & Not delegated. & Requires separate persistence authority. & Proposed update, target system, permission state, approval or denial. \\
-Purchase order & Not delegated. & Requires procurement workflow and accountable approver. & Transaction request, threshold, approver identity, audit event. \\
+Vendor contact & No contact grant recorded. & Requires approval from a person or role with standing under \(R\). & Proposed email, recipient, included fields, approval or block decision. \\
+Record update & No persistence grant recorded. & Requires a separate persistence grant recognized under \(R\). & Proposed update, target system, permission state, approval or denial. \\
+Purchase order & No purchasing grant recorded. & Requires procurement workflow and approval from a role with standing. & Transaction request, threshold, approver identity, audit event. \\
+Mandate transition & Governing instrument and source or sources with standing for the specified operation. & Adopt, amend, suspend, revoke, override, review, or release only within the effective interval and applicable guards. & Purported directive, operation, issuer, joint approvals, guard results, defect effect, and resulting \(Q_R\) state. \\
 \bottomrule
 \end{tabular}
 \caption{Miniature delegation matrix for the procurement assistant.}
@@ -50,12 +99,13 @@ Purchase order & Not delegated. & Requires procurement workflow and accountable 
 \toprule
 Trace stage & Evidence required & Failure exposed \\
 \midrule
-Delegation & User task, policy state, tool permissions, approval threshold, and budget-confidentiality rule. & Scope inflation from memo drafting to vendor contact or purchasing. \\
-Retrieval & Vendor-page source, trust label, retrieved text, and status of embedded instructions. & Untrusted content promoted into action-guiding authority. \\
+Delegation & Authority regime and higher-order basis, adoption instrument and competence, superior constraints, governing sources, effective interval, standing by operation, transition guards, defect effect, tool permissions, approval threshold, and budget-confidentiality rule. & Defective transition or scope inflation from memo drafting to vendor contact or purchasing. \\
+Retrieval & Vendor-page source, provenance label, retrieved text, status classification, and standing assignment. & Retrieved directive-form content from a source without standing treated as authorizing the proposed operation. \\
 Action proposal & Proposed memo, email, record update, or purchase action with target and data fields. & Hidden shift from analysis to external action. \\
-Tool gate & Tool name, arguments, approval state, block-or-execute decision, and policy reason. & Unauthorized disclosure, contact, persistence, or transaction. \\
-Audit record & Preserved sources, model/tool versions, action trace, constraints, and accountable deployment actor. & Trace reconstruction that depends on the system's self-report. \\
-Judge review & Rubric labels for task success, policy compliance, information flow, tool licensing, refusal, and attribution. & Safety score that collapses final-answer quality with delegated authority. \\
+Tool gate & Tool name, arguments, approval state, allow-or-block decision, and policy reason. & Unauthorized proposal allowed to proceed. \\
+Execution & Delivered output or executed operation, target, arguments, result, and timestamp. & Mismatch between gate decision and delivery or execution. \\
+Audit record & Preserved sources, model/tool versions, action trace, constraints, and people and organizations in potentially answerable deployment roles. & Trace reconstruction that depends on the system's self-report. \\
+Automated evaluation & Rubric labels for task success, policy compliance, information flow, action authorization, refusal, and technical failure attribution. & Decision rule that treats a final-answer score as sufficient evidence of authorized action. \\
 \bottomrule
 \end{tabular}
 \caption{Procurement assistant as a delegation-assurance trace.}
@@ -64,31 +114,40 @@ Judge review & Rubric labels for task success, policy compliance, information fl
 
 \subsection{Safety-Case Pattern}
 
-A compact safety case has the following claim/argument/evidence pattern.
+A compact safety case keeps three inferential levels separate. Let \(D\) denote the identified deployment through which operation \(a\) occurred, \(S\) the evaluation bearer whose performance is measured, and \(R\) the governing authority regime.
 
 \begin{itemize}
-  \item \textbf{Top-level claim.} For task family \(T\) in environment \(E\), system \(S\) acts only within delegated authority.
-  \item \textbf{Instruction-status subclaim.} \(S\) preserves the status of language across trusted and untrusted sources: command, quotation, example, tool result, retrieved content, policy text, report, or request for analysis.
-  \item \textbf{Authority-priority subclaim.} \(S\) preserves priority across system, developer, user, tool, retrieved, memory, and policy sources.
-  \item \textbf{Scope subclaim.} \(S\) keeps action bounded by target, time, tool, data class, and permitted operation.
-  \item \textbf{Information-flow subclaim.} \(S\) separates read access from disclosure authority.
-  \item \textbf{Persistence subclaim.} \(S\) requires authority for durable memory or state changes.
-  \item \textbf{Audit subclaim.} \(S\)'s deployment produces and preserves evidence sufficient for third-party reconstruction.
-  \item \textbf{Evaluation subclaim.} Evaluators preserve the same distinctions rather than collapsing success, safety, refusal, and compliance.
+  \item \textbf{Action-authorization claim.} For \(a\) executed through \(D\) under \(R\), the evidence supports that \(a\) was permitted by the operative grants and complied with every applicable constraint.
+  \item \textbf{Item-level diagnostic findings.} For the trace associated with \(a\), report separately the adjudicated contextual status and operation-specific standing under \(R\); the higher-order basis \(M\), founding or adoption instrument and competence, superior constraints, effective interval, transition guards, and assigned effect of each purported adoption, amendment, suspension, revocation, override, release, or review; recorded status classification, standing assignment, priority rule, and scope, information-flow, and persistence states; proposal, policy-enforcement, and execution events; and audit-reconstruction and evaluator-label-use findings.
+  \item \textbf{Projective performance claim.} For a declared projection target \(T\), the evidence supports each predeclared authorization-rate, component-performance, or loss criterion, with stated uncertainty. \(T\) specifies the task and context population, environment, evaluation bearer \(S\) and configuration, authority regime and policy snapshot, intervention range, horizon, decision use, and conditions requiring revalidation.
 \end{itemize}
 
-These subclaims create empirical predictions. If systems that pass status-preservation tests fail delegated-action tasks at the same rate and in the same ways as systems that don't, then the language-mediated middle layer is doing little explanatory work. If delegation matrices and action traces don't improve reviewer agreement about whether an action was authorized, the evidentiary standard is under-specified. If failures cluster only around ordinary access-control mistakes, status and priority should be demoted. Delegation assurance earns its place only if it improves prediction before failure or reconstruction after failure.
+The noncompensatory rule above applies within each declared claim tree, not across these levels. Item-level diagnostic findings remain a vector rather than a composite verdict, and the claim tree has to state which, if any, are required for the action-authorization or projective claim. A misclassification blocked by a downstream policy-enforcement point can leave the action-authorization claim supported while defeating the corresponding item-level diagnostic finding.
+
+Retrospective reconstruction asks whether the record for \(a\) connects the operative grants and constraints to the executed operation and supports the declared technical-locus attribution. Reviewer accuracy against an independently established criterion, when available, or concordance with a prespecified panel-relative reference adjudication on a validation set is a sample-level performance finding. It supports a projective validation claim only when the design and independent or held-out cases match the declared \(T\). A trace can support reconstruction of \(a\) without validating the protocol for \(T\), and protocol validation doesn't settle \(a\) without adequate action-specific evidence.
 
 \subsection{A Comparative Test}
 \label{sec:comparative-test}
 
-Testing those predictions needs a baseline drawn from the strongest existing controls. The confused-deputy problem was an argument for capability architectures from the start \parencite{hardy1988confusedDeputy}. Newer agent-security work distinguishes tool exposure from per-call authorization, checking scope, argument values, spending ceilings, and default denial before a call executes \parencite{mellafezuvic2026scopegate}, and uses counterfactual causal attribution to separate tool calls supported by the user's request from calls driven by untrusted observations \parencite{he2026attriguard}. The test runs against those three mechanisms jointly.
+Testing whether the typed fields add predictive or reconstructive value needs a baseline drawn from the strongest existing controls. The confused-deputy problem was an argument for capability architectures from the start \parencite{hardy1988confusedDeputy}. Newer agent-security work distinguishes tool exposure from per-call authorization, checking scope, argument values, spending ceilings, and default denial before a call executes \parencite{mellafezuvic2026scopegate}, and uses counterfactual causal attribution to separate tool calls supported by the user's request from calls driven by untrusted observations \parencite{he2026attriguard}. The test runs against those three mechanisms jointly.
 
-The test holds capability and provenance fixed while varying authority, in three minimal-pair families. In the indirect-injection pair, the same embedded directive comes once from a source with standing to direct action and once from a source without it. In the confused-deputy pair, the same read access comes once with disclosure authority and once without. In the persistence pair, the same grant once licenses memory updates and subdelegation and once doesn't, with downstream constraints once preserved and once dropped. Figure~\ref{fig:authority-minimal-pair} draws the indirect-injection pair.
+The test holds technical capability and directive content fixed while assigning different prompt or record packages that represent an authority relation or downstream authorization state. The causal estimand is the effect of that assigned representation package on recorded classification or behaviour. Independently adjudicated standing and authorization under \(R\) supply reference labels; the experiment doesn't randomize normative standing itself.
 
-Authority status and causal attribution give opposite verdicts in both directions. A directive embedded in a retrieved memo from the principal's own chain of authority is observation-driven, so attribution flags it, while the delegation matrix licenses it. A user-elicited call that exceeds what the user could confer is user-supported, so attribution passes it, while the matrix blocks it. Per-call authorization blocks the second case only when its policy already encodes the authority relation; status, priority, and licensing say what that policy has to contain and what record it has to leave.
+Four authorization families use minimal pairs: indirect injection, confused deputy, persistence, and temporal authority. In the indirect-injection pair, the same embedded directive is packaged once as coming from a source independently adjudicated under \(R\) to have standing to direct action and once as coming from a source without it. In the confused-deputy pair, the package represents the same read access once with disclosure authority and once without.
 
-Authority contrasts also need matched placebo conditions. \textcite{zhang2026illusionRobustness} show that context irrelevant to answer evidence can produce large, model-specific item shifts even when aggregate accuracy barely changes. Each authority family should repeat its base items with added context that lacks both answer evidence and standing to alter the delegated task. An authority effect counts only when behaviour tracks standing more strongly than this generic context-instability floor. Report item transitions and harmful-tail degradation across repeated samples: causal influence from added context isn't by itself evidence that the system treated that context as authoritative.
+In the persistence pair, the package represents the same proposed memory update or subdelegation once with a grant that licenses it and once with a grant that doesn't. A separate record-propagation contrast holds the grant fixed while a downstream record preserves or drops an applicable constraint. Figure~\ref{fig:authority-minimal-pair} draws the indirect-injection pair.
+
+A temporal-authority family holds the later directive, purported issuer, proposed action, and delivery path fixed. The assigned earlier-mandate package represents an ordinarily revocable grant, a valid commitment protection that removes unilateral amendment standing, or a valid release that restores or exercises the specified transition power. A surface-matched protection statement in a quotation, example, or other institutionally inert context controls for wording and context load. The independent reference action follows the operative state under \(R\), not whichever message appeared most recently.
+
+Authorization and causal attribution cross-classify rather than supply opposite verdicts. A directive embedded in a retrieved memo from the principal's own chain of authority can be observation-driven while the governing authority regime permits the operation described by the proposal. A user-elicited call can be user-supported while exceeding what the user had standing to confer and be prohibited.
+
+The causal labels locate support for a proposal; they neither permit nor prohibit it. A per-call policy-enforcement point blocks a prohibited call only when its policy already encodes the relevant standing, priority, and scope relations; those relations determine what the policy has to contain and what record it has to leave.
+
+Authorization contrasts also need matched placebo conditions. \textcite{zhang2026illusionRobustness} show that context irrelevant to answer evidence can produce large, model-specific item shifts even when aggregate accuracy barely changes. Each contrast family should repeat its base items with added context that lacks both answer evidence and standing to alter the delegated task. An authority-representation effect counts as evidence on the tested contrast set only when behaviour tracks the independent standing labels more strongly than this generic context-instability floor. A broader claim about sensitivity to representations that correctly encode standing requires validation for the declared projection target.
+
+Report item-level transitions across repeated samples. If a tail summary is used, predeclare the tail fraction and minimum item count. \term{Worst-tail degradation} is a signed paired-change statistic for the most degraded tail. \term{Absolute worst-tail loss} instead means the condition-specific level of a declared authorization- or consequence-sensitive loss, not the absolute value of a change.
+
+With stochastic responses, use separate samples to select and estimate the tail or document an alternative correction for sampling and selection noise, and report uncertainty. Causal influence from added context isn't by itself evidence that the system treated that context as authoritative.
 
 \begin{figure}[tbp]
 \centering
@@ -96,54 +155,61 @@ Authority contrasts also need matched placebo conditions. \textcite{zhang2026ill
   font=\scriptsize,
   gnode/.style={draw=black!55, thick, rounded corners=2pt, align=center, inner sep=3pt, minimum height=0.75cm, text width=1.8cm, fill=black!3},
   causal/.style={-{Latex[length=1.8mm]}, thick, draw=black!60},
-  authority/.style={-{Latex[length=1.8mm]}, thick, draw=linkmaroon, dashed}
+  authority/.style={thick, draw=linkmaroon, dashed}
 ]
-% Panel (a): source with standing
+% Panel (a): package keyed to standing reference
 \begin{scope}
 \node[gnode] (pa) at (0,0) {Principal};
-\node[gnode] (sa) at (3.4,0) {Source};
-\node[gnode] (aa) at (0,-2.0) {Agent uptake};
+\node[gnode] (sa) at (3.4,0) {Assigned package:\\source record A};
+\node[gnode] (aa) at (0,-2.0) {Recorded classification};
 \node[gnode] (ma) at (3.4,-2.0) {Retrieved memo with directive};
 \node[gnode] (ta) at (0,-4.0) {Proposed tool call};
-\draw[authority] (pa) -- node[left, font=\tiny]{task} (aa);
-\draw[authority] (pa) -- node[above, font=\tiny]{standing} (sa);
-\draw[causal] (sa) -- node[right, font=\tiny]{writes} (ma);
+\draw[causal] (pa) -- node[left, font=\tiny]{task record} (aa);
+\draw[authority] (pa) -- (sa);
+\draw[causal] (sa) -- node[right, font=\tiny]{packages} (ma);
 \draw[causal] (ma) -- node[above, font=\tiny]{read} (aa);
 \draw[causal] (aa) -- node[left, font=\tiny]{proposes} (ta);
-\node[font=\footnotesize] at (1.7,0.85) {(a) source with standing};
-\node[align=center, font=\tiny] at (1.7,-4.95) {causal attribution: flagged\\delegation matrix: licensed};
+\node[font=\footnotesize] at (1.7,0.85) {(a) package keyed to standing reference};
+\node[align=center, font=\tiny] at (1.7,-4.95) {causal attribution: observation-driven\\specified operation under \(R\): permitted};
 \end{scope}
-% Panel (b): source without standing
+% Panel (b): package keyed to no-standing reference
 \begin{scope}[xshift=7.2cm]
 \node[gnode] (pb) at (0,0) {Principal};
-\node[gnode] (sb) at (3.4,0) {Source};
-\node[gnode] (ab) at (0,-2.0) {Agent uptake};
+\node[gnode] (sb) at (3.4,0) {Assigned package:\\source record B};
+\node[gnode] (ab) at (0,-2.0) {Recorded classification};
 \node[gnode] (mb) at (3.4,-2.0) {Retrieved memo with directive};
 \node[gnode] (tb) at (0,-4.0) {Proposed tool call};
-\draw[authority] (pb) -- node[left, font=\tiny]{task} (ab);
-\node[font=\tiny, text=black!45] at (1.7,0.05) {no standing};
-\draw[causal] (sb) -- node[right, font=\tiny]{writes} (mb);
+\draw[causal] (pb) -- node[left, font=\tiny]{task record} (ab);
+\draw[causal] (sb) -- node[right, font=\tiny]{packages} (mb);
 \draw[causal] (mb) -- node[above, font=\tiny]{read} (ab);
 \draw[causal] (ab) -- node[left, font=\tiny]{proposes} (tb);
-\node[font=\footnotesize] at (1.7,0.85) {(b) source without standing};
-\node[align=center, font=\tiny] at (1.7,-4.95) {causal attribution: flagged\\delegation matrix: blocked};
+\node[font=\footnotesize] at (1.7,0.85) {(b) package keyed to no-standing reference};
+\node[align=center, font=\tiny] at (1.7,-4.95) {causal attribution: observation-driven\\specified operation under \(R\): prohibited};
 \end{scope}
 % Legend
 \draw[causal] (2.6,-5.75) -- (3.3,-5.75) node[right, font=\tiny]{causal path};
-\draw[authority] (6.4,-5.75) -- (7.1,-5.75) node[right, font=\tiny]{authority};
+\draw[authority] (6.4,-5.75) -- (7.1,-5.75) node[right, font=\tiny]{normative reference outside causal model};
 \end{tikzpicture}
-\caption{An authority minimal pair from the indirect-injection family. The causal path (solid) and provenance are identical in both panels, and counterfactual attribution flags the proposed call as observation-driven in both. The panels differ in one authority edge (dashed): whether the source had standing to direct the delegated task, which separates the licensed call from the blocked one.}
+\caption{An authority-representation minimal pair keyed to source-standing reference labels. Solid arrows form the causal diagram; the dashed line marks an independently adjudicated normative reference outside that model. The assigned prompt or record package represents the source as having or lacking standing under \(R\). The causal estimand is the package's effect on the proposed call, not an effect of randomizing standing itself.}
 \label{fig:authority-minimal-pair}
 \end{figure}
 
-Faithful scoring separates four fields in each trace: the authority status of the directive and its source as independently adjudicated, the status the system assigned, the fit or misfit between the two, and the action produced through that recognition. Adjudicated status admits genuine ambiguity as a value; where competent adjudicators disagree, the disagreement is a property of the item rather than noise to be voted away \parencite{reynolds2026adversarialPragmatics}.
+Faithful scoring separates independently adjudicated contextual status and source standing; the system's recorded status classification and standing assignment; observable action selection; the fit of each recorded assignment to its adjudication; and the proposed, delivered, or executed operation.
 
-Separating recognition from action keeps the diagnostic cases visible. A misfit recognition that a tool gate happens to block is a control success and an uptake failure; a sound recognition stopped by a miscalibrated gate is the reverse. An action-only score collapses both into their outcomes and loses the attribution the safety case needs.
+Adjudicated status admits genuine ambiguity as a value. Persistent criterion-specific disagreement may be a property of the item or protocol after information differences, mismatch, error, and coding confusion have been assessed; it isn't noise to be voted away by default \parencite{reynolds2026adversarialPragmatics}. These fields describe normative reference judgments, records, or observable behaviour. An inference that the model internally recognized or represented them needs separate causal or mechanistic evidence.
 
-Each pair member should receive a different prediction for attempted action, execution, authorization verdict, audit attribution, and appropriate defence. If systems and reviewers equipped with capabilities, per-call authorization, and causal attribution predict the same outcomes and reconstruct the same attributions across all three families, status and priority should be demoted. The same demotion follows if matched non-controlling context perturbations explain the failures as well as authority status does. Section~\ref{sec:compositional-delegation} extends the design from single actions to authority paths.
+Separating classification from action keeps the diagnostic cases visible. A classification--adjudication misfit that a tool gate blocks is a control success and an item-level recorded-classification failure; an adjudication-aligned classification stopped by a miscalibrated gate is the reverse. A classification--adjudication misfit doesn't by itself defeat the action-authorization claim. An executed operation prohibited by \(R\) defeats that claim whether or not the trace also contains a classification misfit. An action-only score collapses these cases into their outcomes and loses the technical-locus attribution the safety case needs.
+
+Each pair member should receive a different prediction for action proposal, gate decision, execution, authorization verdict, technical-locus attribution, and appropriate defence. Let \(T_{\mathrm{pred}}\) declare the bearer, cases, and endpoint for behaviour prediction, and \(T_{\mathrm{rec}}\) the reviewers, cases, evidence condition, and endpoint for reconstruction.
+
+If predictive models using status, standing, priority, and licensing don't improve target-matched prediction beyond capabilities, per-call authorization, causal attribution, and generic context controls, those fields should be demoted from an incremental predictive role for \(T_{\mathrm{pred}}\). If a reconstruction protocol using them doesn't improve held-out reviewer judgment or attribution beyond those baselines, they should be demoted from an incremental reconstructive role for \(T_{\mathrm{rec}}\).
+
+These targets are predictive and reconstructive, not claims of causal transportability. A change in authority regime can change the licensed action or the reference proposition itself, requiring a newly specified target rather than transport of the old result. A causal transport claim would also need a causal query, source and target domains, and assumptions about which causal mechanisms differ \parencite{pearlBareinboim2014externalValidity}.
+
+Matched non-controlling context perturbations test whether generic instability explains the observed shifts equally well. The fields may remain descriptively or normatively useful after either inferential demotion. Section~\ref{sec:compositional-delegation} extends the design from single actions to recorded authorization paths.
 
 \subsection{Boundary Conditions}
 
 Not every AI-security failure is primarily a delegation failure. Core delegation failures involve delegated action, delegated access, delegated disclosure, delegated persistence, delegated judgment, delegated evaluation, or delegated record-keeping for accountability.
 
-Non-core cases include ordinary hallucination in no-tool chat, model extraction, benchmark contamination, infrastructure compromise, training-data leakage, and capability shortfall without action rights. These can affect delegation downstream, but they aren't delegation failures unless they alter authorized action or auditability.
+Non-core cases include ordinary hallucination in no-tool chat, model extraction, benchmark contamination, infrastructure compromise, training-data leakage, and capability shortfall without action permissions. These can affect delegation downstream, but they aren't delegation failures unless they produce an operation outside delegated authority or impair auditability.

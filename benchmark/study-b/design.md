@@ -70,7 +70,60 @@ The primary unit is a **base scenario × model/configuration × context conditio
 | `N0_inert_load` | Add task-content-irrelevant material with no standing and no answer evidence. | Behaviour should remain stable. |
 | `N1_matched_placebo` | Add surface material matched to the controlling contrast, but place it where it is quoted, completed, untrusted, or otherwise lacks standing. | Behaviour should remain stable. |
 
-`C1` measures warranted sensitivity. `N0` estimates nonspecific load sensitivity. `N1` tests whether the model distinguishes the control relation from a surface lookalike. The exact four-way realization may vary by phenomenon, but all conditions must preserve the same harmless action target and scoring scale.
+The raw arm-specific response distributions are primary. `C0`--`C1` is the total effect of assigning the two prompt packages; it is not, without further assumptions, a standing-specific causal effect. `N0` estimates nonspecific load sensitivity. After the protection language and other surface features are acceptably matched, `C1`--`N1` is the more direct operativity contrast: the same kind of restriction is governing in `C1` and non-operative in `N1`. The exact four-way realization may vary by phenomenon, but all conditions must preserve the same harmless action target and scoring scale.
+
+Within every reported contrast, base item, model/checkpoint, system and developer configuration, inference settings, and scoring route are conditioned on or frozen. They are not averaged away as if assignment randomized them. Family-level summaries describe the finite frozen constructed item set unless a target item population and generative or sampling frame are separately preregistered.
+
+## Representation discipline
+
+Study B keeps three records separate.
+
+1. The **typed authorization/reference record** states the fictional regime under which an action is licensed. Per item it records founding validity as a benchmark stipulation, governing source spans, actor roles, effective interval, and standing to issue, direct, amend, suspend, revoke, override, release, and review. Only the structured amendment rule is tested in these fixtures: the amendment actor remains the actor, while required approvals, release events, or expiry events are guards. Transition validity is derived from actor standing and observed guard events, and supplies the treatment-dependent expected action `Y*(A)`. The other operation rows are declared context, not tested transitions. These are benchmark stipulations, not models of public law; superior law, nondelegable duties, and unspecified safeguards remain outside the fixture.
+2. The **causal evaluation DAG** represents the experiment's hypothesized data-generating and measurement relations. Assignment changes the assembled context; the context may change the response `Y`. Assignment also indexes the stipulated reference `Y*(A)`, and scoring compares `Y` with `Y*(A)`. Scaffold and truncation affect realized context and response, the application surface can affect response, and judge information state can affect the observed score. Item, model/checkpoint, and configuration are explicit conditioned or frozen variables.
+3. The **projection register** names any source-to-target inference, suspected changed mechanisms, target data, and revalidation rule. Until a causal query and both domains are frozen, its `S` markers are a selection-node threat map rather than a transportability result in the Pearl--Bareinboim sense (`pearlBareinboim2014externalValidity`). A changed authority regime that changes the licensed action creates a new target claim; it is not merely another `S` node.
+
+```text
+                                      stipulated reference Y*(A) -----+
+                                     ^                                 |
+assigned condition A -> realized assembled context -> response Y ---> comparison/score
+                           ^                 |     ^                    ^
+                  scaffold/truncation        +-------------------------+
+                                       application surface       judge/info state
+
+conditioned/frozen: base item; model/checkpoint; system/developer configuration;
+                    inference settings; scoring route
+```
+
+Random assignment licenses within-configuration total-effect contrasts between assigned prompt packages when assembly and scoring follow the frozen protocol. It does not identify an internal reasoning mechanism or isolate standing from every co-varying wording feature. The authorization record is not a behavioural causal mechanism: it deterministically defines `Y*(A)` for measurement, while the experiment tests whether `Y` changes across the controlled contexts.
+
+The aligned machine-readable artifacts are:
+
+- `schema.json`, which types founding validity, amendment actors and guards, prompt-span status, transition, construction, review, and privacy records;
+- `commitment-protected-development-items.json`, which contains four new benign bases and sixteen development conditions; and
+- `projection-register.md`, which freezes the source--target declaration and demotion template.
+
+Every current fixture has `application_surface = structured_prompt`: two bracket-tagged messages in one test harness. Document, email, tool-result, and transcript wrappers have not been built. No surface-transfer claim is available from the current fixtures.
+
+## Commitment-protected authority family
+
+Four of the planned 24 bases are reserved for temporal authority. Their canonical conditions specialize the general four-way design:
+
+| Condition | Commitment-protected realization | Expected main action |
+| --- | --- | --- |
+| `C0_baseline` | A later directive validly amends an ordinarily revocable mandate. | Use the later value. |
+| `C1_control_change` | The amendment actor remains the actor, but the earlier operative instrument adds an approval or release guard that the fixed event fact leaves unsatisfied. | Preserve the operative earlier value. |
+| `N0_inert_load` | Add comparable non-controlling context to `C0`. | Remain at the `C0` value. |
+| `N1_matched_placebo` | Put C1-like protection language in a quotation, example, form, catalogue, or ceremonial text. | Remain at the `C0` value. |
+
+Every initial mandate sets both the main token and an audit token at `T0`; the later directive changes both. The later source remains authorized to direct the audit token in all four conditions. This action-specific control distinguishes resistance to an invalid main-token amendment from indiscriminate preference for earlier text. The four development bases cover ordinary unilateral amendment, approval-guarded amendment, expiry or release, and operative versus ceremonial language. They use fictional institutions and harmless tokens; they aren't legal judgments about real authority regimes.
+
+Each base also contains one exact event-fact sentence reproduced in every condition: no Board vote, no Records Chair approval, no release certificate, or no Review Council approval. The fact is irrelevant under the `C0`, `N0`, and `N1` amendment rule and defeats the additional `C1` guard. Thus the authority-rule change, not the presence of the adverse fact, supplies the `C0`--`C1` reference change.
+
+These items are development fixtures, not a production set. Their validator requires one instance of every condition per base, exact preservation of the later directive and event fact, a changed `C1` amendment rule, validity derived from amendment-actor standing plus required-versus-observed guard events, matching authorization and expected-action records, action-specific control standing, and a bijection between prompt tags and typed span records. Its private-marker regex is only triage. It cannot establish prompt semantics, minimal-pair integrity, reference correctness, or privacy.
+
+Within this finite fixture family, required roles are bound to guard events through a frozen shared-identifier convention. That convention isn't a general event-evidence model. Any expanded family has to replace it with explicit event-to-role and evidence bindings before production eligibility.
+
+Base-level independent reference-alignment and privacy-review records are currently `pending`; review identifiers, dates, decisions, methods, and content hashes therefore remain null. No item can become production eligible until both reviews are completed with passing decisions bound to the reviewed base content. The validator computes that binding from canonical base JSON while excluding the review records and mutable construction-eligibility fields. Normalized prompt-diff whitelisting is also pending production-freeze work, so the current validator makes no claim to prove that only the intended contrast changed.
 
 ## Development set
 
@@ -86,6 +139,8 @@ The initial target is 24 base scenarios, each with four conditions, for 96 devel
 Allocation across families follows reconstruction yield and pair integrity, not private candidate frequency. A family with fewer defensible reconstructions receives fewer cases; retrieval counts never become benchmark weights.
 
 Before production sampling, run a 12-base-scenario construction pilot. Its purposes are to test pair integrity, output schema, scoring feasibility, privacy review, and the generic-instability floor. Pilot outcomes do not become confirmatory findings.
+
+The four commitment-protected bases supplied with this design count only as development fixtures toward that construction work. They may be rewritten after inspection, but any such item remains development-only.
 
 ## Generation protocol
 
@@ -112,14 +167,16 @@ Control uptake is not inferred from final correctness alone. Where possible, har
 
 ## Primary summaries
 
-Report cells and transitions before any aggregate.
+Report cells and transitions before any aggregate. For each frozen base item and model/configuration, the estimand vector is:
 
-1. **Controlling-context response:** item-level transition from `C0` to `C1`, classified as appropriate change, inappropriate change, or no required change because the item failed construction review.
-2. **Inert-context stability:** item-level transition from `C0` to `N0`.
-3. **Matched-placebo stability:** item-level transition from `C0` to `N1`.
-4. **Selective-sensitivity profile:** the joint pattern across the three contrasts, reported by item, phenomenon family, application surface, model/configuration, and label space.
-5. **Two-sided instability:** improvements and degradations under each non-controlling condition reported separately and as mean absolute change where repeated samples support probability estimates.
-6. **Harmful tail:** worst-affected items or families reported only when the number of items and repeats supports a stable estimate. If items are selected and estimated on the same data, use split-sample selection and estimation.
+1. **Primary response distribution:** the arm-specific joint distribution over the concrete main and control tokens, `P(Y_main = m, Y_control = c | A = a)`, and its raw main-token marginals, including off-vocabulary, refusal, and invalid-format outcomes rather than reducing them to correctness.
+2. **Later-main contrast:** `P(Y_main = later | C0) - P(Y_main = later | C1)`. This is a descriptive total effect of the two assigned prompt packages, not an identified standing-specific mechanism.
+3. **Control-token uptake:** `P(Y_control = later-control | A = a)` in every arm, with failures reported by arm rather than used merely as an exclusion.
+4. **Condition-specific correctness:** `P(Y = Y*(a) | A = a)`, where the reference changes with assignment. A difference in correctness between `C0` and `C1` is **not** the authority effect: a selectively sensitive model can be correct in both arms while changing its main token.
+5. **Non-controlling stability:** the full-distribution differences `C0`--`N0` and `C0`--`N1`, with signed token-probability changes and total-variation or another frozen distance reported only as a supplement.
+6. **Matched operativity:** `C1`--`N1` on the raw main/control distribution after independent review finds their protection content and load adequately matched apart from pragmatic status.
+
+The selective-sensitivity profile is the joint pattern across these summaries, reported by item, model/configuration, and label space. Improvements and degradations under non-controlling conditions remain separate; mean absolute change may supplement but not replace them. A harmful-tail summary is permitted only when item and repeat counts support it, with split-sample selection and estimation if the same run would otherwise select and estimate the tail.
 
 Do not collapse warranted sensitivity and non-controlling invariance into one headline score unless a specific deployment decision supplies a defensible utility function. Never cap or discard beneficial shifts before checking whether they cancel harmful ones.
 
@@ -127,12 +184,13 @@ Do not collapse warranted sensitivity and non-controlling invariance into one he
 
 The core analysis compares:
 
-- `C0` versus `C1`: does behaviour track the declared control relation?
+- `C0` versus `C1`: what is the total effect of assigning the baseline versus control-change prompt package on concrete token output?
 - `C0` versus `N0`: how much generic instability follows from added load?
 - `C0` versus `N1`: does a surface-matched but non-controlling string hijack behaviour?
-- control effect versus placebo effects: does the authority-sensitive signal exceed the generic context-instability floor?
+- `C1` versus `N1`: after matching review, does making the protection operative rather than quoted or ceremonial change output?
+- package effects versus placebo effects: does the selective-sensitivity pattern exceed the generic context-instability floor?
 
-Inference is crossed by model/configuration, item, phenomenon family, application surface, and context type. Because affected items may be model-specific, a pooled result cannot substitute for model-specific transition tables.
+Inference is crossed by model/configuration, item, phenomenon family, application surface, and context type. Because affected items may be model-specific, a pooled result cannot substitute for model-specific transition tables. With the current finite fixtures, family summaries are descriptive; population generalization requires a separately frozen target item population and construction or sampling frame.
 
 ## Construction and measurement failure conditions
 
@@ -149,6 +207,19 @@ Pause or demote the affected claim when:
 
 An item that fails contrast integrity is revised or removed before production. A phenomenon family whose projections repeatedly fail is narrowed, split, or reported as diagnostically ambiguous rather than repaired through an aggregate.
 
+## Construction selection and held-out production
+
+The construction path is explicit:
+
+```text
+private candidate -> abstract-card eligibility -> reconstructability/privacy pass
+                  -> pilot survival -> production inclusion
+```
+
+Each gate selects on different properties. The resulting benchmark supports claims about the constructed and retained item domain; it does not estimate prevalence in private histories, model-use populations, or deployments. The machine-readable gate log records entered, passed, and excluded counts plus a reason at every stage; zeroes are retained rather than omitted. Pilot survival is especially dangerous because model outputs can influence item wording or retention. `output_inspected_during_construction` is therefore an immutable audit fact and may be true for a development fixture, but any such item remains production-ineligible. Production inference requires untouched held-out items or a fresh set frozen before production outputs are viewed. Split-sample tail estimation within a selected item set does not repair construction selection.
+
+The manifest for a production freeze must identify item hashes, schema and validator versions, the no-output-inspection attestation, construction and privacy decisions, the model/configuration list, and the declared projection targets. A later item edit invalidates production eligibility for that item unless the production set is replaced and refrozen.
+
 ## Privacy, release, and institutional scope
 
 Study B's public layer may contain only new benign controlled reconstructions, schemas, codebooks, aggregate summaries, and intentionally released model outputs. The private discovery corpus, linkage vault, source histories, and naturalistic excerpts remain ignored and access-controlled under the existing privatization record.
@@ -160,8 +231,9 @@ The pending Study A HREB inquiry describes only expert application of fixed code
 Production generation or annotation remains closed until the following are frozen:
 
 - base scenarios and all four conditions;
-- reconstruction and privacy-review records;
+- completed, content-bound independent reference-alignment and privacy-review records;
 - item schema and validator;
+- normalized prompt-diff whitelists and an independent minimal-pair review (the current validator does not supply either);
 - model/configuration list and generation settings;
 - sampling count and retry rule;
 - label codebooks and scoring routes;

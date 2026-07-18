@@ -4,18 +4,21 @@
 \input{.house-style/preamble.tex}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta,positioning}
+\usepackage[section]{placeins}
+\usepackage{flafter}
+\fancyhead[L]{\small\scshape Evidentiary Assurance}
 
 \setlength{\headheight}{25.3pt}
 \emergencystretch=2em
 
 \hypersetup{
   pdftitle={Evidentiary Assurance for Delegated Authority in AI Systems},
-  pdfkeywords={AI governance, AI evidence, delegated authority, accountability, procedural validity, electronic evidence, contestability}
+  pdfkeywords={AI governance, AI evidence, delegated authority, decision basis, accountability, procedural validity, electronic evidence, contestability}
 }
 
-\title{Evidentiary Assurance for Delegated Authority in AI Systems}
+\title{Evidentiary Assurance for\\Delegated Authority in AI Systems}
 \author{Brett Reynolds \orcidlink{0000-0003-0073-7195}%
-\thanks{Contact: \href{mailto:brett.reynolds@humber.ca}{brett.reynolds@humber.ca}}\\
+\thanks{I used OpenAI Codex and Anthropic Claude extensively in drafting and revising the paper. I reviewed, edited, and approved all the material and take full responsibility for the final text and conclusions. \href{mailto:brett.reynolds@humber.ca}{brett.reynolds@humber.ca}}\\
 Humber Polytechnic \& University of Toronto}
 \date{July 2026}
 
@@ -23,10 +26,10 @@ Humber Polytechnic \& University of Toronto}
 \maketitle
 
 \begin{abstract}
-AI governance increasingly requires logs, documentation, human oversight, impact assessment, provenance, recourse, and auditability. These requirements create evidence, but they don't yet settle the narrower action-level question: what evidence would support, after the fact, a finding that a specific AI action remained within the authority under which the system was permitted to act? This paper develops an evidentiary-assurance account for delegated authority in AI systems. It distinguishes authority, validity, scope, attribution, accountability, procedure, authenticity, integrity, and contestability, then proposes a defeasible sufficiency test and candidate minimum evidence bundle for recommendations, decisions, communications, tool calls, transactions, and content-generation acts with legal or organizational effect.
+AI governance increasingly requires logs, documentation, human oversight, impact assessment, provenance, recourse, and auditability. These requirements create evidence, but they don't yet settle the narrower action-level question: what evidence would make the authorization claim for a specific AI action reviewable after the fact, and would that record support, defeat, or leave the claim indeterminate? Delegation assurance supplies the typed authorization claim and transition semantics. Evidentiary assurance asks whether the preserved record makes that claim evaluable and what evidentiary verdict it warrants. It distinguishes authority, validity, scope, decision basis, attribution, accountability, procedure, authenticity, integrity, and contestability, then proposes a defeasible action-level record-and-verdict test and candidate minimum evidence bundle for recommendations, decisions, communications, tool calls, transactions, and content-generation acts with legal or organizational effect.
 \end{abstract}
 
-\noindent\textbf{Keywords:} AI governance; AI evidence; delegated authority; accountability; procedural validity; electronic evidence; contestability
+\noindent\textbf{Keywords:} AI governance; AI evidence; delegated authority; decision basis; accountability; procedural validity; electronic evidence; contestability
 
 \input{sections-evidentiary/01-introduction}
 \input{sections-evidentiary/02-evidence-primitives}
@@ -34,9 +37,14 @@ AI governance increasingly requires logs, documentation, human oversight, impact
 \input{sections-evidentiary/04-technical-mechanisms}
 \input{sections-evidentiary/05-sufficiency-test}
 \input{sections-evidentiary/05-research-program}
+\clearpage
 \input{sections-evidentiary/06-conclusion}
 
 \clearpage
+\begingroup
+\renewcommand*{\bibfont}{\footnotesize}
+\setlength{\bibitemsep}{0.25\baselineskip}
 \printbibliography
+\endgroup
 
 \end{document}

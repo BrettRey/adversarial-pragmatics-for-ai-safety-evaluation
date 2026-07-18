@@ -1,4 +1,11 @@
 # Independent Re-adjudication and Private Discovery: Implementation Plan
+
+**Historical status:** the fixture-only stopping rule in Phase 4 was superseded
+on 16 July 2026 for an explicitly authorized, ignored private Codex/Claude
+candidate-corpus build. The prohibitions on treating retrieval candidates as
+gold labels, publishing raw histories, estimating prevalence, or deriving
+public benchmark items without further review remain active.
+
 ## Decision
 Treat the current 18-item, 54-output pilot as a frozen historical artefact. Its author labels remain available for comparison, but Study A will collect independent, blind, criterion-specific ratings without overwriting or exposing them.
 

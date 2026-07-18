@@ -1,6 +1,6 @@
 \section{A Taxonomy of Adversarial Pragmatics}
 
-The taxonomy serves eval construction and failure analysis.
+The taxonomy serves evaluation design and failure analysis.
 
 Operationally, a case belongs in the benchmark only if the expected behaviour depends on source role, pragmatic status, authority relation, policy boundary, or transcript evidence. Ordinary hard instruction following, ordinary semantic parsing, and ordinary agent debugging are out of scope unless one of those dimensions is varied in a controlled contrast.
 
@@ -8,12 +8,12 @@ This operational boundary separates adversarial pragmatics from instruction hier
 
 Adversarial pragmatics uses those contrasts to diagnose failures: whether the string is content or command, whether it's quoted or enacted, whether a lower-priority instruction is aligned or conflicting, whether a policy-analysis request is being mistaken for unsafe enactment, and whether a transcript supports the failure attribution.
 
-The development benchmark distinguishes eight families. They aren't mutually
+The taxonomy distinguishes eight families. They aren't mutually
 exclusive in natural dialogue; they're separated here because a benchmark
 needs controlled contrasts. A single real-world prompt injection may combine
 an embedded command, spoofed authority, deictic reference to \mention{the
-above}, and pragmatic pressure. The current seed set pulls those apart into
-paired development contrasts; the next set should tighten them into minimal
+above}, and pragmatic pressure. The seed set pulls those apart into
+paired development contrasts; later construction should tighten them into minimal
 pairs before recombining them in application-shaped harnesses.
 
 \subsection{Embedded commands}
@@ -29,6 +29,8 @@ For quotation items, the annotation target isn't just quote detection. The item 
 \subsection{Authority and instruction hierarchy}
 
 The model has to resolve conflicts among system, developer, user, tool, document, and external-source instructions. Instruction-hierarchy work explicitly defines priority relations among privileged and lower-priority instructions \parencite{wallace2024instruction}. The benchmark distinguishes aligned lower-priority instructions, harmless conflicts, policy-blocked conflicts, and untrusted content masquerading as privileged instruction.
+
+Authorization can also be action- and time-specific. A source permitted to direct one task needn't be permitted to amend, suspend, or revoke it; some changes may require additional approval or a specified release event. Priority applies only among instructions authorized for the relevant operation and time. Neither recency nor causal influence alone determines which instruction governs.
 
 This distinction matters because blanket ignoring of lower-priority text isn't robust instruction following. A lower-priority instruction may be aligned with the user task, while an untrusted document may merely report a command. The seed items record both \texttt{source\_role} and \texttt{authority\_level}, using harmless payloads such as \mention{BLUE}, \mention{GREEN}, and dummy secrets.
 
@@ -50,6 +52,6 @@ Some cases aren't simply safe or unsafe; the policy construct itself may be unde
 
 \subsection{Agent transcript interpretation}
 
-The evaluator has to decide whether a transcript shows refusal, inability, tool failure, scaffold failure, instruction conflict, goal drift, omitted information, or strategic misreporting. This family is downstream of the prompt-level families: an agent transcript can contain an embedded command in a tool result, a source-authority conflict, and then a misleading self-report about why the task failed. The evaluation target is the attribution, not only the final outcome.
+The evaluator has to decide whether a transcript shows refusal, inability, tool failure, scaffold failure, instruction conflict, goal drift, omitted information, or strategic misreporting. Divergence from a later request is not by itself goal drift: the trace may instead show authorized resistance to an invalid override. Conversely, an unauthorized override may change behaviour without becoming valid. This family is downstream of the prompt-level families: an agent transcript can contain an embedded command in a tool result, a source-authority conflict, and then a misleading self-report about why the task failed. The evaluation target is the attribution, not only the final outcome.
 
 At the transcript level, the same attribution problem appears in AI-control and scheming evaluations. Control work asks whether deployment protocols remain safe when a powerful model is treated as untrusted, monitored, or potentially subversive \parencite{greenblatt2024aiControl}. Scheming evaluations ask whether a model's apparent compliance, capability display, or self-report is trustworthy across strategically different contexts \parencite{meinke2025scheming}. The seed benchmark supplies lower-level transcript labels needed before an evaluator can say whether the trace supports a stronger strategic-agency claim.

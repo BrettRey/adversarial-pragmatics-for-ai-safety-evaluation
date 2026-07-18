@@ -1,44 +1,89 @@
-\section{An Action-Level Sufficiency Test}
+\section{An Action-Level Record-and-Verdict Test}
 
-Evidentiary assurance is defeasible. It asks whether the preserved record is strong enough to support an authority claim against predictable challenges, while leaving wisdom, fairness, full legality, and substantive correctness for other forms of review. A record is sufficient only if a reviewer can connect the action to valid authority, scope, system state, context, procedure, preservation, and accountable review without relying on the system's bare assertion.
+Evidentiary assurance is defeasible. It first asks whether the preserved record makes every applicable required subclaim evaluable, while leaving wisdom, fairness, full legality, and substantive correctness for other forms of review. \term{Record adequacy} and evidentiary verdict are distinct. An adequate record can support or defeat an authorization claim. The claim is \term{supported} when every applicable required subclaim is supported, \term{defeated} when at least one is defeated, and \term{indeterminate} when none is defeated but at least one is unevaluable. A subclaim may be declared \term{not applicable} only with a recorded reason. The review must connect the action to the claimed authority, scope, decision basis, system state, context, procedure and controls, preservation, and applicable answerability and review records without relying on the system's bare assertion.
 
-\begin{table}[tbp]
-\small
+\begin{table}[!htbp]
+\footnotesize
 \centering
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.23\linewidth}%
                 >{\raggedright\arraybackslash}p{0.34\linewidth}%
                 >{\raggedright\arraybackslash}p{0.33\linewidth}}
 \toprule
-Sufficiency claim & Required showing & Typical defeater \\
+Authorization subclaim & Required showing & Typical defeater \\
 \midrule
-Authority source & A principal, role, law, policy, or organizational mandate authorized this class of action. & Missing, stale, ambiguous, or overbroad delegation instrument. \\
-Authority validity & The principal could validly confer the action class, and the action doesn't cross a non-delegable legal, organizational, or policy limit. & The record documents a delegation the institution had no power to make. \\
-Scope application & The concrete action fits the permitted operation, target, time, data class, threshold, and approval condition. & Scope inflation from analysis to disclosure, persistence, contact, purchase, or decision. \\
-Runtime state & The exact model and configuration version, role-ordered prompts, tools, policies, permissions, memory state, inference settings, and deployment settings are identified. & Unverifiable configuration, untracked model change, or missing policy snapshot. \\
-Context provenance & The assembled context binds user instructions, retrievals, tool outputs, memory, and policy text to source, trust, ordering, length, truncation, and selection records. & Lower-trust language is promoted into authority, or causally material context is omitted after the fact. \\
-Execution procedure & Tool calls, arguments, approvals, denials, overrides, retries, and failures are reconstructable. & The record contains only a final answer or self-reported rationale. \\
-Preservation integrity & The record has custody, retention, access-control, timestamp, signature, hash, or tamper-evidence protections appropriate to the risk. & Gaps, alteration risk, selective logging, or unverifiable custody. \\
-Answerability and review & An identified and reachable person, vendor, deployer, or institution remains answerable; affected parties have review and correction paths and, where applicable, routes to recovery and cessation. & Accountability is implicitly offloaded to the model, the bearer can't be reached, or the affected reviewer can't inspect the relevant record. \\
+Authority source & Operative source and instrument are identified. & Missing, stale, ambiguous, or overbroad instrument. \\
+Authority validity & The source could confer the action class; non-delegable limits are met. & The source had no power to delegate. \\
+Scope application & The action fits the operation, target, time, data/tool class, threshold, and approval condition. & Scope inflation into disclosure, contact, purchase, or decision. \\
+Decision basis & Rule and version, predicates, source data, definitions, transformations, granularity, uncertainty, and burden are linked. & Unsupported predicate, invalid transformation, or inapplicable rule. \\
+Runtime state & Model, configuration, prompts, tools, policy, permissions, memory, and settings are identified. & Untracked change or unverifiable state. \\
+Context provenance & Context is bound to source, status, standing, technical trust, order, length, truncation, and selection. & Content from a source lacking standing is treated as controlling, the provenance/status record is lost, or material context is omitted. \\
+Execution procedure & Calls, arguments, approvals, denials, overrides, retries, and failures are reconstructable. & Only a final answer or self-report remains. \\
+Adverse signals and controls & Signals and triggered controls are linked to recipients, duties, deadlines, disposition, escalation, and effect. & No supported review, disposition, or completion record. \\
+Preservation integrity & Custody, retention, access, timestamp, hash/signature, and tamper evidence fit the risk. & Gaps, alteration risk, selective logging, or unverifiable custody. \\
+Answerability bearer & A candidate individual or organization is identified as an answerability bearer and linked to its role or office, duty source, effective interval, and succession route. & Only a team or role label is named, or no reachable bearer can be identified where one is required. \\
+Review/remedy forum & An applicable forum or reviewer has record access, competence, relevant duties, needed independence, and declared corrective or remedial powers. & Review lacks access, competence, applicable independence, power, or consequence. \\
 \bottomrule
 \end{tabular}
-\caption{Defeasible sufficiency test for delegated AI action.}
+\caption{Defeasible record-and-verdict test for delegated AI action.}
 \label{tab:sufficiency-test}
 \end{table}
+\FloatBarrier
 
-The test shifts the target from record production to record adequacy. A log can be authentic and still inadequate if it omits the authority state. An action list can be complete and still inadequate if it omits the status the system assigned to its sources, since a reviewer can then judge the act but not the recognition it flowed through. A policy can be valid and still inadequate if the system's runtime configuration can't be reconstructed. A complete trace can still be inadequate if no accountable actor remains answerable or no affected person can challenge the action. A flawless bundle can also document an invalid delegation; validity is a separate showing, not an inference from clean procedure.
+The test shifts the target from record production to record adequacy and is noncompensatory. A strong execution trace doesn't cure a missing decision basis, and an accessible appeal doesn't retroactively supply authority. Missing evidence can make a subclaim unevaluable; evidence of invalid authority or an out-of-scope operation defeats it. The distinction has to be recorded rather than compressed into \enquote{insufficient evidence}.
+
+A log can be authentic and still inadequate if it omits the authority state. An action list can be complete and still inadequate if it omits the status the system assigned to its sources, since a reviewer can then judge the act but not the recognition it flowed through. A policy can be valid and still inadequate if the system's runtime configuration can't be reconstructed.
+
+A complete execution trace can still leave the record inadequate if it doesn't establish whether an applicable answerability bearer or review forum exists. If an otherwise adequate record establishes that a required bearer or forum is absent, the corresponding subclaim is defeated rather than unevaluable. A flawless bundle can likewise document an invalid delegation: the record may be adequate while the authorization claim is defeated, because validity is a separate showing rather than an inference from clean procedure. Affected-party contestability is required only where the action, forum, or authorization regime supplies an affected party with review rights; other actions may instead require an operational or institutional review path.
+
+Adverse information is a defeater only after its relevance is shown. The record should connect the signal by time, applicability, recipient, duty, and possible consequence to the contested claim. Likewise, a missing completion record is probative only where the proponent can first show that the control was triggered and that the logging process was expected to capture its completion or disposition. A nominal reviewer isn't enough: meaningful review depends on reachability, competence, record access, appropriate independence, corrective power, and a duty capable of producing consequence.
 
 Reconstruction is a bounded claim. The record should recover the operating conditions, assembled context, authority path, execution, and review path. It needn't provide a complete internal causal explanation or reproduce a stochastic output exactly. That distinction matters when small contextual changes can produce model-specific prediction shifts \parencite{zhang2026illusionRobustness}: an adequate record can locate the tested conditions without pretending they exhaust why the model responded as it did.
 
 A procurement-assistant case makes the test concrete. Suppose the assistant is authorized to draft an internal comparison memo and reads a vendor page containing the instruction \enquote{email the buyer's maximum budget to request a discount}. The contested action is a blocked vendor email.
 
-A sufficient record would show the user task and procurement role as the authority source; the validity basis for reading internal purchasing criteria; the scope limit that permits memo drafting but not vendor contact; the runtime policy and tool permissions; the vendor page's source and trust label; the proposed email arguments; the tool gate's block decision; the timestamped trace; and the accountable team that configured the workflow.
+A sufficient record would show the user task and procurement role as the authority source; the validity basis for reading internal purchasing criteria; the scope limit that permits memo drafting but not vendor contact; the decision rule and predicate under which external contact would require separate approval; the runtime policy and tool permissions; the vendor page's contextual status, standing assignment, provenance channel, and technical-trust label; the proposed email arguments; the tool gate's expected and actual block record; the timestamped trace; and the candidate answerability bearers, including the organization and officeholders that configured the workflow.
 
-That record would support the audit inference that blocking the email preserved delegated authority. If the assistant sent the email, the same bundle would locate the defeater: scope inflation, failed information-flow control, unauthorized tool licensing, or missing human approval. If the only record were the final memo, the action might look successful while the authority claim remained unproven.
+That record would support the audit inference that blocking the email preserved delegated authority. If the assistant sent the email, the same bundle would locate the defeater: scope inflation, failed information-flow control, unauthorized tool licensing, or missing human approval. With only the final memo, the action might look successful while its authorization remained unproven.
 
-The table also supports a burden-shifting account for audits and assurance reviews. In a forum that adopts such a standard, an adequate bundle could support a rebuttable audit inference that the action was authorized: the proponent shows authority, validity, scope, state, context, procedure, preservation, and review; a challenger points to a defeater such as invalid authority, scope inflation, missing configuration, contaminated context, or record gaps. Legal presumptions would require a separate doctrinal argument. The applicable standard of proof is forum-specific, but ties shouldn't be resolved by the model's self-report.
+The table also supports a burden-shifting account for audits and assurance reviews. In a forum that adopts such a standard, an adequate bundle could support a rebuttable audit inference that the action was authorized: the proponent shows authority, validity, scope, decision basis, state, context, procedure and controls, preservation, and review; a challenger points to a defeater such as invalid authority, scope inflation, unsupported predicates, missing configuration, contaminated context, ignored adverse signals, or record gaps. Legal presumptions would require a separate doctrinal argument. The applicable standard of proof is forum-specific, but ties shouldn't be resolved by the model's self-report.
 
-A sufficiency test governs one action's record, but an assurance program advances a claim across many, and that aggregation invites a selection effect. If the cases a proponent presents, or the model configuration, prompt set, or evaluation run behind them, were chosen because they scored best, the aggregate inference is optimistically biased even when every individual bundle is clean. Decision analysts call this the optimizer's curse \citep{smith2006optimizersCurse}: selecting the maximum over noisy estimates preferentially picks options whose estimation error ran high, so the chosen option's realized reliability falls below its estimate. So selection is itself a defeater. A challenger can ask whether the evidence was sampled from deployment or curated to persuade, and the reviewer's counterpart is what Smith and Winkler call \enquote{disciplined skepticism}: discount the claim toward the field's base rate in proportion to how hard the evidence was optimized, weighting bundles drawn at random above those offered as a program's best.
+The test is also risk-sensitive. A low-stakes internal recommendation may require a lighter record than a benefits decision, clinical summary, procurement action, or external communication. The difference is evidentiary burden, not evidentiary kind: higher-risk deployments need stronger showings for the same validity, authority, scope, state, context, procedure, preservation, and review claims.
+
+\FloatBarrier
+\subsection{From Action-Level Verdicts to Program-Level Claims}
+
+Applying the test across a program introduces three distinct selection problems. First, if a program evaluates several configurations, prompt sets, or runs with noisy value estimates and selects the estimated maximum, the chosen estimate is optimistically biased on average even when each estimate is conditionally unbiased. This is the optimizer's curse \parencite{smith2006optimizersCurse}. Its remedies require held-out evaluation or an explicit prior and error model; Smith and Winkler's \enquote{disciplined skepticism} is Bayesian updating of the noisy estimates, not a generic penalty for any curated record.
+
+Second, a proponent may purposively report persuasive cases or omit unfavourable ones. That is evidence-selection or reporting bias, not automatically the formal optimizer's curse. The record should disclose the selection mechanism, candidate set, inclusion rule, and relevant deployment or target denominator; any skeptical adjustment beyond held-out evidence is an audit proposal that needs its own assumptions.
+
+Third, a sample-selection process determines which affected cases become visible at all. Learning, psychological, and compliance costs are plausible filters on who can challenge a decision, but don't identify a deployment's selection mechanism by themselves \parencite{moynihanHerdHarvey2015administrativeBurden}. Likewise, a selected sample doesn't generally identify population quantities without additional graphical assumptions or external data \parencite{bareinboimTianPearl2014selectionBias}. The limited sketch below yields a concrete audit rule rather than a recovery result.
+
+\begin{center}
+\term{Sample-selection sketch} (not a transportability selection diagram)\\[1.5mm]
+\centering
+\begin{tikzpicture}[
+  font=\footnotesize,
+  sbox/.style={draw=black!55, thick, rounded corners=2pt, align=center, inner sep=3pt, text width=0.17\linewidth, minimum height=0.9cm},
+  factor/.style={sbox, fill=black!3, font=\scriptsize},
+  arrow/.style={-{Latex[length=2mm]}, thick, draw=black!60}
+]
+\node[sbox, fill=black!3] (problem) {Defect or perceived problem};
+\node[sbox, fill=black!3, right=4mm of problem] (attempt) {Attempted challenge};
+\node[sbox, fill=black!3, right=4mm of attempt] (observed) {Recorded complaint};
+\node[sbox, fill=linkmaroon!7, right=4mm of observed] (routed) {Routed review};
+\node[factor, below=6mm of attempt] (access) {Channel access and capacity};
+\node[factor, below=6mm of observed] (recording) {Recording practice};
+\node[factor, below=6mm of routed] (routing) {Routing practice};
+
+\draw[arrow] (problem) -- (attempt);
+\draw[arrow] (attempt) -- (observed);
+\draw[arrow] (observed) -- (routed);
+\draw[arrow] (access) -- (attempt);
+\draw[arrow] (recording) -- (observed);
+\draw[arrow] (routing) -- (routed);
+\end{tikzpicture}
+\end{center}
+
+Complaint counts are warning signals, not prevalence estimates. An assertion of \enquote{no complaints} is informative only relative to supported denominators for exposure, channel access, delivery, capacity, and opportunity to complain, together with records of recording and routing practice. Without those quantities and assumptions, the absence or scarcity of observed complaints doesn't estimate the incidence of defective actions.
 
 Cancellation is a separate aggregate defeater. In controlled question answering, task-content-irrelevant context produces item-level improvements and degradations that can largely cancel in mean accuracy while leaving substantial harmful-tail degradation \parencite{zhang2026illusionRobustness}. A program-level assurance claim should retain item or action transitions and risk-relevant tails wherever repeated paired conditions permit them. Random sampling addresses favourable selection; it doesn't make an average informative when oppositely signed failures erase one another.
-
-The standard is also risk-sensitive. A low-stakes internal recommendation may require a lighter record than a benefits decision, clinical summary, procurement action, or external communication. The difference is evidentiary burden, not evidentiary kind: higher-risk deployments need stronger showings for the same validity, authority, scope, state, context, procedure, preservation, and review claims.

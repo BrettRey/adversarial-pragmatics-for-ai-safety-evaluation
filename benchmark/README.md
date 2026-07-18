@@ -30,6 +30,45 @@ The default local model set is:
 - `gemma3:12b`
 - `glm-4.7-flash:q4_K_M`
 
+## Study B: Design Only
+
+`study-b/` contains the separate selective-sensitivity design, projection
+register, typed authorization schema, and commitment-protected development
+fixtures. These files are not part of the historical pilot or Study A, contain
+no results, and authorize no collection. Validate the current development
+package with:
+
+```bash
+make validate-study-b
+```
+
+The checked fixtures use a structured prompt harness. Document, email,
+tool-result, and transcript wrappers remain target conditions for later direct
+validation; the current metadata does not establish application-surface
+transfer.
+
+### Exploratory API candidates
+
+The following model is a candidate for a future, separately versioned API
+cohort. It is **not** part of the frozen 54-row local pilot or Study A, and the
+current pilot runner supports Ollama rather than OpenAI-compatible endpoints.
+
+- `thinkingmachines/inkling` via NVIDIA NIM
+  - API base: `https://integrate.api.nvidia.com/v1`
+  - Authentication: `NVIDIA_API_KEY`
+  - Access: free NVIDIA-hosted endpoint for prototyping, research, development,
+    testing, and evaluation through the free NVIDIA Developer Program
+  - Status: experimental, non-production, and subject to provider limits or
+    withdrawal
+  - Data boundary: public benign benchmark items only; do not send private
+    Study A returns, confidential material, or sensitive data
+  - Integration needed: a separate OpenAI-compatible runner that records
+    provider and endpoint provenance
+
+Access and model ID were verified on 2026-07-16 against the
+[NVIDIA Inkling endpoint](https://build.nvidia.com/thinkingmachines/inkling)
+and [NIM access documentation](https://docs.api.nvidia.com/nim/docs/product).
+
 For a quick two-item check:
 
 ```bash

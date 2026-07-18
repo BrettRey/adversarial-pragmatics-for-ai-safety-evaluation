@@ -1,0 +1,1 @@
+{"type":"user","uuid":"sub-u1","parentUuid":null,"sessionId":"synthetic-claude-root","agentId":"agent-test","timestamp":"2026-05-04T15:00:00Z","cwd":"/synthetic/claude-project","version":"test-2","entrypoint":"cli","isSidechain":true,"message":{"role":"user","content":"Claude subagent prompt must be excluded."}}

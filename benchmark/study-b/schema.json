@@ -1,0 +1,497 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/adversarial-pragmatics/study-b/schema.json",
+  "title": "Study B commitment-protected authority development items",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "study_id",
+    "status",
+    "created",
+    "construction_selection",
+    "construction_gate_log",
+    "base_scenarios"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "study_id": {"const": "AP-STUDY-B-COMMITMENT-PROTECTED-DEVELOPMENT"},
+    "status": {"const": "development_only_no_collection_authorized"},
+    "created": {"type": "string", "pattern": "^20[0-9]{2}-[0-9]{2}-[0-9]{2}$"},
+    "construction_selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stages", "claim_boundary", "held_out_rule"],
+      "properties": {
+        "stages": {
+          "const": [
+            "private_candidate",
+            "abstract_card_eligibility",
+            "reconstructability_privacy_pass",
+            "pilot_survival",
+            "production_inclusion"
+          ]
+        },
+        "claim_boundary": {"type": "string", "minLength": 20},
+        "held_out_rule": {"type": "string", "minLength": 20}
+      }
+    },
+    "construction_gate_log": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {"$ref": "#/$defs/construction_gate_record"}
+    },
+    "base_scenarios": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {"$ref": "#/$defs/base_scenario"}
+    }
+  },
+  "$defs": {
+    "construction_gate_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stage", "entered_count", "passed_count", "excluded_count", "reason"],
+      "properties": {
+        "stage": {"enum": ["private_candidate", "abstract_card_eligibility", "reconstructability_privacy_pass", "pilot_survival", "production_inclusion"]},
+        "entered_count": {"type": "integer", "minimum": 0},
+        "passed_count": {"type": "integer", "minimum": 0},
+        "excluded_count": {"type": "integer", "minimum": 0},
+        "reason": {"type": "string", "minLength": 15}
+      }
+    },
+    "actor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role_id", "description"],
+      "properties": {
+        "role_id": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+        "description": {"type": "string", "minLength": 3}
+      }
+    },
+    "fixed_elements": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "later_directive_id",
+        "later_directive_text",
+        "main_action_target",
+        "initial_main_value",
+        "requested_main_value",
+        "control_action_target",
+        "initial_control_value",
+        "requested_control_value",
+        "fixed_event_fact_text",
+        "response_format"
+      ],
+      "properties": {
+        "later_directive_id": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+        "later_directive_text": {"type": "string", "minLength": 20},
+        "main_action_target": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+        "initial_main_value": {"$ref": "#/$defs/token"},
+        "requested_main_value": {"$ref": "#/$defs/token"},
+        "control_action_target": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+        "initial_control_value": {"$ref": "#/$defs/token"},
+        "requested_control_value": {"$ref": "#/$defs/token"},
+        "fixed_event_fact_text": {"type": "string", "minLength": 20},
+        "response_format": {"const": "MAIN|CONTROL"}
+      }
+    },
+    "prompt_message": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role", "text"],
+      "properties": {
+        "role": {"enum": ["system", "user"]},
+        "text": {"type": "string", "minLength": 20}
+      }
+    },
+    "standing_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["holders", "target", "guard"],
+      "properties": {
+        "holders": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+          "uniqueItems": true
+        },
+        "target": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+        "guard": {"type": "string", "minLength": 3}
+      }
+    },
+    "operation_standing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["issue", "direct", "amend", "suspend", "revoke", "override", "release", "review"],
+      "properties": {
+        "issue": {"$ref": "#/$defs/standing_entry"},
+        "direct": {"$ref": "#/$defs/standing_entry"},
+        "amend": {"$ref": "#/$defs/standing_entry"},
+        "suspend": {"$ref": "#/$defs/standing_entry"},
+        "revoke": {"$ref": "#/$defs/standing_entry"},
+        "override": {"$ref": "#/$defs/standing_entry"},
+        "release": {"$ref": "#/$defs/standing_entry"},
+        "review": {"$ref": "#/$defs/standing_entry"}
+      }
+    },
+    "amendment_rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["amendment_actors", "target", "required_events", "required_roles", "effective_interval", "status"],
+      "properties": {
+        "amendment_actors": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+          "uniqueItems": true
+        },
+        "target": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+        "required_events": {
+          "type": "array",
+          "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+          "uniqueItems": true
+        },
+        "required_roles": {
+          "type": "array",
+          "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+          "uniqueItems": true
+        },
+        "effective_interval": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["start", "end"],
+          "properties": {
+            "start": {"type": "string", "pattern": "^T[0-9]+$"},
+            "end": {"type": "string", "pattern": "^(T[0-9]+|open)$"}
+          }
+        },
+        "status": {"const": "operative_benchmark_stipulation"}
+      }
+    },
+    "governing_source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_span_id", "source_kind", "operative"],
+      "properties": {
+        "source_span_id": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+        "source_kind": {"enum": ["instrument", "directive", "record", "quotation", "filler"]},
+        "operative": {"type": "boolean"}
+      }
+    },
+    "transition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operation", "issuer_role", "target", "event_time", "requested_value", "guard_evaluation", "valid", "reason"],
+      "properties": {
+        "operation": {"const": "amend"},
+        "issuer_role": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+        "target": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+        "event_time": {"type": "string", "pattern": "^T[0-9]+$"},
+        "requested_value": {"$ref": "#/$defs/token"},
+        "guard_evaluation": {"$ref": "#/$defs/guard_evaluation"},
+        "valid": {"type": "boolean"},
+        "reason": {"type": "string", "minLength": 10}
+      }
+    },
+    "guard_evaluation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required_events", "observed_events"],
+      "properties": {
+        "required_events": {
+          "type": "array",
+          "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+          "uniqueItems": true
+        },
+        "observed_events": {
+          "type": "array",
+          "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+          "uniqueItems": true
+        }
+      }
+    },
+    "licensed_action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action_class", "main_target", "main_value", "control_target", "control_value"],
+      "properties": {
+        "action_class": {"const": "emit_two_harmless_tokens"},
+        "main_target": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+        "main_value": {"$ref": "#/$defs/token"},
+        "control_target": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+        "control_value": {"$ref": "#/$defs/token"}
+      }
+    },
+    "authorization_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "regime_id",
+        "governing_sources",
+        "actor_roles",
+        "effective_interval",
+        "operation_standing",
+        "amendment_rule",
+        "purported_transition",
+        "licensed_action"
+      ],
+      "properties": {
+        "regime_id": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+        "governing_sources": {
+          "type": "array",
+          "minItems": 2,
+          "items": {"$ref": "#/$defs/governing_source"}
+        },
+        "actor_roles": {
+          "type": "array",
+          "minItems": 3,
+          "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+          "uniqueItems": true
+        },
+        "effective_interval": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["start", "end"],
+          "properties": {
+            "start": {"type": "string", "pattern": "^T[0-9]+$"},
+            "end": {"type": "string", "pattern": "^(T[0-9]+|open)$"}
+          }
+        },
+        "operation_standing": {"$ref": "#/$defs/operation_standing"},
+        "amendment_rule": {"$ref": "#/$defs/amendment_rule"},
+        "purported_transition": {"$ref": "#/$defs/transition"},
+        "licensed_action": {"$ref": "#/$defs/licensed_action"}
+      }
+    },
+    "manipulation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "changed_fact", "context_operative", "causal_exposure_note"],
+      "properties": {
+        "kind": {
+          "enum": [
+            "valid_amendment",
+            "operative_commitment_protection",
+            "inert_load",
+            "surface_matched_nonoperative_protection"
+          ]
+        },
+        "changed_fact": {"type": "string", "minLength": 10},
+        "context_operative": {"type": "boolean"},
+        "causal_exposure_note": {"type": "string", "minLength": 10}
+      }
+    },
+    "privacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["new_scenario", "source_excerpt_used", "source_episode_recoverable", "payload_class"],
+      "properties": {
+        "new_scenario": {"const": true},
+        "source_excerpt_used": {"const": false},
+        "source_episode_recoverable": {"const": false},
+        "payload_class": {"const": "harmless_fictional_tokens"}
+      }
+    },
+    "construction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["output_inspected_during_construction", "production_eligible", "status_reason"],
+      "properties": {
+        "output_inspected_during_construction": {"type": "boolean"},
+        "production_eligible": {"type": "boolean"},
+        "status_reason": {"const": "development item; production requires a fresh frozen held-out set"}
+      }
+    },
+    "review_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "review_id", "review_date", "decision", "method", "content_hash"],
+      "properties": {
+        "status": {"enum": ["pending", "completed"]},
+        "review_id": {
+          "anyOf": [
+            {"type": "null"},
+            {"type": "string", "pattern": "^[a-zA-Z0-9_-]{3,64}$"}
+          ]
+        },
+        "review_date": {
+          "anyOf": [
+            {"type": "null"},
+            {"type": "string", "pattern": "^20[0-9]{2}-[0-9]{2}-[0-9]{2}$"}
+          ]
+        },
+        "decision": {"enum": [null, "pass", "fail"]},
+        "method": {
+          "anyOf": [
+            {"type": "null"},
+            {"type": "string", "minLength": 10}
+          ]
+        },
+        "content_hash": {
+          "anyOf": [
+            {"type": "null"},
+            {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"}
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"status": {"const": "pending"}}},
+          "then": {
+            "properties": {
+              "review_id": {"const": null},
+              "review_date": {"const": null},
+              "decision": {"const": null},
+              "method": {"const": null},
+              "content_hash": {"const": null}
+            }
+          }
+        },
+        {
+          "if": {"properties": {"status": {"const": "completed"}}},
+          "then": {
+            "properties": {
+              "review_id": {"type": "string"},
+              "review_date": {"type": "string"},
+              "decision": {"enum": ["pass", "fail"]},
+              "method": {"type": "string"},
+              "content_hash": {"type": "string"}
+            }
+          }
+        }
+      ]
+    },
+    "declared_or_unspecified": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "note"],
+      "properties": {
+        "status": {"enum": ["declared", "unspecified"]},
+        "note": {"type": "string", "minLength": 10}
+      }
+    },
+    "founding_validity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stipulated_valid_for_benchmark",
+        "adoption_source_id",
+        "adoption_event",
+        "scope",
+        "effective_interval",
+        "superior_or_nondelegable_constraints",
+        "review",
+        "release",
+        "emergency"
+      ],
+      "properties": {
+        "stipulated_valid_for_benchmark": {"const": true},
+        "adoption_source_id": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+        "adoption_event": {"type": "string", "minLength": 10},
+        "scope": {"type": "string", "minLength": 20},
+        "effective_interval": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["start", "end"],
+          "properties": {
+            "start": {"type": "string", "pattern": "^T[0-9]+$"},
+            "end": {"type": "string", "pattern": "^(T[0-9]+|open)$"}
+          }
+        },
+        "superior_or_nondelegable_constraints": {"$ref": "#/$defs/declared_or_unspecified"},
+        "review": {"$ref": "#/$defs/declared_or_unspecified"},
+        "release": {"$ref": "#/$defs/declared_or_unspecified"},
+        "emergency": {"$ref": "#/$defs/declared_or_unspecified"}
+      }
+    },
+    "condition_item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "item_id",
+        "condition",
+        "context_variant_id",
+        "development_status",
+        "phenomenon_family",
+        "application_surface",
+        "prompt_messages",
+        "tagged_spans",
+        "manipulation",
+        "authorization_record",
+        "expected_action",
+        "privacy",
+        "construction"
+      ],
+      "properties": {
+        "item_id": {"type": "string", "pattern": "^APB-CP[0-9]{2}-(C0|C1|N0|N1)$"},
+        "condition": {"enum": ["C0_baseline", "C1_control_change", "N0_inert_load", "N1_matched_placebo"]},
+        "context_variant_id": {"enum": ["baseline", "control_change", "inert_load", "matched_placebo"]},
+        "development_status": {"const": "development_only"},
+        "phenomenon_family": {"const": "commitment_protected_authority"},
+        "application_surface": {"const": "structured_prompt"},
+        "prompt_messages": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {"$ref": "#/$defs/prompt_message"}
+        },
+        "tagged_spans": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 4,
+          "items": {"$ref": "#/$defs/tagged_span"}
+        },
+        "manipulation": {"$ref": "#/$defs/manipulation"},
+        "authorization_record": {"$ref": "#/$defs/authorization_record"},
+        "expected_action": {"$ref": "#/$defs/licensed_action"},
+        "privacy": {"$ref": "#/$defs/privacy"},
+        "construction": {"$ref": "#/$defs/construction"}
+      }
+    },
+    "tagged_span": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["span_id", "pragmatic_status", "operative", "content_type", "provenance_type", "source_role", "channel", "technical_trust"],
+      "properties": {
+        "span_id": {"enum": ["mandate", "event_fact", "later_directive", "inert_context", "placebo"]},
+        "pragmatic_status": {"enum": ["governing_rule", "event_fact", "directive", "inert_load", "matched_placebo"]},
+        "operative": {"type": "boolean"},
+        "content_type": {"enum": ["instrument", "event_assertion", "directive", "inventory_sentence", "example_or_quotation"]},
+        "provenance_type": {"const": "benchmark_authored_fiction"},
+        "source_role": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+        "channel": {"const": "structured_prompt_user_message"},
+        "technical_trust": {"const": "trusted_test_fixture"}
+      }
+    },
+    "base_scenario": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["base_id", "scenario_family", "fictional_domain", "actors", "fixed_elements", "founding_validity", "independent_reference_review", "privacy_review", "conditions"],
+      "properties": {
+        "base_id": {"type": "string", "pattern": "^APB-CP[0-9]{2}$"},
+        "scenario_family": {"enum": ["ordinary_unilateral_amendment", "joint_amendment", "expiry_release", "operative_ceremonial"]},
+        "fictional_domain": {"type": "string", "minLength": 5},
+        "actors": {
+          "type": "array",
+          "minItems": 3,
+          "items": {"$ref": "#/$defs/actor"}
+        },
+        "fixed_elements": {"$ref": "#/$defs/fixed_elements"},
+        "founding_validity": {"$ref": "#/$defs/founding_validity"},
+        "independent_reference_review": {"$ref": "#/$defs/review_record"},
+        "privacy_review": {"$ref": "#/$defs/review_record"},
+        "conditions": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "items": {"$ref": "#/$defs/condition_item"}
+        }
+      }
+    },
+    "token": {"type": "string", "pattern": "^[A-Z][A-Z0-9_-]{2,15}$"}
+  }
+}

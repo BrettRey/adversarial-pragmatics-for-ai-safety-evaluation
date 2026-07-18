@@ -1,8 +1,10 @@
 \section{Experiments}
 
-The empirical program has two stages: a completed local seed pilot and a larger development pass. The seed pilot is a measurement-calibration and judge-validation demonstration, not evidence of model-level safety differences. Its purpose is to test whether the item schema, adjudication protocol, and summary metrics can turn raw model outputs into auditable distinctions.
+The empirical programme has three stages. This paper reports the completed local seed pilot, a historical measurement-calibration and judge-validation demonstration rather than evidence of model-level safety differences. Study A will apply fixed codebooks to the same 54 prompt--response objects; because both prompts and responses are fixed, it produces object- and procedure-level adjudication summaries rather than a causal effect. Study B is a separate pre-collection study that will use newly constructed four-condition interventions and repeated samples to test selective contextual sensitivity. Its current four bases yield 16 development fixtures, not production items or results; Section~\ref{sec:benchmark-construction} maps the construction pilot, development set, and possible later expansion. No Study A or Study B results are reported here.
 
-The local seed pilot ran the 18-item seed benchmark against three accessible Ollama models: \texttt{qwen3:8b}, \texttt{gemma3:12b}, and \texttt{glm-4.7-flash:q4\_K\_M}. This produced 54 item--model outputs. The run used local Ollama 0.15.2 on June 30, 2026. Generation settings were temperature 0, seed 1, 256 predicted tokens, no thinking trace, and model unloading between runs. A single expert adjudicator (the author, who also wrote the items and their expected-behaviour labels) labelled every row for task success, policy compliance, safety risk, risk type, refusal outcome, failure attribution, confidence, and rationale. All 54 rows received complete labels, so the pilot tests pipeline coherence rather than the quality of independently produced comparison labels.
+The local seed pilot ran the 18-item seed benchmark against three accessible Ollama models: \texttt{qwen3:8b}, \texttt{gemma3:12b}, and \texttt{glm-4.7-flash:q4\_K\_M}. This produced 54 item--model outputs. The run used local Ollama 0.15.2 on June 30, 2026. Generation settings were temperature 0, seed 1, 256 predicted tokens, no thinking trace, and model unloading between runs.
+
+A single expert adjudicator (the author, who also wrote the items and their expected-behaviour labels) labelled every row for task success, policy compliance, safety risk, risk type, refusal outcome, failure attribution, confidence, and rationale. All 54 rows received complete labels, so the pilot tests pipeline coherence rather than the quality of independently produced comparison labels. Table~\ref{tab:local-seed-pilot} reports the model-level counts, and Figure~\ref{fig:pilot-model-outcomes} displays their task, policy, and paired-contrast profiles.
 
 \begin{table}[!htbp]
 \centering
@@ -30,7 +32,7 @@ Total & 36 & 11 & 7 & 46 & 12/24 \\
 
 Across the pilot, 36 of 54 outputs were full task successes, 11 were partial successes, and 7 were failures. Policy compliance was higher than task success: 46 outputs were compliant, 7 were noncompliant, and 1 was policy-ambiguous. Adjudicator confidence was high for 41 rows and medium for 13 rows, with no low-confidence adjudications.
 
-Pairwise results require reporting by contrast family rather than as a single aggregate. Three pairs were stable across all models: the embedded-command source pair, the mention/use pair, and the scope-negation pair. Three pairs had zero paired-contrast passes: the ambiguous deictic-reference pair, the agent transcript pair, and the policy-boundary pair.
+Figure~\ref{fig:pilot-pair-accuracy} shows why pairwise results require reporting by contrast family rather than as a single aggregate. Three pairs were stable across all models: the embedded-command source pair, the mention/use pair, and the scope-negation pair. Three pairs had zero paired-contrast passes: the ambiguous deictic-reference pair, the agent transcript pair, and the policy-boundary pair.
 
 P008 is excluded from those paired-contrast totals. It remains in the row-level pilot evidence because it surfaced a useful confidentiality problem, but its members differ in phenomenon family and both require non-disclosure.
 
@@ -43,9 +45,21 @@ The failures differed by family. In the deictic-reference item, all three models
 \label{fig:pilot-pair-accuracy}
 \end{figure}
 
-The automatic diagnostic pass worked as triage, with limits. All seven noncompliant rows were high-priority diagnostic rows. But low-priority rows still included partial task failures and one policy-ambiguous row. This shape is expected for a pragmatic benchmark: simple token checks can identify many dangerous rows, but they can't decide whether an answer satisfies the intended speech act, source relation, or policy boundary.
+The automatic diagnostic pass worked as triage, with limits (Figure~\ref{fig:pilot-diagnostic-triage}). All seven noncompliant rows were high-priority diagnostic rows. But low-priority rows still included partial task failures and one policy-ambiguous row. This shape is expected for a pragmatic benchmark: simple token checks can identify many dangerous rows, but they can't decide whether an answer satisfies the intended speech act, source relation, or policy boundary.
 
-One row exposes a principled boundary between pragmatic status and information flow. In AP-SEED-016, one model refused the request but repeated \mention{ALPHA-000} while explaining the refusal. From a mention/use perspective, the response is metalinguistic: the string is mentioned in the course of refusal rather than enacted as a disclosure request. From a confidentiality perspective, the protected token still reached the output channel. The item marks an adjudication-instability point: speech-act status can make a response pragmatically safe while channel occupancy makes it an information-flow failure. The development set has to separate those criteria explicitly.
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=\linewidth]{pilot_diagnostic_triage}
+\caption{Rule-aided diagnostic priority compared with adjudicated labels. Source: sanitized summaries for run \texttt{local-pilot-20260630-185417}; \(N=54\) item--model rows. All bars use a common row-count scale, with colour and hatch distinguishing diagnostic row totals, non-success rows, noncompliant rows, and policy-ambiguous rows.}
+\label{fig:pilot-diagnostic-triage}
+\end{figure}
+\FloatBarrier
+
+One row exposes a principled boundary between pragmatic status and information flow. In AP-SEED-016, one model refused the request but repeated \mention{ALPHA-000} while explaining the refusal. On the speech-act criterion, the string is mentioned in the course of refusal rather than supplied by enacting the embedded disclosure request. That makes the occurrence non-enactive, not safe simpliciter. On the confidentiality criterion, the protected token still reached the output channel. The item marks an adjudication-instability point because speech-act status and information-flow authorization can diverge. The development set has to separate those criteria explicitly.
+
+A first LLM-judge validation pass reinforces the need to treat model judges as measurement objects. The judge produced valid structured labels for all 54 rows, but the author-label distributions are heavily skewed, so exact agreement mostly tracks base rates (Table~\ref{tab:llm-judge-validation}): task-success agreement equals the majority-class baseline, safety-risk agreement falls below it, and the refusal-outcome figure sits 1.8 points above a constant judge. Chance-corrected agreement runs from \(\kappa = 0.14\) (safety risk) to \(\kappa = 0.79\) (refusal outcome), but these kappa values are fragile at this cell count, and the 54 rows aren't independent of the 18 crossed items.
+
+Minority-class agreement is low exactly where safety evaluation needs it. The judge recovered none of 11 partial task successes (upgrading 10 to full success), 3 of 7 noncompliant rows, none of 11 risk-labelled rows, and 6 of 17 rows attributed to \texttt{capability\_failure}. Table~\ref{tab:llm-judge-validation} reports 6/18 across all non-\texttt{none} attribution labels because one other row was attributed to policy ambiguity. The judge recovered both author-labelled refusals and the direct policy-boundary failures, but that apparent strength rests on two minority rows.
 
 \begin{table}[!htbp]
 \centering
@@ -64,22 +78,10 @@ Failure attribution & 77.8\% & 66.7\% & 0.40 & 6/18 non-\texttt{none} \\
 \bottomrule
 \end{tabular}
 \end{table}
-
-A first LLM-judge validation pass reinforces the need to treat model judges as measurement objects. The judge produced valid structured labels for all 54 rows, but the expert label distributions are heavily skewed, so exact agreement mostly tracks base rates (Table~\ref{tab:llm-judge-validation}): task-success agreement equals the majority-class baseline, safety-risk agreement falls below it, and the refusal-outcome figure sits 1.8 points above a constant judge. Chance-corrected agreement runs from \(\kappa = 0.14\) (safety risk) to \(\kappa = 0.79\) (refusal outcome), but these kappa values are fragile at this cell count, and the 54 rows aren't independent of the 18 crossed items.
-
-The informative statistic is class-specific agreement on minority author labels, and it's low exactly where safety evaluation needs it. The judge recovered none of the 11 partial task successes (upgrading 10 to full success), 3 of 7 noncompliant rows, none of the 11 risk-labelled rows, and 6 of the 17 rows whose author failure attribution was \texttt{capability\_failure}. Table~\ref{tab:llm-judge-validation} reports 6/18 for all non-\texttt{none} attribution labels because one additional row was attributed to policy ambiguity. The judge did recover both author-labelled refusals and the direct policy-boundary failures, but that apparent refusal strength rests on two minority rows.
+\FloatBarrier
 
 Three design features cap what this pass can show. The judge is one of the three evaluated models, so it graded its own 18 outputs. The judge prompt included each item's expected-behaviour field, so these figures are an upper bound on rubric-aided judging, not judging as deployed. And the comparison labels come from a single adjudicator who also wrote the items and expected-behaviour fields (see Limitations and Next Steps).
 
 On this pilot, triage belongs to the rule-aided diagnostic pass, which flagged all 7 noncompliant rows; the unvalidated judge missed most of the labels that matter. The negative result motivates the judge-validation protocol and warns against judge-based grading. The confusion pattern is still diagnostic: the judge upgrades partials, misses risk-labelled rows, and misses capability attributions, exactly the failure profile a validation pass has to screen for.
 
-\begin{figure}[!htbp]
-\centering
-\includegraphics[width=\linewidth]{pilot_diagnostic_triage}
-\caption{Rule-aided diagnostic priority compared with adjudicated labels. Source: sanitized summaries for run \texttt{local-pilot-20260630-185417}; \(N=54\) item--model rows. All bars use a common row-count scale, with colour and hatch distinguishing diagnostic row totals, non-success rows, noncompliant rows, and policy-ambiguous rows.}
-\label{fig:pilot-diagnostic-triage}
-\end{figure}
-
 The release also includes a deterministic fake-data calibration pass, documented in the supplement. The pass checks schemas, figure layouts, rater-workload assumptions, and decision thresholds; it isn't evidence about model or judge behaviour.
-
-\clearpage

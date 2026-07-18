@@ -1,28 +1,42 @@
 \section{Forward Look: Compositional Delegation Assurance}
 \label{sec:compositional-delegation}
 
-Single-agent delegation assurance is the base case. Many useful systems will instead decompose work across coordinator agents, specialist agents, tools, retrieved documents, policy documents, contracts, memories, and evaluators. The authority claim then becomes compositional: the question is whether delegated authority survives handoff, transformation, summarization, tool use, policy checking, and review.
+Single-agent delegation assurance is the base case. Many useful systems will instead decompose work across coordinator agents, specialist agents, tools, retrieved documents, policy documents, contracts, memories, and automated evaluators. The authorization claim then becomes compositional: the question is whether every task assignment rested on a grant recognized as valid under \(R\), every proposed or executed operation fell within delegated authority, every applicable constraint remained operative, and the record supports those conclusions across handoff, transformation, summarization, tool use, policy checking, and review.
 
-This extension is better called \term{compositional delegation assurance} than simply multi-agent delegation assurance. Agents can receive delegated tasks, propose actions, and call tools. Tools execute operations. Documents, contracts, policies, and memories constrain, evidence, or contaminate authority. Treating all of them as agents would flatten the roles that delegation assurance needs to preserve. Treating them as nodes in an authority graph gives the right evaluation object.
+This extension is better called \term{compositional delegation assurance} than simply multi-agent delegation assurance. Agents can receive delegated tasks, propose actions, and call tools. Tools may execute operations. Documents, contracts, policies, and memories may record grants, state constraints, or supply evidence; systems can also misclassify their contents. They don't acquire standing merely by entering a context. Treating all of them as agents would erase distinctions that delegation assurance needs to preserve. Treating them as nodes in a graph of recorded authorization relations gives the right evaluation object.
 
-In a compositional setting, each edge in the graph carries an authority claim. A principal may authorize a coordinator agent to draft a procurement memo. The coordinator may ask a specialist agent to compare vendors, retrieve a contract, consult a policy, and prepare a tool call. The assurance question is no longer only whether the final email, memo, record update, or purchase order was authorized. It's whether every handoff preserved the principal, action class, scope, constraints, provenance, subdelegation license, information-flow rights, persistence rights, and non-delegable limits.
+In a compositional setting, the assurance representation is a graph with typed edges. Delegation edges record claims about grants and applicable constraints; retrieval, proposal, execution, and provenance edges record content flow, proposed operations, executed operations, or evidence. A joint grant or transition needs a guarded relation or hyperedge because several pairwise edges would falsely imply unilateral standing. The graph doesn't treat authority as a substance transmitted along edges, and a recorded edge doesn't by itself establish that the represented grant is valid.
 
-The central security property is monotonic authority. Downstream agents may receive narrower authority, more specific context, or an explicit escalation duty, but no broader authority than the upstream delegate had. A summarizer has to retain confidentiality constraints. A coordinator has to keep \enquote{draft an internal comparison} distinct from \enquote{contact the vendor}. A tool wrapper has to require approval rather than treat a natural-language rationale as approval. A retrieved contract clause has to remain a constraint source rather than become an executable instruction.
+A principal may authorize a coordinator agent to draft a procurement memo. The coordinator may ask a specialist agent to compare vendors, retrieve a contract, consult a policy, and prepare a tool-call proposal. The assurance question is whether each task assignment rested on a grant valid under \(R\), whether each proposed or executed operation fell within \(A_R(t)\), and whether the handoff record retained the governing sources, instruments, effective intervals, operation-specific standing, action class, scope, constraints, provenance, permission to subdelegate, information-flow permissions, persistence permissions, and non-delegable limits.
 
-Compositional delegation assurance adds several evaluation requirements to the single-action pattern. First, the original delegation has to license subdelegation at all. Second, each handoff has to preserve or narrow scope. Third, constraints have to survive summarization, routing, and memory updates. Fourth, provenance has to remain attached to instructions, documents, tool results, and policy text. Fifth, unresolved conflicts have to be escalated or preserved as conflicts rather than flattened into confident action. Finally, the audit record has to reconstruct the path from principal authority through intermediate agents and tool gates to the contested action.
+The normative and representational levels have to remain separate. Section~\ref{sec:delegation-beyond-responsiveness} defines \(A_R(t)\) from the operative normative state after valid transitions. Let \(s_t\) be the recorded authorization state, and let \(\widehat{A}(s_t)\) be the set of actions that state represents as permitted.
 
-Two failure paths have to remain separate. An intermediate node may lose an authority edge or constraint during handoff. Alternatively, the authority path may remain intact while accumulated context nonspecifically destabilizes behaviour. The first is a compositional delegation failure. The second is a contextual-reliability failure unless the trace shows that the system misrecognized standing, priority, or scope. Because context-induced shifts can be model-specific, path tests should include matched non-controlling loads and repeated samples rather than infer lost authority from a changed output alone \parencite{zhang2026illusionRobustness}.
+Normative \term{non-amplification} requires \(A_R(t_{\mathrm{down}}) \subseteq A_R(t_{\mathrm{up}})\) between comparable handoffs unless a valid authority-conferring event or constraint change under \(R\) supports the added region. The record-propagation condition separately requires every permission in \(\widehat{A}(s_{\mathrm{down}}) \setminus \widehat{A}(s_{\mathrm{up}})\) to be tied to a separately recorded grant or constraint change. This detects unexplained record expansion but doesn't establish that the recorded event is valid.
 
-This also changes judge validation. A judge asked to score a final transcript may miss whether authority expanded in the middle of the graph. A compositional judge has to evaluate path properties: whether a subagent had authority to receive the task, whether a tool call stayed inside the delegated scope, whether constraints were preserved across summaries, and whether the final record supports third-party reconstruction. The judge's own authority is part of the graph when its label licenses a safety, compliance, or deployment claim.
+The record-soundness subclaim is \(\widehat{A}(s_t) \subseteq A_R(t)\), a relation that requires separate evidence under \(R\). An underinclusive record may preserve soundness while defeating a task-fulfilment, mandate-compliance, or record-completeness finding. Because authorization sets can be incomparable, none of these relations defines a single scalar amount of authority.
 
-The research program extends the comparative test of Section~\ref{sec:comparative-test} from single actions to authority paths (Figure~\ref{fig:authority-path-pair}). Build contrast sets where the final output is held constant but the authority path differs: one version preserves a confidentiality constraint through a coordinator and specialist agent, while another drops it during summarization; one tool call is licensed by a valid subdelegation, while another is produced by an agent that never received contact authority; one retrieved contract constrains an action, while another is misread as an instruction. These tests would measure whether delegation assurance scales from an action-level property to a graph property.
+Adding an authority-conferring instrument can change \(\widehat{A}(s_t)\); it changes \(A_R(t)\) only if the instrument is valid and applicable under \(R\). Neither change rewrites an earlier grant or record state. A valid unrecorded grant can leave an operation authorized but its record-based assurance indeterminate.
+
+A summarization handoff has to retain the record of an applicable confidentiality constraint, and a downstream policy-enforcement point has to apply that constraint to the proposed operation. A coordinator has to keep \mention{draft an internal comparison} distinct from \mention{contact the vendor}. A tool wrapper has to require the approval specified by the governing rule rather than treat a natural-language rationale as approval. A retrieved contract clause may supply evidence of an applicable constraint, subject to validity and adjudication, but its presence in context doesn't make it an operation to execute.
+
+Compositional delegation assurance adds several requirements to the single-action pattern. First, the evidence has to support that the governing grant permits subdelegation. Second, the normative authorization path has to satisfy non-amplification. Third, every handoff record has to satisfy the record-propagation condition, with every added permission tied to a separately recorded authority-conferring event and with the event's validity and applicability under \(R\) assessed separately for record soundness.
+
+Fourth, the record has to retain every still-applicable constraint through summarization, routing, and memory updates. Fifth, provenance has to remain linked to instructions, documents, tool results, and policy text. Sixth, unresolved conflicts have to be escalated or recorded as conflicts rather than converted into an unqualified action proposal. Finally, the audit record has to reconstruct both the normative basis asserted for the action and the sequence of classifications, proposals, gate decisions, and executions from the principal's grant to the contested action.
+
+Several failure levels have to remain separate. An intermediate record may omit a grant or still-applicable constraint during handoff. The omission is a recorded-authorization propagation failure and defeats the corresponding component or audit subclaim. It may make a declared claim indeterminate or defeated, depending on its claim tree, without making the normative proposition that the executed operation fell within \(A_R(t)\) false. An unsupported permission introduced into \(\widehat{A}(s_t)\) is a record-soundness failure even if a later gate blocks the proposed operation; an executed operation outside \(A_R(t)\) defeats the action-authorization claim.
+
+Separately, accumulated context may destabilize behaviour even when the record remains intact. A changed output motivates a contextual-reliability hypothesis. A trace may independently support an item-level classification--adjudication misfit concerning status, standing, priority, or scope, but no single item establishes a contextual-reliability failure over \(T\). The projective claim requires target-matched repeated evidence. Path tests should include matched non-controlling loads and repeated samples rather than infer a dropped or misclassified grant or constraint from changed output alone \parencite{zhang2026illusionRobustness}.
+
+This separation also governs automated-evaluator validation. A final-transcript score may miss an unsupported permission introduced at an intermediate node. An automated evaluator for compositional delegation may be assigned to assess whether a subagent was permitted to receive the relevant information, whether it had a valid grant for the assigned action, whether the proposed operation belonged to \(\widehat{A}(s_t)\), whether the executed operation belonged to \(A_R(t)\), whether constraints remained recorded across summaries, and whether the trace supports third-party reconstruction.
+
+That label is evidence about the assigned claims, not a grant, authorization decision, or liability finding. If a decision rule gives it operational effect, the assurance graph should record who authorized its use, the evaluator's scope, and the rule.
 
 \begin{figure}[tbp]
 \centering
 \begin{tikzpicture}[
   font=\scriptsize,
   gnode/.style={draw=black!55, thick, rounded corners=2pt, align=center, inner sep=3pt, minimum height=0.75cm, text width=1.55cm, fill=black!3},
-  causal/.style={-{Latex[length=1.8mm]}, thick, draw=black!60},
+  flow/.style={-{Latex[length=1.8mm]}, thick, draw=black!60},
   atag/.style={font=\tiny, text=linkmaroon, align=center}
 ]
 % Path (a): constraint preserved
@@ -30,28 +44,35 @@ The research program extends the comparative test of Section~\ref{sec:comparativ
 \node[gnode] (p1) at (0,0) {Principal};
 \node[gnode] (c1) at (3.3,0) {Coordinator};
 \node[gnode] (s1) at (6.6,0) {Specialist};
-\node[gnode] (t1) at (9.9,0) {Tool call};
-\draw[causal] (p1) -- (c1);
-\draw[causal] (c1) -- node[below, font=\tiny]{summarization} (s1);
-\draw[causal] (s1) -- (t1);
+\node[gnode] (t1) at (9.9,0) {Call proposal};
+\draw[flow] (p1) -- node[below, font=\tiny]{handoff} (c1);
+\draw[flow] (c1) -- node[below, font=\tiny]{summarization} (s1);
+\draw[flow] (s1) -- node[below, font=\tiny]{proposal flow} (t1);
 \node[atag] at (1.65,0.6) {memo scope\\budget confidential};
 \node[atag] at (4.95,0.6) {memo scope\\budget confidential};
-\node[atag] at (8.25,0.6) {within scope};
-\node[font=\tiny, align=center] at (9.9,-0.95) {audit: constraint\\shown to hold};
+\node[atag] at (8.25,0.6) {proposed call};
+\node[font=\tiny, align=center] at (9.9,-0.95) {audit: constraint\\recorded at gate};
 % Path (b): constraint dropped
 \node[font=\footnotesize] at (-1.15,-2.35) {(b)};
 \node[gnode] (p2) at (0,-3.1) {Principal};
 \node[gnode] (c2) at (3.3,-3.1) {Coordinator};
 \node[gnode] (s2) at (6.6,-3.1) {Specialist};
-\node[gnode] (t2) at (9.9,-3.1) {Tool call};
-\draw[causal] (p2) -- (c2);
-\draw[causal] (c2) -- node[below, font=\tiny]{summarization} (s2);
-\draw[causal] (s2) -- (t2);
+\node[gnode] (t2) at (9.9,-3.1) {Call proposal};
+\draw[flow] (p2) -- node[below, font=\tiny]{handoff} (c2);
+\draw[flow] (c2) -- node[below, font=\tiny]{summarization} (s2);
+\draw[flow] (s2) -- node[below, font=\tiny]{proposal flow} (t2);
 \node[atag] at (1.65,-2.5) {memo scope\\budget confidential};
 \node[atag] at (4.95,-2.5) {memo scope\\\textcolor{black!45}{constraint dropped}};
-\node[atag] at (8.25,-2.5) {within scope};
-\node[font=\tiny, align=center] at (9.9,-4.05) {audit: constraint\\not reconstructible};
+\node[atag] at (8.25,-2.5) {proposed call};
+\node[font=\tiny, align=center] at (9.9,-4.05) {audit: constraint\\absent at gate};
 \end{tikzpicture}
-\caption{Two authority paths with the same handoffs and the same final call. Authority tags travel with each handoff; in (b) the summarization hop drops the confidentiality constraint attached to the original grant. The tool gate sees identical calls, and the difference is whether the audit record can show the constraint remained in force.}
+\caption{Two recorded authorization paths with the same handoffs and the same final proposed call. Solid arrows mark handoff or proposal flow, not causal or authority relations. Recorded authorization and constraint fields are propagated at each handoff; in (b), the summarization step omits the confidentiality constraint attached to the original grant. The policy-enforcement point receives the same proposed call but a different constraint record. The trace establishes which fields were available at each point; it doesn't by itself establish internal representation, actual enforcement, or legal validity.}
 \label{fig:authority-path-pair}
 \end{figure}
+\FloatBarrier
+
+The research program extends the comparative test of Section~\ref{sec:comparative-test} from single actions to recorded authorization paths. One contrast family holds \(R\), the handoffs, and the final proposed call constant while varying whether an intermediate record retains an applicable constraint; Figure~\ref{fig:authority-path-pair} illustrates this record-propagation contrast. A second holds the proposed call and technical capabilities constant while varying whether a valid subdelegation places the operation in \(A_R(t)\).
+
+A third uses a factorial design: it varies contextual status while holding source standing fixed and varies source standing while holding contextual status fixed. The outcomes should remain separate: classification--adjudication fit, represented permissions, authorization under \(R\), gate decision, execution, and third-party reconstruction.
+
+These tests can show whether the recorded classifications and observable decisions discriminate the tested normative and record-level contrasts. They don't by themselves establish internal representation or support claims about other paths, systems, configurations, deployments, or times.

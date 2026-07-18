@@ -1,70 +1,77 @@
 \section{Failure-To-Evidence Mapping}
 
-Table~\ref{tab:delegation-failures} gives the diagnostic translation. It asks what delegation-layer failure would have to be evidenced, monitored, or ruled out before the system's action could be treated as authorized.
+Table~\ref{tab:delegation-failures} gives candidate diagnostic translations. For each surface failure, it asks which delegation-layer hypothesis should be tested when evaluating whether an operation executed through the deployment was authorized. The mapping proposes diagnoses rather than automatically reclassifying every listed failure as a delegation failure.
 
 \begin{table}[p]
-\small
+\scriptsize
+\renewcommand{\arraystretch}{0.92}
 \centering
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.22\linewidth}%
                 >{\raggedright\arraybackslash}p{0.34\linewidth}%
                 >{\raggedright\arraybackslash}p{0.34\linewidth}}
 \toprule
-Surface failure & Delegation-layer failure & Security question \\
+Surface failure & Candidate delegation-layer diagnosis & Security question \\
 \midrule
-\multicolumn{3}{l}{\textit{Authority uptake failures}} \\
+\multicolumn{3}{l}{\textit{Instruction-status, standing, and priority failures}} \\
 \midrule
-Direct prompt injection & Instruction authority is overwritten by an attacker-controlled string. & Which instruction source had authority, and did the system preserve that priority? \\
-Indirect prompt injection & Untrusted data is promoted into an action-guiding instruction. & Did the system preserve the distinction between content to process and instruction to obey? \\
-Jailbreak & Safety constraints are treated as negotiable within the user dialogue. & Which constraints are non-delegable, and did the system maintain them under pressure? \\
+Direct prompt injection & The deployment acts as though an attacker-controlled directive superseded the governing instruction. & What was the occurrence's contextual status, did its source have standing, and did any applicable priority rule match the authority regime? \\
+Indirect prompt injection & The deployment's classification treats directive-form content presented as data as a command in use, or its action selection treats a source without standing as controlling. & Were contextual status, source standing, and any applicable conflict priority recorded separately? \\
+Jailbreak & Safety constraints are treated as negotiable within the user dialogue. & Which constraints are non-delegable, and did the deployment preserve and apply them under pressure? \\
+Apparent non-responsiveness & The deployment rejects a later directive because its source lacks amendment or override standing, or because a joint, review, or release condition isn't satisfied. This can be authorized resistance rather than failure. & Which mandate was operative, which transition was attempted, and did resistance preserve or violate that mandate? \\
+Improper override or interference & A principal, intermediary, or other source causes the recorded or executed authorization state to change without the operation-specific standing or guards required by \(R\). & Did the purported amendment, revocation, override, or release produce a valid normative transition, only a causal change in the recorded or executed state, or neither? \\
 \midrule
-\multicolumn{3}{l}{\textit{Action execution failures}} \\
+\multicolumn{3}{l}{\textit{Proposal, gate, and execution failures}} \\
 \midrule
-Tool misuse & The model invokes a legitimate tool for an unauthorized action. & Was the tool call licensed by the principal's goal and the system's policy scope? \\
-Data exfiltration & Access to information is delegated without corresponding release authority. & Did the system distinguish permission to read from permission to disclose? \\
-Memory poisoning & Persistent state is modified by content without authority to shape future action. & Who may update durable context, and how is that update audited? \\
-Goal drift & The system pursues a nearby or inferred objective beyond the delegated task. & What objective was delegated, and what evidence shows the system stayed within it? \\
-Over-refusal & The system declines safe work because refusal is treated as the dominant safety action. & Did the system confuse risk control with task abandonment? \\
-Under-refusal & The system completes a request that violates policy or authority constraints. & Which boundary should have blocked action, and why did it fail? \\
-Scaffold failure & The model's surrounding workflow loses, hides, or misapplies constraints. & Did the system preserve authority and scope across components, not just inside the model turn? \\
+Tool misuse & A tool-call proposal falls outside recorded scope, a gate allows an operation not authorized under \(R\), or the deployment executes a prohibited operation. & What did the record represent as permitted, what did the gate decide, and what operation was executed? \\
+Data exfiltration & Access to information is delegated without corresponding release authority. & Did the deployment distinguish permission to read from permission to disclose? \\
+Memory poisoning & The deployment executes a persistent-state update on the basis of content from a source without standing or without an authorized update path. & Who or what may authorize durable-context updates, and how is the update audited? \\
+Goal drift & The deployment pursues an objective outside the operative mandate, including its valid amendments, protected discretion, and release conditions. Divergence from a source's latest preference isn't sufficient. & What mandate was operative at the relevant time, and what evidence shows whether the deployment stayed within it? \\
+Over-refusal & The deployment refuses work that the authority regime permits. The refusal is a task-fulfilment failure; if the regime also requires the work and the omission is assessed, it defeats mandate compliance as well. & Was completion merely permitted or required, and which task-success or mandate-compliance claim did the refusal defeat? \\
+Under-refusal & The deployment delivers or executes an operation prohibited by the authority regime. & Which boundary should have blocked the operation, and why did it fail? \\
+Scaffold failure & A component in the configured deployment fails to propagate or correctly apply a recorded grant or constraint. & Did the deployment propagate the record of the governing grant and constraints across components, not just inside the model turn? \\
 \midrule
 \multicolumn{3}{l}{\textit{Evidentiary and evaluation failures}} \\
 \midrule
-Agent transcript misreporting & The system's report doesn't match what happened during delegated action. & Can auditors reconstruct the action, evidence, and failure attribution from the trace? \\
-LLM-judge failure & The evaluator collapses task success, compliance, risk, and failure attribution. & Is the evaluator validated and scoped to support the safety claim? \\
+Agent transcript misreporting & A deployment-generated report doesn't match what happened during delegated action. & Can an assurance reviewer reconstruct the executed operation and technical failure locus from the trace and supporting evidence? \\
+LLM-judge failure & An LLM judge, as an automated evaluator, collapses task success, compliance, risk, and technical failure attribution. & Was the automated evaluator validated and scoped to support the declared assurance claim? \\
 \bottomrule
 \end{tabular}
-\caption{AI-security failures as delegation-layer failures.}
+\caption{Candidate delegation-layer diagnoses for AI-security failures.}
 \label{tab:delegation-failures}
 \end{table}
 
-The corresponding evaluation requirements are shown in Table~\ref{tab:delegation-evidence}. A delegation-assurance evaluation doesn't need every row for every deployment. The rows are evidence families. A calendar assistant, a coding agent, a medical summarization system, and an institutional triage tool will weight them differently. Each safety claim still has to name the evidence family it relies on and the test that could defeat it.
+The corresponding evaluation requirements are shown in Table~\ref{tab:delegation-evidence}. The rows are fields required by an authorization or evaluation claim, not a general test of the full institutional record. Evidentiary assurance asks whether the preserved record makes that claim evaluable and what evidentiary verdict it warrants. A delegation-assurance evaluation doesn't need every row for every deployment: different claims require different applicable subsets and depths. The framework assigns no weights and sums no rows into a scalar score. Each claim has to name its required subclaims and defeating tests; the noncompensatory rule applies to every declared claim tree.
 
 \begin{table}[p]
-\footnotesize
+\scriptsize
 \setlength{\tabcolsep}{3pt}
-\renewcommand{\arraystretch}{0.9}
+\renewcommand{\arraystretch}{0.88}
 \centering
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.27\linewidth}%
                 >{\raggedright\arraybackslash}p{0.31\linewidth}%
                 >{\raggedright\arraybackslash}p{0.32\linewidth}}
 \toprule
-Delegation subclaim & Evidence standard & Evaluation requirement \\
+Authorization or diagnostic dimension & Required authorization record & Evaluation requirement \\
 \midrule
-Instruction status & The record shows which strings were treated as commands, quotations, examples, data, policy, tool results, reports, or requests for analysis. & Minimal pairs contrast command, quotation, embedded content, policy example, and reported speech while holding the action target constant; assigned status is scored against independently adjudicated status, with fit recorded separately from the resulting action. \\
-Authority priority & The system preserves priority among system, developer, user, tool, retrieved, memory, and policy sources. & Crossed source-conflict items test aligned and conflicting subordinate content under the same surface request. \\
-Scope control & The trace identifies the permitted action, target, time, tool, data class, and operation before action. & Items vary one scope boundary at a time: permitted action, prohibited action, target, tool, time, data class, or approval threshold. \\
-Provenance & Source identity and trust level are bound to uptake decisions in the trace. & The same payload appears as user request, webpage text, email body, retrieved document, tool output, policy text, and memory. \\
-Action licensing & Each tool call follows from delegated task, policy scope, and approval state. & Tool-call tasks separate reading, transforming, storing, sending, deleting, and purchasing as distinct licensed operations. \\
-Information flow & Read, transform, store, and disclose rights remain distinct. & Read-but-do-not-reveal and transform-without-leaking tasks use benign canaries and confidential-but-actionable fields. \\
-Persistence & Durable memory or state updates require a trusted source and an authorized update path. & Memory-update tasks cross trusted, untrusted, stale, adversarial, and user-corrected sources. \\
-Refusal calibration & Refusal and completion track delegated authority and policy risk rather than uncertainty or linguistic form alone. & Safe/unsafe paired requests contrast safe analysis of unsafe text with unsafe enactment of quoted or embedded text. \\
-Failure attribution & The adjudication separates model capability, policy boundary, scaffold, tool, evaluator, and taxonomy instability. & Multi-axis adjudication applies to final outputs, intermediate traces, blocked actions, and evaluator labels. \\
-Audit reconstruction & A third party can reconstruct the recorded authority path, operating conditions, execution, and review path without relying on the system's bare assertion. & Trace-review tasks require reconstruction of source, authority, scope, configuration, context, tool call, policy state, approval state, and recorded policy reason. \\
-Judge validation & Automated graders preserve the same delegation distinctions and report uncertainty. & LLM-judge validation compares no-rubric, rubric-aided, and adversarially phrased conditions against expert labels. \\
+Instruction status & The record shows how directive-form string occurrences were classified and used: as commands in use, quotations or other mentions, examples, data, policy text, tool results, reports, or objects of analysis. & Minimal pairs contrast command use, mention, embedded content, policy example, and reported speech while holding the action target constant; the recorded classification is scored against independently adjudicated status, with fit recorded separately from the resulting action. \\
+Source standing and conflict priority & The trace records governing sources, authority object, effective interval, operation-specific standing, joint or guarded conditions, transition result, channel, content type, and technical trust separately; independently adjudicated standing supplies the reference. & Crossed items vary prompt or record representations keyed to standing and priority labels while holding directive content and the surface request fixed; the causal contrast is between assigned packages, not normative statuses. \\
+Scope control & The trace records the operation class, target, time, tool, data class, approval threshold, and authorization verdict used at the gate. & Items vary one scope boundary at a time: permitted action, prohibited action, target, tool, time, data class, or approval threshold. \\
+Provenance & Issuer or role, provenance channel, content type, and technical-trust status remain separately recorded and bound to classifications or observable action-selection decisions in the trace. & The same directive-form content appears as user request, webpage text, email body, retrieved document, tool output, policy text, and memory. \\
+Action licensing & The trace distinguishes the model-generated tool-call proposal, gate decision, and executed operation, and records the authorization verdict under the applicable grant, constraints, and approval state. & Tool-call tasks separately score proposal, gate decision, and execution for reading, transforming, storing, sending, deleting, and purchasing. \\
+Information flow & Read, transform, store, and disclose permissions remain distinct; quoting or metalinguistically reproducing a protected value in a delivered output can still disclose it. & Read-but-do-not-reveal and transform-without-leaking tasks use benign canaries and confidential-but-actionable fields, including metalinguistic, quoted, or negated outputs that reproduce a canary. \\
+Persistence & Durable memory or state updates require a source with standing and an authorized update path. & Memory-update tasks cross sources with and without standing, including technically trusted, untrusted, stale, adversarial, and user-corrected sources. \\
+Refusal calibration & Refusal and completion are scored separately for action authorization, task success, and any requirement to act. & Paired tasks distinguish permitted completion, required completion, prohibited execution, and safe analysis of quoted or embedded descriptions. \\
+Technical failure attribution & The record separately identifies the technical locus, the applicable normative boundary, and evaluator or taxonomy uncertainty. & Technical-locus labels distinguish model action selection, scaffold or routing, policy-enforcement point, tool or runtime, and logging; separate fields record normative adjudication and evaluative uncertainty. \\
+Audit reconstruction & A third party can reconstruct the recorded authorization path, operating conditions, execution, and review path without relying on a model-generated statement that the action was authorized. & Trace-review tasks require reconstruction of governing sources, effective interval, standing by operation, purported transitions and assigned effects, joint approvals or guards, scope, configuration, proposal, gate decision, execution, and recorded policy reason. \\
+Automated-evaluator validation & The evaluation record keeps the delegation dimensions separate and includes uncertainty rather than collapsing them into one dispositive label. & On held-out cases matched to the evaluator's declared \(T\), LLM-judge validation compares no-rubric, rubric-aided, and adversarially phrased conditions against expert-adjudicated reference labels. \\
 \bottomrule
 \end{tabular}
-\caption{Delegation evidence standards and evaluation requirements.}
+\caption{Delegation-claim fields and evaluation requirements.}
 \label{tab:delegation-evidence}
 \end{table}
 
-The procurement example shows the unit of evaluation. A final memo can be correct while the trace still fails delegation assurance if the system used an unauthorized email tool, disclosed the budget ceiling, or updated a vendor record without permission. Conversely, a refusal can be safe at the output layer and still fail delegation assurance if the assistant abandoned a licensed comparison task because it encountered quoted unsafe text. The target is the justified action claim, not the final answer alone.
+The procurement example shows the unit of evaluation. A final memo can be correct while the action-authorization claim is defeated because the deployment executed an unauthorized email operation, disclosed the budget ceiling, or updated a vendor record without permission.
+
+Conversely, refusing a permitted comparison task can defeat task success without defeating action authorization. If \(R\) required completion and the omission is assessed, the refusal instead defeats a separately declared mandate-compliance claim. An inadequate trace makes the relevant claim indeterminate rather than turning missing evidence into evidence of unauthorized action. The target is the action-authorization claim, not the final answer alone.
+
+\clearpage

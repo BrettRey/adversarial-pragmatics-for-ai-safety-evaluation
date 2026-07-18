@@ -74,10 +74,17 @@ Verify tracked artifacts and exercise the synthetic preparation workflows with:
 make public-check
 make study-a-synthetic
 make discovery-synthetic
+make discovery-naturalistic-synthetic
 ```
 
-The Study A and discovery commands use deterministic synthetic fixtures only.
-They do not run an external study or import private interaction history.
+These Study A and discovery commands use deterministic synthetic fixtures only.
+They do not run an external study or import private interaction history. The
+separate `build_naturalistic_pragmatic_corpus.py` workflow can process an
+explicitly authorized local Codex/Claude history source into an ignored
+privacy-minimized corpus and a separate owner-only linkage vault. Its outputs
+are pseudonymized internal discovery candidates, not anonymous data, paper
+evidence, or publication-ready excerpts. The transformation and audit boundary
+is recorded in `notes/naturalistic-corpus-privatization-record.md`.
 
 Maintainers with the ignored local-pilot and Study A production artifacts can
 also run `make phase1-check` and `make study-a-freeze-ready`. Freeze readiness

@@ -1,14 +1,15 @@
 # Adversarial Pragmatics for AI Safety Evaluation
+<!-- SUMMARY: empirical adversarial-pragmatics benchmark; arXiv v2 public 2026-07-16; Study A gated on HREB scope response; release tag/DOI pending · status: active · updated: 2026-07-18 -->
 
-Status: active research artifact. Scaffold created 2026-06-26; public arXiv identifier assigned 2026-07-01.
+Status: active research artifact. Scaffold created 2026-06-26; public arXiv identifier assigned 2026-07-01; v2 replacement public 2026-07-16.
 
 Title: *Adversarial Pragmatics for AI Safety Evaluation: A Benchmark for Instruction Conflict, Embedded Commands, and Policy Ambiguity*.
 
-Public arXiv identifier: `arXiv:2607.01153`. Submission-system identifier: `submit/7776593`.
+Public arXiv identifier: `arXiv:2607.01153` (v2 public since 2026-07-16). Submission-system identifiers: `submit/7776593` (v1), `submit/7830880` (v2 replacement). Paper password recorded in `private/arxiv-credentials.md` (gitignored).
 
 ## Canonical Local State
 
-The current repository state supersedes arXiv v1 for project and job-market use.
+The repository state remains canonical for project and job-market use. arXiv v2 was built from the repository manuscript as of 2026-07-15; where they have since diverged, the repository governs.
 
 Current artifact:
 
@@ -32,15 +33,15 @@ Current paper stack in this repository:
 
 ## Public-Version Gap
 
-arXiv v1 currently reports the earlier nine-pair / 13/27 strict-pair readout.
-The repaired local version reports eight eligible paired contrasts plus one
-diagnostic contrast and 12/24 eligible paired-contrast passes; the new wording
-does not claim that the seed pairs are uniformly strict minimal pairs.
+Closed on the arXiv side: v2 (replacement `submit/7830880`, submitted
+2026-07-15 UTC, announced public 2026-07-16) was built from the repaired
+repository manuscript ~-- eight eligible paired contrasts plus one diagnostic
+contrast, 12/24 eligible paired-contrast passes, no uniform
+strict-minimal-pair claim ~-- and fixed the v1 font-load failure by bundling
+fonts at the package top level (see `submission/arxiv/README.md`).
 
-Before circulating the project as a polished public artifact:
+Still outstanding for a numbered archival release:
 
-- submit an arXiv revision matching the canonical local manuscript;
-- push the corresponding repository state;
 - tag a numbered GitHub release from the same commit;
 - archive that release with a DOI if external citation is expected.
 
@@ -116,14 +117,21 @@ submission/arxiv/adversarial-pragmatics-arxiv-source.tar.gz
   development can continue.
 - A fresh local stamp-2 production candidate was rebuilt and semantically
   verified on 2026-07-16 after the object-only and gate-v3 repairs. Freeze
-  readiness passes. Collection readiness fails closed as intended because the
-  corrected files are not committed/tagged and no operational config, Humber
-  evidence, real assignment registry/attestation, or identity-side roster
-  review exists. Rebuild and re-stamp after implementing any Humber conditions;
-  no tag or external opening has been authorized.
-- Use the fixture-only repair miner privately after that decision; do not import
-  real histories or derive naturalistic items until Study A has informed the
-  rubric and analysis path.
+  readiness passes. This public-project commit is not the Study A freeze tag;
+  collection readiness still fails closed because there is no authorized tag,
+  operational config, Humber evidence, real assignment registry/attestation,
+  or identity-side roster review. Rebuild and re-stamp after implementing any
+  Humber conditions; no tag or external opening has been authorized.
+- The real-history pragmatic-extremes derivative has been rebuilt as a
+  privacy-minimized v2 corpus plus a separate owner-only linkage vault. The raw
+  v1 derivative and a second older derivative were aggregate-audited and
+  deleted. V2 contains 477 pseudonymized retrieval candidates and 300 minimized
+  internal-review rows; deterministic validation and a 60-row contextual audit
+  found no retained direct identifier or credential-pattern match in review
+  text, but contextual reidentification risk remains. It is internal-only, not
+  anonymous or public safe. Any public case requires a new controlled reconstruction and a separate
+  scope decision. Exact record:
+  `notes/naturalistic-corpus-privatization-record.md`.
 - Split P008 into two clean contrast pairs for the development set.
 - Add a disjoint judge model, no-rubric condition, alternate judge prompts, repeated items, and balanced minority classes.
 - After Study A closes, consider adding explicit system-assigned-status and
@@ -238,9 +246,10 @@ submission/arxiv/adversarial-pragmatics-arxiv-source.tar.gz
   feedback: schema version 3 replaces deployment-severity `safety_risk` and
   `risk_type` judgments with visible security-boundary status and type. The
   historical pilot remains frozen and no external Study A result is claimed.
-- Added a fixture-only local repair-episode miner and review page. Real ChatGPT,
-  Codex, and Claude Code histories remain unimported and must stay under
-  ignored `private/` paths.
+- Added a fixture-only local repair-episode miner and review page. This was the
+  active boundary on 2026-07-10; it was superseded on 2026-07-16 for a private,
+  authorized Codex/Claude candidate-corpus build. Raw records, bounded episodes,
+  provenance, and review decisions remain under ignored `private/` paths.
 
 ### 2026-07-14 Study A interface and paper-stack review
 

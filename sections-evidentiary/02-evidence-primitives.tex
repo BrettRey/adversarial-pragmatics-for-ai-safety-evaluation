@@ -1,6 +1,6 @@
 \section{Evidence Primitives}
 
-Table~\ref{tab:evidentiary-primitives} separates nine review questions that often get collapsed. The columns matter together: the middle column names the record each primitive needs, while the right column prevents that primitive from doing more work than it can support. A system can have authentic logs without valid authority, clear provenance without delegated scope, or a plausible explanation without a reliable record of which model, prompt, policy, tool, or approval path produced the action.
+Table~\ref{tab:evidentiary-primitives} separates ten review questions that often get collapsed. The columns matter together: the middle column names the record each primitive needs, while the right column prevents that primitive from doing more work than it can support. A system can have authentic logs without valid authority, clear provenance without delegated scope, or a clean trace of a decision rule whose predicates were never established.
 
 \begin{table}[tbp]
 \small
@@ -14,16 +14,23 @@ Primitive & Evidence it needs & What it doesn't establish alone \\
 Authority & Delegation instrument, role, policy source, or legal/organizational mandate. & That the principal could validly confer that authority. \\
 Validity & Legal or organizational power to delegate this action class, including non-delegable limits. & That this action stayed within the delegated limits. \\
 Scope & Action class, target, time, tool, data class, threshold, exception, and approval condition. & That the action was actually produced under that scope. \\
+Decision basis & Governing rule and version; required factual and legal predicates; source evidence and data definitions; transformations, aggregation, imputation, temporal granularity, uncertainty, and burden allocation. & Authorization, general substantive correctness, legality, or fairness. \\
 Attribution & System instance, model and tool versions, configuration, actor, approval, and execution trace. & That the action was validly authorized. \\
-Accountability & Human, role, vendor, deployer, or institution answerable for authorization, monitoring, reliance, and correction. & That the accountable party personally performed the action. \\
-Procedure & Required steps, notices, reviews, approvals, overrides, escalation paths, and recourse records. & That the substantive outcome was correct or fair. \\
+Accountability & Identified individual or organization capable of bearing the relevant duty, linked role or office, duty source, effective interval, succession route, and bearer-specific powers. & That a role label or team is itself a reachable bearer, that the bearer performed the action, or that it has the review forum's powers. \\
+Procedure & Required steps, notices, reviews, approvals, overrides, adverse-signal routes, expected controls, escalation paths, dispositions, and recourse records. & That the substantive outcome was correct or fair. \\
 Authenticity & Identity, source, signature, timestamp, record association, and custody evidence. & That the authenticated assertion is true or authorized. \\
 Integrity & Completeness, tamper evidence, retention controls, hash or log protection, and change history. & That an intact record contains enough information for review. \\
-Contestability & Accessible reasons, relevant record, disclosure path, review forum, and correction route. & That the original action was valid. \\
+Contestability & Accessible reasons, relevant record, disclosure path, competent review forum, applicable independence, and correction or remedy route. & That the original action was valid or that every action gives an affected party the same review rights. \\
 \bottomrule
 \end{tabular}
 \caption{Evidentiary primitives for delegated AI action.}
 \label{tab:evidentiary-primitives}
 \end{table}
 
-Explanation, provenance, audit logging, and documentation map onto parts of the table. Evidentiary assurance needs the bundle: enough linked evidence to support an action-level authority claim.
+\term{Decision basis} is provisional as a separate primitive. Its distinctive question is whether the rule actually used was linked to the rule's required predicates through defensible data definitions and transformations. The record should also map the rule used back to its claimed source of authority. A perfectly attributable execution can otherwise preserve an unsupported inference without exposing it as such. Decision-basis evidence doesn't establish general legality or fairness, and it should be folded into Authority, Validity, and Scope if matched-case testing shows that it detects no additional failure.
+
+Action-level review requires two linked records rather than one generic owner field. The accountability primitive uses an \term{answerability-bearer matrix} to identify each candidate individual or organization, the linked role or office, duty source, effective interval, succession route, and bearer-specific powers. The contestability primitive uses a \term{review/remedy forum matrix} to identify the forum or reviewer, institutional or jurisdictional basis, record access, competence, applicable independence, duties, and powers to review, correct, halt, sanction, compensate, or remediate where those powers apply. The bearer doesn't acquire the forum's powers, and neither record establishes legal liability on its own.
+
+Procedure contains two records that ordinary logs often omit. An \term{adverse-signal record} binds warnings, legal advice, adverse review decisions, complaints, and incidents to their time, applicability, recipients, relevant duties, deadlines, dispositions, escalations, and downstream changes. An \term{expected-control record} binds a triggering condition to the act required, responsible role, due time, completion or disposition, and monitoring coverage. Failure to record completion counts against an assurance claim only when the expected completeness of that logging is itself supported.
+
+Explanation, provenance, logging, and documentation supply parts of the linked evidence required by the action-level record-and-verdict test.
