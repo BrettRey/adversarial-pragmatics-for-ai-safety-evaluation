@@ -1,7 +1,7 @@
 # Study B Projection Register
 
 **Status:** declaration template and selection-node threat map; no transportability result
-**Date:** 2026-07-18
+**Date:** 2026-07-20
 **Applies to:** Study B only; development fixtures authorize no collection
 
 ## Rule
@@ -37,6 +37,8 @@ Family summaries remain descriptive of the finite frozen constructed item set un
 | P2 | Frozen Study B run at provider/model version and retrieval date `v0` | Later provider/model version or materially changed local checkpoint `v1` | Same condition effect on the same licensed action | Fresh repeats in every target condition; exact version and configuration record | Model weights, provider routing, system prompt, inference defaults, moderation layer | Yes only if item and authorization record are unchanged | No automatic carry-over; revalidate directly and report versions separately | Direct revalidation required |
 | P3 | Frozen rule-aided scoring of harmless tokens | Expert or LLM-judge scoring of the same common response set | Agreement and error of a changed measurement route under unchanged label semantics | Every route scores the same frozen responses; blinded route comparison, agreement, calibration, and information-state audit | Judge/rubric, source-order presentation, expected-answer visibility | Yes only if the response set and label meaning are unchanged | Treat disagreement as measurement-validation evidence; do not describe this as Pearlean transport | Measurement validation only, not a causal transport claim |
 | P4 | One stipulated fictional authority regime | A regime with different amendment, release, or outcome rules | Not the same query when the licensed action changes | A new authorization record and newly specified expected action | Normative target or construct meaning | No | Define a new target claim or estimand; do not add an `S` node to P1--P3 | Transport prohibited as currently stated |
+
+The proposed `manufacturer_statement_institutional_force` reconstruction is an in-study assignment contrast under one stipulated regime, not P4. Each arm needs its treatment-dependent authorization/reference record because the wrapper facts determine whether Rule 7 licenses registry action. Moving a result later to a real or different regime becomes P4 when the licensed action or outcome meaning changes. A move to another document, email, or tool wrapper remains eligible for P1 only when the regime and action-specific reference are preserved and the target wrapper is directly revalidated.
 
 ## Selection-node threat map
 

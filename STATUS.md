@@ -1,5 +1,5 @@
 # Adversarial Pragmatics for AI Safety Evaluation
-<!-- SUMMARY: empirical adversarial-pragmatics benchmark; arXiv v2 public 2026-07-16; Study A gated on HREB scope response; release tag/DOI pending · status: active · updated: 2026-07-18 -->
+<!-- SUMMARY: empirical adversarial-pragmatics benchmark; arXiv v2 public 2026-07-16; Study A gated on HREB scope response; release tag/DOI pending · status: active · updated: 2026-07-20 -->
 
 Status: active research artifact. Scaffold created 2026-06-26; public arXiv identifier assigned 2026-07-01; v2 replacement public 2026-07-16.
 
@@ -30,6 +30,8 @@ Current paper stack in this repository:
 - `supplement.tex`: schema, item inventory, protocol, reproducibility notes, and sanitized pilot summaries.
 - `delegation-assurance.tex`: framework paper on status, priority, licensing, and evidence standards for delegated machine action.
 - `evidentiary-assurance.tex`: governance/legal assurance paper on action-level evidence bundles and review.
+
+On 2026-07-20, the official Hinkle automated-vehicle testimony and introduced H.R. 7390 were integrated as a targeted case in Delegation Assurance and Evidentiary Assurance. Study B now records a fictional controlled-reconstruction hook for institutional force. Study A is unchanged, and this work supplies no collection authorization. Both primary sources are archived in the central literature directory.
 
 ## Public-Version Gap
 

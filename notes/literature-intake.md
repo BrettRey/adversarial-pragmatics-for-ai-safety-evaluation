@@ -1,6 +1,6 @@
 # Literature Intake
 
-Date: 2026-06-26
+Date: 2026-06-26; updated 2026-07-20
 
 Scope: first-pass intake for the adversarial-pragmatics benchmark. I checked the shared literature folder at `/Users/brettreynolds/projects/LLM-CLI-projects/literature`, Mendeley Desktop holdings, and current online primary sources. The project-local repository does not currently have its own `literature/` directory.
 
@@ -13,6 +13,7 @@ Scope: first-pass intake for the adversarial-pragmatics benchmark. I checked the
 | LLM-as-judge and instruction-following evaluation | Zheng et al. (2023); Liu et al. (2023); Zeng et al. (2024); Zhou et al. (2023); Hu and Levy (2023) | LLM judging can scale evaluation, but judges are sensitive to prompts, domains, deceptive fluency, and the precise measurability of the instruction. | Supports algorithmic checks where possible and a separate validation protocol for LLM-as-judge behavior. | verified from online and local sources |
 | Quotation, demonstration, and use/mention | Davidson (1979); Clark and Gerrig (1990); Recanati (2001); Maier (2014) | Quotation is not a single simple device for mentioning words: displayed linguistic material can be a demonstration, a closed singular term, an open quotation, mixed quotation, scare quote, or incorporated quotation. | Gives the construct basis for quoted-command, embedded-command, demonstrated-string, and use/mention minimal pairs. | downloaded and moved to shared literature |
 | Disagreement and annotation validity | Artstein and Poesio (2008); Davani et al. (2022); Pavlick and Kwiatkowski (2019); Messick (1995); Moss (1994) | Some disagreement reflects unreliable annotation; some persists under more labels or more context and should be modeled as construct signal. | Supports confidence labels, criterion-conflict notes, adjudication notes, and disagreement-as-data rather than majority vote only. | ACL sources verified online; Messick/Moss local in Mendeley |
+| Sectoral safety cases and legal answerability | Hinkle (2020); introduced H.R. 7390 (2026) | Manufacturer promises, version-bounded safety arguments, regulator access, operational authorization, incident evidence, responsibility, and liability are related but non-identical institutional objects. | Supplies a concrete case for Delegation Assurance and Evidentiary Assurance, plus a controlled-reconstruction hook for Study B; it does not alter Study A. | complete primary sources archived locally; bill verified as introduced, not enacted |
 
 ## Source-by-Source Notes
 
@@ -39,6 +40,8 @@ Scope: first-pass intake for the adversarial-pragmatics benchmark. I checked the
 | Artstein and Poesio (2008), "Inter-Coder Agreement for Computational Linguistics" | Agreement measures encode assumptions about coders, categories, and chance correction. | Cite for annotation reliability methods. | from ACL page |
 | Davani et al. (2022), "Looking Beyond the Majority Vote" | Majority vote can hide systematic annotator differences in subjective tasks. | Cite for modeling disagreement instead of suppressing it. | from ACL page |
 | Pavlick and Kwiatkowski (2019), "Inherent Disagreements in Human Textual Inferences" | Some NLI disagreements persist with more ratings and more context and should be captured by evaluation. | Cite for disagreement-as-construct-signal. | from ACL page |
+| Hinkle (2020), congressional testimony on autonomous vehicles | Describes a manufacturer's domain-bounded automated-driving assurance as a promise and argues for manufacturer responsibility and for civil litigation and discovery as routes to adverse internal evidence. | Use as an explicit advocacy position on responsibility and differentiated record access, not as enacted law or proof that a promise itself authorizes operation or fixes liability. | complete official witness statement |
+| H.R. 7390 (2026), introduced SELF DRIVE Act | Would require a claims--arguments--evidence safety case for each automated-driving-system version, tied to its operational design domain; separately addresses limited testing authorization, crash reporting, access protections, and possible common-law liability. | Use to separate projective performance claims from action authorization and to motivate event-to-version binding and change-control requirements. | complete official introduced text and status page; not current law |
 
 ## Contradiction and Tension Map
 
@@ -48,6 +51,7 @@ Scope: first-pass intake for the adversarial-pragmatics benchmark. I checked the
 | Refusal as success vs refusal as failure | HarmBench, JailbreakBench, and Do-Not-Answer emphasize correct refusal for harmful requests. | XSTest and Arditi et al. show over-refusal and refusal-direction manipulation as distinct phenomena. | Scoring must not collapse "refused" into "safe"; code separate outcome fields. |
 | Scalable judge vs validated judge | MT-Bench and G-Eval show practical value for LLM-as-judge workflows. | LLMBar and Hu/Levy show that prompted judgments can fail on instruction-following and metalinguistic distinctions. | Use LLM judges only as measured systems; include judge-validation items in the benchmark. |
 | Majority-vote gold labels vs disagreement as data | Artstein and Poesio support principled agreement measurement. | Davani et al. and Pavlick/Kwiatkowski show systematic/persistent disagreement. | Annotation protocol should record confidence, evaluation criterion, and disagreement type before adjudication. |
+| Manufacturer promise vs authorization and liability | Hinkle argues that the manufacturer should be identified as responsible for driving when it makes the domain-bounded automated-driving promise. | The introduced H.R. 7390 treats safety cases, limited-operation authorization, crash records, and common-law liability in separate provisions. | Keep public commitment, projective performance claim, operation authorization, institutional answerability, and liability as distinct typed relations. |
 
 ## Benchmark Implications
 
@@ -59,4 +63,4 @@ Scope: first-pass intake for the adversarial-pragmatics benchmark. I checked the
 
 ## Local Archive Status
 
-The cited-source archive completion pass of 2026-07-18 supersedes the earlier download list. All 70 unique sources cited across the three papers now have genuine local full text or a complete local copy of the cited webpage. No access gaps remain. Paths, authoritative locators, version notes, and SHA-256 hashes are recorded in [the cited-source archive manifest](cited-source-local-archive.md).
+The cited-source archive completion pass of 2026-07-20 supersedes the earlier download list. All 77 unique sources cited across the three papers now have genuine local full text or a complete local copy of the cited webpage. No access gaps remain. Paths, authoritative locators, version notes, and SHA-256 hashes are recorded in [the cited-source archive manifest](cited-source-local-archive.md).

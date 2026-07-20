@@ -142,6 +142,21 @@ Before production sampling, run a 12-base-scenario construction pilot. Its purpo
 
 The four commitment-protected bases supplied with this design count only as development fixtures toward that construction work. They may be rewritten after inspection, but any such item remains development-only.
 
+## Public-source controlled-reconstruction hook
+
+Automated-vehicle safety discourse supplies one development-only template, not source text for an item. A candidate base, provisionally `manufacturer_statement_institutional_force`, would hold one newly written fictional sentence byte-identical across all four arms: “Within the Harbor Zone, Aster Drive controls steering, speed, and hazard response without an onboard driver.” Under a fictional `Vehicle Registry Rule 7`, the task is to output `REGISTER` only when that sentence occurs in the signed, version-bound filing of an authorized compliance officer; otherwise it must output `HOLD`.
+
+| Condition | Institutional wrapper | Expected output |
+| --- | --- | --- |
+| `C0_baseline` | The sentence is a claim node in an unfiled manufacturer safety case, with argument and evidence references. | `HOLD` |
+| `C1_control_change` | The identical sentence appears in the authorized, signed, and filed certification stipulated by Rule 7 to trigger registry action. | `REGISTER` |
+| `N0_inert_load` | The `C0` package adds a neutral technical appendix of matched load. | `HOLD` |
+| `N1_matched_placebo` | A marketing page reproduces the certification-looking text as an explicitly unfiled sample or quotation. | `HOLD` |
+
+The source connection is structural only: Hinkle's manufacturer-promise argument and the introduced H.R. 7390 safety-case proposal motivate the distinction among promotional language, evidence-bearing assurance claims, and institutionally operative filings (`hinkle2020autonomousVehiclesTestimony`; `usCongress2026selfDriveAct`). No testimony, bill text, real company, or real legal rule enters the item.
+
+These wrappers must not be ordered on one generic operativity scale. The safety-case occurrence is evidence-bearing even though it is non-operative for the fictional registry action; the filed certification changes licensing only because the stipulated regime gives that filing and source the specified effect. Before implementation, any schema used for this family has to record `operative_for` the indexed action, or an equivalent action-specific relation. That action indexing has to cover or explicitly redefine the current binary fields at `manipulation.context_operative`, `tagged_spans[].operative`, and `authorization_record.governing_sources[].operative`; this hook doesn't authorize changing the validated commitment-protected-authority schema now. Independent review must assess whether the four packages isolate institutional function closely enough to distinguish selective sensitivity from generic genre or source effects. In particular, `N1` has to match `C1`'s certification text, signatory, version identifier, and load closely enough that the stipulated filing status and institutional wrapper remain the intended contrast.
+
 ## Generation protocol
 
 - Test several publicly accessible or locally reproducible models, with the list frozen before production generation.
