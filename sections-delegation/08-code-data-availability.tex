@@ -1,0 +1,11 @@
+\section*{Code and Data Availability}
+
+\href{https://github.com/BrettRey/adversarial-pragmatics-for-ai-safety-evaluation}{The project repository} carries the delegation-assurance artifact under \path{assurance/delegation/}. The state described here is commit \texttt{95e927b}. A numbered release and an archival DOI are pending; until they exist, cite the commit rather than the branch.
+
+The artifact contains three versioned schemas: \path{regime.schema.json} (\texttt{regime-2.0.0}), \path{authorization-trace.schema.json} (\texttt{authorization-trace-2.0.0}), and \path{oracle.schema.json} (\texttt{oracle-2.0.0}). It also contains the reviewer and predictor view policy, the frozen projective-claim register, seven fixtures encoding the level separations of Section~\ref{sec:typed-claim-stack}, a hidden-oracle set, and the frozen empirical program specifications with their input and output schemas under \path{assurance/delegation/empirical/}.
+
+Two analyzers are included. The semantic engine derives authorization standing, guards, payload--scope fit, grant and subgrant validity, transition effects, local authorization, state continuity, prefix and cumulative conditions, terminal-state conditions, and the applicability tree from reference-free traces. The empirical analyzer validates the three frozen input schemas and emits observation vectors and noncompensatory family verdicts. Both are exercised by synthetic pass, fail, noncompensation, split, leakage, manifest, and oracle-masking regressions.
+
+The hidden oracles are authored against the regime fixtures rather than generated from engine output, and the view policy excludes them from reviewer and predictor inputs. That construction detects disagreement between the engine and an independently written expectation; it doesn't establish that the two rest on different modelling assumptions, so it's weaker than a differential implementation and is reported as such.
+
+No target-study outcomes exist. Every reported result is synthetic regression output. The engine derives the declared closed-world subset only, and doesn't implement open-text institutional interpretation, defeasible legal reasoning, arbitrary history predicates, or discretionary adjudication.
