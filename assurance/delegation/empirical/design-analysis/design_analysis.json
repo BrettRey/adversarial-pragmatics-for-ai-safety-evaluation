@@ -1,0 +1,59 @@
+{
+  "profile": "standard",
+  "reps": 20000,
+  "seed": 20260722,
+  "design_assumptions": {
+    "local": {
+      "true_family_effect": 0.15,
+      "between_pair_sd": 0.18,
+      "pair_measure_sd": 0.16,
+      "nuisance_mean": 0.05,
+      "nuisance_sd": 0.06,
+      "n_pairs": 30
+    },
+    "predictive": {
+      "true_family_improvement": 0.05,
+      "between_family_sd": 0.05,
+      "n_families": 10,
+      "ece_bins": 10,
+      "ece_n": 30
+    },
+    "reviewer": {
+      "true_concordance_gain": 0.15,
+      "reviewer_sd": 0.1,
+      "case_sd": 0.1,
+      "residual_sd": 0.1,
+      "n_reviewers": 6,
+      "n_cases": 10
+    }
+  },
+  "results": [
+    {
+      "programme": "local_discrimination",
+      "true_effect": 0.15,
+      "n_per_family": 30,
+      "gate_pass_rate_modelled": 0.9565,
+      "type_m_exaggeration_given_gate_modelled": 1.1198202230523757,
+      "type_s_rate_given_gate_modelled": 0.0,
+      "naive_bias_subtract_max_nuisance": -0.039604002721598364,
+      "naive_bias_as_fraction_of_effect": -0.2640266848106558,
+      "modelled_bias_subtract_mean_nuisance": 0.013866744658977137
+    },
+    {
+      "programme": "predictive_ablation",
+      "n_trace_families": 10,
+      "normal_lcb_coverage": 0.9182,
+      "t_interval_coverage": 0.9495,
+      "ece_n": 30,
+      "mean_ece_under_perfect_calibration": 0.17687873503242385,
+      "ece_gate_false_fail_rate_at_0.10": 0.97565
+    },
+    {
+      "programme": "reviewer_reconstruction",
+      "n_reviewers": 6,
+      "n_cases": 10,
+      "max_of_two_ses_coverage": 0.8708,
+      "crossed_known_components_coverage": 0.95105
+    }
+  ]
+}

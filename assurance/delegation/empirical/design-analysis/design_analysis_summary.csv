@@ -1,0 +1,4 @@
+programme,true_effect,n_per_family,gate_pass_rate_modelled,type_m_exaggeration_given_gate_modelled,type_s_rate_given_gate_modelled,naive_bias_subtract_max_nuisance,naive_bias_as_fraction_of_effect,modelled_bias_subtract_mean_nuisance,n_trace_families,normal_lcb_coverage,t_interval_coverage,ece_n,mean_ece_under_perfect_calibration,ece_gate_false_fail_rate_at_0.10,n_reviewers,n_cases,max_of_two_ses_coverage,crossed_known_components_coverage
+local_discrimination,0.15,30.0,0.9565,1.1198202230523757,0.0,-0.039604002721598364,-0.2640266848106558,0.013866744658977137,,,,,,,,,,
+predictive_ablation,,,,,,,,,10.0,0.9182,0.9495,30.0,0.17687873503242385,0.97565,,,,
+reviewer_reconstruction,,,,,,,,,,,,,,,6.0,10.0,0.8708,0.95105

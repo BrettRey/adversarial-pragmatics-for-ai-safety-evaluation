@@ -38,7 +38,7 @@ RESPONSES_ARG = $(if $(RESPONSES),--responses $(RESPONSES),)
 SUMMARY_DIR_ARG = $(if $(SUMMARY_DIR),--summary-dir $(SUMMARY_DIR),)
 
 # Targets
-.PHONY: all all-papers clean distclean view view-supplement view-delegation view-evidentiary delegation evidentiary help test validate-items validate-study-b analyze-study-b validate-claims validate-delegation validate-sources assurance-check privacy-check public-check phase1-check pilot-local pilot-smoke pilot-diagnose pilot-review-app pilot-ingest-adjudication pilot-adjudication-report pilot-figures pilot-judge-validation fake-dev-calibration study-a-synthetic study-a-self-pilot study-a-self-pilot-report study-a-judge-audit study-a-production-build study-a-manifest-stamp1 study-a-manifest-stamp2 study-a-manifest-verify study-a-freeze-ready study-a-collection-ready discovery-synthetic discovery-naturalistic-synthetic
+.PHONY: all all-papers clean distclean view view-supplement view-delegation view-evidentiary delegation evidentiary help test validate-items validate-study-b analyze-study-b validate-claims validate-delegation validate-sources assurance-check privacy-check public-check phase1-check pilot-local pilot-smoke pilot-diagnose pilot-review-app pilot-ingest-adjudication pilot-adjudication-report pilot-figures pilot-judge-validation fake-dev-calibration study-a-synthetic study-a-self-pilot study-a-self-pilot-report study-a-judge-audit study-a-production-build study-a-manifest-stamp1 study-a-manifest-stamp2 study-a-manifest-verify study-a-freeze-ready study-a-collection-ready discovery-synthetic discovery-naturalistic-synthetic design-analysis
 
 # Default target: build the paper and supplement PDFs
 all: $(MAIN).pdf $(SUPPLEMENT).pdf
@@ -186,6 +186,11 @@ validate-delegation:
 	python3 scripts/analyze_delegation_programs.py --validate-specs
 	python3 -m unittest scripts.test_validate_delegation_artifacts
 	python3 -m unittest scripts.test_analyze_delegation_programs
+	python3 -m unittest scripts.test_design_analysis
+
+design-analysis:
+	@echo "==> Running delegation design analysis (standard profile)..."
+	python3 scripts/design_analysis.py --profile standard
 
 validate-sources:
 	@echo "==> Verifying cited-source local archive and hashes..."
