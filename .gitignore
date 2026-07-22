@@ -40,3 +40,6 @@ benchmark/results/*
 # Generated arXiv submission bundles
 submission/arxiv/build/
 submission/arxiv/*.tar.gz
+
+# Dated arXiv proof snapshots (kept locally, not tracked)
+submission/arxiv/version-history/
