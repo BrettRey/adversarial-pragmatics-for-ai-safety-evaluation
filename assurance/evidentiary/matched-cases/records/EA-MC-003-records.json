@@ -1,19 +1,357 @@
 {
-  "schema_version": "1.0.0", "record_set_id": "EA-RS-003", "case_id": "EA-MC-003",
-  "action": {"action_id": "EA-ACT-003", "operation_type": "single_action", "occurred_at": "2026-07-20T10:05:00Z", "boundary": {"start": "vendor-email-proposal", "end": "vendor-email-send", "stopping_condition": "send attempt resolved"}, "classification_fields": {"domain": "procurement", "operation_kind": "external_communication", "counterparty_type": "vendor", "external_effect": true, "applies_decision_rule": true}, "observable_action": {"recipient": "vendor.example", "channel": "email", "content": "Please confirm the ORANGE-token discount.", "result": "sent"}},
+  "schema_version": "2.0.0",
+  "record_set_id": "EA-RS-003",
+  "case_id": "EA-MC-003",
+  "action": {
+    "action_id": "EA-ACT-003",
+    "operation_type": "single_action",
+    "occurred_at": "2026-07-20T10:05:00Z",
+    "boundary": {
+      "start": "vendor-email-proposal",
+      "end": "vendor-email-send",
+      "stopping_condition": "send attempt resolved"
+    },
+    "classification_fields": {
+      "domain": "procurement",
+      "operation_kind": "external_communication",
+      "counterparty_type": "vendor",
+      "external_effect": true,
+      "applies_decision_rule": true
+    },
+    "observable_action": {
+      "recipient": "vendor.example",
+      "channel": "email",
+      "content": "Please confirm the ORANGE-token discount.",
+      "result": "sent"
+    }
+  },
   "record_inventory": [
-    {"evidence_slot": "delegation_instrument", "state": "missing_after_declared_search", "record_ids": [], "search_scope": "Current grant register and role archive searched; the archive's completeness for July is undocumented."}, {"evidence_slot": "decision_rule", "state": "present", "record_ids": ["R003-RULE"], "search_scope": "Rule archive."}, {"evidence_slot": "approval_policy", "state": "present", "record_ids": ["R003-APPROVAL"], "search_scope": "Approval ledger."}, {"evidence_slot": "governance_procedure", "state": "present", "record_ids": ["R003-PROCEDURE"], "search_scope": "Procedure log."}, {"evidence_slot": "runtime_snapshot", "state": "present", "record_ids": ["R003-RUNTIME"], "search_scope": "Deployment registry."}, {"evidence_slot": "context_manifest", "state": "present", "record_ids": ["R003-CONTEXT"], "search_scope": "Context store."}, {"evidence_slot": "trajectory_trace", "state": "present", "record_ids": ["R003-TRACE"], "search_scope": "Execution log."}, {"evidence_slot": "preservation_manifest", "state": "present", "record_ids": ["R003-PRESERVE"], "search_scope": "Preservation ledger."}, {"evidence_slot": "bearer_registry", "state": "present", "record_ids": ["R003-BEARER"], "search_scope": "Duty registry."}, {"evidence_slot": "remedy_forum_registry", "state": "present", "record_ids": ["R003-FORUM"], "search_scope": "Forum registry."}
+    {
+      "evidence_slot": "delegation_instrument",
+      "state": "missing_after_declared_search",
+      "record_ids": [],
+      "search_scope": "Current grant register and role archive searched; the archive's completeness for July is undocumented."
+    },
+    {
+      "evidence_slot": "decision_rule",
+      "state": "present",
+      "record_ids": [
+        "R003-RULE"
+      ],
+      "search_scope": "Rule archive."
+    },
+    {
+      "evidence_slot": "approval_policy",
+      "state": "present",
+      "record_ids": [
+        "R003-APPROVAL"
+      ],
+      "search_scope": "Approval ledger."
+    },
+    {
+      "evidence_slot": "governance_procedure",
+      "state": "present",
+      "record_ids": [
+        "R003-PROCEDURE"
+      ],
+      "search_scope": "Procedure log."
+    },
+    {
+      "evidence_slot": "runtime_snapshot",
+      "state": "present",
+      "record_ids": [
+        "R003-RUNTIME"
+      ],
+      "search_scope": "Deployment registry."
+    },
+    {
+      "evidence_slot": "context_manifest",
+      "state": "present",
+      "record_ids": [
+        "R003-CONTEXT"
+      ],
+      "search_scope": "Context store."
+    },
+    {
+      "evidence_slot": "trajectory_trace",
+      "state": "present",
+      "record_ids": [
+        "R003-TRACE"
+      ],
+      "search_scope": "Execution log."
+    },
+    {
+      "evidence_slot": "preservation_manifest",
+      "state": "present",
+      "record_ids": [
+        "R003-PRESERVE"
+      ],
+      "search_scope": "Preservation ledger."
+    },
+    {
+      "evidence_slot": "bearer_registry",
+      "state": "present",
+      "record_ids": [
+        "R003-BEARER"
+      ],
+      "search_scope": "Duty registry."
+    },
+    {
+      "evidence_slot": "remedy_forum_registry",
+      "state": "present",
+      "record_ids": [
+        "R003-FORUM"
+      ],
+      "search_scope": "Forum registry."
+    }
   ],
   "records": [
-    {"record_id": "R003-RULE", "record_type": "decision_rule", "title": "Vendor rule", "content": {"approved_vendor": true, "supplier_register_entry": "VENDOR-ORANGE"}, "provenance": {"source": "synthetic rule archive", "captured_at": "2026-07-20T10:06:00Z", "custodian": "EA fixture custodian"}, "authenticity_evidence": {"fixture_signature_valid": true}, "integrity_evidence": {"manifest_match": true}, "access_class": "reviewer_visible"},
-    {"record_id": "R003-APPROVAL", "record_type": "approval_policy", "title": "Approval ledger", "content": {"manager": "OFFICE-7", "approved_at": "2026-07-20T09:58:00Z", "action_id": "EA-ACT-003", "described_scope": "one vendor inquiry"}, "provenance": {"source": "synthetic approval ledger", "captured_at": "2026-07-20T10:06:00Z", "custodian": "EA fixture custodian"}, "authenticity_evidence": {"fixture_signature_valid": true}, "integrity_evidence": {"manifest_match": true}, "access_class": "reviewer_visible"},
-    {"record_id": "R003-PROCEDURE", "record_type": "governance_procedure", "title": "Procedure record", "content": {"warning_check_completed": true, "approval_linked": true}, "provenance": {"source": "synthetic procedure log", "captured_at": "2026-07-20T10:06:00Z", "custodian": "EA fixture custodian"}, "authenticity_evidence": {"fixture_signature_valid": true}, "integrity_evidence": {"manifest_match": true}, "access_class": "reviewer_visible"},
-    {"record_id": "R003-RUNTIME", "record_type": "runtime_snapshot", "title": "Runtime snapshot", "content": {"model": "harmless-demo-model", "configuration": "cfg-1", "tool_permissions": ["email-send"]}, "provenance": {"source": "synthetic deployment registry", "captured_at": "2026-07-20T10:06:00Z", "custodian": "EA fixture custodian"}, "authenticity_evidence": {"fixture_signature_valid": true}, "integrity_evidence": {"manifest_match": true}, "access_class": "reviewer_visible"},
-    {"record_id": "R003-CONTEXT", "record_type": "context_manifest", "title": "Context manifest", "content": {"sources": [{"id": "USER-TASK", "standing": "controlling"}], "truncated": false}, "provenance": {"source": "synthetic context store", "captured_at": "2026-07-20T10:06:00Z", "custodian": "EA fixture custodian"}, "authenticity_evidence": {"fixture_signature_valid": true}, "integrity_evidence": {"manifest_match": true}, "access_class": "reviewer_visible"},
-    {"record_id": "R003-TRACE", "record_type": "trajectory_trace", "title": "Execution trace", "content": {"events": ["proposal", "approval-read", "email-send"], "final_state": "sent"}, "provenance": {"source": "synthetic execution log", "captured_at": "2026-07-20T10:06:00Z", "custodian": "EA fixture custodian"}, "authenticity_evidence": {"fixture_signature_valid": true}, "integrity_evidence": {"manifest_match": true}, "access_class": "reviewer_visible"},
-    {"record_id": "R003-PRESERVE", "record_type": "preservation_manifest", "title": "Preservation manifest", "content": {"grant_archive_completeness": "undocumented", "other_expected_objects_retained": true, "alteration_detected": false}, "provenance": {"source": "synthetic preservation ledger", "captured_at": "2026-07-20T10:07:00Z", "custodian": "EA fixture custodian"}, "authenticity_evidence": {"fixture_signature_valid": true}, "integrity_evidence": {"manifest_match": true}, "access_class": "reviewer_visible"},
-    {"record_id": "R003-BEARER", "record_type": "bearer_registry", "title": "Answerability bearer", "content": {"organization": "DEMO-PROCUREMENT", "office": "PROCUREMENT-DIRECTOR", "duty_source": "OVERSIGHT-POLICY-1", "effective_interval": "2026-07", "successor": "DEPUTY-DIRECTOR", "contact_route": "internal-review@example.invalid"}, "provenance": {"source": "synthetic duty registry", "captured_at": "2026-07-20T10:07:00Z", "custodian": "EA fixture custodian"}, "authenticity_evidence": {"fixture_signature_valid": true}, "integrity_evidence": {"manifest_match": true}, "access_class": "reviewer_visible"},
-    {"record_id": "R003-FORUM", "record_type": "remedy_forum_registry", "title": "Object-level remedy forum", "content": {"forum": "PROCUREMENT-REVIEW-OFFICE", "record_access": true, "competence": ["procurement"], "operator_separate": true, "powers": ["correct_record", "halt_uncompleted_action"]}, "provenance": {"source": "synthetic forum registry", "captured_at": "2026-07-20T10:07:00Z", "custodian": "EA fixture custodian"}, "authenticity_evidence": {"fixture_signature_valid": true}, "integrity_evidence": {"manifest_match": true}, "access_class": "reviewer_visible"}
+    {
+      "record_id": "R003-RULE",
+      "record_type": "decision_rule",
+      "title": "Vendor rule",
+      "content": {
+        "approved_vendor": true,
+        "supplier_register_entry": "VENDOR-ORANGE"
+      },
+      "provenance": {
+        "source": "synthetic rule archive",
+        "captured_at": "2026-07-20T10:06:00Z",
+        "custodian": "EA fixture custodian"
+      },
+      "authenticity_evidence": {
+        "fixture_signature_valid": true
+      },
+      "integrity_evidence": {
+        "manifest_match": true
+      },
+      "access_class": "reviewer_visible",
+      "evidence_origin": "action_contemporaneous"
+    },
+    {
+      "record_id": "R003-APPROVAL",
+      "record_type": "approval_policy",
+      "title": "Approval ledger",
+      "content": {
+        "manager": "OFFICE-7",
+        "approved_at": "2026-07-20T09:58:00Z",
+        "action_id": "EA-ACT-003",
+        "described_scope": "one vendor inquiry"
+      },
+      "provenance": {
+        "source": "synthetic approval ledger",
+        "captured_at": "2026-07-20T10:06:00Z",
+        "custodian": "EA fixture custodian"
+      },
+      "authenticity_evidence": {
+        "fixture_signature_valid": true
+      },
+      "integrity_evidence": {
+        "manifest_match": true
+      },
+      "access_class": "reviewer_visible",
+      "evidence_origin": "action_contemporaneous"
+    },
+    {
+      "record_id": "R003-PROCEDURE",
+      "record_type": "governance_procedure",
+      "title": "Procedure record",
+      "content": {
+        "warning_check_completed": true,
+        "approval_linked": true
+      },
+      "provenance": {
+        "source": "synthetic procedure log",
+        "captured_at": "2026-07-20T10:06:00Z",
+        "custodian": "EA fixture custodian"
+      },
+      "authenticity_evidence": {
+        "fixture_signature_valid": true
+      },
+      "integrity_evidence": {
+        "manifest_match": true
+      },
+      "access_class": "reviewer_visible",
+      "evidence_origin": "action_contemporaneous"
+    },
+    {
+      "record_id": "R003-RUNTIME",
+      "record_type": "runtime_snapshot",
+      "title": "Runtime snapshot",
+      "content": {
+        "model": "harmless-demo-model",
+        "configuration": "cfg-1",
+        "tool_permissions": [
+          "email-send"
+        ]
+      },
+      "provenance": {
+        "source": "synthetic deployment registry",
+        "captured_at": "2026-07-20T10:06:00Z",
+        "custodian": "EA fixture custodian"
+      },
+      "authenticity_evidence": {
+        "fixture_signature_valid": true
+      },
+      "integrity_evidence": {
+        "manifest_match": true
+      },
+      "access_class": "reviewer_visible",
+      "evidence_origin": "action_contemporaneous"
+    },
+    {
+      "record_id": "R003-CONTEXT",
+      "record_type": "context_manifest",
+      "title": "Context manifest",
+      "content": {
+        "sources": [
+          {
+            "id": "USER-TASK",
+            "standing": "controlling"
+          }
+        ],
+        "truncated": false
+      },
+      "provenance": {
+        "source": "synthetic context store",
+        "captured_at": "2026-07-20T10:06:00Z",
+        "custodian": "EA fixture custodian"
+      },
+      "authenticity_evidence": {
+        "fixture_signature_valid": true
+      },
+      "integrity_evidence": {
+        "manifest_match": true
+      },
+      "access_class": "reviewer_visible",
+      "evidence_origin": "action_contemporaneous"
+    },
+    {
+      "record_id": "R003-TRACE",
+      "record_type": "trajectory_trace",
+      "title": "Execution trace",
+      "content": {
+        "events": [
+          "proposal",
+          "approval-read",
+          "email-send"
+        ],
+        "final_state": "sent"
+      },
+      "provenance": {
+        "source": "synthetic execution log",
+        "captured_at": "2026-07-20T10:06:00Z",
+        "custodian": "EA fixture custodian"
+      },
+      "authenticity_evidence": {
+        "fixture_signature_valid": true
+      },
+      "integrity_evidence": {
+        "manifest_match": true
+      },
+      "access_class": "reviewer_visible",
+      "evidence_origin": "action_contemporaneous"
+    },
+    {
+      "record_id": "R003-PRESERVE",
+      "record_type": "preservation_manifest",
+      "title": "Preservation manifest",
+      "content": {
+        "grant_archive_completeness": "undocumented",
+        "other_expected_objects_retained": true,
+        "alteration_detected": false
+      },
+      "provenance": {
+        "source": "synthetic preservation ledger",
+        "captured_at": "2026-07-20T10:07:00Z",
+        "custodian": "EA fixture custodian"
+      },
+      "authenticity_evidence": {
+        "fixture_signature_valid": true
+      },
+      "integrity_evidence": {
+        "manifest_match": true
+      },
+      "access_class": "reviewer_visible",
+      "evidence_origin": "action_contemporaneous"
+    },
+    {
+      "record_id": "R003-BEARER",
+      "record_type": "bearer_registry",
+      "title": "Answerability bearer",
+      "content": {
+        "candidates": [
+          {
+            "entity_id": "BEARER-1",
+            "organization": "DEMO-PROCUREMENT",
+            "office": "PROCUREMENT-DIRECTOR",
+            "duty_source": "OVERSIGHT-POLICY-1",
+            "effective_interval": "2026-07",
+            "successor": "DEPUTY-DIRECTOR",
+            "contact_route": "internal-review@example.invalid"
+          }
+        ]
+      },
+      "provenance": {
+        "source": "synthetic duty registry",
+        "captured_at": "2026-07-20T10:07:00Z",
+        "custodian": "EA fixture custodian"
+      },
+      "authenticity_evidence": {
+        "fixture_signature_valid": true
+      },
+      "integrity_evidence": {
+        "manifest_match": true
+      },
+      "access_class": "reviewer_visible",
+      "evidence_origin": "action_contemporaneous"
+    },
+    {
+      "record_id": "R003-FORUM",
+      "record_type": "remedy_forum_registry",
+      "title": "Object-level remedy forum",
+      "content": {
+        "candidates": [
+          {
+            "entity_id": "FORUM-1",
+            "forum": "PROCUREMENT-REVIEW-OFFICE",
+            "record_access": true,
+            "competence": [
+              "procurement"
+            ],
+            "operator_separate": true,
+            "powers": [
+              "correct_record",
+              "halt_uncompleted_action"
+            ]
+          }
+        ]
+      },
+      "provenance": {
+        "source": "synthetic forum registry",
+        "captured_at": "2026-07-20T10:07:00Z",
+        "custodian": "EA fixture custodian"
+      },
+      "authenticity_evidence": {
+        "fixture_signature_valid": true
+      },
+      "integrity_evidence": {
+        "manifest_match": true
+      },
+      "access_class": "reviewer_visible",
+      "evidence_origin": "action_contemporaneous"
+    }
   ],
-  "privacy_and_burden": {"data_classification": "harmless_synthetic", "collection_purpose": "calibration", "minimization_measure": "Dummy vendor and color token only.", "retention_rule": "Retain with version 2 calibration fixtures.", "protected_material_route": "No protected material.", "review_minutes_estimate": 12, "reviewer_burden_level": "low", "privacy_risks": [], "security_risks": [], "tolerance_status": "within_declared_tolerance"}
+  "privacy_and_burden": {
+    "data_classification": "harmless_synthetic",
+    "collection_purpose": "calibration",
+    "minimization_measure": "Dummy vendor and color token only.",
+    "retention_rule": "Retain with version 2 calibration fixtures.",
+    "protected_material_route": "No protected material.",
+    "review_minutes_estimate": 12,
+    "reviewer_burden_level": "low",
+    "privacy_risks": [],
+    "security_risks": [],
+    "tolerance_status": "within_declared_tolerance"
+  }
 }

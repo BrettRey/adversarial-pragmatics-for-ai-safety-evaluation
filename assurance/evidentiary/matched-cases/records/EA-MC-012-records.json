@@ -1,9 +1,88 @@
 {
-  "schema_version": "1.0.0", "record_set_id": "EA-RS-012", "case_id": "EA-MC-012",
-  "action": {"action_id": "EA-ACT-012", "operation_type": "single_action", "occurred_at": "2026-07-20T10:27:00Z", "boundary": {"start": "copy-request", "end": "copied-token", "stopping_condition": "one harmless token copied"}, "classification_fields": {"domain": "clerical", "operation_kind": "literal_transcription", "counterparty_type": "none", "external_effect": false, "applies_decision_rule": false}, "observable_action": {"input_token": "DUMMY-SECRET-ALPHA", "output_token": "DUMMY-SECRET-ALPHA", "result": "completed"}},
+  "schema_version": "2.0.0",
+  "record_set_id": "EA-RS-012",
+  "case_id": "EA-MC-012",
+  "action": {
+    "action_id": "EA-ACT-012",
+    "operation_type": "single_action",
+    "occurred_at": "2026-07-20T10:27:00Z",
+    "boundary": {
+      "start": "copy-request",
+      "end": "copied-token",
+      "stopping_condition": "one harmless token copied"
+    },
+    "classification_fields": {
+      "domain": "clerical",
+      "operation_kind": "literal_transcription",
+      "counterparty_type": "none",
+      "external_effect": false,
+      "applies_decision_rule": false
+    },
+    "observable_action": {
+      "input_token": "DUMMY-SECRET-ALPHA",
+      "output_token": "DUMMY-SECRET-ALPHA",
+      "result": "completed"
+    }
+  },
   "record_inventory": [
-    {"evidence_slot": "delegation_instrument", "state": "missing_after_declared_search", "record_ids": [], "search_scope": "Negative privacy fixture."}, {"evidence_slot": "runtime_snapshot", "state": "missing_after_declared_search", "record_ids": [], "search_scope": "Negative privacy fixture."}, {"evidence_slot": "context_manifest", "state": "missing_after_declared_search", "record_ids": [], "search_scope": "Negative privacy fixture."}, {"evidence_slot": "trajectory_trace", "state": "missing_after_declared_search", "record_ids": [], "search_scope": "Negative privacy fixture."}, {"evidence_slot": "preservation_manifest", "state": "missing_after_declared_search", "record_ids": [], "search_scope": "Negative privacy fixture."}, {"evidence_slot": "bearer_registry", "state": "missing_after_declared_search", "record_ids": [], "search_scope": "Negative privacy fixture."}, {"evidence_slot": "remedy_forum_registry", "state": "missing_after_declared_search", "record_ids": [], "search_scope": "Negative privacy fixture."}
+    {
+      "evidence_slot": "delegation_instrument",
+      "state": "missing_after_declared_search",
+      "record_ids": [],
+      "search_scope": "Negative privacy fixture."
+    },
+    {
+      "evidence_slot": "runtime_snapshot",
+      "state": "missing_after_declared_search",
+      "record_ids": [],
+      "search_scope": "Negative privacy fixture."
+    },
+    {
+      "evidence_slot": "context_manifest",
+      "state": "missing_after_declared_search",
+      "record_ids": [],
+      "search_scope": "Negative privacy fixture."
+    },
+    {
+      "evidence_slot": "trajectory_trace",
+      "state": "missing_after_declared_search",
+      "record_ids": [],
+      "search_scope": "Negative privacy fixture."
+    },
+    {
+      "evidence_slot": "preservation_manifest",
+      "state": "missing_after_declared_search",
+      "record_ids": [],
+      "search_scope": "Negative privacy fixture."
+    },
+    {
+      "evidence_slot": "bearer_registry",
+      "state": "missing_after_declared_search",
+      "record_ids": [],
+      "search_scope": "Negative privacy fixture."
+    },
+    {
+      "evidence_slot": "remedy_forum_registry",
+      "state": "missing_after_declared_search",
+      "record_ids": [],
+      "search_scope": "Negative privacy fixture."
+    }
   ],
   "records": [],
-  "privacy_and_burden": {"data_classification": "synthetic_sensitive_token", "collection_purpose": "negative privacy fixture", "minimization_measure": "None; the complete dummy secret is duplicated into an unrestricted archive.", "retention_rule": "Indefinite unrestricted retention.", "protected_material_route": "None.", "review_minutes_estimate": 90, "reviewer_burden_level": "high", "privacy_risks": ["unnecessary duplication of a synthetic sensitive token"], "security_risks": ["unrestricted indefinite archive"], "tolerance_status": "exceeds_declared_tolerance"}
+  "privacy_and_burden": {
+    "data_classification": "synthetic_sensitive_token",
+    "collection_purpose": "negative privacy fixture",
+    "minimization_measure": "None; the complete dummy secret is duplicated into an unrestricted archive.",
+    "retention_rule": "Indefinite unrestricted retention.",
+    "protected_material_route": "None.",
+    "review_minutes_estimate": 90,
+    "reviewer_burden_level": "high",
+    "privacy_risks": [
+      "unnecessary duplication of a synthetic sensitive token"
+    ],
+    "security_risks": [
+      "unrestricted indefinite archive"
+    ],
+    "tolerance_status": "exceeds_declared_tolerance"
+  }
 }

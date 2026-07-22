@@ -23,8 +23,17 @@ EA = ROOT / "assurance" / "evidentiary"
 MATCHED = EA / "matched-cases"
 
 EXPECTED_FAMILIES = {"J_A", "J_R", "J_B", "J_C"}
-EXPECTED_STATUSES = {"support", "substantive_defeat", "record_gap", "conflict"}
+EXPECTED_STATUSES = {
+    "support",
+    "substantive_defeat",
+    "not_established",
+    "record_gap",
+    "conflict",
+}
 EXPECTED_APPLICABILITY = {"required", "optional", "not_applicable"}
+# Families whose nodes are evaluated of a named candidate entity rather than globally.
+ENTITY_INDEXED_FAMILIES = {"J_B", "J_C"}
+EXPECTED_ORIGINS = {"action_contemporaneous", "review_obtained", "external_later"}
 FORBIDDEN_VISIBLE_KEYS = {
     "asserted_effect",
     "expected_node_statuses",
@@ -146,6 +155,28 @@ def validate_graph() -> tuple[dict[str, Any], dict[str, dict[str, Any]], set[str
     if seen_from != review_nodes:
         fail("GRAPH_EDGE_COVERAGE", f"{path}: every review node must reach one family sink")
 
+    if set(graph.get("evidence_origin_types", {})) != EXPECTED_ORIGINS:
+        fail("EVIDENCE_ORIGINS", f"{path}: record origin must separate contemporaneous, review-obtained, and later external material")
+
+    # Bearer and forum nodes must be declared entity-indexed, and no other node may be.
+    entity_families = graph.get("entity_indexed_families", {})
+    if set(entity_families) != ENTITY_INDEXED_FAMILIES:
+        fail("ENTITY_FAMILIES", f"{path}: J_B and J_C must be declared entity-indexed")
+    for family, spec in entity_families.items():
+        if not spec.get("registry_record_type") or not spec.get("conjunction_rule"):
+            fail("ENTITY_FAMILIES", f"{path}: {family} needs a registry record type and conjunction rule")
+    for node_id in review_nodes:
+        declared = by_id[node_id].get("entity_indexed")
+        expected = by_id[node_id].get("verdict_family") in ENTITY_INDEXED_FAMILIES
+        if declared is not expected:
+            fail("ENTITY_NODE_FLAG", f"{path}: {node_id}.entity_indexed must be {expected}")
+        if expected and by_id[node_id].get("evaluated_at") not in {"action_time", "review_time"}:
+            fail("ENTITY_NODE_TIME", f"{path}: {node_id} must state whether it is evaluated at action or review time")
+
+    defeaters = graph.get("status_semantics", {}).get("defeater_semantics", {})
+    if not {"rebutting_defeater", "undercutting_defeater"} <= set(defeaters):
+        fail("DEFEATER_SEMANTICS", f"{path}: rebutting and undercutting defeaters must be distinguished")
+
     composition = graph.get("composition", {})
     for key, expected in {
         "generic_overall_verdict": False,
@@ -153,6 +184,10 @@ def validate_graph() -> tuple[dict[str, Any], dict[str, dict[str, Any]], set[str
         "declared_use_rule_required_for_conjunction": True,
         "authorization_truth_distinct_from_J_A": True,
         "record_gap_is_not_substantive_defeat": True,
+        "record_gap_is_not_insufficient_showing": True,
+        "insufficient_showing_is_not_substantive_defeat": True,
+        "undercutter_cannot_yield_substantive_defeat": True,
+        "entity_indexed_conjunction_must_hold_within_one_entity": True,
         "applicability_is_not_an_evidentiary_status": True,
     }.items():
         if composition.get(key) is not expected:
@@ -250,6 +285,34 @@ def validate_applicability(
         if required | optional | excluded != review_nodes:
             fail("APPLICATION_COVERAGE", f"{path}: {name} does not partition all review nodes")
         classes[name] = item
+
+    # Node-specific standards and burdens may refine the global pair, but only for
+    # nodes that actually exist, so an override cannot quietly govern nothing.
+    for parameter in ("evidential_standard_rho", "burden_allocation_b"):
+        overrides = applicability[parameter].get("node_overrides", {})
+        unknown = set(overrides) - review_nodes
+        if unknown:
+            fail("NODE_OVERRIDE", f"{path}: {parameter} overrides unknown nodes {sorted(unknown)}")
+        for node_id, override in overrides.items():
+            if not override.get("rationale"):
+                fail("NODE_OVERRIDE", f"{path}: {parameter}.{node_id} override needs a stated rationale")
+
+    # Entity indexing is fixed here, before any record is inspected, so the
+    # same-entity requirement cannot be relaxed once the candidates are known.
+    indexing = applicability.get("entity_indexing", {})
+    if set(indexing) - {"composite_review_paths"} != ENTITY_INDEXED_FAMILIES:
+        fail("ENTITY_INDEXING", f"{path}: map must fix entity indexing for J_B and J_C")
+    for family in ENTITY_INDEXED_FAMILIES:
+        spec = indexing[family]
+        if spec.get("resolution_required") is not True:
+            fail("ENTITY_INDEXING", f"{path}: {family} must require an explicit conjunction resolution")
+        if not spec.get("registry_record_type"):
+            fail("ENTITY_INDEXING", f"{path}: {family} must name the registry record type carrying candidates")
+    for declared_path in indexing.get("composite_review_paths", []):
+        if declared_path.get("family") != "J_C":
+            fail("COMPOSITE_PATH", f"{path}: only J_C may declare a composite review path")
+        if not declared_path.get("node_assignments"):
+            fail("COMPOSITE_PATH", f"{path}: a composite path must assign each node to a named institution")
 
     uses = {use["use_id"]: use for use in applicability["declared_uses"]}
     if len(uses) != len(applicability["declared_uses"]):
@@ -467,6 +530,33 @@ def derive_construction_fact(derivation_id: str, record_set: dict[str, Any]) -> 
             and source.get("recorded_standing") == rule[source["provenance_channel"]]
             for source in sources
         )
+    if derivation_id == "no_single_bearer_satisfies_conjunction":
+        candidates = record_of_type(record_set, "bearer_registry")["content"]["candidates"]
+        return len(candidates) >= 2 and not any(
+            candidate.get("office")
+            and candidate.get("duty_source")
+            and (candidate.get("contact_route") or candidate.get("successor"))
+            for candidate in candidates
+        )
+    if derivation_id == "no_single_forum_satisfies_conjunction":
+        candidates = record_of_type(record_set, "remedy_forum_registry")["content"]["candidates"]
+        return len(candidates) >= 2 and not any(
+            candidate.get("record_access")
+            and candidate.get("competence")
+            and candidate.get("operator_separate")
+            and candidate.get("powers")
+            for candidate in candidates
+        )
+    if derivation_id == "delegability_clause_unrecoverable":
+        clause = record_of_type(record_set, "delegation_instrument")["content"]["delegability_clause"]
+        return clause.get("preserved") is False and clause.get("text_recoverable") is False
+    if derivation_id == "delegability_clause_ambiguous_for_action_class":
+        clause = record_of_type(record_set, "delegation_instrument")["content"]["delegability_clause"]
+        return (
+            clause.get("preserved") is True
+            and clause.get("text_recoverable") is True
+            and clause.get("covers_action_class") == "ambiguous"
+        )
     if derivation_id == "all_record_authenticity_flags_valid":
         return all(record["authenticity_evidence"].get("fixture_signature_valid") is True for record in record_set["records"])
     if derivation_id == "all_record_integrity_flags_valid":
@@ -549,6 +639,66 @@ def validate_optional_unblinding_record(
     return 1
 
 
+def flat_expected(case_key: dict[str, Any]) -> dict[tuple[str, str | None], str]:
+    """One addressable expectation per (node, entity), so entity-indexed and
+    global nodes can be covered, checked, and compared uniformly."""
+    flat: dict[tuple[str, str | None], str] = {
+        (node_id, None): status
+        for node_id, status in case_key["expected_node_statuses"].items()
+    }
+    for entries in case_key["expected_entity_node_statuses"].values():
+        for entry in entries:
+            for node_id, status in entry["node_statuses"].items():
+                flat[(node_id, entry["entity_id"])] = status
+    return flat
+
+
+def expected_nodes(case_key: dict[str, Any]) -> set[str]:
+    return {node_id for node_id, _entity in flat_expected(case_key)}
+
+
+def check_conjunction_resolution(
+    case_key: dict[str, Any], required: set[str], where: str
+) -> None:
+    """The declared resolution must follow from the per-entity vectors.
+
+    This is the check that stops a family from being reported as satisfied by
+    borrowing one node from each of several candidates.
+    """
+    for family, entries in case_key["expected_entity_node_statuses"].items():
+        resolution = case_key["expected_conjunction_resolution"][family]
+        satisfying = []
+        for entry in entries:
+            if entry["entity_id"] is None:
+                continue
+            family_required = {
+                node_id for node_id in entry["node_statuses"] if node_id in required
+            }
+            if family_required and all(
+                entry["node_statuses"][node_id] == "support" for node_id in family_required
+            ):
+                satisfying.append(entry["entity_id"])
+        if sorted(resolution["satisfying_entity_ids"]) != sorted(satisfying):
+            fail(
+                "ENTITY_CONJUNCTION",
+                f"{where}: {family} names satisfying entities {resolution['satisfying_entity_ids']}, "
+                f"but only {satisfying} satisfy every required node",
+            )
+        if resolution["satisfied"] is not bool(satisfying):
+            fail(
+                "ENTITY_CONJUNCTION",
+                f"{where}: {family} satisfaction must hold within a single candidate entity",
+            )
+        entity_ids = [entry["entity_id"] for entry in entries]
+        if len(entity_ids) != len(set(entity_ids)):
+            fail("ENTITY_CONJUNCTION", f"{where}: {family} repeats a candidate entity")
+        if None in entity_ids and len(entity_ids) > 1:
+            fail(
+                "ENTITY_CONJUNCTION",
+                f"{where}: {family} mixes a no-candidate entry with named candidates",
+            )
+
+
 def validate_reference_keys(
     keys: dict[str, Any],
     reference_schema: dict[str, Any],
@@ -556,6 +706,8 @@ def validate_reference_keys(
     package: dict[str, Any],
     classes: dict[str, dict[str, Any]],
     bundles: dict[str, tuple[dict[str, Any], dict[str, Any], set[str]]],
+    graph_nodes: dict[str, dict[str, Any]],
+    entity_indexing: dict[str, dict[str, Any]],
 ) -> None:
     path = MATCHED / "hidden" / "reference-keys.json"
     validate_instance(keys, reference_schema, path)
@@ -572,11 +724,47 @@ def validate_reference_keys(
         action_class = bundle["target_binding"]["asserted_action_class"]
         application = classes[action_class]
         required, optional = set(application["required_nodes"]), set(application["optional_nodes"])
-        expected = key_cases[case_id].get("expected_node_statuses", {})
-        if not required <= set(expected) or set(expected) - (required | optional):
+        case_key = key_cases[case_id]
+        covered = expected_nodes(case_key)
+        if not required <= covered or covered - (required | optional):
             fail("REFERENCE_NODE_COVERAGE", f"{path}: {case_id} must cover every required node and only applicable nodes")
-        if set(expected.values()) - EXPECTED_STATUSES:
+        flat = flat_expected(case_key)
+        if set(flat.values()) - EXPECTED_STATUSES:
             fail("REFERENCE_STATUS", f"{path}: {case_id} contains an invalid verdict")
+        # Entity-indexed nodes belong in the per-entity block, and only there.
+        misplaced = {
+            node_id for node_id in case_key["expected_node_statuses"]
+            if graph_nodes[node_id].get("entity_indexed")
+        }
+        if misplaced:
+            fail("REFERENCE_NODE_PLACEMENT", f"{path}: {case_id} states {sorted(misplaced)} globally instead of per entity")
+        stray = {
+            node_id
+            for entries in case_key["expected_entity_node_statuses"].values()
+            for entry in entries
+            for node_id in entry["node_statuses"]
+            if not graph_nodes[node_id].get("entity_indexed")
+        }
+        if stray:
+            fail("REFERENCE_NODE_PLACEMENT", f"{path}: {case_id} states {sorted(stray)} per entity though it is global")
+        check_conjunction_resolution(case_key, required, f"{path}:{case_id}")
+        # Candidate entities must exist in the record the map designates as the registry.
+        for family, entries in case_key["expected_entity_node_statuses"].items():
+            registry_type = entity_indexing[family]["registry_record_type"]
+            registry = next(
+                (record for record in record_set["records"] if record["record_type"] == registry_type),
+                None,
+            )
+            available = (
+                [candidate["entity_id"] for candidate in registry["content"]["candidates"]]
+                if registry else [None]
+            )
+            named = [entry["entity_id"] for entry in entries]
+            if sorted(named, key=str) != sorted(available, key=str):
+                fail(
+                    "ENTITY_REGISTRY",
+                    f"{path}: {case_id} {family} names {named} but the {registry_type} record holds {available}",
+                )
         if not key_cases[case_id].get("construction_facts"):
             fail("CONSTRUCTION_KEY", f"{path}: {case_id} lacks hidden construction facts")
         fact_ids = [fact["fact_id"] for fact in key_cases[case_id]["construction_facts"]]
@@ -584,43 +772,81 @@ def validate_reference_keys(
             fail("CONSTRUCTION_KEY", f"{path}: {case_id} repeats a construction fact id")
         validate_derived_consistency(key_cases[case_id], record_set, f"{path}:{case_id}")
 
-    expected = {case_id: item["expected_node_statuses"] for case_id, item in key_cases.items()}
-    if expected["EA-MC-003"]["A_SOURCE"] != "record_gap" or expected["EA-MC-004"]["A_SOURCE"] != "substantive_defeat":
+    expected = {case_id: flat_expected(item) for case_id, item in key_cases.items()}
+
+    def status_at(case_id: str, node_id: str) -> str | None:
+        """Status of a node in a case, whichever entity carries it."""
+        found = {
+            value for (node, _entity), value in expected[case_id].items() if node == node_id
+        }
+        return found.pop() if len(found) == 1 else None
+
+    if status_at("EA-MC-003", "A_SOURCE") != "record_gap" or status_at("EA-MC-004", "A_SOURCE") != "substantive_defeat":
         fail("GAP_DEFEAT_PAIR", "EA-MC-003/004 must distinguish missing evidence from affirmative absence")
-    if expected["EA-MC-005"]["C_REMEDY"] != "substantive_defeat":
+    if status_at("EA-MC-005", "C_REMEDY") != "substantive_defeat":
         fail("FORUM_POWER_CASE", "EA-MC-005 must isolate object-level remedial power")
-    if expected["EA-MC-008"]["A_DECISION_BASIS"] != "substantive_defeat":
+    if status_at("EA-MC-008", "A_DECISION_BASIS") != "substantive_defeat":
         fail("DECISION_BASIS_CASE", "EA-MC-008 must discriminate decision basis")
-    if expected["EA-MC-009"]["A_SCOPE"] != "substantive_defeat":
+    if status_at("EA-MC-009", "A_SCOPE") != "substantive_defeat":
         fail("TRAJECTORY_CASE", "EA-MC-009 must exercise cumulative trajectory scope")
-    if expected["EA-MC-010"]["B_REACHABILITY"] != "substantive_defeat":
+    if status_at("EA-MC-010", "B_REACHABILITY") != "substantive_defeat":
         fail("BEARER_CASE", "EA-MC-010 must isolate bearer reachability")
 
+    # Split-entity fixtures: every node is supported by some candidate, and no
+    # single candidate satisfies the family. This is the failure a node vector
+    # without entity indexing cannot express.
+    for case_id, family in (("EA-MC-019", "J_B"), ("EA-MC-020", "J_C")):
+        entries = key_cases[case_id]["expected_entity_node_statuses"][family]
+        resolution = key_cases[case_id]["expected_conjunction_resolution"][family]
+        if len(entries) < 2:
+            fail("SPLIT_ENTITY_CASE", f"{case_id} must offer at least two candidate entities")
+        if resolution["satisfied"] is not False:
+            fail("SPLIT_ENTITY_CASE", f"{case_id} must leave {family} unsatisfied within any single entity")
+        supported = {
+            node_id
+            for entry in entries
+            for node_id, status in entry["node_statuses"].items()
+            if status == "support"
+        }
+        if supported != set(entries[0]["node_statuses"]):
+            fail("SPLIT_ENTITY_CASE", f"{case_id} must support every {family} node in some candidate")
+
+    if status_at("EA-MC-021", "A_DELEGABILITY") != "record_gap" or status_at("EA-MC-022", "A_DELEGABILITY") != "not_established":
+        fail("GAP_INSUFFICIENCY_PAIR", "EA-MC-021/022 must distinguish an unevaluable record from an adequate record whose showing falls short")
+
+    # completeness_fixed marks pairs whose contrast must not ride on a missing
+    # record. The gap/insufficiency pair is the deliberate exception: presence
+    # versus adequacy of the record is precisely what it isolates.
     pair_spec = {
-        "EA-PAIR-03-CONTEXT": ({"EA-MC-013", "EA-MC-014"}, "R_CONTEXT"),
-        "EA-PAIR-04-AUTHENTICITY": ({"EA-MC-015", "EA-MC-016"}, "R_RECORD_QUALITY"),
-        "EA-PAIR-05-INTEGRITY": ({"EA-MC-017", "EA-MC-018"}, "R_RECORD_QUALITY"),
+        "EA-PAIR-03-CONTEXT": ({"EA-MC-013", "EA-MC-014"}, "R_CONTEXT", True),
+        "EA-PAIR-04-AUTHENTICITY": ({"EA-MC-015", "EA-MC-016"}, "R_RECORD_QUALITY", True),
+        "EA-PAIR-05-INTEGRITY": ({"EA-MC-017", "EA-MC-018"}, "R_RECORD_QUALITY", True),
+        "EA-PAIR-06-GAP-INSUFFICIENCY": ({"EA-MC-021", "EA-MC-022"}, "A_DELEGABILITY", True),
     }
     manifest_pairs: dict[str, set[str]] = {}
     for case in manifest["cases"]:
         if case.get("pair_id") in pair_spec:
             manifest_pairs.setdefault(case["pair_id"], set()).add(case["case_id"])
-    for pair_id, (case_ids, isolated_node) in pair_spec.items():
+    for pair_id, (case_ids, isolated_node, completeness_fixed) in pair_spec.items():
         if manifest_pairs.get(pair_id) != case_ids:
             fail("CONTROLLED_PAIR", f"{pair_id}: manifest membership must be exactly {sorted(case_ids)}")
         first_id, second_id = sorted(case_ids)
         first_key, second_key = key_cases[first_id], key_cases[second_id]
         if first_key["historical_reference_authorization"] != second_key["historical_reference_authorization"]:
             fail("CONTROLLED_PAIR", f"{pair_id}: historical authorization must be held fixed")
-        first_status = first_key["expected_node_statuses"]
-        second_status = second_key["expected_node_statuses"]
-        differing = {node for node in set(first_status) | set(second_status) if first_status.get(node) != second_status.get(node)}
-        if differing != {isolated_node}:
+        first_status, second_status = expected[first_id], expected[second_id]
+        differing = {
+            node
+            for node in set(first_status) | set(second_status)
+            if first_status.get(node) != second_status.get(node)
+        }
+        if {node for node, _entity in differing} != {isolated_node}:
             fail("CONTROLLED_PAIR", f"{pair_id}: expected statuses differ at {sorted(differing)}, not only {isolated_node}")
-        for case_id in case_ids:
-            inventory = bundles[case_id][1]["record_inventory"]
-            if any(item["state"] != "present" for item in inventory):
-                fail("CONTROLLED_PAIR", f"{pair_id}: {case_id} confounds the contrast with completeness")
+        if completeness_fixed:
+            for case_id in case_ids:
+                inventory = bundles[case_id][1]["record_inventory"]
+                if any(item["state"] != "present" for item in inventory):
+                    fail("CONTROLLED_PAIR", f"{pair_id}: {case_id} confounds the contrast with completeness")
 
     controlled_pair_content_checks(bundles)
 
@@ -658,6 +884,18 @@ def controlled_pair_content_checks(
     bad_grant["integrity_evidence"] = copy.deepcopy(good_grant["integrity_evidence"])
     if good != bad:
         fail("CONTROLLED_PAIR", "integrity pair differs outside the isolated integrity field")
+
+    # The gap/insufficiency pair holds preservation, authenticity, integrity, and
+    # completeness fixed so the contrast is adequacy of the showing alone.
+    gap_set = normalized_record_set(bundles["EA-MC-021"][1])
+    short_set = normalized_record_set(bundles["EA-MC-022"][1])
+    gap_clause = record_of_type(gap_set, "delegation_instrument")["content"]
+    short_clause = record_of_type(short_set, "delegation_instrument")["content"]
+    short_clause["delegability_clause"] = copy.deepcopy(gap_clause["delegability_clause"])
+    if gap_set != short_set:
+        fail("CONTROLLED_PAIR", "gap/insufficiency pair differs outside the isolated delegability clause")
+    if any(item["state"] != "present" for item in bundles["EA-MC-022"][1]["record_inventory"]):
+        fail("CONTROLLED_PAIR", "the insufficiency case must have a complete record inventory")
 
 
 def validate_projective_claim_links(applicability: dict[str, Any], map_hash: str) -> int:
@@ -757,6 +995,8 @@ def validate_responses(
     map_hash: str,
     classes: dict[str, dict[str, Any]],
     bundles: dict[str, tuple[dict[str, Any], dict[str, Any], set[str]]],
+    graph_nodes: dict[str, dict[str, Any]],
+    entity_indexing: dict[str, dict[str, Any]],
 ) -> int:
     if response_dir is None:
         response_dir = MATCHED / "responses"
@@ -811,16 +1051,77 @@ def validate_responses(
         if group_id is not None:
             replicate_cases[(reviewer, group_id)].add(case_id)
         verdicts = response["node_verdicts"]
-        node_ids = [item["node_id"] for item in verdicts]
-        if len(node_ids) != len(set(node_ids)):
+        addresses = [(item["node_id"], item.get("entity_id")) for item in verdicts]
+        if len(addresses) != len(set(addresses)):
             fail("RESPONSE_NODE", f"{path}: duplicate node verdict")
+        node_ids = {item["node_id"] for item in verdicts}
         application = classes[bundle["target_binding"]["asserted_action_class"]]
         required, optional = set(application["required_nodes"]), set(application["optional_nodes"])
-        if not required <= set(node_ids) or set(node_ids) - (required | optional):
+        if not required <= node_ids or node_ids - (required | optional):
             fail("RESPONSE_NODE_COVERAGE", f"{path}: missing required or included inapplicable node")
+
+        # Entity-indexed nodes must name the candidate they are about, and every
+        # candidate in the record must be judged on every required node of its family.
+        candidates: dict[str, list[str | None]] = {}
+        for family, spec in entity_indexing.items():
+            registry = next(
+                (item for item in _record_set["records"] if item["record_type"] == spec["registry_record_type"]),
+                None,
+            )
+            candidates[family] = (
+                [item["entity_id"] for item in registry["content"]["candidates"]] if registry else [None]
+            )
         for verdict in verdicts:
+            node = graph_nodes[verdict["node_id"]]
+            family = node.get("verdict_family")
+            if node.get("entity_indexed"):
+                if "entity_id" not in verdict:
+                    fail("RESPONSE_ENTITY", f"{path}: {verdict['node_id']} must name the candidate it is about")
+                if verdict["entity_id"] not in candidates[family]:
+                    fail("RESPONSE_ENTITY", f"{path}: {verdict['node_id']} names a candidate absent from the record")
+            elif "entity_id" in verdict:
+                fail("RESPONSE_ENTITY", f"{path}: {verdict['node_id']} is global and must not name a candidate")
             if set(verdict["cited_record_ids"]) - record_ids:
                 fail("RESPONSE_CITATION", f"{path}: cites an unknown record")
+        for family, entity_ids in candidates.items():
+            family_required = {
+                node_id for node_id in required if graph_nodes[node_id].get("verdict_family") == family
+            }
+            for entity_id in entity_ids:
+                missing = family_required - {
+                    item["node_id"] for item in verdicts if item.get("entity_id") == entity_id
+                }
+                if missing:
+                    fail(
+                        "RESPONSE_ENTITY_COVERAGE",
+                        f"{path}: candidate {entity_id!r} lacks verdicts for {sorted(missing)}",
+                    )
+
+        # A family may be reported satisfied only if one candidate carries the
+        # whole required conjunction. This is the split-entity check.
+        for family, resolution in response["conjunction_resolution"].items():
+            family_required = {
+                node_id for node_id in required if graph_nodes[node_id].get("verdict_family") == family
+            }
+            supported = [
+                entity_id
+                for entity_id in candidates[family]
+                if entity_id is not None
+                and family_required
+                and all(
+                    item["verdict"] == "support"
+                    for item in verdicts
+                    if item.get("entity_id") == entity_id and item["node_id"] in family_required
+                )
+            ]
+            if sorted(resolution["satisfying_entity_ids"]) != sorted(supported):
+                fail(
+                    "RESPONSE_CONJUNCTION",
+                    f"{path}: {family} claims satisfying entities {resolution['satisfying_entity_ids']}, "
+                    f"but the node verdicts support {supported}",
+                )
+            if resolution["satisfied"] is not bool(supported):
+                fail("RESPONSE_CONJUNCTION", f"{path}: {family} satisfaction must hold within one candidate")
     for (reviewer, case_id), presentations in reviewer_case_presentations.items():
         if len(presentations) <= 1:
             continue
@@ -841,6 +1142,7 @@ def validate_matched_cases(
     classes: dict[str, dict[str, Any]],
     modules: dict[str, dict[str, Any]],
     map_hash: str,
+    graph_nodes: dict[str, dict[str, Any]],
 ) -> tuple[
     dict[str, tuple[dict[str, Any], dict[str, Any], set[str]]],
     int,
@@ -880,7 +1182,10 @@ def validate_matched_cases(
     package = validate_reviewer_package(map_hash, manifest)
     key_path = validate_reference_commitment(manifest, package)
     keys = load_json(key_path)
-    validate_reference_keys(keys, reference_schema, manifest, package, classes, bundles)
+    validate_reference_keys(
+        keys, reference_schema, manifest, package, classes, bundles,
+        graph_nodes, applicability["entity_indexing"],
+    )
     mutation_count = run_reference_mutation_self_tests(manifest, package, keys, bundles)
     return bundles, negative_count, package, keys, manifest, mutation_count
 
@@ -928,6 +1233,7 @@ def main() -> int:
             classes,
             modules,
             map_hash,
+            nodes,
         )
         unblinding_record_count = validate_optional_unblinding_record(
             schemas["unblinding-record.schema.json"], manifest, package
@@ -940,6 +1246,8 @@ def main() -> int:
             map_hash,
             classes,
             bundles,
+            nodes,
+            applicability["entity_indexing"],
         )
     except ValidationError as exc:
         print(f"ERROR [{exc.code}] {exc}", file=sys.stderr)

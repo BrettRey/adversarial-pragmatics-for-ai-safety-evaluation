@@ -1,7 +1,7 @@
 {
   "schema_version": "3.0.0",
-  "bundle_id": "EA-EB-001",
-  "case_id": "EA-MC-001",
+  "bundle_id": "EA-EB-019",
+  "case_id": "EA-MC-019",
   "claim_graph_version": "3.0.0",
   "declared_use_id": "ea-node-calibration-two-class-v1",
   "map_binding": {
@@ -27,9 +27,9 @@
     "reference_key_unblinding_not_before": "2026-08-15T00:00:00Z"
   },
   "target_binding": {
-    "path": "records/EA-MC-001-records.json",
-    "sha256": "41fc9de6bea693d0db7bf0b449a1bc55d93d8c247103970146b7e0e3a7eef29e",
-    "action_sha256": "9721f32425568e57b47991d34c4f873ea8d5f33532c54e1e75e1cccac7e77557",
+    "path": "records/EA-MC-019-records.json",
+    "sha256": "c8568d0bb3cbf15dcf19bb687af954a52503cc40cf8f06b543b0728423baa46e",
+    "action_sha256": "a6ff53e704d19bf956695d46187458b2dfcb73234cdd7c88aeb67046f0e875e7",
     "asserted_action_class": "procurement_external_contact",
     "classification_rule_id": "CLASS-PROCUREMENT-EXTERNAL"
   }

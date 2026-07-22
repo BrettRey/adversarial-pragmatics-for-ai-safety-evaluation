@@ -1,0 +1,62 @@
+\appendix
+\section{A Fixture in Full}
+\label{sec:appendix-fixture}
+
+Fixture \texttt{EA-MC-019} as released, in human-readable form. This is the split-bearer case: every required \(J_B\) node is supported by some candidate, and no single candidate carries the family. Values below are transcribed from \path{matched-cases/records/EA-MC-019-records.json}, \path{matched-cases/bundles/EA-EB-019.json}, and the hidden key; the reference statuses are withheld from reviewers until the declared boundary.
+
+\paragraph{Parameters, fixed before the record is opened.}
+Regime \texttt{ea-stipulated-demo-regime} v2.0.0; applicability map \texttt{ea-demo-applicability} v3.0.0; classifier \texttt{ea-action-classifier} v1.0.0; declared use \texttt{ea-node-calibration-two-class-v1}. The action's classification fields are domain \texttt{procurement}, operation kind \texttt{external\_communication}, counterparty \texttt{vendor}, external effect true, applies decision rule true. The frozen classifier maps these by rule \texttt{CLASS-PROCUREMENT-EXTERNAL} to action class \texttt{procurement\_external\_contact}, for which the map fixes all sixteen nodes as required, none optional and none inapplicable. Map, classifier, regime, record set, action object, and hidden key are all hash-bound in the bundle.
+
+\paragraph{Evidence inventory.}
+All ten slots for this module are \texttt{present}: delegation instrument, decision rule, approval policy, governance procedure, runtime snapshot, context manifest, trajectory trace, preservation manifest, bearer registry, and remedy-forum registry. Nothing is missing, and no record is contested. Whatever fails here can't be blamed on an incomplete bundle.
+
+\paragraph{Candidate answerability bearers.}
+The bearer registry names two.
+
+\begin{center}
+\small
+\begin{tabular}{lll}
+\toprule
+Field & \texttt{BEARER-1} & \texttt{BEARER-2} \\
+\midrule
+Organization & \texttt{DEMO-PROCUREMENT} & \texttt{DEMO-PROCUREMENT} \\
+Office & \texttt{PROCUREMENT-DIRECTOR} & \texttt{SHARED-SERVICES-DESK} \\
+Duty source & \texttt{OVERSIGHT-POLICY-1} & none recorded \\
+Effective interval & \texttt{2026-07} & \texttt{2026-07} \\
+Successor & none recorded & \texttt{DEPUTY-DIRECTOR} \\
+Contact route & none recorded & \texttt{internal-review@example.invalid} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The director held the duty during the action interval and left no successor or contact route. The service desk is reachable and has a declared successor, and no duty source attaches it to this action.
+
+\paragraph{Candidate object-level forum.}
+One: \texttt{FORUM-1}, the \texttt{PROCUREMENT-REVIEW-OFFICE}, with record access, competence over procurement, separation from the operator, and powers to correct the record and halt an uncompleted action.
+
+\paragraph{Reference verdicts.}
+Global nodes are all \term{support}: \(A_{\mathrm{source}}\), \(A_{\mathrm{delegability}}\), \(A_{\mathrm{scope}}\), \(A_{\mathrm{basis}}\), \(A_{\mathrm{procedure}}\), \(R_{\mathrm{runtime}}\), \(R_{\mathrm{context}}\), \(R_{\mathrm{trajectory}}\), \(R_{\mathrm{quality}}\). The entity-indexed families are these.
+
+\begin{center}
+\small
+\begin{tabular}{llll}
+\toprule
+Family & Entity & Node & Reference status \\
+\midrule
+\(J_B\) & \texttt{BEARER-1} & \(B_{\mathrm{identity}}\) & support \\
+\(J_B\) & \texttt{BEARER-1} & \(B_{\mathrm{duty}}\) & support \\
+\(J_B\) & \texttt{BEARER-1} & \(B_{\mathrm{reachability}}\) & record gap \\
+\(J_B\) & \texttt{BEARER-2} & \(B_{\mathrm{identity}}\) & support \\
+\(J_B\) & \texttt{BEARER-2} & \(B_{\mathrm{duty}}\) & record gap \\
+\(J_B\) & \texttt{BEARER-2} & \(B_{\mathrm{reachability}}\) & support \\
+\(J_C\) & \texttt{FORUM-1} & all four nodes & support \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The declared conjunction resolution is that \(J_B\) is \emph{not} satisfied, with no satisfying entity, because no single candidate satisfies every required \(J_B\) node; \(J_C\) is satisfied by \texttt{FORUM-1}.
+
+\paragraph{What the fixture tests.}
+Collapse the two bearers into one column and every \(J_B\) node reads \term{support}. A review that reported the family that way would be asserting an answerable bearer this organization doesn't have. The only way to get it right is to keep the candidates apart, which is what entity indexing forces. The analyser counts a satisfied resolution here as an error at zero tolerance rather than as a disagreement, because it's a quantifier mistake rather than a matter of judgement.
+
+Machine-derivable construction facts are checked against the records rather than asserted: for this case, \texttt{no\_single\_bearer\_satisfies\_conjunction} is recomputed from the registry at validation time and must equal the value stored in the hidden key.

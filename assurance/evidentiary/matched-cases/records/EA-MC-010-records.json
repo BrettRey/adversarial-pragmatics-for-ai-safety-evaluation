@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0.0",
+  "schema_version": "2.0.0",
   "record_set_id": "EA-RS-010",
   "case_id": "EA-MC-010",
   "action": {
@@ -134,7 +134,8 @@
       "integrity_evidence": {
         "manifest_match": true
       },
-      "access_class": "reviewer_visible"
+      "access_class": "reviewer_visible",
+      "evidence_origin": "action_contemporaneous"
     },
     {
       "record_id": "R010-RULE",
@@ -156,7 +157,8 @@
       "integrity_evidence": {
         "manifest_match": true
       },
-      "access_class": "reviewer_visible"
+      "access_class": "reviewer_visible",
+      "evidence_origin": "action_contemporaneous"
     },
     {
       "record_id": "R010-APPROVAL",
@@ -178,7 +180,8 @@
       "integrity_evidence": {
         "manifest_match": true
       },
-      "access_class": "reviewer_visible"
+      "access_class": "reviewer_visible",
+      "evidence_origin": "action_contemporaneous"
     },
     {
       "record_id": "R010-PROCEDURE",
@@ -199,7 +202,8 @@
       "integrity_evidence": {
         "manifest_match": true
       },
-      "access_class": "reviewer_visible"
+      "access_class": "reviewer_visible",
+      "evidence_origin": "action_contemporaneous"
     },
     {
       "record_id": "R010-RUNTIME",
@@ -223,7 +227,8 @@
       "integrity_evidence": {
         "manifest_match": true
       },
-      "access_class": "reviewer_visible"
+      "access_class": "reviewer_visible",
+      "evidence_origin": "action_contemporaneous"
     },
     {
       "record_id": "R010-CONTEXT",
@@ -253,7 +258,8 @@
       "integrity_evidence": {
         "manifest_match": true
       },
-      "access_class": "reviewer_visible"
+      "access_class": "reviewer_visible",
+      "evidence_origin": "action_contemporaneous"
     },
     {
       "record_id": "R010-TRACE",
@@ -279,7 +285,8 @@
       "integrity_evidence": {
         "manifest_match": true
       },
-      "access_class": "reviewer_visible"
+      "access_class": "reviewer_visible",
+      "evidence_origin": "action_contemporaneous"
     },
     {
       "record_id": "R010-PRESERVE",
@@ -301,48 +308,25 @@
       "integrity_evidence": {
         "manifest_match": true
       },
-      "access_class": "reviewer_visible"
+      "access_class": "reviewer_visible",
+      "evidence_origin": "action_contemporaneous"
     },
     {
       "record_id": "R010-BEARER",
       "record_type": "bearer_registry",
       "title": "Answerability-bearer record",
       "content": {
-        "organization": "DEMO-PROCUREMENT",
-        "office": "PROCUREMENT-DIRECTOR",
-        "duty_source": "OVERSIGHT-POLICY-1",
-        "effective_interval": "2026-07",
-        "office_status": "dissolved",
-        "successor": null,
-        "contact_route": null
-      },
-      "provenance": {
-        "source": "synthetic calibration fixture",
-        "captured_at": "2026-07-20T10:10:00Z",
-        "custodian": "EA fixture custodian"
-      },
-      "authenticity_evidence": {
-        "fixture_signature_valid": true
-      },
-      "integrity_evidence": {
-        "manifest_match": true
-      },
-      "access_class": "reviewer_visible"
-    },
-    {
-      "record_id": "R010-FORUM",
-      "record_type": "remedy_forum_registry",
-      "title": "Object-level remedy-forum record",
-      "content": {
-        "forum": "PROCUREMENT-REVIEW-OFFICE",
-        "record_access": true,
-        "competence": [
-          "procurement"
-        ],
-        "operator_separate": true,
-        "powers": [
-          "correct_record",
-          "halt_uncompleted_action"
+        "candidates": [
+          {
+            "entity_id": "BEARER-1",
+            "organization": "DEMO-PROCUREMENT",
+            "office": "PROCUREMENT-DIRECTOR",
+            "duty_source": "OVERSIGHT-POLICY-1",
+            "effective_interval": "2026-07",
+            "office_status": "dissolved",
+            "successor": null,
+            "contact_route": null
+          }
         ]
       },
       "provenance": {
@@ -356,7 +340,43 @@
       "integrity_evidence": {
         "manifest_match": true
       },
-      "access_class": "reviewer_visible"
+      "access_class": "reviewer_visible",
+      "evidence_origin": "action_contemporaneous"
+    },
+    {
+      "record_id": "R010-FORUM",
+      "record_type": "remedy_forum_registry",
+      "title": "Object-level remedy-forum record",
+      "content": {
+        "candidates": [
+          {
+            "entity_id": "FORUM-1",
+            "forum": "PROCUREMENT-REVIEW-OFFICE",
+            "record_access": true,
+            "competence": [
+              "procurement"
+            ],
+            "operator_separate": true,
+            "powers": [
+              "correct_record",
+              "halt_uncompleted_action"
+            ]
+          }
+        ]
+      },
+      "provenance": {
+        "source": "synthetic calibration fixture",
+        "captured_at": "2026-07-20T10:10:00Z",
+        "custodian": "EA fixture custodian"
+      },
+      "authenticity_evidence": {
+        "fixture_signature_valid": true
+      },
+      "integrity_evidence": {
+        "manifest_match": true
+      },
+      "access_class": "reviewer_visible",
+      "evidence_origin": "action_contemporaneous"
     }
   ],
   "privacy_and_burden": {

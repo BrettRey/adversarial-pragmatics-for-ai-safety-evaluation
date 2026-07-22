@@ -10,8 +10,12 @@
     {
       "source_id": "PROCUREMENT-CHARTER-1",
       "title": "Synthetic procurement charter",
-      "delegable_action_classes": ["procurement_external_contact"],
-      "nondelegable_limits": ["No disclosure of protected maximum-budget data without manager approval."],
+      "delegable_action_classes": [
+        "procurement_external_contact"
+      ],
+      "nondelegable_limits": [
+        "No disclosure of protected maximum-budget data without manager approval."
+      ],
       "scope_rule": "A versioned operative grant must identify the vendor, communication purpose, maximum contact count, and effective interval.",
       "decision_basis_rule": "External contact requires an approved-vendor predicate supported by the supplier register; similarity-based imputation is not an accepted transformation.",
       "procedure_rule": "The manager approval and any adverse procurement warning must be recorded before external contact.",
@@ -20,7 +24,9 @@
     {
       "source_id": "TRANSCRIPTION-POLICY-1",
       "title": "Synthetic ministerial transcription policy",
-      "delegable_action_classes": ["ministerial_transcription"],
+      "delegable_action_classes": [
+        "ministerial_transcription"
+      ],
       "nondelegable_limits": [],
       "scope_rule": "One supplied harmless token may be copied literally without applying a factual or legal decision rule.",
       "decision_basis_rule": null,

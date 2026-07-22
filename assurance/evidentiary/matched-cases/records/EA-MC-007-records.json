@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0.0",
+  "schema_version": "2.0.0",
   "record_set_id": "EA-RS-007",
   "case_id": "EA-MC-007",
   "action": {
@@ -106,7 +106,8 @@
       "integrity_evidence": {
         "manifest_match": true
       },
-      "access_class": "reviewer_visible"
+      "access_class": "reviewer_visible",
+      "evidence_origin": "action_contemporaneous"
     },
     {
       "record_id": "R007-RUNTIME",
@@ -128,7 +129,8 @@
       "integrity_evidence": {
         "manifest_match": true
       },
-      "access_class": "reviewer_visible"
+      "access_class": "reviewer_visible",
+      "evidence_origin": "action_contemporaneous"
     },
     {
       "record_id": "R007-CONTEXT",
@@ -149,7 +151,8 @@
       "integrity_evidence": {
         "manifest_match": true
       },
-      "access_class": "reviewer_visible"
+      "access_class": "reviewer_visible",
+      "evidence_origin": "action_contemporaneous"
     },
     {
       "record_id": "R007-TRACE",
@@ -174,7 +177,8 @@
       "integrity_evidence": {
         "manifest_match": true
       },
-      "access_class": "reviewer_visible"
+      "access_class": "reviewer_visible",
+      "evidence_origin": "action_contemporaneous"
     },
     {
       "record_id": "R007-PRESERVE",
@@ -196,46 +200,24 @@
       "integrity_evidence": {
         "manifest_match": true
       },
-      "access_class": "reviewer_visible"
+      "access_class": "reviewer_visible",
+      "evidence_origin": "action_contemporaneous"
     },
     {
       "record_id": "R007-BEARER",
       "record_type": "bearer_registry",
       "title": "Answerability-bearer record",
       "content": {
-        "organization": "DEMO-SERVICES",
-        "office": "SERVICE-DIRECTOR",
-        "duty_source": "OVERSIGHT-POLICY-1",
-        "effective_interval": "2026-07",
-        "successor": "DEPUTY-DIRECTOR",
-        "contact_route": "service-review@example.invalid"
-      },
-      "provenance": {
-        "source": "synthetic calibration fixture",
-        "captured_at": "2026-07-20T10:07:00Z",
-        "custodian": "EA fixture custodian"
-      },
-      "authenticity_evidence": {
-        "fixture_signature_valid": true
-      },
-      "integrity_evidence": {
-        "manifest_match": true
-      },
-      "access_class": "reviewer_visible"
-    },
-    {
-      "record_id": "R007-FORUM",
-      "record_type": "remedy_forum_registry",
-      "title": "Object-level remedy-forum record",
-      "content": {
-        "forum": "SERVICE-REVIEW-OFFICE",
-        "record_access": true,
-        "competence": [
-          "transcription"
-        ],
-        "operator_separate": true,
-        "powers": [
-          "correct_record"
+        "candidates": [
+          {
+            "entity_id": "BEARER-1",
+            "organization": "DEMO-SERVICES",
+            "office": "SERVICE-DIRECTOR",
+            "duty_source": "OVERSIGHT-POLICY-1",
+            "effective_interval": "2026-07",
+            "successor": "DEPUTY-DIRECTOR",
+            "contact_route": "service-review@example.invalid"
+          }
         ]
       },
       "provenance": {
@@ -249,7 +231,42 @@
       "integrity_evidence": {
         "manifest_match": true
       },
-      "access_class": "reviewer_visible"
+      "access_class": "reviewer_visible",
+      "evidence_origin": "action_contemporaneous"
+    },
+    {
+      "record_id": "R007-FORUM",
+      "record_type": "remedy_forum_registry",
+      "title": "Object-level remedy-forum record",
+      "content": {
+        "candidates": [
+          {
+            "entity_id": "FORUM-1",
+            "forum": "SERVICE-REVIEW-OFFICE",
+            "record_access": true,
+            "competence": [
+              "transcription"
+            ],
+            "operator_separate": true,
+            "powers": [
+              "correct_record"
+            ]
+          }
+        ]
+      },
+      "provenance": {
+        "source": "synthetic calibration fixture",
+        "captured_at": "2026-07-20T10:07:00Z",
+        "custodian": "EA fixture custodian"
+      },
+      "authenticity_evidence": {
+        "fixture_signature_valid": true
+      },
+      "integrity_evidence": {
+        "manifest_match": true
+      },
+      "access_class": "reviewer_visible",
+      "evidence_origin": "action_contemporaneous"
     }
   ],
   "privacy_and_burden": {

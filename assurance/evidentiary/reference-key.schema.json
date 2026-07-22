@@ -4,59 +4,338 @@
   "title": "Hidden evidentiary-assurance calibration reference key",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "set_id", "set_version", "do_not_expose_during_review", "unblinding_not_before", "generic_overall_verdict", "cases"],
+  "required": [
+    "schema_version",
+    "set_id",
+    "set_version",
+    "do_not_expose_during_review",
+    "unblinding_not_before",
+    "generic_overall_verdict",
+    "cases"
+  ],
   "properties": {
-    "schema_version": {"const": "3.0.0"},
-    "set_id": {"type": "string", "minLength": 1},
-    "set_version": {"type": "string", "minLength": 1},
-    "do_not_expose_during_review": {"const": true},
-    "unblinding_not_before": {"type": "string", "format": "date-time"},
-    "generic_overall_verdict": {"type": "null"},
-    "cases": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/caseKey"}}
+    "schema_version": {
+      "const": "4.0.0"
+    },
+    "set_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "set_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "do_not_expose_during_review": {
+      "const": true
+    },
+    "unblinding_not_before": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "generic_overall_verdict": {
+      "type": "null"
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/caseKey"
+      }
+    }
   },
   "$defs": {
-    "status": {"enum": ["support", "substantive_defeat", "record_gap", "conflict"]},
-    "historicalValue": {"enum": ["authorized_by_fixture_construction", "unauthorized_by_fixture_construction", "not_determined_by_fixture", "contested_in_fixture"]},
-    "provenanceKind": {"enum": ["machine_derived", "stipulated_construction"]},
+    "status": {
+      "enum": [
+        "support",
+        "substantive_defeat",
+        "not_established",
+        "record_gap",
+        "conflict"
+      ]
+    },
+    "historicalValue": {
+      "enum": [
+        "authorized_by_fixture_construction",
+        "unauthorized_by_fixture_construction",
+        "not_determined_by_fixture",
+        "contested_in_fixture"
+      ]
+    },
+    "provenanceKind": {
+      "enum": [
+        "machine_derived",
+        "stipulated_construction"
+      ]
+    },
     "basis": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["kind", "derivation_id"],
+      "required": [
+        "kind",
+        "derivation_id"
+      ],
       "properties": {
-        "kind": {"$ref": "#/$defs/provenanceKind"},
-        "derivation_id": {"oneOf": [{"type": "null"}, {"type": "string", "minLength": 1}]}
+        "kind": {
+          "$ref": "#/$defs/provenanceKind"
+        },
+        "derivation_id": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        }
       },
       "allOf": [
-        {"if": {"properties": {"kind": {"const": "machine_derived"}}}, "then": {"properties": {"derivation_id": {"type": "string", "minLength": 1}}}},
-        {"if": {"properties": {"kind": {"const": "stipulated_construction"}}}, "then": {"properties": {"derivation_id": {"type": "null"}}}}
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "machine_derived"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "derivation_id": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "stipulated_construction"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "derivation_id": {
+                "type": "null"
+              }
+            }
+          }
+        }
       ]
     },
     "constructionFact": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["fact_id", "kind", "statement", "derivation_id", "expected_value"],
+      "required": [
+        "fact_id",
+        "kind",
+        "statement",
+        "derivation_id",
+        "expected_value"
+      ],
       "properties": {
-        "fact_id": {"type": "string", "pattern": "^[A-Z0-9_-]+$"},
-        "kind": {"$ref": "#/$defs/provenanceKind"},
-        "statement": {"type": "string", "minLength": 1},
-        "derivation_id": {"oneOf": [{"type": "null"}, {"type": "string", "minLength": 1}]},
+        "fact_id": {
+          "type": "string",
+          "pattern": "^[A-Z0-9_-]+$"
+        },
+        "kind": {
+          "$ref": "#/$defs/provenanceKind"
+        },
+        "statement": {
+          "type": "string",
+          "minLength": 1
+        },
+        "derivation_id": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
         "expected_value": {}
       },
       "allOf": [
-        {"if": {"properties": {"kind": {"const": "machine_derived"}}}, "then": {"properties": {"derivation_id": {"type": "string", "minLength": 1}, "expected_value": {"not": {"type": "null"}}}}},
-        {"if": {"properties": {"kind": {"const": "stipulated_construction"}}}, "then": {"properties": {"derivation_id": {"type": "null"}, "expected_value": {"type": "null"}}}}
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "machine_derived"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "derivation_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "expected_value": {
+                "not": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "stipulated_construction"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "derivation_id": {
+                "type": "null"
+              },
+              "expected_value": {
+                "type": "null"
+              }
+            }
+          }
+        }
       ]
     },
     "caseKey": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["case_id", "historical_reference_authorization", "historical_reference_basis", "construction_facts", "expected_node_statuses"],
+      "required": [
+        "case_id",
+        "historical_reference_authorization",
+        "historical_reference_basis",
+        "construction_facts",
+        "expected_node_statuses",
+        "expected_entity_node_statuses",
+        "expected_conjunction_resolution"
+      ],
       "properties": {
-        "case_id": {"type": "string", "pattern": "^EA-MC-[0-9]{3}$"},
-        "historical_reference_authorization": {"$ref": "#/$defs/historicalValue"},
-        "historical_reference_basis": {"$ref": "#/$defs/basis"},
-        "construction_facts": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/constructionFact"}},
-        "expected_node_statuses": {"type": "object", "minProperties": 1, "additionalProperties": {"$ref": "#/$defs/status"}}
+        "case_id": {
+          "type": "string",
+          "pattern": "^EA-MC-[0-9]{3}$"
+        },
+        "historical_reference_authorization": {
+          "$ref": "#/$defs/historicalValue"
+        },
+        "historical_reference_basis": {
+          "$ref": "#/$defs/basis"
+        },
+        "construction_facts": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/constructionFact"
+          }
+        },
+        "expected_node_statuses": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "$ref": "#/$defs/status"
+          }
+        },
+        "expected_entity_node_statuses": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "J_B",
+            "J_C"
+          ],
+          "properties": {
+            "J_B": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/entityNodeStatuses"
+              }
+            },
+            "J_C": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/entityNodeStatuses"
+              }
+            }
+          }
+        },
+        "expected_conjunction_resolution": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "J_B",
+            "J_C"
+          ],
+          "properties": {
+            "J_B": {
+              "$ref": "#/$defs/conjunctionResolution"
+            },
+            "J_C": {
+              "$ref": "#/$defs/conjunctionResolution"
+            }
+          }
+        }
+      }
+    },
+    "entityNodeStatuses": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "entity_id",
+        "node_statuses"
+      ],
+      "properties": {
+        "entity_id": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "node_statuses": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "$ref": "#/$defs/status"
+          }
+        }
+      }
+    },
+    "conjunctionResolution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "satisfied",
+        "satisfying_entity_ids",
+        "reason"
+      ],
+      "properties": {
+        "satisfied": {
+          "type": "boolean"
+        },
+        "satisfying_entity_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
       }
     }
   }

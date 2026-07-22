@@ -5,104 +5,398 @@
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "schema_version", "map_id", "map_version", "claim_graph_version", "frozen_at",
-    "fixed_before_review", "authorization_regime_R", "adjudicating_review_forum_F_review",
-    "evidential_standard_rho", "burden_allocation_b", "action_classifier",
-    "applicability_semantics", "action_classes", "declared_uses", "domain_forum_modules"
+    "schema_version",
+    "map_id",
+    "map_version",
+    "claim_graph_version",
+    "frozen_at",
+    "fixed_before_review",
+    "authorization_regime_R",
+    "adjudicating_review_forum_F_review",
+    "evidential_standard_rho",
+    "burden_allocation_b",
+    "action_classifier",
+    "applicability_semantics",
+    "action_classes",
+    "declared_uses",
+    "domain_forum_modules",
+    "entity_indexing"
   ],
   "properties": {
-    "schema_version": {"const": "2.0.0"},
-    "map_id": {"type": "string"},
-    "map_version": {"type": "string"},
-    "claim_graph_version": {"const": "2.0.0"},
-    "frozen_at": {"type": "string", "format": "date-time"},
-    "fixed_before_review": {"const": true},
-    "authorization_regime_R": {"$ref": "#/$defs/binding"},
+    "schema_version": {
+      "const": "3.0.0"
+    },
+    "map_id": {
+      "type": "string"
+    },
+    "map_version": {
+      "type": "string"
+    },
+    "claim_graph_version": {
+      "const": "3.0.0"
+    },
+    "frozen_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "fixed_before_review": {
+      "const": true
+    },
+    "authorization_regime_R": {
+      "$ref": "#/$defs/binding"
+    },
     "adjudicating_review_forum_F_review": {
-      "type": "object", "additionalProperties": false,
-      "required": ["id", "version", "role"],
-      "properties": {"id": {"type": "string"}, "version": {"type": "string"}, "role": {"type": "string"}}
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "version",
+        "role"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string"
+        }
+      }
     },
-    "evidential_standard_rho": {"$ref": "#/$defs/nonemptyObject"},
-    "burden_allocation_b": {"$ref": "#/$defs/nonemptyObject"},
-    "action_classifier": {"$ref": "#/$defs/binding"},
+    "evidential_standard_rho": {
+      "$ref": "#/$defs/nonemptyObject"
+    },
+    "burden_allocation_b": {
+      "$ref": "#/$defs/nonemptyObject"
+    },
+    "action_classifier": {
+      "$ref": "#/$defs/binding"
+    },
     "applicability_semantics": {
-      "type": "object", "additionalProperties": false,
-      "required": ["required", "optional", "not_applicable"],
-      "properties": {"required": {"type": "string"}, "optional": {"type": "string"}, "not_applicable": {"type": "string"}}
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "required",
+        "optional",
+        "not_applicable"
+      ],
+      "properties": {
+        "required": {
+          "type": "string"
+        },
+        "optional": {
+          "type": "string"
+        },
+        "not_applicable": {
+          "type": "string"
+        }
+      }
     },
-    "action_classes": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/actionClass"}},
-    "declared_uses": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/declaredUse"}},
-    "domain_forum_modules": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/module"}}
+    "action_classes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/actionClass"
+      }
+    },
+    "declared_uses": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/declaredUse"
+      }
+    },
+    "domain_forum_modules": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/module"
+      }
+    },
+    "entity_indexing": {
+      "$ref": "#/$defs/nonemptyObject"
+    }
   },
   "$defs": {
-    "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
-    "binding": {
-      "type": "object", "additionalProperties": false,
-      "required": ["id", "version", "path", "sha256"],
-      "properties": {"id": {"type": "string"}, "version": {"type": "string"}, "path": {"type": "string"}, "sha256": {"$ref": "#/$defs/sha256"}}
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
     },
-    "nonemptyObject": {"type": "object", "minProperties": 1},
-    "actionClass": {
-      "type": "object", "additionalProperties": false,
-      "required": ["action_class", "module_id", "required_nodes", "optional_nodes", "not_applicable_nodes", "fixed_reason"],
+    "binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "version",
+        "path",
+        "sha256"
+      ],
       "properties": {
-        "action_class": {"type": "string"}, "module_id": {"type": "string"},
-        "required_nodes": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
-        "optional_nodes": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
-        "not_applicable_nodes": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
-        "fixed_reason": {"type": "string"}
+        "id": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "nonemptyObject": {
+      "type": "object",
+      "minProperties": 1
+    },
+    "actionClass": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action_class",
+        "module_id",
+        "required_nodes",
+        "optional_nodes",
+        "not_applicable_nodes",
+        "fixed_reason"
+      ],
+      "properties": {
+        "action_class": {
+          "type": "string"
+        },
+        "module_id": {
+          "type": "string"
+        },
+        "required_nodes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "optional_nodes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "not_applicable_nodes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "fixed_reason": {
+          "type": "string"
+        }
       }
     },
     "tolerances": {
-      "type": "object", "additionalProperties": false,
-      "required": ["false_support_rate_max", "false_defeat_rate_max", "gap_defeat_confusion_rate_max", "required_node_omission_rate_max", "median_review_minutes_max", "privacy_or_security_breach_count_max"],
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "false_support_rate_max",
+        "false_defeat_rate_max",
+        "gap_defeat_confusion_rate_max",
+        "required_node_omission_rate_max",
+        "median_review_minutes_max",
+        "privacy_or_security_breach_count_max",
+        "gap_insufficiency_confusion_rate_max",
+        "entity_conjunction_error_rate_max"
+      ],
       "properties": {
-        "false_support_rate_max": {"type": "number", "minimum": 0, "maximum": 1},
-        "false_defeat_rate_max": {"type": "number", "minimum": 0, "maximum": 1},
-        "gap_defeat_confusion_rate_max": {"type": "number", "minimum": 0, "maximum": 1},
-        "required_node_omission_rate_max": {"type": "number", "minimum": 0, "maximum": 1},
-        "median_review_minutes_max": {"type": "number", "minimum": 0},
-        "privacy_or_security_breach_count_max": {"type": "integer", "minimum": 0}
+        "false_support_rate_max": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "false_defeat_rate_max": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "gap_defeat_confusion_rate_max": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "required_node_omission_rate_max": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "median_review_minutes_max": {
+          "type": "number",
+          "minimum": 0
+        },
+        "privacy_or_security_breach_count_max": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "gap_insufficiency_confusion_rate_max": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "entity_conjunction_error_rate_max": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
       }
     },
     "minimumReachThresholds": {
-      "type": "object", "additionalProperties": false,
-      "required": ["distinct_cases_per_action_class_min", "genuine_responses_per_action_class_min", "distinct_reviewers_per_action_class_min", "reviewers_per_case_min"],
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "distinct_cases_per_action_class_min",
+        "genuine_responses_per_action_class_min",
+        "distinct_reviewers_per_action_class_min",
+        "reviewers_per_case_min"
+      ],
       "properties": {
-        "distinct_cases_per_action_class_min": {"type": "integer", "minimum": 2},
-        "genuine_responses_per_action_class_min": {"type": "integer", "minimum": 2},
-        "distinct_reviewers_per_action_class_min": {"type": "integer", "minimum": 2},
-        "reviewers_per_case_min": {"type": "integer", "minimum": 2}
+        "distinct_cases_per_action_class_min": {
+          "type": "integer",
+          "minimum": 2
+        },
+        "genuine_responses_per_action_class_min": {
+          "type": "integer",
+          "minimum": 2
+        },
+        "distinct_reviewers_per_action_class_min": {
+          "type": "integer",
+          "minimum": 2
+        },
+        "reviewers_per_case_min": {
+          "type": "integer",
+          "minimum": 2
+        }
       }
     },
     "declaredUse": {
-      "type": "object", "additionalProperties": false,
-      "required": ["use_id", "intended_use", "action_classes", "minimum_useful_reach", "minimum_reach_thresholds", "required_coverage_tags", "required_controlled_pair_ids", "tolerances", "failure_rule", "separately_predeclared_narrower_use_ids", "independent_retest_required", "scalar_aggregation_permitted"],
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "use_id",
+        "intended_use",
+        "action_classes",
+        "minimum_useful_reach",
+        "minimum_reach_thresholds",
+        "required_coverage_tags",
+        "required_controlled_pair_ids",
+        "tolerances",
+        "failure_rule",
+        "separately_predeclared_narrower_use_ids",
+        "independent_retest_required",
+        "scalar_aggregation_permitted"
+      ],
       "properties": {
-        "use_id": {"type": "string"}, "intended_use": {"type": "string"},
-        "action_classes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}},
-        "minimum_useful_reach": {"type": "string"},
-        "minimum_reach_thresholds": {"$ref": "#/$defs/minimumReachThresholds"},
-        "required_coverage_tags": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
-        "required_controlled_pair_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
-        "tolerances": {"$ref": "#/$defs/tolerances"},
-        "failure_rule": {"type": "string"},
-        "separately_predeclared_narrower_use_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
-        "independent_retest_required": {"const": true}, "scalar_aggregation_permitted": {"const": false}
+        "use_id": {
+          "type": "string"
+        },
+        "intended_use": {
+          "type": "string"
+        },
+        "action_classes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "minimum_useful_reach": {
+          "type": "string"
+        },
+        "minimum_reach_thresholds": {
+          "$ref": "#/$defs/minimumReachThresholds"
+        },
+        "required_coverage_tags": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required_controlled_pair_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "tolerances": {
+          "$ref": "#/$defs/tolerances"
+        },
+        "failure_rule": {
+          "type": "string"
+        },
+        "separately_predeclared_narrower_use_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "independent_retest_required": {
+          "const": true
+        },
+        "scalar_aggregation_permitted": {
+          "const": false
+        }
       }
     },
     "module": {
-      "type": "object", "additionalProperties": false,
-      "required": ["module_id", "version", "scope", "expected_evidence_slots", "required_object_forum_powers", "comparability_status"],
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "module_id",
+        "version",
+        "scope",
+        "expected_evidence_slots",
+        "required_object_forum_powers",
+        "comparability_status"
+      ],
       "properties": {
-        "module_id": {"type": "string"}, "version": {"type": "string"}, "scope": {"type": "string"},
+        "module_id": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "scope": {
+          "type": "string"
+        },
         "expected_evidence_slots": {
           "description": "Review functions for which the record inventory must declare present, contested, or searched-and-missing evidence; these are not concrete record types.",
-          "type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
         },
-        "required_object_forum_powers": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
-        "comparability_status": {"enum": ["untested", "supported_for_declared_use", "not_comparable"]}
+        "required_object_forum_powers": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "comparability_status": {
+          "enum": [
+            "untested",
+            "supported_for_declared_use",
+            "not_comparable"
+          ]
+        }
       }
     }
   }

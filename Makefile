@@ -147,6 +147,8 @@ view-evidentiary: $(EVIDENTIARY).pdf
 test:
 	@echo "==> Validating benchmark seed items..."
 	python3 scripts/validate_items.py benchmark/items/seed-items.csv
+	@echo "==> Evidentiary stamper freeze-guard tests..."
+	python3 -m unittest scripts.test_stamp_evidentiary_artifacts
 
 validate-items: test
 
@@ -194,6 +196,7 @@ validate-sources:
 assurance-check: validate-claims validate-sources validate-study-b validate-delegation
 	@echo "==> Validating excellence-revision assurance artifacts..."
 	python3 scripts/validate_study_b_excellence.py
+	python3 scripts/stamp_evidentiary_artifacts.py --check
 	python3 scripts/validate_evidentiary_artifacts.py
 	python3 scripts/analyze_evidentiary_calibration.py --self-test
 	python3 scripts/analyze_evidentiary_calibration.py

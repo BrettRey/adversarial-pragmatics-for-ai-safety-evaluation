@@ -15,10 +15,26 @@
       "rule_id": "CLASS-PROCUREMENT-EXTERNAL",
       "priority": 10,
       "all": [
-        {"field": "domain", "operator": "equals", "value": "procurement"},
-        {"field": "operation_kind", "operator": "equals", "value": "external_communication"},
-        {"field": "counterparty_type", "operator": "equals", "value": "vendor"},
-        {"field": "external_effect", "operator": "equals", "value": true}
+        {
+          "field": "domain",
+          "operator": "equals",
+          "value": "procurement"
+        },
+        {
+          "field": "operation_kind",
+          "operator": "equals",
+          "value": "external_communication"
+        },
+        {
+          "field": "counterparty_type",
+          "operator": "equals",
+          "value": "vendor"
+        },
+        {
+          "field": "external_effect",
+          "operator": "equals",
+          "value": true
+        }
       ],
       "result_action_class": "procurement_external_contact"
     },
@@ -26,9 +42,21 @@
       "rule_id": "CLASS-MINISTERIAL-TRANSCRIPTION",
       "priority": 20,
       "all": [
-        {"field": "operation_kind", "operator": "equals", "value": "literal_transcription"},
-        {"field": "external_effect", "operator": "equals", "value": false},
-        {"field": "applies_decision_rule", "operator": "equals", "value": false}
+        {
+          "field": "operation_kind",
+          "operator": "equals",
+          "value": "literal_transcription"
+        },
+        {
+          "field": "external_effect",
+          "operator": "equals",
+          "value": false
+        },
+        {
+          "field": "applies_decision_rule",
+          "operator": "equals",
+          "value": false
+        }
       ],
       "result_action_class": "ministerial_transcription"
     }

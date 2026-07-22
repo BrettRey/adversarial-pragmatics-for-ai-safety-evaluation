@@ -1,8 +1,36 @@
 {
-  "schema_version": "2.0.0", "bundle_id": "EA-EB-016", "case_id": "EA-MC-016", "claim_graph_version": "2.0.0", "declared_use_id": "ea-node-calibration-two-class-v1",
-  "map_binding": {"id": "ea-demo-applicability", "version": "2.0.0", "path": "applicability-map.json", "sha256": "355021bbb8ee6432171c31842a78fddb2b91f01736c2a509d3f260ab5a4bbeb3"},
-  "classifier_binding": {"id": "ea-action-classifier", "version": "1.0.0", "path": "action-classifier.json", "sha256": "77a0303b43ff7c9174079d81f07f5d64b8647f7d9ea3eab96be143cf5ec3a9dc"},
-  "regime_binding": {"id": "ea-stipulated-demo-regime", "version": "2.0.0", "path": "authorization-regime.json", "sha256": "7b181a9e01243567d08f8459cebef5b39eee220f408beed91267d63ad187d39d"},
-  "review_timing": {"review_opened_at": "2026-07-21T10:00:00Z", "reference_key_unblinding_not_before": "2026-08-15T00:00:00Z"},
-  "target_binding": {"path": "records/EA-MC-016-records.json", "sha256": "75b5f5bb717832d2227b01bcafe18cbe1a211ec27dfcbc7e08e252027072c482", "action_sha256": "30ae69d712b59a7ae5f99d4518db6a8e288e9d2d670af908b52a39b09c277f0f", "asserted_action_class": "ministerial_transcription", "classification_rule_id": "CLASS-MINISTERIAL-TRANSCRIPTION"}
+  "schema_version": "3.0.0",
+  "bundle_id": "EA-EB-016",
+  "case_id": "EA-MC-016",
+  "claim_graph_version": "3.0.0",
+  "declared_use_id": "ea-node-calibration-two-class-v1",
+  "map_binding": {
+    "id": "ea-demo-applicability",
+    "version": "3.0.0",
+    "path": "applicability-map.json",
+    "sha256": "34f9d5885105830b27124dfc17e0a47e4b82f7307485b646b6797b83fabc98ad"
+  },
+  "classifier_binding": {
+    "id": "ea-action-classifier",
+    "version": "1.0.0",
+    "path": "action-classifier.json",
+    "sha256": "c53ad72f01d0d490b53f71237eebff4e4a01078b3b22f414dd22f0c9d57f4174"
+  },
+  "regime_binding": {
+    "id": "ea-stipulated-demo-regime",
+    "version": "2.0.0",
+    "path": "authorization-regime.json",
+    "sha256": "b5df8d9dd3e34917e9be9c90cd3a2f8f23413bd34356b064e9b61cbe34b5e719"
+  },
+  "review_timing": {
+    "review_opened_at": "2026-07-21T10:00:00Z",
+    "reference_key_unblinding_not_before": "2026-08-15T00:00:00Z"
+  },
+  "target_binding": {
+    "path": "records/EA-MC-016-records.json",
+    "sha256": "5b7b42510b0652f72325d69f48cebe62dcd15d8c095de746038d53365e4e2228",
+    "action_sha256": "30ae69d712b59a7ae5f99d4518db6a8e288e9d2d670af908b52a39b09c277f0f",
+    "asserted_action_class": "ministerial_transcription",
+    "classification_rule_id": "CLASS-MINISTERIAL-TRANSCRIPTION"
+  }
 }
