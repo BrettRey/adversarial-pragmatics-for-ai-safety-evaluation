@@ -30,7 +30,7 @@ The figure is a review architecture rather than an assurance case in the sense o
 \node[rail, fill=black!3] at (-2.6,1.35) (authorization) {Authorization conditions: source, delegability, scope, predicates, procedure};
 \node[rail, fill=black!3] at (-2.6,0.45) (reconstruction) {Record reconstruction: identity, authenticity, integrity, completeness, custody, access};
 \node[rail, fill=black!3] at (-2.6,-0.45) (bearer) {Answerability bearer: identity, duty, interval, succession, reachability};
-\node[rail, fill=black!3] at (-2.6,-1.35) (forum) {Object-level contestability: access, competence, independence, remedies};
+\node[rail, fill=black!3] at (-2.6,-1.35) (forum) {Object-forum capacity: access, competence, independence, remedies};
 \node[claim] at (3.55,1.35) (ja) {\(J_A\): evidence-relative authorization verdicts};
 \node[claim] at (3.55,0.45) (jr) {\(J_R\): record-adequacy verdicts};
 \node[claim] at (3.55,-0.45) (jb) {\(J_B\): identity, duty, and reachability verdicts};
@@ -42,7 +42,7 @@ The figure is a review architecture rather than an assurance case in the sense o
 \draw[arrow] (bearer.east) -- (jb.west);
 \draw[arrow] (forum.east) -- (jc.west);
 \end{tikzpicture}
-\caption{Typed review architecture. Arrows mean evidentiary bearing, not causal influence, temporal order, or logical identity with the underlying authorization proposition. The bearer and forum rails are evaluated of each named candidate separately.}
+\caption{Typed review architecture. Arrows mean evidentiary bearing, not causal influence, temporal order, or logical identity with the underlying authorization proposition. The bearer and forum rails are evaluated for each named candidate separately.}
 \label{fig:evidence-rail}
 \end{figure}
 

@@ -1,8 +1,10 @@
 \appendix
-\section{A Fixture in Full}
+\section{An Exposed Demonstration Fixture}
 \label{sec:appendix-fixture}
 
-Fixture \texttt{EA-MC-019} as released, in human-readable form. This is the split-bearer case: every required \(J_B\) node is supported by some candidate, and no single candidate carries the family. Values below are transcribed from \path{matched-cases/records/EA-MC-019-records.json}, \path{matched-cases/bundles/EA-EB-019.json}, and the hidden key; the reference statuses are withheld from reviewers until the declared boundary.
+This is a summary of fixture \texttt{EA-MC-019}, not a full transcription: it gives the parameters, the evidence inventory, the registry fields that carry the contrast, and the reference verdicts, but not the complete contents of every record. The full JSON is in the repository at \path{matched-cases/records/EA-MC-019-records.json} and \path{matched-cases/bundles/EA-EB-019.json}.
+
+Publishing the reference verdicts below spends the case. Any reviewer who has read this paper knows its key, so \texttt{EA-MC-019} is designated permanently as an \term{exposed demonstration} fixture: the manifest marks it, the validator excludes it from the coverage any declared use requires, and the analyser drops responses on it before computing coverage or reach. \texttt{EA-MC-023} carries the same construct with different offices and is held blinded for calibration. A worked example that could still be used as a test would be a worked example nobody should trust.
 
 \paragraph{Parameters, fixed before the record is opened.}
 Regime \texttt{ea-stipulated-demo-regime} v2.0.0; applicability map \texttt{ea-demo-applicability} v3.0.0; classifier \texttt{ea-action-classifier} v1.0.0; declared use \texttt{ea-node-calibration-two-class-v1}. The action's classification fields are domain \texttt{procurement}, operation kind \texttt{external\_communication}, counterparty \texttt{vendor}, external effect true, applies decision rule true. The frozen classifier maps these by rule \texttt{CLASS-PROCUREMENT-EXTERNAL} to action class \texttt{procurement\_external\_contact}, for which the map fixes all sixteen nodes as required, none optional and none inapplicable. Map, classifier, regime, record set, action object, and hidden key are all hash-bound in the bundle.

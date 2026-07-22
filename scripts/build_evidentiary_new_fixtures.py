@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Author the four fixtures that exercise entity indexing and the gap/insufficiency split.
+"""Author the five fixtures that exercise entity indexing and the gap/insufficiency split.
 
 EA-MC-019  a split answerability bearer: every J_B node is supported by some
            candidate, and no single candidate carries the whole conjunction.
@@ -9,10 +9,13 @@ EA-MC-021  a delegability clause that was not preserved in reviewable form, so
 EA-MC-022  the identical bundle with the clause fully preserved and authentic,
            but genuinely ambiguous as to this action class: not_established.
 
+EA-MC-023  a blinded twin of 019, since 019 is reproduced in the paper and is
+           therefore permanently unusable for a blinded calibration.
+
 021 and 022 form a controlled pair whose records differ in exactly one field, so
 the contrast isolates adequacy of the record from adequacy of the showing.
 
-This script is idempotent: rerunning it rewrites the same four cases.
+This script is idempotent: rerunning it rewrites the same five cases.
 """
 
 from __future__ import annotations
@@ -311,6 +314,46 @@ def main() -> int:
         },
     }
 
+    # --- 023: blinded split-bearer twin of the exposed demonstration case ----
+    # EA-MC-019 is published in the paper, so it can never serve a blinded use.
+    # This carries the same construct with different offices and failure reasons.
+    twin_bearers = [
+        {**whole_bearer("BEARER-1", "CATEGORY-MANAGER"), "successor": None, "contact_route": None},
+        {**whole_bearer("BEARER-2", "VENDOR-HELPDESK"), "duty_source": None},
+    ]
+    recs = common_records(23, CLEAR_CLAUSE) + [
+        record("R023-BEARER", "bearer_registry", "Answerability bearers",
+               {"candidates": twin_bearers}, "synthetic duty registry"),
+        record("R023-FORUM", "remedy_forum_registry", "Object-level remedy forum",
+               {"candidates": [whole_forum("FORUM-1", "PROCUREMENT-REVIEW-OFFICE")]},
+               "synthetic forum registry"),
+    ]
+    cases[23] = build_case(23, recs, 14)
+    keys[23] = {
+        "case_id": "EA-MC-023",
+        "historical_reference_authorization": "not_determined_by_fixture",
+        "historical_reference_basis": {"kind": "stipulated_construction", "derivation_id": None},
+        "construction_facts": [{
+            "fact_id": "MC023_BEARER_SPLIT", "kind": "machine_derived",
+            "statement": "No single candidate bearer carries identity, duty, and reachability together.",
+            "derivation_id": "no_single_bearer_satisfies_conjunction", "expected_value": True,
+        }],
+        "expected_node_statuses": {**A_SUPPORT, **R_SUPPORT},
+        "expected_entity_node_statuses": {
+            "J_B": [
+                {"entity_id": "BEARER-1", "node_statuses": {**B_WHOLE, "B_REACHABILITY": "record_gap"}},
+                {"entity_id": "BEARER-2", "node_statuses": {**B_WHOLE, "B_DUTY": "record_gap"}},
+            ],
+            "J_C": [{"entity_id": "FORUM-1", "node_statuses": dict(C_WHOLE)}],
+        },
+        "expected_conjunction_resolution": {
+            "J_B": {"satisfied": False, "satisfying_entity_ids": [],
+                    "reason": "no single candidate satisfies every required J_B node"},
+            "J_C": {"satisfied": True, "satisfying_entity_ids": ["FORUM-1"],
+                    "reason": "candidate FORUM-1 satisfies every required J_C node"},
+        },
+    }
+
     # --- 021 / 022: gap versus insufficiency, isolated at A_DELEGABILITY ------
     for n, clause, status, fact_id, derivation, statement in (
         (21, UNRECOVERABLE_CLAUSE, "record_gap", "MC021_CLAUSE_UNRECOVERABLE",
@@ -363,16 +406,19 @@ def main() -> int:
     manifest_path = MC / "case-manifest.json"
     manifest = json.loads(manifest_path.read_text())
     entries = {
-        19: ("procurement_bearer_conjunction_split", None),
-        20: ("procurement_forum_conjunction_split", None),
-        21: ("procurement_gap_insufficiency_contrast", "EA-PAIR-06-GAP-INSUFFICIENCY"),
-        22: ("procurement_gap_insufficiency_contrast", "EA-PAIR-06-GAP-INSUFFICIENCY"),
+        # EA-MC-019 is reproduced in the paper, so it is permanently exposed.
+        19: ("procurement_bearer_conjunction_split", None, "exposed_demonstration"),
+        20: ("procurement_forum_conjunction_split", None, "blinded"),
+        21: ("procurement_gap_insufficiency_contrast", "EA-PAIR-06-GAP-INSUFFICIENCY", "blinded"),
+        22: ("procurement_gap_insufficiency_contrast", "EA-PAIR-06-GAP-INSUFFICIENCY", "blinded"),
+        23: ("procurement_bearer_conjunction_split", None, "blinded"),
     }
     manifest["cases"] = [c for c in manifest["cases"] if c["case_id"] not in
                          {f"EA-MC-{n:03d}" for n in entries}]
-    for n, (tag, pair_id) in entries.items():
+    for n, (tag, pair_id, exposure) in entries.items():
         manifest["cases"].append({
             "case_id": f"EA-MC-{n:03d}", "pair_id": pair_id, "coverage_tags": [tag],
+            "exposure": exposure,
             "bundle": f"bundles/EA-EB-{n:03d}.json", "bundle_sha256": "0" * 64,
         })
     manifest["cases"].sort(key=lambda c: c["case_id"])

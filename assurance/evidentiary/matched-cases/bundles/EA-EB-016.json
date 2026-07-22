@@ -8,7 +8,7 @@
     "id": "ea-demo-applicability",
     "version": "3.0.0",
     "path": "applicability-map.json",
-    "sha256": "34f9d5885105830b27124dfc17e0a47e4b82f7307485b646b6797b83fabc98ad"
+    "sha256": "e16fb47f0f7c4634dc9ecf265653793404113b9782e4799c45693e699dc902b4"
   },
   "classifier_binding": {
     "id": "ea-action-classifier",

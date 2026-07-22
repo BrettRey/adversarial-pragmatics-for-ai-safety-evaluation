@@ -20,6 +20,12 @@ exactly one verdict:
 - **conflict**: material supporting and defeating records remain unresolved
   under the conflict rule.
 
+Apply these in order. Ask first whether the material you may consider lets you
+reach the merits of the node. If it does not, the status is **record gap**. If it
+does, exactly one of the other four applies. A record that was required but never
+created is a gap at the record-adequacy node; it does not stop you reaching the
+merits elsewhere when other evidence does.
+
 The gap/not-established boundary matters because the two call for different
 responses. A gap names material to preserve or produce; not established says the
 record was there and the case still was not made. Ask whether you were unable to
@@ -38,8 +44,8 @@ metadata are evidence to assess, not pre-entered node verdicts.
 
 ## Bearer and forum nodes are about a named candidate
 
-Every `B_` node is evaluated of a particular candidate answerability bearer, and
-every `C_` node of a particular object-level forum, as listed in the case's
+Every `B_` node is evaluated for a particular candidate answerability bearer, and
+every `C_` node for a particular object-level forum, as listed in the case's
 bearer or forum registry. Enter one verdict per candidate per required node and
 name the candidate in `entity_id`. Where the registry names no candidate at all,
 enter the verdict with a null `entity_id`.
@@ -79,6 +85,13 @@ declared boundary. After that time, the opening event is recorded in a separate
 record names the committed key hash and does not modify the key. The analyzer
 will not compare responses with the key without a valid post-boundary opening
 record.
+
+Cases are marked `blinded` or `exposed_demonstration` in the manifest. An exposed
+case has had its reference verdicts published, so any reviewer who has read the
+paper already knows its key. `EA-MC-019` is exposed for that reason and is
+excluded from every declared use: the validator will not let it satisfy required
+coverage, and the analyser drops responses on it before computing coverage or
+reach. `EA-MC-023` carries the same construct and is held blinded.
 
 Each declared use also fixes numeric minimum reach: at least four distinct
 cases, twelve genuine responses, and three distinct reviewers per action

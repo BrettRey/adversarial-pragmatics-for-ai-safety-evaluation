@@ -299,7 +299,12 @@ def coverage_reach_result(
     use: dict[str, Any],
     case_metadata: dict[str, dict[str, Any]],
 ) -> dict[str, Any]:
-    observed_case_ids = {response["case_id"] for response in responses}
+    # Responses on an exposed demonstration fixture cannot evidence a blinded
+    # use; they are dropped before coverage and reach are computed.
+    observed_case_ids = {
+        response["case_id"] for response in responses
+        if case_metadata.get(response["case_id"], {}).get("exposure") != "exposed_demonstration"
+    }
     observed_tags = {
         tag
         for case_id in observed_case_ids
@@ -309,6 +314,8 @@ def coverage_reach_result(
     missing_tags = sorted(required_tags - observed_tags)
     reviewers_by_case: dict[str, set[str]] = defaultdict(set)
     for response in responses:
+        if case_metadata.get(response["case_id"], {}).get("exposure") == "exposed_demonstration":
+            continue
         reviewers_by_case[response["case_id"]].add(response["pseudonymous_reviewer_id"])
     reviewer_minimum = use["minimum_reach_thresholds"]["reviewers_per_case_min"]
     pair_results: dict[str, Any] = {}
@@ -942,6 +949,7 @@ def main() -> int:
                 case["case_id"]: {
                     "coverage_tags": case["coverage_tags"],
                     "pair_id": case.get("pair_id"),
+                    "exposure": case.get("exposure", "blinded"),
                 }
                 for case in manifest["cases"]
             }

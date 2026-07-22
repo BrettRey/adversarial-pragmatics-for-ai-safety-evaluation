@@ -34,6 +34,9 @@ EXPECTED_APPLICABILITY = {"required", "optional", "not_applicable"}
 # Families whose nodes are evaluated of a named candidate entity rather than globally.
 ENTITY_INDEXED_FAMILIES = {"J_B", "J_C"}
 EXPECTED_ORIGINS = {"action_contemporaneous", "review_obtained", "external_later"}
+# A fixture whose reference key has been published (for example in the paper)
+# can never again serve a blinded use: any reviewer who read it knows the answer.
+EXPECTED_EXPOSURE = {"blinded", "exposed_demonstration"}
 FORBIDDEN_VISIBLE_KEYS = {
     "asserted_effect",
     "expected_node_statuses",
@@ -940,13 +943,19 @@ def validate_manifest_coverage(
         tags = case.get("coverage_tags")
         if not isinstance(tags, list) or not tags or len(tags) != len(set(tags)):
             fail("COVERAGE_TAG", f"{case['case_id']}: coverage tags must be a nonempty unique list")
+        if case.get("exposure") not in EXPECTED_EXPOSURE:
+            fail("EXPOSURE", f"{case['case_id']}: must declare exposure as blinded or exposed_demonstration")
         if case.get("pair_id") is not None:
             pairs[case["pair_id"]].add(case["case_id"])
+    exposed = {case_id for case_id, case in cases.items() if case["exposure"] == "exposed_demonstration"}
     for use in applicability["declared_uses"]:
+        # An exposed fixture is excluded from every blinded use, so required
+        # coverage has to be satisfiable without it.
         eligible = {
             case_id
             for case_id, (bundle, _record_set, _record_ids) in bundles.items()
             if bundle["target_binding"]["asserted_action_class"] in use["action_classes"]
+            and case_id not in exposed
         }
         available_tags = {tag for case_id in eligible for tag in cases[case_id]["coverage_tags"]}
         missing_tags = set(use["required_coverage_tags"]) - available_tags

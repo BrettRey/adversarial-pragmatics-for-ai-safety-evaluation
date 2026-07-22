@@ -8,7 +8,7 @@
   "frozen_at": "2026-07-21T09:30:00Z",
   "reference_key_binding": {
     "path": "hidden/reference-keys.json",
-    "sha256": "c4bcebdf2c1a88206eba4717fd2b75b7701c2a6ef15a7cace9c59c9ba19f7e63",
+    "sha256": "0109bf6c91c3ea3d497a592f9db6daf11f6949cf68d99d53f09932c83eed6eef",
     "unblinding_not_before": "2026-08-15T00:00:00Z"
   },
   "cases": [
@@ -19,7 +19,8 @@
         "procurement_scope_defeat"
       ],
       "bundle": "bundles/EA-EB-001.json",
-      "bundle_sha256": "e6c835f3386e0445c365359bb142ae7fe7bf81932f1f8c28f5173de62e6f58b1"
+      "bundle_sha256": "a46ea1952ffb5043b5b22a72a7ab736b6a26ad4b459f8991b60c19b44785f7e9",
+      "exposure": "blinded"
     },
     {
       "case_id": "EA-MC-002",
@@ -28,7 +29,8 @@
         "procurement_selective_record_loss"
       ],
       "bundle": "bundles/EA-EB-002.json",
-      "bundle_sha256": "dac715f78ceedcea18b1b83b986be3262418d9317ba27a06a44467579b3b6089"
+      "bundle_sha256": "9f304e91005473335e9df57de152d62e61ba00a55b1e6889a6876ba222a525fc",
+      "exposure": "blinded"
     },
     {
       "case_id": "EA-MC-003",
@@ -37,7 +39,8 @@
         "procurement_authority_record_gap"
       ],
       "bundle": "bundles/EA-EB-003.json",
-      "bundle_sha256": "837ae37b5bbcd9d6ef3f0c854296ff8411487eea81a067b19af3136a85706557"
+      "bundle_sha256": "cc966d94879c3c2d723a52173bcbb2f025f5ac9306fa3f6a9b0b102fa9ae31c8",
+      "exposure": "blinded"
     },
     {
       "case_id": "EA-MC-004",
@@ -46,7 +49,8 @@
         "procurement_authority_substantive_defeat"
       ],
       "bundle": "bundles/EA-EB-004.json",
-      "bundle_sha256": "6873226780a1e0a9d13302b2fbcde825bfe1ddf86ec4444e9a714fe926b4b6f1"
+      "bundle_sha256": "7af008041a5cae86850c6ed43d4c02e6570ab434a9dc0aa2a79f4e1f10fc2fc8",
+      "exposure": "blinded"
     },
     {
       "case_id": "EA-MC-005",
@@ -55,7 +59,8 @@
         "procurement_object_forum_remedy_defeat"
       ],
       "bundle": "bundles/EA-EB-005.json",
-      "bundle_sha256": "5d2c0bb1e644cdebc419427b47c878780d55a507f916d3923a1e451a665a54eb"
+      "bundle_sha256": "12f9544b341d9b8c52d13ffd1bee55c776071e558c252933b411733af6187f9e",
+      "exposure": "blinded"
     },
     {
       "case_id": "EA-MC-006",
@@ -64,7 +69,8 @@
         "procurement_authority_conflict"
       ],
       "bundle": "bundles/EA-EB-006.json",
-      "bundle_sha256": "95854efdd5fff2f8013eeef2fb430ed1cc976702851ef0dbce3e2c43a3723363"
+      "bundle_sha256": "4b58946ae9a3aac7e3673f2843a0f0ecc2efdf72240f940f82837991c6b5feea",
+      "exposure": "blinded"
     },
     {
       "case_id": "EA-MC-007",
@@ -73,7 +79,8 @@
         "transcription_applicability_semantics"
       ],
       "bundle": "bundles/EA-EB-007.json",
-      "bundle_sha256": "553e09c27e6abe1bba6d38127acb1d6ed7b9cdd4927b831245d9262968c906a0"
+      "bundle_sha256": "8e95f83fc01f4d38543ed37ea501060ab350fae1a9519238fde9d037fa7dff75",
+      "exposure": "blinded"
     },
     {
       "case_id": "EA-MC-008",
@@ -82,7 +89,8 @@
         "procurement_decision_basis_defeat"
       ],
       "bundle": "bundles/EA-EB-008.json",
-      "bundle_sha256": "7f1f153a262a52cbebbe0e5d8730a7235bb708c411265887681f1bd43b7ec318"
+      "bundle_sha256": "8a94cad95cd73d4bbad4a45c0105e225a23bc9f7c668bd817cbb9a80e05442e2",
+      "exposure": "blinded"
     },
     {
       "case_id": "EA-MC-009",
@@ -91,7 +99,8 @@
         "procurement_trajectory_scope_defeat"
       ],
       "bundle": "bundles/EA-EB-009.json",
-      "bundle_sha256": "ccefbedeeb39c5bb83b31656e07e2761a7f5802c40ac95b15913c7220bbe8cff"
+      "bundle_sha256": "693f82664f66c3c37fd80b0aa536638eb812dcfc84b14e8e04076e85941851a9",
+      "exposure": "blinded"
     },
     {
       "case_id": "EA-MC-010",
@@ -100,7 +109,8 @@
         "procurement_bearer_reachability_defeat"
       ],
       "bundle": "bundles/EA-EB-010.json",
-      "bundle_sha256": "214fa8496142f554f242c6fc8a6de5930ee7149b421511ed531297af1c333ef1"
+      "bundle_sha256": "c37ae4b6b46c69354cdc25af2dd811b67f832daef654ec8f2521f0d50eb1b869",
+      "exposure": "blinded"
     },
     {
       "case_id": "EA-MC-013",
@@ -109,7 +119,8 @@
         "transcription_context_standing_contrast"
       ],
       "bundle": "bundles/EA-EB-013.json",
-      "bundle_sha256": "7e8c7c115d1454dedc46963d07697a2517afd6a4d89bb6b353560345639d453d"
+      "bundle_sha256": "88c8e6f42e8effc9ecdbd1189c94830dec7cc7a5d0a3afc14d9241e6d0e4af85",
+      "exposure": "blinded"
     },
     {
       "case_id": "EA-MC-014",
@@ -118,7 +129,8 @@
         "transcription_context_standing_contrast"
       ],
       "bundle": "bundles/EA-EB-014.json",
-      "bundle_sha256": "5cd4e196f073a5748ce7a440adf0ad19a3132d9712292f61fa269f3a66d20e8f"
+      "bundle_sha256": "1d9acb63c1f1eae8fcf7715fe4f09edde5678122d9d9073c56a7e820bd126603",
+      "exposure": "blinded"
     },
     {
       "case_id": "EA-MC-015",
@@ -127,7 +139,8 @@
         "transcription_authenticity_contrast"
       ],
       "bundle": "bundles/EA-EB-015.json",
-      "bundle_sha256": "10e485422f2830383b819e06a03ad0b59a854534f23404397fc9b145782c5e88"
+      "bundle_sha256": "07a94fd2ddf4fe772c0c3c9596367a5fee22de608883ca3060515491c093c9fe",
+      "exposure": "blinded"
     },
     {
       "case_id": "EA-MC-016",
@@ -136,7 +149,8 @@
         "transcription_authenticity_contrast"
       ],
       "bundle": "bundles/EA-EB-016.json",
-      "bundle_sha256": "004dcc55b35a4e11a72765ff4b1f6cee6089543fd790d2cc8e6a97c6f933cd17"
+      "bundle_sha256": "be399f5d61b72219028ace46c1eb838508ecda1eaa31655d0861c21b5ddfdd41",
+      "exposure": "blinded"
     },
     {
       "case_id": "EA-MC-017",
@@ -145,7 +159,8 @@
         "transcription_integrity_contrast"
       ],
       "bundle": "bundles/EA-EB-017.json",
-      "bundle_sha256": "8b45ce55d73147d0fb02a8b09523cbac7580af0ed56e08b0f8f651b4b5a171b0"
+      "bundle_sha256": "19e2e93b1429a05f2ab3febac4878ff59918b8756aec6fbd9b9954717c5ec9e8",
+      "exposure": "blinded"
     },
     {
       "case_id": "EA-MC-018",
@@ -154,7 +169,8 @@
         "transcription_integrity_contrast"
       ],
       "bundle": "bundles/EA-EB-018.json",
-      "bundle_sha256": "79ad93fa3d4fc7299e77a5da973b907eacbad468c554361b11af2e3aee0027cd"
+      "bundle_sha256": "74649e1052697f8a9c1cdbe8c5b9de68999c85f3536f18f51602fbc30550f956",
+      "exposure": "blinded"
     },
     {
       "case_id": "EA-MC-019",
@@ -162,8 +178,9 @@
       "coverage_tags": [
         "procurement_bearer_conjunction_split"
       ],
+      "exposure": "exposed_demonstration",
       "bundle": "bundles/EA-EB-019.json",
-      "bundle_sha256": "c3aff64b8505a0cd40fcaffd8c647302d226c197929c8bb0301ab30adb00d9ae"
+      "bundle_sha256": "59d0d10a303a6d9595f410c05746c28aefa101c43d377644ab0c027eaf510dc8"
     },
     {
       "case_id": "EA-MC-020",
@@ -171,8 +188,9 @@
       "coverage_tags": [
         "procurement_forum_conjunction_split"
       ],
+      "exposure": "blinded",
       "bundle": "bundles/EA-EB-020.json",
-      "bundle_sha256": "05370a65c28c0310dfaee23626d677e343fbf50d44a7c6c1abd67888e157c97a"
+      "bundle_sha256": "3cecdfbde3530e960f4a912277692a1e4703790d2a79c0cbc441922b610ffa0a"
     },
     {
       "case_id": "EA-MC-021",
@@ -180,8 +198,9 @@
       "coverage_tags": [
         "procurement_gap_insufficiency_contrast"
       ],
+      "exposure": "blinded",
       "bundle": "bundles/EA-EB-021.json",
-      "bundle_sha256": "ac4e855b644aba5f074a34b67c3456601fdb2cbd9f0bbe69dbb0fd1b65c6500b"
+      "bundle_sha256": "97a719ca5ce12bb9a6cbf233c0e17b8bde7c0fc136b7440d904b26170ef61b94"
     },
     {
       "case_id": "EA-MC-022",
@@ -189,8 +208,19 @@
       "coverage_tags": [
         "procurement_gap_insufficiency_contrast"
       ],
+      "exposure": "blinded",
       "bundle": "bundles/EA-EB-022.json",
-      "bundle_sha256": "2360f6938490b8a2dc8ac1191c42922e642017a1cbd45244c64ca1caa27a7ea3"
+      "bundle_sha256": "cf76fef3d333b349c7b360b884895db7d8ba2dcd11ddedf4195b7347ff0ef0cf"
+    },
+    {
+      "case_id": "EA-MC-023",
+      "pair_id": null,
+      "coverage_tags": [
+        "procurement_bearer_conjunction_split"
+      ],
+      "exposure": "blinded",
+      "bundle": "bundles/EA-EB-023.json",
+      "bundle_sha256": "407da80ece2748dea8b6cdb790df4028b03500740336ac528e2824bdf066a18c"
     }
   ],
   "negative_fixtures": [

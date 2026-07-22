@@ -306,14 +306,14 @@
       "registry_record_type": "bearer_registry",
       "conjunction_rule": "single_entity",
       "resolution_required": true,
-      "rule": "Every required J_B node is evaluated of each candidate bearer named in the registry. The family is satisfied for a use only if one candidate satisfies the whole required conjunction."
+      "rule": "Every required J_B node is evaluated for each candidate bearer named in the registry. The family is satisfied for a use only if one candidate satisfies the whole required conjunction."
     },
     "J_C": {
       "entity_kind": "object_level_forum",
       "registry_record_type": "remedy_forum_registry",
       "conjunction_rule": "single_entity_or_declared_composite_path",
       "resolution_required": true,
-      "rule": "Every required J_C node is evaluated of each candidate forum. The family is satisfied only if one forum satisfies the whole required conjunction, or a composite review path declared in this map divides those functions among named institutions."
+      "rule": "Every required J_C node is evaluated for each candidate forum. The family is satisfied only if one forum satisfies the whole required conjunction, or a composite review path declared in this map divides those functions among named institutions."
     },
     "composite_review_paths": []
   }

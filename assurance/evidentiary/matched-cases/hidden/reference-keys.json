@@ -1396,6 +1396,79 @@
           "reason": "candidate FORUM-1 satisfies every required J_C node"
         }
       }
+    },
+    {
+      "case_id": "EA-MC-023",
+      "historical_reference_authorization": "not_determined_by_fixture",
+      "historical_reference_basis": {
+        "kind": "stipulated_construction",
+        "derivation_id": null
+      },
+      "construction_facts": [
+        {
+          "fact_id": "MC023_BEARER_SPLIT",
+          "kind": "machine_derived",
+          "statement": "No single candidate bearer carries identity, duty, and reachability together.",
+          "derivation_id": "no_single_bearer_satisfies_conjunction",
+          "expected_value": true
+        }
+      ],
+      "expected_node_statuses": {
+        "A_SOURCE": "support",
+        "A_DELEGABILITY": "support",
+        "A_SCOPE": "support",
+        "A_DECISION_BASIS": "support",
+        "A_PROCEDURE": "support",
+        "R_RUNTIME": "support",
+        "R_CONTEXT": "support",
+        "R_TRAJECTORY": "support",
+        "R_RECORD_QUALITY": "support"
+      },
+      "expected_entity_node_statuses": {
+        "J_B": [
+          {
+            "entity_id": "BEARER-1",
+            "node_statuses": {
+              "B_IDENTITY": "support",
+              "B_DUTY": "support",
+              "B_REACHABILITY": "record_gap"
+            }
+          },
+          {
+            "entity_id": "BEARER-2",
+            "node_statuses": {
+              "B_IDENTITY": "support",
+              "B_DUTY": "record_gap",
+              "B_REACHABILITY": "support"
+            }
+          }
+        ],
+        "J_C": [
+          {
+            "entity_id": "FORUM-1",
+            "node_statuses": {
+              "C_ACCESS": "support",
+              "C_COMPETENCE": "support",
+              "C_INDEPENDENCE": "support",
+              "C_REMEDY": "support"
+            }
+          }
+        ]
+      },
+      "expected_conjunction_resolution": {
+        "J_B": {
+          "satisfied": false,
+          "satisfying_entity_ids": [],
+          "reason": "no single candidate satisfies every required J_B node"
+        },
+        "J_C": {
+          "satisfied": true,
+          "satisfying_entity_ids": [
+            "FORUM-1"
+          ],
+          "reason": "candidate FORUM-1 satisfies every required J_C node"
+        }
+      }
     }
   ]
 }
