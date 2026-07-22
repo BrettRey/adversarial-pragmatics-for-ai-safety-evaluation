@@ -270,6 +270,78 @@ The point of this fake pass is to test whether the planned tables and figures di
 
 \clearpage
 
+\section{Evidence map for the benchmark comparison}
+
+Each non-obvious cell in the comparison table in the main paper is recorded here
+with the basis for its coding, so the interpretive judgments can be checked
+against the cited papers rather than taken on trust. \textbf{Y} = yes,
+\textbf{P} = partial, \textbf{N} = no or not reported. Column keys follow the
+main table: (a) task success scored apart from policy or safety compliance;
+(b) source role and pragmatic status both annotated; (c) expected behaviour
+adjudicated independently of the item author; (d) grader or judge error itself
+measured; (e) nuisance or placebo transformations; (f) transcript-level failure
+attribution; (g) an item may stay unresolved.
+
+\textbf{SEP} \citep{zverev2025separate}. (a) N: reports separation and utility
+scores and states that it doesn't measure whether outputs are correct; there is
+no compliance dimension. (b) P: source role is carried by argument position,
+with the system input treated as instruction and the user input as data, which
+the paper describes as a proxy; pragmatic status isn't annotated. (c) N:
+expected answers are fixed by construction as a single unambiguous word.
+(d) N: scoring is substring match, and its error rate isn't estimated. (e) P:
+four probe positions and two insistence levels are varied, with no placebo
+condition. (g) N: the test is a binary substring check.
+
+\textbf{AgentDojo} \citep{debenedetti2024agentdojo}. (a) Y: benign utility,
+utility under attack, and targeted attack success are separate. (b) P:
+untrusted provenance is built into the environment, but isn't annotated or
+scored as an item property. (c) N: utility and security functions are written
+by the task authors. (d) N: LLM judges are deliberately not used, on the
+grounds that an evaluating model could itself be hijacked, and the deterministic
+graders aren't separately validated. (e) P: each task runs with and without
+injection. (g) N: scoring is a deterministic binary function.
+
+\textbf{IHEval} \citep{zhang2025iheval}. (a) P: baseline task ability is
+separated from hierarchy-following, but not from safety compliance. (b) P:
+source role is annotated across system, user, conversation history, and tool
+inputs; pragmatic status isn't. (c) N: items are model-drafted with author
+review. (d) N: programmatic scoring is treated as removing grader bias, and the
+error-type classifier isn't validated. (e) Y: instruction strictness is varied
+as a factor that shouldn't change the expected answer, alongside aligned and
+reference controls. (f) P: an error-type taxonomy is reported in aggregate and
+isn't validated. (g) N: seeking clarification is explicitly penalised.
+
+\textbf{BIPIA} \citep{yi2025bipia}. (a) P: attack success appears in the model
+table while utility appears only in the defence evaluation. (d) N: scoring
+combines rule-based checks, an LLM judge, and language detection, none of them
+validated against independent labels. (e) P: a no-injection control set exists;
+position is treated as a moderator rather than a nuisance factor.
+
+\textbf{InjecAgent} \citep{zhan2024injecagent}. (a) P: attack success and a
+valid-output rate are reported, while user-task success is assumed rather than
+scored. (b) P: attacker-modifiable field placement and difficulty labels are
+recorded; pragmatic status isn't. (c) N: cases are model-generated with manual
+revision. (d) N: the primary metric has no judge, and the auxiliary classifiers
+aren't validated. (f) P: a valid rate and a refusal-versus-relay sensitivity
+rate decompose the outcome, unvalidated. (g) Y: invalid outputs are excluded on
+the stated ground that they can't be categorized either way, and both
+valid-only and all-cases rates are reported.
+
+\textbf{Tensor Trust} \citep{toyer2023tensor}. (a) Y: hijacking and extraction
+robustness are reported alongside a separate defence-validity check. (b) P:
+message roles are structural and are ablated; pragmatic strategies are recovered
+only by unsupervised topic modelling. (c) P: items are authored by players and
+adjudicated by the researchers using reference models and manual removal, with
+no agreement statistics reported. (d) Y: a labelled detection set is used to
+measure grader accuracy, precision, and recall. (e) P: a defence-validity
+control and a message-role ablation are present; a dummy-text placebo appears
+only in the transfer study. (g) N: ambiguity is removed at construction.
+
+Scale figures are deliberately not tabulated. Two of these papers report
+different dataset sizes across their preprint and published versions, and one
+gives inconsistent tool counts within a single version, so a scale column would
+require version-specific caveats that the comparison doesn't depend on.
+
 \section{Study B decision gates}
 
 These gates are declared in the machine-readable claim register before any production outcome is viewed. The main paper states one of them illustratively; the full set is reproduced here.
@@ -294,5 +366,11 @@ make fake-dev-calibration
 \end{verbatim}
 
 The report, judge-validation, and fake-calibration commands write sanitized aggregate files to \path{benchmark/results/summaries/}. The main paper's pilot table is derived from those summaries, not from \path{~/Downloads} and not from untracked raw output logs.
+
+\clearpage
+\begingroup
+\renewcommand*{\bibfont}{\footnotesize}
+\printbibliography[title={References cited in this supplement}]
+\endgroup
 
 \end{document}

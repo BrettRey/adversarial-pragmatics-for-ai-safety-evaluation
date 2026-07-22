@@ -63,7 +63,7 @@ Item & Pair & Family & Surface & Control dimension & Response act & Status \\
 
 Each item records the control dimension, context source, source role, authority level, pragmatic status, response act, expected behaviour, task-success label, policy-compliance label, safety-risk label, risk type, refusal outcome, failure attribution, and a judge-validation flag. One scalar field is legacy development metadata: \texttt{authority\_level}. It can't represent additional approval requirements, transition type, or time-specific authorization. Study B's typed authorization record is the intended replacement for controlled authority contrasts. The validator script enforces the seed schema and label inventories.
 
-\begin{figure}[t]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=\linewidth]{evaluation_pipeline}
 \caption{Evaluation pipeline for the benchmark artifact. The diagram summarizes the data flow from pre-specified item metadata through model output, rule-aided triage, expert labels, LLM-judge labels, adjudication, and metric-driven item revision. No performance quantity is encoded in the figure.}

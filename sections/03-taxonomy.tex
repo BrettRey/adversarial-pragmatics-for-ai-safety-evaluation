@@ -18,20 +18,20 @@ pairs before recombining them in application-shaped harnesses.
 
 The eight families also aren't ontologically parallel, and it's worth saying so plainly. Embedding, mention/use, scope, deixis, and indirect speech acts are relations of directive interpretation. Authority and instruction hierarchy is a normative relation. Policy-boundary ambiguity is partly a property of the evaluative criterion rather than of the prompt. Agent transcript interpretation is an evaluation surface and horizon. Read as one flat inventory, they make coverage and assignment stability harder to interpret, because a change along one dimension looks like wholesale family reassignment.
 
-The item schema already records those dimensions separately, so the families are better read as frequently co-occurring bundles over three axes (Table~\ref{tab:taxonomy-axes}). An item takes a value on each axis without being taxonomically anomalous, and taxonomy drift can then be reported per axis: a reclassification of surface isn't the same event as a reclassification of directive interpretation.
+The families are better read as frequently co-occurring bundles over three axes (Table~\ref{tab:taxonomy-axes}). An item takes a value on each axis without being taxonomically anomalous, and taxonomy drift can then be reported per axis: a reclassification of surface isn't the same event as a reclassification of directive interpretation. The seed schema represents these axes only partly. It records enough to separate them for the seed contrasts, and it doesn't yet carry fields for policy-boundary status, information-flow authorization, or trajectory horizon; Study~B's typed authorization record is the intended full representation.
 
 \begin{table}[!htbp]
 \centering
 \small
-\caption{Three axes that cross-cut the eight families. Each axis is already recorded per item in the seed schema, so an item can vary on one axis while holding the others fixed.}
+\caption{Three axes that cross-cut the eight families, with what the seed schema does and doesn't yet record for each. \texttt{authority\_level} is legacy scalar metadata and can't represent additional approval requirements, transition type, or time-specific authorization.}
 \label{tab:taxonomy-axes}
-\begin{tabular}{p{0.20\linewidth}p{0.24\linewidth}p{0.44\linewidth}}
+\begin{tabular}{p{0.20\linewidth}p{0.30\linewidth}p{0.38\linewidth}}
 \toprule
-Axis & Recorded fields & Representative values \\
+Axis & Partly recorded by & Not yet represented \\
 \midrule
-Directive interpretation & \texttt{pragmatic\_status}, \texttt{response\_act} & enacted or mentioned; direct or indirect; scoped or unscoped; resolved or ambiguous reference \\
-Normative control relation & \texttt{source\_role}, \texttt{authority\_level} & source role; authorization; priority; policy boundary; information-flow permission \\
-Evaluation surface and horizon & \texttt{context\_source}, application surface & user prompt; document; webpage; email; tool result; single-turn transcript; trajectory \\
+Directive interpretation & \texttt{pragmatic\_status}, \texttt{response\_act}: enacted or mentioned, direct or indirect, scoped or unscoped, resolved or ambiguous reference & mixed and incorporated quotation; degrees of indirectness \\
+Normative control relation & \texttt{source\_role}, \texttt{authority\_level}: source role and a coarse authority rank & policy-boundary status; information-flow authorization; priority among competing directives \\
+Evaluation surface and horizon & \texttt{context\_source} and application surface: user prompt, document, webpage, email, tool result & trajectory horizon, stopping condition, and multi-turn transcript structure \\
 \bottomrule
 \end{tabular}
 \end{table}
