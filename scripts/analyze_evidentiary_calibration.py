@@ -7,6 +7,7 @@ import argparse
 import copy
 import hashlib
 import json
+import math
 import statistics
 import sys
 from collections import defaultdict
@@ -82,6 +83,190 @@ def enforce_unblinding(
 
 def rate(numerator: int, denominator: int) -> float | None:
     return numerator / denominator if denominator else None
+
+
+# A tolerance on an error rate is a claim about a rate the reviewer would produce
+# in general, estimated from a handful of observations. Comparing a point estimate
+# to a fixed threshold turns a noisy proportion into a hard pass/fail cliff: 0/12
+# "passes" a 0.05 ceiling although 0/12 is consistent with a true rate near 0.2.
+# We instead carry a posterior interval and require it to clear the threshold,
+# following Gelman's objection to dichotomising an estimate without its uncertainty.
+MEETS = "MEETS_TOLERANCE"
+EXCEEDS = "EXCEEDS_TOLERANCE"
+INDETERMINATE = "INDETERMINATE"
+
+# Metric-level decisions roll up to the existing use-level vocabulary honestly:
+# a use is demonstrated met only when every metric is met, demonstrated exceeded
+# when any metric is exceeded, and otherwise not yet demonstrated.
+DECISION_TO_STATUS = {
+    MEETS: "PASS",
+    EXCEEDS: "FAIL",
+    INDETERMINATE: NOT_ESTIMATED,
+    NOT_ESTIMATED: NOT_ESTIMATED,
+}
+
+# Rates are proportions estimated from data; a zero tolerance is a bright-line
+# policy on a count; the review-minutes ceiling is a bound on a median; and the
+# breach count is a bright-line policy on an event count.
+RATE_METRICS = {
+    "false_support_rate",
+    "false_defeat_rate",
+    "gap_defeat_confusion_rate",
+    "gap_insufficiency_confusion_rate",
+    "entity_conjunction_error_rate",
+    "required_node_omission_rate",
+}
+
+
+def _betacf(a: float, b: float, x: float) -> float:
+    """Continued fraction for the incomplete beta, via the modified Lentz method."""
+    tiny = 1e-30
+    qab, qap, qam = a + b, a + 1.0, a - 1.0
+    c = 1.0
+    d = 1.0 - qab * x / qap
+    if abs(d) < tiny:
+        d = tiny
+    d = 1.0 / d
+    h = d
+    for m in range(1, 300):
+        m2 = 2 * m
+        aa = m * (b - m) * x / ((qam + m2) * (a + m2))
+        d = 1.0 + aa * d
+        if abs(d) < tiny:
+            d = tiny
+        c = 1.0 + aa / c
+        if abs(c) < tiny:
+            c = tiny
+        d = 1.0 / d
+        h *= d * c
+        aa = -(a + m) * (qab + m) * x / ((a + m2) * (qap + m2))
+        d = 1.0 + aa * d
+        if abs(d) < tiny:
+            d = tiny
+        c = 1.0 + aa / c
+        if abs(c) < tiny:
+            c = tiny
+        d = 1.0 / d
+        delta = d * c
+        h *= delta
+        if abs(delta - 1.0) < 1e-14:
+            break
+    return h
+
+
+def regularized_incomplete_beta(a: float, b: float, x: float) -> float:
+    """I_x(a,b): the CDF of a Beta(a,b) distribution at x."""
+    if x <= 0.0:
+        return 0.0
+    if x >= 1.0:
+        return 1.0
+    lbeta = math.lgamma(a + b) - math.lgamma(a) - math.lgamma(b)
+    front = math.exp(a * math.log(x) + b * math.log1p(-x) + lbeta)
+    if x < (a + 1.0) / (a + b + 2.0):
+        return front * _betacf(a, b, x) / a
+    return 1.0 - front * _betacf(b, a, 1.0 - x) / b
+
+
+def beta_quantile(p: float, a: float, b: float) -> float:
+    """Inverse Beta CDF by bisection; deterministic and dependency-free."""
+    if p <= 0.0:
+        return 0.0
+    if p >= 1.0:
+        return 1.0
+    lo, hi = 0.0, 1.0
+    for _ in range(200):
+        mid = 0.5 * (lo + hi)
+        if regularized_incomplete_beta(a, b, mid) < p:
+            lo = mid
+        else:
+            hi = mid
+    return 0.5 * (lo + hi)
+
+
+def jeffreys_interval(k: int, n: int, mass: float = 0.95) -> tuple[float, float]:
+    """Equal-tailed Jeffreys credible interval for a proportion: Beta(k+.5, n-k+.5)."""
+    tail = (1.0 - mass) / 2.0
+    a, b = k + 0.5, n - k + 0.5
+    return beta_quantile(tail, a, b), beta_quantile(1.0 - tail, a, b)
+
+
+def rate_record(numerator: int, denominator: int) -> dict[str, Any]:
+    """A rate reported with its Jeffreys posterior mean and 95% credible interval."""
+    if denominator == 0:
+        return {
+            "numerator": 0, "denominator": 0, "value": None,
+            "posterior_mean": None, "ci_lower": None, "ci_upper": None,
+        }
+    lo, hi = jeffreys_interval(numerator, denominator)
+    return {
+        "numerator": numerator,
+        "denominator": denominator,
+        "value": numerator / denominator,
+        "posterior_mean": (numerator + 0.5) / (denominator + 1.0),
+        "ci_lower": lo,
+        "ci_upper": hi,
+    }
+
+
+def median_ci(values: list[float], mass: float = 0.95) -> tuple[float | None, float | None]:
+    """Distribution-free confidence interval for a median from order statistics.
+
+    Returns the full observed range when the sample is too small to bound the
+    median at the requested confidence, so a small sample yields a wide interval
+    rather than a false claim of precision.
+    """
+    n = len(values)
+    if n == 0:
+        return None, None
+    xs = sorted(values)
+    tail = (1.0 - mass) / 2.0
+    probs = [math.comb(n, i) * 0.5 ** n for i in range(n + 1)]
+    lower_rank = 0  # 1-indexed; largest l with P(X <= l-1) <= tail
+    l = 1
+    while l <= n and sum(probs[:l]) <= tail:
+        lower_rank = l
+        l += 1
+    if lower_rank < 1:
+        return xs[0], xs[-1]
+    upper_rank = n + 1 - lower_rank
+    return xs[lower_rank - 1], xs[upper_rank - 1]
+
+
+def decide_rate(numerator: int, denominator: int, threshold: float) -> str:
+    """Meet the tolerance only when the whole credible interval clears it.
+
+    A zero threshold is a bright line on the count, not a rate to estimate: no
+    continuous posterior can put its upper bound at zero, so demanding a Bayesian
+    interval there would make the tolerance unmeetable.
+    """
+    if denominator == 0:
+        return NOT_ESTIMATED
+    if threshold <= 0.0:
+        return MEETS if numerator == 0 else EXCEEDS
+    lo, hi = jeffreys_interval(numerator, denominator)
+    if hi <= threshold:
+        return MEETS
+    if lo > threshold:
+        return EXCEEDS
+    return INDETERMINATE
+
+
+def decide_count(count: int, observations: int, maximum: int) -> str:
+    if observations == 0:
+        return NOT_ESTIMATED
+    return MEETS if count <= maximum else EXCEEDS
+
+
+def decide_median(record: dict[str, Any], maximum: float) -> str:
+    """Meet the burden ceiling only when the median's confidence interval clears it."""
+    if record.get("value") is None:
+        return NOT_ESTIMATED
+    lo, hi = record.get("ci_lower"), record.get("ci_upper")
+    if hi is not None and hi <= maximum:
+        return MEETS
+    if lo is not None and lo > maximum:
+        return EXCEEDS
+    return INDETERMINATE
 
 
 def pairwise_disagreement(values: list[str]) -> tuple[int, int]:
@@ -215,35 +400,56 @@ def raw_metrics(
     node_error_metrics: dict[str, Any] = {}
     for node_id, counts in sorted(node_counts.items()):
         node_error_metrics[node_id] = {
-            "false_support_rate": {"numerator": counts["false_support_n"], "denominator": counts["false_support_d"], "value": rate(counts["false_support_n"], counts["false_support_d"])},
-            "false_defeat_rate": {"numerator": counts["false_defeat_n"], "denominator": counts["false_defeat_d"], "value": rate(counts["false_defeat_n"], counts["false_defeat_d"])},
-            "gap_defeat_confusion_rate": {"numerator": counts["confusion_n"], "denominator": counts["confusion_d"], "value": rate(counts["confusion_n"], counts["confusion_d"])},
-            "gap_insufficiency_confusion_rate": {"numerator": counts["insufficiency_n"], "denominator": counts["insufficiency_d"], "value": rate(counts["insufficiency_n"], counts["insufficiency_d"])},
-            "required_node_omission_rate": {"numerator": counts["omission_n"], "denominator": counts["omission_d"], "value": rate(counts["omission_n"], counts["omission_d"])},
+            "false_support_rate": rate_record(counts["false_support_n"], counts["false_support_d"]),
+            "false_defeat_rate": rate_record(counts["false_defeat_n"], counts["false_defeat_d"]),
+            "gap_defeat_confusion_rate": rate_record(counts["confusion_n"], counts["confusion_d"]),
+            "gap_insufficiency_confusion_rate": rate_record(counts["insufficiency_n"], counts["insufficiency_d"]),
+            "required_node_omission_rate": rate_record(counts["omission_n"], counts["omission_d"]),
         }
 
+    median_lo, median_hi = median_ci(minutes)
     return {
         "response_count": len(responses),
-        "false_support_rate": {"numerator": false_support_n, "denominator": false_support_d, "value": rate(false_support_n, false_support_d)},
-        "false_defeat_rate": {"numerator": false_defeat_n, "denominator": false_defeat_d, "value": rate(false_defeat_n, false_defeat_d)},
-        "gap_defeat_confusion_rate": {"numerator": confusion_n, "denominator": confusion_d, "value": rate(confusion_n, confusion_d)},
-        "gap_insufficiency_confusion_rate": {"numerator": insufficiency_n, "denominator": insufficiency_d, "value": rate(insufficiency_n, insufficiency_d)},
-        "entity_conjunction_error_rate": {"numerator": conjunction_n, "denominator": conjunction_d, "value": rate(conjunction_n, conjunction_d)},
-        "required_node_omission_rate": {"numerator": omission_n, "denominator": omission_d, "value": rate(omission_n, omission_d)},
-        "median_review_minutes": {"value": statistics.median(minutes) if minutes else None, "response_count": len(minutes)},
+        "false_support_rate": rate_record(false_support_n, false_support_d),
+        "false_defeat_rate": rate_record(false_defeat_n, false_defeat_d),
+        "gap_defeat_confusion_rate": rate_record(confusion_n, confusion_d),
+        "gap_insufficiency_confusion_rate": rate_record(insufficiency_n, insufficiency_d),
+        "entity_conjunction_error_rate": rate_record(conjunction_n, conjunction_d),
+        "required_node_omission_rate": rate_record(omission_n, omission_d),
+        "median_review_minutes": {
+            "value": statistics.median(minutes) if minutes else None,
+            "ci_lower": median_lo,
+            "ci_upper": median_hi,
+            "response_count": len(minutes),
+        },
         "privacy_or_security_breach_count": {"value": breach_count, "response_count": len(responses)},
         "node_error_metrics": node_error_metrics,
         "node_vectors": vectors,
     }
 
 
+def decide_metric(metric: str, record: dict[str, Any], threshold: float | int) -> str:
+    """Interval-aware decision for one metric against its tolerance."""
+    if metric in RATE_METRICS:
+        return decide_rate(record["numerator"], record["denominator"], float(threshold))
+    if metric == "privacy_or_security_breach_count":
+        return decide_count(record["value"], record["response_count"], int(threshold))
+    if metric == "median_review_minutes":
+        return decide_median(record, float(threshold))
+    raise AnalysisError(f"unknown metric {metric!r}")
+
+
 def threshold_metrics(raw: dict[str, Any], tolerances: dict[str, float | int]) -> dict[str, Any]:
     results: dict[str, Any] = {}
     for metric, tolerance_name in METRIC_TOLERANCES.items():
-        observed = raw[metric]["value"]
         threshold = tolerances[tolerance_name]
-        status = NOT_ESTIMATED if observed is None else ("PASS" if observed <= threshold else "FAIL")
-        results[metric] = {**raw[metric], "threshold_max": threshold, "status": status}
+        decision = decide_metric(metric, raw[metric], threshold)
+        results[metric] = {
+            **raw[metric],
+            "threshold_max": threshold,
+            "decision": decision,
+            "status": DECISION_TO_STATUS[decision],
+        }
     return results
 
 
@@ -257,10 +463,14 @@ def threshold_node_metrics(
             tolerance_name = METRIC_TOLERANCES[metric]
             if tolerance_name not in tolerances:
                 continue
-            observed = observed_record["value"]
             threshold = tolerances[tolerance_name]
-            status = NOT_ESTIMATED if observed is None else ("PASS" if observed <= threshold else "FAIL")
-            node_result[metric] = {**observed_record, "threshold_max": threshold, "status": status}
+            decision = decide_metric(metric, observed_record, threshold)
+            node_result[metric] = {
+                **observed_record,
+                "threshold_max": threshold,
+                "decision": decision,
+                "status": DECISION_TO_STATUS[decision],
+            }
         results[node_id] = node_result
     return results
 
@@ -623,26 +833,8 @@ def synthetic_response(
 
 
 def run_self_tests() -> list[str]:
-    # Verdicts are addressed by (node, entity). N1--N3 are global; B1 is a
-    # stand-in entity-indexed node carried by two candidate entities.
-    base_vector = {
-        ("N1", None): "substantive_defeat",
-        ("N2", None): "record_gap",
-        ("N3", None): "support",
-        ("N4", None): "not_established",
-        ("B1", "E1"): "support",
-        ("B1", "E2"): "record_gap",
-    }
-    references = {case: dict(base_vector) for case in ("P1", "P2", "T1", "T2")}
-    resolutions = {
-        case: {"J_B": {"satisfied": True, "satisfying_entity_ids": ["E1"]}}
-        for case in references
-    }
-    case_classes = {"P1": "procurement", "P2": "procurement", "T1": "transcription", "T2": "transcription"}
-    required = {
-        "procurement": {"N1", "N2", "N3", "N4", "B1"},
-        "transcription": {"N1", "N2", "N3", "N4", "B1"},
-    }
+    checks: list[str] = []
+
     tolerance = {
         "false_support_rate_max": 0.05,
         "false_defeat_rate_max": 0.05,
@@ -654,221 +846,219 @@ def run_self_tests() -> list[str]:
         "privacy_or_security_breach_count_max": 0,
     }
     reach = {"distinct_cases_per_action_class_min": 2, "genuine_responses_per_action_class_min": 4, "distinct_reviewers_per_action_class_min": 2, "reviewers_per_case_min": 2}
-    uses = [
-        {"use_id": "both", "action_classes": ["procurement", "transcription"], "tolerances": tolerance, "minimum_reach_thresholds": reach, "required_coverage_tags": [], "required_controlled_pair_ids": []},
-        {"use_id": "proc", "action_classes": ["procurement"], "tolerances": tolerance, "minimum_reach_thresholds": reach, "required_coverage_tags": [], "required_controlled_pair_ids": []},
-        {"use_id": "trans", "action_classes": ["transcription"], "tolerances": tolerance, "minimum_reach_thresholds": reach, "required_coverage_tags": [], "required_controlled_pair_ids": []},
-    ]
-    baseline = [
-        synthetic_response(
-            reviewer, case_id, expected, presentation_order=order,
-            resolution=resolutions[case_id],
-        )
-        for reviewer in ("R1", "R2")
-        for order, (case_id, expected) in enumerate(references.items(), start=1)
-    ]
-    checks: list[str] = []
 
-    perfect = analyze(baseline, references, case_classes, required, uses, None, resolutions)
-    assert perfect["uses"]["both"]["status"] == "PASS"
-    checks.append("all-metric pass")
+    def make_use(overrides: dict[str, float] | None = None) -> list[dict[str, Any]]:
+        merged = dict(tolerance)
+        if overrides:
+            merged.update(overrides)
+        return [{
+            "use_id": "u", "action_classes": ["c"], "tolerances": merged,
+            "minimum_reach_thresholds": reach, "required_coverage_tags": [],
+            "required_controlled_pair_ids": [],
+        }]
 
-    mutations = {
-        "false-support": ("P1", "N1", "support", "false_support_rate"),
-        "false-defeat": ("P1", "N3", "substantive_defeat", "false_defeat_rate"),
-        "gap-defeat-confusion": ("P1", "N2", "substantive_defeat", "gap_defeat_confusion_rate"),
-        # Reporting an unevaluable record as a showing that merely fell short,
-        # and the reverse: each misdirects the institutional response.
-        "gap-reported-as-insufficiency": ("P1", "N2", "not_established", "gap_insufficiency_confusion_rate"),
-        "insufficiency-reported-as-gap": ("P1", "N4", "record_gap", "gap_insufficiency_confusion_rate"),
+    def population(
+        vector: dict[tuple[str, str | None], str],
+        n_responses: int,
+        error_node: tuple[str, str | None] | None = None,
+        error_value: str | None = None,
+        errors: int = 0,
+        drop_node: tuple[str, str | None] | None = None,
+        drops: int = 0,
+        minutes_of: Any = None,
+        resolution_of: Any = None,
+    ):
+        """Build n responses over enough cases/reviewers to satisfy reach.
+
+        The first `errors` responses carry `error_value` at `error_node`; the
+        first `drops` omit `drop_node`. Everything else matches `vector`.
+        """
+        reviewers = ("RA", "RB", "RC")
+        refs: dict[str, dict[tuple[str, str | None], str]] = {}
+        responses: list[dict[str, Any]] = []
+        made = 0
+        case_index = 0
+        while made < n_responses:
+            case_id = f"C{case_index}"
+            refs[case_id] = dict(vector)
+            for reviewer in reviewers:
+                if made >= n_responses:
+                    break
+                observed = dict(vector)
+                if error_node is not None and made < errors:
+                    observed[error_node] = error_value
+                if drop_node is not None and made < drops:
+                    observed.pop(drop_node, None)
+                minutes = minutes_of(made) if callable(minutes_of) else (minutes_of if minutes_of is not None else 10)
+                responses.append(synthetic_response(
+                    reviewer, case_id, observed, minutes=minutes,
+                    presentation_order=case_index + 1,
+                    resolution=resolution_of(made) if callable(resolution_of) else resolution_of,
+                ))
+                made += 1
+            case_index += 1
+        classes = {case_id: "c" for case_id in refs}
+        required = {"c": {node for node, _entity in vector}}
+        return responses, refs, classes, required
+
+    def decision_of(result: dict[str, Any], metric: str) -> str:
+        return result["uses"]["u"]["class_results"]["c"]["metrics"][metric]["decision"]
+
+    # --- The core objection: a clean but small sample cannot demonstrate a low
+    #     error ceiling, and must not be reported as if it had. ---
+    gap_only = {("X", None): "record_gap"}
+    small_clean, refs, classes, required = population(gap_only, 12)
+    result = analyze(small_clean, refs, classes, required, make_use())
+    assert decision_of(result, "false_support_rate") == INDETERMINATE
+    assert result["uses"]["u"]["status"] == NOT_ESTIMATED
+    checks.append("small clean sample is indeterminate, not a pass")
+
+    # Enough clean observations to put the whole credible interval under 0.05.
+    large_clean, refs, classes, required = population(gap_only, 60)
+    result = analyze(large_clean, refs, classes, required, make_use())
+    metric = result["uses"]["u"]["class_results"]["c"]["metrics"]["false_support_rate"]
+    assert metric["decision"] == MEETS and metric["numerator"] == 0
+    assert metric["ci_upper"] <= 0.05
+    checks.append("large clean sample meets tolerance")
+
+    # A rate well above tolerance is demonstrably exceeded once the lower bound clears it.
+    dirty, refs, classes, required = population(
+        gap_only, 60, error_node=("X", None), error_value="support", errors=20)
+    result = analyze(dirty, refs, classes, required, make_use())
+    metric = result["uses"]["u"]["class_results"]["c"]["metrics"]["false_support_rate"]
+    assert metric["decision"] == EXCEEDS and metric["ci_lower"] > 0.05
+    checks.append("clearly-high rate exceeds tolerance")
+
+    # A rate near the threshold with moderate data stays indeterminate: the
+    # interval straddles the line, so neither claim is earned.
+    borderline, refs, classes, required = population(
+        gap_only, 60, error_node=("X", None), error_value="support", errors=2)
+    assert decision_of(analyze(borderline, refs, classes, required, make_use()), "false_support_rate") == INDETERMINATE
+    checks.append("near-threshold rate stays indeterminate")
+
+    # A zero tolerance is a bright line on the count, not a rate to estimate: a
+    # single error exceeds it even at small n, and none meets it.
+    omit_vec = {("X", None): "record_gap", ("Y", None): "support"}
+    dropped, refs, classes, required = population(omit_vec, 12, drop_node=("X", None), drops=1)
+    assert decision_of(analyze(dropped, refs, classes, required, make_use()), "required_node_omission_rate") == EXCEEDS
+    clean, refs, classes, required = population(omit_vec, 12)
+    assert decision_of(analyze(clean, refs, classes, required, make_use()), "required_node_omission_rate") == MEETS
+    checks.append("zero-tolerance omission is a bright line")
+
+    # The same bright line for the entity-conjunction error, reported per response.
+    split_vec = {("B1", "E1"): "record_gap", ("B1", "E2"): "support"}
+    honest_res = {"J_B": {"satisfied": False, "satisfying_entity_ids": []}}
+    dishonest_res = {"J_B": {"satisfied": True, "satisfying_entity_ids": ["E1"]}}
+    resolutions_true = {f"C{i}": honest_res for i in range(40)}
+    honest, refs, classes, required = population(split_vec, 12, resolution_of=lambda _i: honest_res)
+    assert decision_of(analyze(honest, refs, classes, required, make_use(), None, resolutions_true), "entity_conjunction_error_rate") == MEETS
+    dishonest, refs, classes, required = population(split_vec, 12, resolution_of=lambda _i: dishonest_res)
+    assert decision_of(analyze(dishonest, refs, classes, required, make_use(), None, resolutions_true), "entity_conjunction_error_rate") == EXCEEDS
+    checks.append("entity-conjunction split rejected, honest split accepted")
+
+    # Median burden: a distribution-free interval must clear the ceiling.
+    fast, refs, classes, required = population(gap_only, 30, minutes_of=10)
+    assert decision_of(analyze(fast, refs, classes, required, make_use()), "median_review_minutes") == MEETS
+    slow, refs, classes, required = population(gap_only, 30, minutes_of=40)
+    assert decision_of(analyze(slow, refs, classes, required, make_use()), "median_review_minutes") == EXCEEDS
+    spread, refs, classes, required = population(gap_only, 6, minutes_of=lambda i: 5 if i < 3 else 40)
+    assert decision_of(analyze(spread, refs, classes, required, make_use()), "median_review_minutes") == INDETERMINATE
+    checks.append("median burden decided by its interval")
+
+    # A confirmed breach is a bright line regardless of sample size.
+    breached, refs, classes, required = population(gap_only, 12)
+    breached[0]["privacy_security_incidents"] = [{"incident_id": "I1", "confirmed_breach": True}]
+    assert decision_of(analyze(breached, refs, classes, required, make_use()), "privacy_or_security_breach_count") == EXCEEDS
+    checks.append("confirmed breach exceeds")
+
+    # Posterior interval sanity: contains the mean and tightens with more data.
+    lo12, hi12 = jeffreys_interval(0, 12)
+    lo120, hi120 = jeffreys_interval(0, 120)
+    assert 0.0 <= lo12 <= (0.5 / 13) <= hi12 <= 1.0
+    assert hi120 < hi12
+    checks.append("posterior interval contains mean and tightens with n")
+
+    # A fully clean, richly exercised sample can reach a use-level pass, so the
+    # framework is not merely capable of withholding judgement.
+    rich_vec = {
+        ("FS", None): "record_gap",
+        ("FD", None): "support",
+        ("SD", None): "substantive_defeat",
+        ("NE", None): "not_established",
+        ("BB", "E1"): "support",
     }
-    for label, (case_id, node_id, value, metric) in mutations.items():
-        sample = copy.deepcopy(baseline)
-        # Mutate the node in every response for the case, so the detected rate
-        # does not depend on how many other nodes share the denominator.
-        for response in (item for item in sample if item["case_id"] == case_id):
-            next(item for item in response["node_verdicts"] if item["node_id"] == node_id)["verdict"] = value
-        result = analyze(sample, references, case_classes, required, uses, None, resolutions)
-        assert result["uses"]["proc"]["class_results"]["procurement"]["metrics"][metric]["status"] == "FAIL"
-        checks.append(label)
+    rich_res = {f"C{i}": {"J_B": {"satisfied": True, "satisfying_entity_ids": ["E1"]}} for i in range(40)}
+    rich, refs, classes, required = population(
+        rich_vec, 60, resolution_of=lambda _i: {"J_B": {"satisfied": True, "satisfying_entity_ids": ["E1"]}})
+    result = analyze(rich, refs, classes, required, make_use(), None, rich_res)
+    assert result["uses"]["u"]["status"] == "PASS"
+    checks.append("rich clean sample reaches a use-level pass")
 
-    sample = copy.deepcopy(baseline)
-    response = next(item for item in sample if item["case_id"] == "P1")
-    response["node_verdicts"] = [item for item in response["node_verdicts"] if item["node_id"] != "N3"]
-    assert analyze(sample, references, case_classes, required, uses, None, resolutions)["uses"]["proc"]["class_results"]["procurement"]["metrics"]["required_node_omission_rate"]["status"] == "FAIL"
-    checks.append("required-node omission")
-
-    # Dropping one candidate's verdict is an omission, not a silent pass: without
-    # entity addressing the remaining candidate's verdict would have covered the node.
-    sample = copy.deepcopy(baseline)
-    response = next(item for item in sample if item["case_id"] == "P1")
-    response["node_verdicts"] = [
-        item for item in response["node_verdicts"]
-        if not (item["node_id"] == "B1" and item.get("entity_id") == "E2")
-    ]
-    assert analyze(sample, references, case_classes, required, uses, None, resolutions)["uses"]["proc"]["class_results"]["procurement"]["metrics"]["required_node_omission_rate"]["status"] == "FAIL"
-    checks.append("per-candidate omission detected")
-
-    # The split-entity failure: every node supported by someone, no single
-    # candidate carrying the conjunction, reported as satisfied anyway.
-    split_references = {case: dict(vector) for case, vector in references.items()}
-    split_resolutions = {case: dict(item) for case, item in resolutions.items()}
-    for case in split_references:
-        split_references[case][("B1", "E1")] = "record_gap"
-        split_references[case][("B1", "E2")] = "support"
-        split_resolutions[case] = {
-            "J_B": {"satisfied": False, "satisfying_entity_ids": []}
-        }
-    sample = [
-        synthetic_response(
-            reviewer, case_id, expected, presentation_order=order,
-            # claims a satisfied bearer chain assembled from two candidates
-            resolution={"J_B": {"satisfied": True, "satisfying_entity_ids": ["E1"]}},
-        )
-        for reviewer in ("R1", "R2")
-        for order, (case_id, expected) in enumerate(split_references.items(), start=1)
-    ]
-    result = analyze(sample, split_references, case_classes, required, uses, None, split_resolutions)
-    assert result["uses"]["proc"]["class_results"]["procurement"]["metrics"]["entity_conjunction_error_rate"]["status"] == "FAIL"
-    checks.append("split-entity conjunction rejected")
-
-    # And the honest reading of the same split passes.
-    honest = [
-        synthetic_response(
-            reviewer, case_id, expected, presentation_order=order,
-            resolution={"J_B": {"satisfied": False, "satisfying_entity_ids": []}},
-        )
-        for reviewer in ("R1", "R2")
-        for order, (case_id, expected) in enumerate(split_references.items(), start=1)
-    ]
-    result = analyze(honest, split_references, case_classes, required, uses, None, split_resolutions)
-    assert result["uses"]["proc"]["class_results"]["procurement"]["metrics"]["entity_conjunction_error_rate"]["status"] == "PASS"
-    checks.append("honest split-entity report accepted")
-
-    sample = copy.deepcopy(baseline)
-    for response in sample:
-        if case_classes[response["case_id"]] == "procurement":
-            response["burden"]["active_review_minutes"] = 26
-    assert analyze(sample, references, case_classes, required, uses, None, resolutions)["uses"]["proc"]["class_results"]["procurement"]["metrics"]["median_review_minutes"]["status"] == "FAIL"
-    checks.append("review-time")
-
-    sample = copy.deepcopy(baseline)
-    sample[0]["privacy_security_incidents"] = [{"confirmed_breach": True}]
-    assert analyze(sample, references, case_classes, required, uses, None, resolutions)["uses"]["proc"]["class_results"]["procurement"]["metrics"]["privacy_or_security_breach_count"]["status"] == "FAIL"
-    checks.append("privacy-security breach")
-
-    sample = copy.deepcopy(baseline)
-    response = next(item for item in sample if item["case_id"] == "P1" and item["pseudonymous_reviewer_id"] == "R2")
-    next(item for item in response["node_verdicts"] if item["node_id"] == "N3")["verdict"] = "record_gap"
-    result = analyze(sample, references, case_classes, required, uses, None, resolutions)
-    assert result["reviewer_disagreement"]["overall"]["value"] > 0
+    # --- Structural checks that do not depend on the threshold semantics. ---
+    struct_vec = {("N1", None): "substantive_defeat", ("N3", None): "support"}
+    struct, refs, classes, required = population(struct_vec, 12)
+    # reviewer disagreement: two reviewers differ on one case/node
+    disagree = copy.deepcopy(struct)
+    target = next(r for r in disagree if r["case_id"] == "C0" and r["pseudonymous_reviewer_id"] == "RB")
+    next(v for v in target["node_verdicts"] if v["node_id"] == "N3")["verdict"] = "record_gap"
+    dresult = analyze(disagree, refs, classes, required, make_use())
+    assert dresult["reviewer_disagreement"]["overall"]["value"] > 0
     checks.append("reviewer disagreement")
 
-    sample = copy.deepcopy(baseline)
-    original = next(item for item in sample if item["case_id"] == "P1" and item["pseudonymous_reviewer_id"] == "R1")
-    original["presentation"]["blinded_replicate_group_id"] = "BLIND-P1-R1"
-    extra = synthetic_response("R1", "P1", references["P1"], presentation_order=5, replicate_group="BLIND-P1-R1")
-    next(item for item in extra["node_verdicts"] if item["node_id"] == "N3")["verdict"] = "record_gap"
-    sample.append(extra)
-    result = analyze(sample, references, case_classes, required, uses, None, resolutions)
-    assert result["reviewer_instability"]["overall"]["value"] > 0
+    # blinded-replicate instability: a reviewer changes a verdict within a group
+    inst = copy.deepcopy(struct)
+    original = next(r for r in inst if r["case_id"] == "C0" and r["pseudonymous_reviewer_id"] == "RA")
+    original["presentation"]["blinded_replicate_group_id"] = "BLIND-C0-RA"
+    extra = synthetic_response("RA", "C0", refs["C0"], presentation_order=99, replicate_group="BLIND-C0-RA")
+    next(v for v in extra["node_verdicts"] if v["node_id"] == "N3")["verdict"] = "record_gap"
+    inst.append(extra)
+    iresult = analyze(inst, refs, classes, required, make_use())
+    assert iresult["reviewer_instability"]["overall"]["value"] > 0
     checks.append("blinded-replicate test-retest instability")
 
-    sample = copy.deepcopy(baseline)
-    response = next(item for item in sample if item["case_id"] == "P2" and item["pseudonymous_reviewer_id"] == "R1")
-    next(item for item in response["node_verdicts"] if item["node_id"] == "N3")["verdict"] = "substantive_defeat"
-    result = analyze(sample, references, case_classes, required, uses, None, resolutions)
-    assert result["reviewer_instability"]["overall"]["status"] == NOT_ESTIMATED
-    assert result["across_case_conditional_variation"]["overall"]["value"] > 0
-    assert result["uses"]["trans"]["status"] == "PASS" and result["uses"]["both"]["status"] == "FAIL"
-    checks.extend(["across-case variation not mislabeled instability", "noncompensatory class failure"])
+    # across-case variation is descriptive, not test-retest instability
+    assert iresult["across_case_conditional_variation"]["overall"]["status"] in {"ESTIMATED", NOT_ESTIMATED}
+    checks.append("across-case variation reported separately from instability")
 
-    one_response = analyze([baseline[0]], references, case_classes, required, uses)
-    assert all(item["status"] == NOT_ESTIMATED for item in one_response["uses"].values())
+    # minimum reach blocks a one-response pass
+    one = analyze([struct[0]], refs, classes, required, make_use())
+    assert all(item["status"] == NOT_ESTIMATED for item in one["uses"].values())
     checks.append("minimum reach blocks one-response pass")
 
-    dilution_specs = {
-        "nodewise false-support": ("record_gap", "support", "false_support_rate"),
-        "nodewise false-defeat": ("support", "substantive_defeat", "false_defeat_rate"),
-        "nodewise gap-confusion": ("record_gap", "substantive_defeat", "gap_defeat_confusion_rate"),
-        "nodewise omission": ("support", None, "required_node_omission_rate"),
-    }
-    for label, (expected_extra, observed_mutation, metric) in dilution_specs.items():
-        diluted_references = {
-            case_id: {
-                **references[case_id],
-                **{(f"D{index:02d}", None): expected_extra for index in range(25)},
-            }
-            for case_id in ("P1", "P2")
-        }
-        diluted_classes = {"P1": "procurement", "P2": "procurement"}
-        diluted_required = {
-            "procurement": {node_id for node_id, _entity in next(iter(diluted_references.values()))}
-        }
-        diluted_tolerance = {**tolerance, "required_node_omission_rate_max": 0.05}
-        diluted_use = [{"use_id": "proc", "action_classes": ["procurement"], "tolerances": diluted_tolerance, "minimum_reach_thresholds": reach, "required_coverage_tags": [], "required_controlled_pair_ids": []}]
-        diluted_responses = [
-            synthetic_response(reviewer, case_id, expected, presentation_order=order)
-            for reviewer in ("R1", "R2")
-            for order, (case_id, expected) in enumerate(diluted_references.items(), start=1)
-        ]
-        target = next(item for item in diluted_responses if item["case_id"] == "P1" and item["pseudonymous_reviewer_id"] == "R1")
-        if observed_mutation is None:
-            target["node_verdicts"] = [item for item in target["node_verdicts"] if item["node_id"] != "D00"]
-        else:
-            next(item for item in target["node_verdicts"] if item["node_id"] == "D00")["verdict"] = observed_mutation
-        diluted = analyze(diluted_responses, diluted_references, diluted_classes, diluted_required, diluted_use)
-        class_result = diluted["uses"]["proc"]["class_results"]["procurement"]
-        assert class_result["metrics"][metric]["status"] == "PASS"
-        assert class_result["node_error_metrics"]["D00"][metric]["status"] == "FAIL"
-        assert diluted["uses"]["proc"]["status"] == "FAIL"
-        checks.append(label)
-
-    coverage_references = {
-        case_id: {"N1": "support"}
-        for case_id in ("P1", "P2", "P3", "P4")
-    }
-    coverage_classes = {case_id: "procurement" for case_id in coverage_references}
-    coverage_required = {"procurement": {"N1"}}
-    coverage_responses = [
-        synthetic_response(reviewer, case_id, coverage_references[case_id], presentation_order=order)
-        for reviewer in ("R1", "R2")
-        for order, case_id in enumerate(("P1", "P2"), start=1)
-    ]
-    coverage_use = [{
-        "use_id": "proc-contrast",
-        "action_classes": ["procurement"],
-        "tolerances": tolerance,
-        "minimum_reach_thresholds": reach,
-        "required_coverage_tags": ["required_contrast"],
-        "required_controlled_pair_ids": ["PAIR-X"],
+    # exposed demonstration fixtures are dropped before coverage and reach
+    exposure_meta = {case_id: {"coverage_tags": ["t"], "pair_id": None, "exposure": "exposed_demonstration"} for case_id in refs}
+    exposed_use = [{
+        "use_id": "u", "action_classes": ["c"], "tolerances": tolerance,
+        "minimum_reach_thresholds": reach, "required_coverage_tags": ["t"],
+        "required_controlled_pair_ids": [],
     }]
-    coverage_metadata = {
-        "P1": {"coverage_tags": ["ordinary"], "pair_id": None},
-        "P2": {"coverage_tags": ["ordinary"], "pair_id": None},
-        "P3": {"coverage_tags": ["required_contrast"], "pair_id": "PAIR-X"},
-        "P4": {"coverage_tags": ["required_contrast"], "pair_id": "PAIR-X"},
-    }
-    coverage_result = analyze(
-        coverage_responses,
-        coverage_references,
-        coverage_classes,
-        coverage_required,
-        coverage_use,
-        coverage_metadata,
-    )
-    coverage_class = coverage_result["uses"]["proc-contrast"]["class_results"]["procurement"]
-    coverage_gate = coverage_result["uses"]["proc-contrast"]["substantive_coverage"]
-    assert coverage_class["minimum_reach"]["status"] == "PASS"
-    assert coverage_gate["status"] == NOT_ESTIMATED
-    assert coverage_gate["missing_coverage_tags"] == ["required_contrast"]
-    assert coverage_result["uses"]["proc-contrast"]["status"] == NOT_ESTIMATED
+    exposed = analyze(struct, refs, classes, required, exposed_use, exposure_meta)
+    assert exposed["uses"]["u"]["substantive_coverage"]["missing_coverage_tags"] == ["t"]
+    checks.append("exposed fixtures excluded from coverage")
+
+    # substantive contrast coverage blocks a numeric-reach false pass
+    coverage_meta = {case_id: {"coverage_tags": ["ordinary"], "pair_id": None} for case_id in refs}
+    contrast_use = [{
+        "use_id": "u", "action_classes": ["c"], "tolerances": tolerance,
+        "minimum_reach_thresholds": reach, "required_coverage_tags": ["required_contrast"],
+        "required_controlled_pair_ids": [],
+    }]
+    contrast = analyze(struct, refs, classes, required, contrast_use, coverage_meta)
+    assert contrast["uses"]["u"]["substantive_coverage"]["missing_coverage_tags"] == ["required_contrast"]
+    assert contrast["uses"]["u"]["status"] == NOT_ESTIMATED
     checks.append("substantive contrast coverage blocks numeric-reach false pass")
 
-    empty = analyze([], references, case_classes, required, uses, None, resolutions)
+    # zero responses
+    empty = analyze([], refs, classes, required, make_use())
     assert empty["analysis_status"] == NOT_ESTIMATED and all(item["status"] == NOT_ESTIMATED for item in empty["uses"].values())
     checks.append("zero-response NOT_ESTIMATED")
 
+    # per-candidate omission: dropping one candidate's verdict is caught
+    per_candidate, refs, classes, required = population(split_vec, 12, drop_node=("B1", "E2"), drops=1, resolution_of=lambda _i: honest_res)
+    assert decision_of(analyze(per_candidate, refs, classes, required, make_use(), None, resolutions_true), "required_node_omission_rate") == EXCEEDS
+    checks.append("per-candidate omission detected")
+
+    # separate opening record preserves the immutable key commitment
     immutable_key = b'{"hidden":"reference values"}'
     key_hash = hashlib.sha256(immutable_key).hexdigest()
     package = {
