@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://brettreynolds.ca/schemas/delegation/analysis-output-1.0.0.json",
+  "title": "Vector-preserving Delegation Assurance empirical analysis output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "program_id", "specification_id", "specification_version", "specification_sha256", "input_id", "decision", "not_estimated_reason", "scalar_aggregation_permitted", "integrity_diagnostics", "family_results", "observation_vectors"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "program_id": {"enum": ["local_discrimination", "predictive_typed_ablation", "reviewer_reconstruction"]},
+    "specification_id": {"type": "string", "minLength": 1},
+    "specification_version": {"const": "1.0.0"},
+    "specification_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "input_id": {"type": "string", "minLength": 1},
+    "decision": {"enum": ["PASS", "FAIL", "NOT_ESTIMATED"]},
+    "not_estimated_reason": {"type": ["string", "null"]},
+    "scalar_aggregation_permitted": {"const": false},
+    "integrity_diagnostics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["split", "reset", "leakage", "oracle_masking", "reference_join", "design_object_sha256s"],
+      "properties": {
+        "split": {"enum": ["PASS", "NOT_APPLICABLE"]},
+        "reset": {"enum": ["PASS", "NOT_APPLICABLE"]},
+        "leakage": {"enum": ["PASS", "NOT_APPLICABLE"]},
+        "oracle_masking": {"enum": ["PASS", "NOT_APPLICABLE"]},
+        "reference_join": {"enum": ["PASS", "NOT_APPLICABLE"]},
+        "design_object_sha256s": {
+          "type": "object",
+          "minProperties": 2,
+          "additionalProperties": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+        }
+      }
+    },
+    "family_results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["family", "decision", "counts", "metrics", "thresholds", "reasons"],
+        "properties": {
+          "family": {"type": "string", "minLength": 1},
+          "decision": {"enum": ["PASS", "FAIL", "NOT_ESTIMATED"]},
+          "counts": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 0}},
+          "metrics": {"type": "object", "additionalProperties": {"type": ["number", "null"]}},
+          "thresholds": {"type": "object", "additionalProperties": {"type": "number"}},
+          "reasons": {"type": "array", "items": {"type": "string", "minLength": 1}}
+        }
+      }
+    },
+    "observation_vectors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["observation_id", "family", "values"],
+        "properties": {
+          "observation_id": {"type": "string", "minLength": 1},
+          "family": {"type": "string", "minLength": 1},
+          "values": {"type": "object"}
+        }
+      }
+    }
+  }
+}

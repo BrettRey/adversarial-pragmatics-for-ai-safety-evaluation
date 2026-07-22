@@ -1,0 +1,18 @@
+{
+  "schema_version": "2.0.0",
+  "trace_id": "valid_revocation_transition",
+  "scenario": "valid_revocation_transition",
+  "contextual_status_references": {},
+  "classification_fit": {},
+  "valid_grants": {"revocable_memo_grant": true},
+  "transition_effects": {"memo_revocation": "effective"},
+  "proposal_authorizations": {"post_revocation_memo_proposal": "prohibited"},
+  "gate_fidelity": {},
+  "execution_authorizations": {},
+  "prefix_condition_results": {},
+  "cumulative_condition_results": {},
+  "terminal_condition_results": {},
+  "trajectory_authorization": "authorized",
+  "record_adequacy": "adequate",
+  "final_normative_state": {"active_grant_ids": [], "authority_object_states": {"protected_mandate": "protected"}}
+}

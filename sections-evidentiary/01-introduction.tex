@@ -1,43 +1,45 @@
 \section{Introduction}
 
-AI risk-management guidance already treats governance, transparency, accountability, documentation, and monitoring as core trustworthiness practices \parencite{nist2023artificial}. NIST's generative-AI profile adds a more specific emphasis on governance, content provenance, pre-deployment testing, and incident disclosure \parencite{nist2024generative}. These requirements produce evidence. They don't yet settle the action-level review question: given a contested AI action, what record would make the authorization claim evaluable?
+AI risk-management guidance already treats governance, transparency, accountability, documentation, and monitoring as core trustworthiness practices \citep{nist2023artificial}. NIST's generative-AI profile adds a more specific emphasis on governance, content provenance, pre-deployment testing, and incident disclosure \citep{nist2024generative}. These requirements produce evidence. They don't yet settle the action-level review question: given a contested AI action, what record would make the authorization claim evaluable?
 
-The question is narrower than explainability, broader than logging, and more forensic than ordinary model documentation. Explainability usually concerns the relation between a model and its output: why a prediction or generated answer took the shape it did. Logging identifies recorded events, and model documentation states intended use and evaluation context. Evidentiary assurance concerns the relation between a deployed system and an authorized action: whether records of authority, configuration, context, tool use, oversight, and preservation support a later authorization claim.
+The question is narrower than explainability, broader than logging, and more forensic than ordinary model documentation. Explainability usually concerns the relation between a model and its output: why a prediction or generated answer took the shape it did. Logging identifies recorded events, and model documentation states intended use and evaluation context. Evidentiary assurance concerns the relation between a deployed system, a bounded record, and an authorization claim: what records of authority, configuration, context, tool use, oversight, and preservation warrant under a declared review procedure.
 
-Whole-process reviewability already spans commissioning, development, operation, and investigation, with records shaped by the review context \parencite{cobbeLeeSingh2021reviewable}. The narrower question here concerns the noncompensatory evidence bundle for one contested action-level authorization claim.
+Whole-process reviewability already spans commissioning, development, operation, and investigation, with records shaped by the review context \citep{cobbeLeeSingh2021reviewable}. The narrower question here concerns one contested action or trajectory. Four outputs have to remain distinct: what the record warrants about authorization, whether the record is adequate for the declared review, whether it identifies a legally or institutionally answerable bearer, and whether an applicable forum has access and remedial capacity.
 
-The target action may be a recommendation, decision, communication, tool call, transaction, record update, or content-generation act with legal or organizational effect. The central evidentiary burden is to connect that act to the claimed source of authority and expose its validity, scope, required factual and legal predicates, relevant system state, and procedure actually followed, using records whose authenticity and integrity can survive later review.
+The target may be one recommendation, decision, communication, tool call, transaction, record update, or content-generation act with legal or organizational effect. It may instead be a bounded composite operation: an ordered sequence whose included deployment and descendant sessions, tools, resources, time interval, and stopping condition are declared. The central evidentiary burden is to connect the single or composite operation to the claimed source of authority and expose its validity, scope, required factual and legal predicates, relevant system state, and procedure actually followed, using records whose authenticity and integrity can survive later review.
 
-Figure~\ref{fig:evidence-rail} summarizes six converging evidence rails for delegated AI action. The rails have no temporal order and aren't substitutable ingredients. Each supports a distinct family of subclaims, and a strong showing on one doesn't compensate for a missing showing on another.
+Figure~\ref{fig:evidence-rail} gives the canonical claim graph. The authorization regime (R), adjudicating review forum (\(F_{\mathrm{review}}\)), evidential standard \(\rho\), burden allocation \(b\), action class \(c\), declared use \(u\), and versioned applicability map fix the review before the record is inspected. The object-level complaint, appeal, regulatory, or remedy forum is instead something the evidence may establish or defeat under \(J_C\); it is not \(F_{\mathrm{review}}\). Evidence then bears on four typed verdict families. A declared use may require some conjunction of their outputs, but the framework doesn't turn that use rule into one generic assurance verdict.
 
 \begin{figure}[tbp]
 \centering
 \begin{tikzpicture}[
-  font=\footnotesize,
+  font=\scriptsize,
   box/.style={draw=black!55, thick, rounded corners=2pt, align=center, inner sep=3pt, minimum height=0.95cm},
   rail/.style={box, text width=0.40\linewidth, minimum height=0.72cm},
-  claim/.style={box, text width=0.19\linewidth, minimum height=5.1cm, fill=linkmaroon!7},
+  claim/.style={box, text width=0.27\linewidth, minimum height=0.72cm, fill=linkmaroon!7},
+  settings/.style={box, text width=0.78\linewidth, minimum height=0.72cm, fill=black!3},
   arrow/.style={-{Latex[length=2mm]}, thick, draw=black!60}
 ]
-\node[rail, fill=black!3] at (-2.6,2.25) (authorization) {Authorization: source, validity, scope};
-\node[rail, fill=black!3] at (-2.6,1.35) (basis) {Decision basis: rule, predicates, transformations};
-\node[rail, fill=black!3] at (-2.6,0.45) (execution) {Execution and provenance: state, context, actions};
-\node[rail, fill=black!3] at (-2.6,-0.45) (signals) {Adverse signals and controls: warnings, expected controls, disposition};
-\node[rail, fill=black!3] at (-2.6,-1.35) (preservation) {Preservation and integrity: authenticity, custody, completeness};
-\node[rail, fill=black!3] at (-2.6,-2.25) (contestability) {Answerability bearer and review/remedy forum: duties, access, powers};
-\node[claim] at (3.55,0) (review) {Reviewable action-level\\authorization claim};
+\node[settings] at (0,2.7) (settings) {Prospectively fixed review: regime (R); adjudicating forum \(F_{\mathrm{review}}\); standard \(\rho\); burden \(b\); action class \(c\); use \(u\); map version};
+\node[rail, fill=black!3] at (-2.6,1.35) (authorization) {Authorization conditions: source, delegability, scope, predicates, procedure};
+\node[rail, fill=black!3] at (-2.6,0.45) (reconstruction) {Record reconstruction: identity, authenticity, integrity, completeness, custody, access};
+\node[rail, fill=black!3] at (-2.6,-0.45) (bearer) {Answerability bearer: identity, duty, interval, succession, reachability};
+\node[rail, fill=black!3] at (-2.6,-1.35) (forum) {Object-level contestability: access, competence, independence, remedies};
+\node[claim] at (3.55,1.35) (ja) {\(J_A\): evidence-relative authorization verdicts};
+\node[claim] at (3.55,0.45) (jr) {\(J_R\): record-adequacy verdicts};
+\node[claim] at (3.55,-0.45) (jb) {\(J_B\): identity, duty, and reachability verdicts};
+\node[claim] at (3.55,-1.35) (jc) {\(J_C\): object-forum capacity verdicts};
 
-\draw[arrow] (authorization.east) -- ([yshift=17mm]review.west);
-\draw[arrow] (basis.east) -- ([yshift=10mm]review.west);
-\draw[arrow] (execution.east) -- ([yshift=3mm]review.west);
-\draw[arrow] (signals.east) -- ([yshift=-3mm]review.west);
-\draw[arrow] (preservation.east) -- ([yshift=-10mm]review.west);
-\draw[arrow] (contestability.east) -- ([yshift=-17mm]review.west);
+\draw[arrow] (settings.south) -- (0,1.95);
+\draw[arrow] (authorization.east) -- (ja.west);
+\draw[arrow] (reconstruction.east) -- (jr.west);
+\draw[arrow] (bearer.east) -- (jb.west);
+\draw[arrow] (forum.east) -- (jc.west);
 \end{tikzpicture}
-\caption{Converging, noncompensatory evidence rails. Arrows mean evidentiary support, not causal influence or temporal order.}
+\caption{Canonical typed verdict graph. Arrows mean evidentiary bearing, not causal influence, temporal order, or logical identity with the underlying authorization proposition.}
 \label{fig:evidence-rail}
 \end{figure}
 
-Administrative-law record review gives a useful generic legal analogue. A reviewer needs more than a plausible result. The record has to support review of authority, procedure, reasons, evidentiary basis, and reviewability. The analogy is schematic and jurisdiction-sensitive: Canada, the United States, the European Union, and Australia don't share a single doctrine of administrative record review. AI action records add a further burden: they have to distinguish the system that produced the act from the people and organizations responsible for authorizing and relying on it.
+Administrative-law record review gives a useful generic legal analogue. A reviewer needs more than a plausible result. The record has to support review of authority, procedure, reasons, evidentiary basis, and reviewability. The analogy is schematic and jurisdiction-sensitive: Canada, the United States, the European Union, and Australia don't share a single doctrine of administrative record review. AI action records add a further burden: they have to distinguish the system that produced the act from the people and organizations legally or institutionally answerable for authorizing and relying on it. Causal contribution, moral responsibility, legal liability, and institutional answerability aren't interchangeable.
 
-Delegation assurance \parencite{reynolds2026delegationAssurance} supplies the typed authorization claim and transition semantics. Evidentiary assurance asks whether the preserved record makes that claim evaluable and what evidentiary verdict it warrants, rather than redefining standing or valid transition. Its contribution is an evidence-bundle account: a way to specify what has to be preserved before an organization can later defend, revise, or abandon the claim that an AI action remained authorized, scoped, attributable, procedurally valid, and contestable.
+Delegation assurance \citep{reynolds2026delegationAssurance} supplies the typed authorization claim and transition semantics. Evidentiary assurance asks what the preserved record warrants about that claim rather than redefining standing or valid transition. A bad record doesn't make an authorized action historically unauthorized, and a pristine record can document an unauthorized action. The framework therefore supplies a versioned evidence-bundle account, a prospective applicability map, and harmless matched calibration fixtures for a review procedure whose own interpretation and use require assessment-validity evidence. The fixtures test whether the distinctions are executable; they don't yet supply a validation result.

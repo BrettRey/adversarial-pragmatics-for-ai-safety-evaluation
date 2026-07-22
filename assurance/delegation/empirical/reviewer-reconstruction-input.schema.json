@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://brettreynolds.ca/schemas/delegation/reviewer-reconstruction-input-1.0.0.json",
+  "title": "Reviewer reconstruction ablation analysis input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "input_id", "program_id", "specification_id", "specification_version", "created_at", "design", "design_object_bindings", "observations"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "input_id": {"$ref": "#/$defs/id"},
+    "program_id": {"const": "reviewer_reconstruction"},
+    "specification_id": {"const": "DA_RECON_001_SPEC"},
+    "specification_version": {"const": "1.0.0"},
+    "created_at": {"type": "string", "format": "date-time"},
+    "design": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["assignment_frozen_before_reviews", "condition_randomized", "reset_policy", "held_out_case_ids", "oracle_masking_confirmed"],
+      "properties": {
+        "assignment_frozen_before_reviews": {"const": true},
+        "condition_randomized": {"const": true},
+        "reset_policy": {"const": "independent_randomized_presentation"},
+        "held_out_case_ids": {"$ref": "#/$defs/idList"},
+        "oracle_masking_confirmed": {"const": true}
+      }
+    },
+    "design_object_bindings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["assignment_manifest", "held_out_manifest"],
+      "properties": {
+        "assignment_manifest": {"$ref": "#/$defs/manifest"},
+        "held_out_manifest": {"$ref": "#/$defs/manifest"}
+      }
+    },
+    "observations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["judgment_id", "reviewer_id", "case_id", "family", "condition", "reviewer_verdict", "reference_label", "justified_uncertainty", "technical_locus_correct", "reviewer_view", "oracle_visible_to_reviewer", "review_locked_at", "reference_joined_at"],
+        "properties": {
+          "judgment_id": {"$ref": "#/$defs/id"},
+          "reviewer_id": {"$ref": "#/$defs/id"},
+          "case_id": {"$ref": "#/$defs/id"},
+          "family": {"enum": ["single_action", "gate_failure", "transition", "cumulative_trajectory"]},
+          "condition": {"enum": ["typed", "degraded"]},
+          "reviewer_verdict": {"$ref": "#/$defs/verdict"},
+          "reference_label": {"$ref": "#/$defs/verdict"},
+          "justified_uncertainty": {"type": "boolean"},
+          "technical_locus_correct": {"type": "boolean"},
+          "reviewer_view": {"type": "object"},
+          "oracle_visible_to_reviewer": {"const": false},
+          "review_locked_at": {"type": "string", "format": "date-time"},
+          "reference_joined_at": {"type": "string", "format": "date-time"}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "id": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_.-]*$"},
+    "idList": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+    "verdict": {"enum": ["supported", "defeated", "unevaluable"]},
+    "manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["manifest_id", "manifest_version", "frozen_at", "content", "sha256"],
+      "properties": {
+        "manifest_id": {"$ref": "#/$defs/id"},
+        "manifest_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+        "frozen_at": {"type": "string", "format": "date-time"},
+        "content": {"type": "object", "minProperties": 1},
+        "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      }
+    }
+  }
+}

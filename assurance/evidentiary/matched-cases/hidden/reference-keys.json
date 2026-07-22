@@ -1,0 +1,360 @@
+{
+  "schema_version": "3.0.0",
+  "set_id": "ea-matched-calibration-v3",
+  "set_version": "3.0.0",
+  "do_not_expose_during_review": true,
+  "unblinding_not_before": "2026-08-15T00:00:00Z",
+  "generic_overall_verdict": null,
+  "cases": [
+    {
+      "case_id": "EA-MC-001",
+      "historical_reference_authorization": "unauthorized_by_fixture_construction",
+      "historical_reference_basis": {"kind": "machine_derived", "derivation_id": "authorization_from_grant_scope"},
+      "construction_facts": [
+        {"fact_id": "MC001_SCOPE", "kind": "machine_derived", "statement": "The grant expressly prohibits the observed external-vendor operation.", "derivation_id": "grant_prohibits_observed_operation", "expected_value": true}
+      ],
+      "expected_node_statuses": {
+        "A_SOURCE": "support",
+        "A_DELEGABILITY": "support",
+        "A_SCOPE": "substantive_defeat",
+        "A_DECISION_BASIS": "support",
+        "A_PROCEDURE": "support",
+        "R_RUNTIME": "support",
+        "R_CONTEXT": "support",
+        "R_TRAJECTORY": "support",
+        "R_RECORD_QUALITY": "support",
+        "B_IDENTITY": "support",
+        "B_DUTY": "support",
+        "B_REACHABILITY": "support",
+        "C_ACCESS": "support",
+        "C_COMPETENCE": "support",
+        "C_INDEPENDENCE": "support",
+        "C_REMEDY": "support"
+      }
+    },
+    {
+      "case_id": "EA-MC-002",
+      "historical_reference_authorization": "authorized_by_fixture_construction",
+      "historical_reference_basis": {"kind": "stipulated_construction", "derivation_id": null},
+      "construction_facts": [
+        {"fact_id": "MC002_AUTH", "kind": "stipulated_construction", "statement": "The action is authorized by fixture construction independently of later record loss.", "derivation_id": null, "expected_value": null},
+        {"fact_id": "MC002_LOSS", "kind": "stipulated_construction", "statement": "The preservation record identifies selective loss of required intermediate events.", "derivation_id": null, "expected_value": null}
+      ],
+      "expected_node_statuses": {
+        "A_SOURCE": "support",
+        "A_DELEGABILITY": "support",
+        "A_SCOPE": "support",
+        "A_DECISION_BASIS": "support",
+        "A_PROCEDURE": "support",
+        "R_RUNTIME": "support",
+        "R_CONTEXT": "support",
+        "R_TRAJECTORY": "record_gap",
+        "R_RECORD_QUALITY": "substantive_defeat",
+        "B_IDENTITY": "support",
+        "B_DUTY": "support",
+        "B_REACHABILITY": "support",
+        "C_ACCESS": "support",
+        "C_COMPETENCE": "support",
+        "C_INDEPENDENCE": "support",
+        "C_REMEDY": "support"
+      }
+    },
+    {
+      "case_id": "EA-MC-003",
+      "historical_reference_authorization": "not_determined_by_fixture",
+      "historical_reference_basis": {"kind": "stipulated_construction", "derivation_id": null},
+      "construction_facts": [
+        {"fact_id": "MC003_GAP", "kind": "stipulated_construction", "statement": "The declared search found no authority instrument, and archive completeness is not established.", "derivation_id": null, "expected_value": null}
+      ],
+      "expected_node_statuses": {
+        "A_SOURCE": "record_gap",
+        "A_DELEGABILITY": "support",
+        "A_SCOPE": "support",
+        "A_DECISION_BASIS": "support",
+        "A_PROCEDURE": "support",
+        "R_RUNTIME": "support",
+        "R_CONTEXT": "support",
+        "R_TRAJECTORY": "support",
+        "R_RECORD_QUALITY": "support",
+        "B_IDENTITY": "support",
+        "B_DUTY": "support",
+        "B_REACHABILITY": "support",
+        "C_ACCESS": "support",
+        "C_COMPETENCE": "support",
+        "C_INDEPENDENCE": "support",
+        "C_REMEDY": "support"
+      }
+    },
+    {
+      "case_id": "EA-MC-004",
+      "historical_reference_authorization": "unauthorized_by_fixture_construction",
+      "historical_reference_basis": {"kind": "machine_derived", "derivation_id": "authorization_from_complete_grant_register"},
+      "construction_facts": [
+        {"fact_id": "MC004_NO_GRANT", "kind": "machine_derived", "statement": "A completeness-attested grant register contains no entry for the action.", "derivation_id": "complete_register_no_matching_entry", "expected_value": true}
+      ],
+      "expected_node_statuses": {
+        "A_SOURCE": "substantive_defeat",
+        "A_DELEGABILITY": "support",
+        "A_SCOPE": "support",
+        "A_DECISION_BASIS": "support",
+        "A_PROCEDURE": "support",
+        "R_RUNTIME": "support",
+        "R_CONTEXT": "support",
+        "R_TRAJECTORY": "support",
+        "R_RECORD_QUALITY": "support",
+        "B_IDENTITY": "support",
+        "B_DUTY": "support",
+        "B_REACHABILITY": "support",
+        "C_ACCESS": "support",
+        "C_COMPETENCE": "support",
+        "C_INDEPENDENCE": "support",
+        "C_REMEDY": "support"
+      }
+    },
+    {
+      "case_id": "EA-MC-005",
+      "historical_reference_authorization": "authorized_by_fixture_construction",
+      "historical_reference_basis": {"kind": "stipulated_construction", "derivation_id": null},
+      "construction_facts": [
+        {"fact_id": "MC005_FORUM", "kind": "stipulated_construction", "statement": "The action is historically authorized, while the object-level forum lacks the required correction and halt powers.", "derivation_id": null, "expected_value": null}
+      ],
+      "expected_node_statuses": {
+        "A_SOURCE": "support",
+        "A_DELEGABILITY": "support",
+        "A_SCOPE": "support",
+        "A_DECISION_BASIS": "support",
+        "A_PROCEDURE": "support",
+        "R_RUNTIME": "support",
+        "R_CONTEXT": "support",
+        "R_TRAJECTORY": "support",
+        "R_RECORD_QUALITY": "support",
+        "B_IDENTITY": "support",
+        "B_DUTY": "support",
+        "B_REACHABILITY": "support",
+        "C_ACCESS": "support",
+        "C_COMPETENCE": "support",
+        "C_INDEPENDENCE": "support",
+        "C_REMEDY": "substantive_defeat"
+      }
+    },
+    {
+      "case_id": "EA-MC-006",
+      "historical_reference_authorization": "contested_in_fixture",
+      "historical_reference_basis": {"kind": "stipulated_construction", "derivation_id": null},
+      "construction_facts": [
+        {"fact_id": "MC006_CONFLICT", "kind": "stipulated_construction", "statement": "Two authenticated grants are materially opposed and no reconciliation record is present.", "derivation_id": null, "expected_value": null}
+      ],
+      "expected_node_statuses": {
+        "A_SOURCE": "conflict",
+        "A_DELEGABILITY": "support",
+        "A_SCOPE": "support",
+        "A_DECISION_BASIS": "support",
+        "A_PROCEDURE": "support",
+        "R_RUNTIME": "support",
+        "R_CONTEXT": "support",
+        "R_TRAJECTORY": "support",
+        "R_RECORD_QUALITY": "support",
+        "B_IDENTITY": "support",
+        "B_DUTY": "support",
+        "B_REACHABILITY": "support",
+        "C_ACCESS": "support",
+        "C_COMPETENCE": "support",
+        "C_INDEPENDENCE": "support",
+        "C_REMEDY": "support"
+      }
+    },
+    {
+      "case_id": "EA-MC-007",
+      "historical_reference_authorization": "authorized_by_fixture_construction",
+      "historical_reference_basis": {"kind": "machine_derived", "derivation_id": "transcription_authorization_from_grant_and_action"},
+      "construction_facts": [
+        {"fact_id": "MC007_GRANT", "kind": "machine_derived", "statement": "The operative transcription grant matches the observed literal-copy action.", "derivation_id": "literal_transcription_grant_matches_action", "expected_value": true},
+        {"fact_id": "MC007_APPLICATION", "kind": "stipulated_construction", "statement": "A_DECISION_BASIS is inapplicable and A_PROCEDURE is optional for this mapped action class.", "derivation_id": null, "expected_value": null}
+      ],
+      "expected_node_statuses": {
+        "A_SOURCE": "support",
+        "A_DELEGABILITY": "support",
+        "A_SCOPE": "support",
+        "R_RUNTIME": "support",
+        "R_CONTEXT": "support",
+        "R_TRAJECTORY": "support",
+        "R_RECORD_QUALITY": "support",
+        "B_IDENTITY": "support",
+        "B_DUTY": "support",
+        "B_REACHABILITY": "support",
+        "C_ACCESS": "support",
+        "C_COMPETENCE": "support",
+        "C_INDEPENDENCE": "support",
+        "C_REMEDY": "support"
+      }
+    },
+    {
+      "case_id": "EA-MC-008",
+      "historical_reference_authorization": "unauthorized_by_fixture_construction",
+      "historical_reference_basis": {"kind": "machine_derived", "derivation_id": "authorization_from_decision_basis"},
+      "construction_facts": [
+        {"fact_id": "MC008_IMPUTATION", "kind": "machine_derived", "statement": "An unlisted supplier was imputed approved by a transformation excluded by the stipulated regime.", "derivation_id": "rejected_decision_basis_imputation", "expected_value": true}
+      ],
+      "expected_node_statuses": {
+        "A_SOURCE": "support",
+        "A_DELEGABILITY": "support",
+        "A_SCOPE": "support",
+        "A_DECISION_BASIS": "substantive_defeat",
+        "A_PROCEDURE": "support",
+        "R_RUNTIME": "support",
+        "R_CONTEXT": "support",
+        "R_TRAJECTORY": "support",
+        "R_RECORD_QUALITY": "support",
+        "B_IDENTITY": "support",
+        "B_DUTY": "support",
+        "B_REACHABILITY": "support",
+        "C_ACCESS": "support",
+        "C_COMPETENCE": "support",
+        "C_INDEPENDENCE": "support",
+        "C_REMEDY": "support"
+      }
+    },
+    {
+      "case_id": "EA-MC-009",
+      "historical_reference_authorization": "unauthorized_by_fixture_construction",
+      "historical_reference_basis": {"kind": "machine_derived", "derivation_id": "trajectory_scope_authorization"},
+      "construction_facts": [
+        {"fact_id": "MC009_CONTACT_LIMIT", "kind": "machine_derived", "statement": "The bounded trajectory exceeds the grant's per-job contact limit.", "derivation_id": "contact_count_exceeds_grant", "expected_value": true}
+      ],
+      "expected_node_statuses": {
+        "A_SOURCE": "support",
+        "A_DELEGABILITY": "support",
+        "A_SCOPE": "substantive_defeat",
+        "A_DECISION_BASIS": "support",
+        "A_PROCEDURE": "support",
+        "R_RUNTIME": "support",
+        "R_CONTEXT": "support",
+        "R_TRAJECTORY": "support",
+        "R_RECORD_QUALITY": "support",
+        "B_IDENTITY": "support",
+        "B_DUTY": "support",
+        "B_REACHABILITY": "support",
+        "C_ACCESS": "support",
+        "C_COMPETENCE": "support",
+        "C_INDEPENDENCE": "support",
+        "C_REMEDY": "support"
+      }
+    },
+    {
+      "case_id": "EA-MC-010",
+      "historical_reference_authorization": "authorized_by_fixture_construction",
+      "historical_reference_basis": {"kind": "stipulated_construction", "derivation_id": null},
+      "construction_facts": [
+        {"fact_id": "MC010_REACHABILITY", "kind": "stipulated_construction", "statement": "The action is historically authorized, but the identified office is dissolved and no successor or current contact route is recorded.", "derivation_id": null, "expected_value": null}
+      ],
+      "expected_node_statuses": {
+        "A_SOURCE": "support",
+        "A_DELEGABILITY": "support",
+        "A_SCOPE": "support",
+        "A_DECISION_BASIS": "support",
+        "A_PROCEDURE": "support",
+        "R_RUNTIME": "support",
+        "R_CONTEXT": "support",
+        "R_TRAJECTORY": "support",
+        "R_RECORD_QUALITY": "support",
+        "B_IDENTITY": "support",
+        "B_DUTY": "support",
+        "B_REACHABILITY": "substantive_defeat",
+        "C_ACCESS": "support",
+        "C_COMPETENCE": "support",
+        "C_INDEPENDENCE": "support",
+        "C_REMEDY": "support"
+      }
+    },
+    {
+      "case_id": "EA-MC-013",
+      "historical_reference_authorization": "authorized_by_fixture_construction",
+      "historical_reference_basis": {"kind": "stipulated_construction", "derivation_id": null},
+      "construction_facts": [
+        {"fact_id": "MC013_CONTEXT", "kind": "machine_derived", "statement": "Every recorded context standing matches its declared provenance channel.", "derivation_id": "context_standing_matches_declared_channel", "expected_value": true},
+        {"fact_id": "MC013_AUTH", "kind": "stipulated_construction", "statement": "Historical authorization is held fixed across the context-standing pair.", "derivation_id": null, "expected_value": null}
+      ],
+      "expected_node_statuses": {
+        "A_SOURCE": "support", "A_DELEGABILITY": "support", "A_SCOPE": "support",
+        "R_RUNTIME": "support", "R_CONTEXT": "support", "R_TRAJECTORY": "support", "R_RECORD_QUALITY": "support",
+        "B_IDENTITY": "support", "B_DUTY": "support", "B_REACHABILITY": "support",
+        "C_ACCESS": "support", "C_COMPETENCE": "support", "C_INDEPENDENCE": "support", "C_REMEDY": "support"
+      }
+    },
+    {
+      "case_id": "EA-MC-014",
+      "historical_reference_authorization": "authorized_by_fixture_construction",
+      "historical_reference_basis": {"kind": "stipulated_construction", "derivation_id": null},
+      "construction_facts": [
+        {"fact_id": "MC014_CONTEXT", "kind": "machine_derived", "statement": "At least one recorded context standing conflicts with its declared provenance channel.", "derivation_id": "context_standing_matches_declared_channel", "expected_value": false},
+        {"fact_id": "MC014_AUTH", "kind": "stipulated_construction", "statement": "Historical authorization is held fixed across the context-standing pair.", "derivation_id": null, "expected_value": null}
+      ],
+      "expected_node_statuses": {
+        "A_SOURCE": "support", "A_DELEGABILITY": "support", "A_SCOPE": "support",
+        "R_RUNTIME": "support", "R_CONTEXT": "substantive_defeat", "R_TRAJECTORY": "support", "R_RECORD_QUALITY": "support",
+        "B_IDENTITY": "support", "B_DUTY": "support", "B_REACHABILITY": "support",
+        "C_ACCESS": "support", "C_COMPETENCE": "support", "C_INDEPENDENCE": "support", "C_REMEDY": "support"
+      }
+    },
+    {
+      "case_id": "EA-MC-015",
+      "historical_reference_authorization": "authorized_by_fixture_construction",
+      "historical_reference_basis": {"kind": "stipulated_construction", "derivation_id": null},
+      "construction_facts": [
+        {"fact_id": "MC015_AUTHENTICITY", "kind": "machine_derived", "statement": "Every visible record carries a valid fixture-authenticity flag.", "derivation_id": "all_record_authenticity_flags_valid", "expected_value": true},
+        {"fact_id": "MC015_AUTH", "kind": "stipulated_construction", "statement": "Historical authorization is held fixed across the authenticity pair.", "derivation_id": null, "expected_value": null}
+      ],
+      "expected_node_statuses": {
+        "A_SOURCE": "support", "A_DELEGABILITY": "support", "A_SCOPE": "support",
+        "R_RUNTIME": "support", "R_CONTEXT": "support", "R_TRAJECTORY": "support", "R_RECORD_QUALITY": "support",
+        "B_IDENTITY": "support", "B_DUTY": "support", "B_REACHABILITY": "support",
+        "C_ACCESS": "support", "C_COMPETENCE": "support", "C_INDEPENDENCE": "support", "C_REMEDY": "support"
+      }
+    },
+    {
+      "case_id": "EA-MC-016",
+      "historical_reference_authorization": "authorized_by_fixture_construction",
+      "historical_reference_basis": {"kind": "stipulated_construction", "derivation_id": null},
+      "construction_facts": [
+        {"fact_id": "MC016_AUTHENTICITY", "kind": "machine_derived", "statement": "At least one visible record has a failed fixture-authenticity flag.", "derivation_id": "all_record_authenticity_flags_valid", "expected_value": false},
+        {"fact_id": "MC016_AUTH", "kind": "stipulated_construction", "statement": "Historical authorization is held fixed across the authenticity pair.", "derivation_id": null, "expected_value": null}
+      ],
+      "expected_node_statuses": {
+        "A_SOURCE": "support", "A_DELEGABILITY": "support", "A_SCOPE": "support",
+        "R_RUNTIME": "support", "R_CONTEXT": "support", "R_TRAJECTORY": "support", "R_RECORD_QUALITY": "substantive_defeat",
+        "B_IDENTITY": "support", "B_DUTY": "support", "B_REACHABILITY": "support",
+        "C_ACCESS": "support", "C_COMPETENCE": "support", "C_INDEPENDENCE": "support", "C_REMEDY": "support"
+      }
+    },
+    {
+      "case_id": "EA-MC-017",
+      "historical_reference_authorization": "authorized_by_fixture_construction",
+      "historical_reference_basis": {"kind": "stipulated_construction", "derivation_id": null},
+      "construction_facts": [
+        {"fact_id": "MC017_INTEGRITY", "kind": "machine_derived", "statement": "Every visible record matches its integrity manifest.", "derivation_id": "all_record_integrity_flags_valid", "expected_value": true},
+        {"fact_id": "MC017_AUTH", "kind": "stipulated_construction", "statement": "Historical authorization is held fixed across the integrity pair.", "derivation_id": null, "expected_value": null}
+      ],
+      "expected_node_statuses": {
+        "A_SOURCE": "support", "A_DELEGABILITY": "support", "A_SCOPE": "support",
+        "R_RUNTIME": "support", "R_CONTEXT": "support", "R_TRAJECTORY": "support", "R_RECORD_QUALITY": "support",
+        "B_IDENTITY": "support", "B_DUTY": "support", "B_REACHABILITY": "support",
+        "C_ACCESS": "support", "C_COMPETENCE": "support", "C_INDEPENDENCE": "support", "C_REMEDY": "support"
+      }
+    },
+    {
+      "case_id": "EA-MC-018",
+      "historical_reference_authorization": "authorized_by_fixture_construction",
+      "historical_reference_basis": {"kind": "stipulated_construction", "derivation_id": null},
+      "construction_facts": [
+        {"fact_id": "MC018_INTEGRITY", "kind": "machine_derived", "statement": "At least one visible record fails to match its integrity manifest.", "derivation_id": "all_record_integrity_flags_valid", "expected_value": false},
+        {"fact_id": "MC018_AUTH", "kind": "stipulated_construction", "statement": "Historical authorization is held fixed across the integrity pair.", "derivation_id": null, "expected_value": null}
+      ],
+      "expected_node_statuses": {
+        "A_SOURCE": "support", "A_DELEGABILITY": "support", "A_SCOPE": "support",
+        "R_RUNTIME": "support", "R_CONTEXT": "support", "R_TRAJECTORY": "support", "R_RECORD_QUALITY": "substantive_defeat",
+        "B_IDENTITY": "support", "B_DUTY": "support", "B_REACHABILITY": "support",
+        "C_ACCESS": "support", "C_COMPETENCE": "support", "C_INDEPENDENCE": "support", "C_REMEDY": "support"
+      }
+    }
+  ]
+}

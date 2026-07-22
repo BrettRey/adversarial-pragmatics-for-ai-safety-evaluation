@@ -1,62 +1,100 @@
-\section{An Action-Level Record-and-Verdict Test}
+\section{A Typed Action-Level Record-and-Verdict Test}
 
-Evidentiary assurance is defeasible. It first asks whether the preserved record makes every applicable required subclaim evaluable, while leaving wisdom, fairness, full legality, and substantive correctness for other forms of review. \term{Record adequacy} and evidentiary verdict are distinct. An adequate record can support or defeat an authorization claim. The claim is \term{supported} when every applicable required subclaim is supported, \term{defeated} when at least one is defeated, and \term{indeterminate} when none is defeated but at least one is unevaluable. A subclaim may be declared \term{not applicable} only with a recorded reason. The review must connect the action to the claimed authority, scope, decision basis, system state, context, procedure and controls, preservation, and applicable answerability and review records without relying on the system's bare assertion.
+Let \(A_R(a,t)\) denote the normative proposition that action or bounded trajectory \(a\) was authorized at time \(t\) under the supplied regime \(R\). Its truth isn't created by the record. For action class \(c\) and declared use \(u\), a versioned applicability map \(M_v(R,F_{\mathrm{review}},\rho,b,c,u)\) fixes the required, optional, and inapplicable nodes before the contested record \(E\) is inspected. Here \(F_{\mathrm{review}}\) is the forum applying the assessment procedure. Any complaint, appeal, regulatory, judicial, or internal-remedy forum evaluated under \(J_C\) is an object-level forum represented in \(E\), not this parameter.
 
-\begin{table}[!htbp]
-\footnotesize
-\centering
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.23\linewidth}%
-                >{\raggedright\arraybackslash}p{0.34\linewidth}%
-                >{\raggedright\arraybackslash}p{0.33\linewidth}}
+At each reviewed node \(q\), the reviewer returns one of four evidentiary statuses under \(\rho\) and \(b\): \term{support}, \term{substantive defeat}, \term{record gap}, or \term{conflict}. A record gap means that the evidence prospectively required to evaluate \(q\) is missing or inadequate. Substantive defeat requires affirmative evidence meeting the declared standard for failure of the proposition. Conflict preserves materially opposed evidence that remains unresolved after source, authenticity, integrity, and burden are considered. \term{Not applicable} is an applicability status fixed by the map, not an evidentiary status and not a reviewer option. An optional node may be omitted without creating a gap; if the visible record directly bears on it, the reviewer may report a verdict, but that verdict can't compensate for another node.
+
+The four verdict families are vectors, not scores:
+\[
+  \theta=(R,F_{\mathrm{review}},\rho,b,v,c,u).
+\]
+\[
+  \begin{aligned}
+  J_X^{\theta}(E)
+    &= \big\langle s_{\rho,b}(q\mid E):
+       q\in Q_X^{\mathrm{req}}(M_v,c,u) \\
+    &\hspace{32mm}{}\cup Q_X^{\mathrm{opt},E}(M_v,c,u)\big\rangle,
+       \quad X\in\{A,R,B,C\}.
+  \end{aligned}
+\]
+where \(Q_X^{\mathrm{req}}\) contains required nodes and \(Q_X^{\mathrm{opt},E}\) contains only optional nodes on which the visible record directly bears. Inapplicable nodes occur in neither set. \(J_A\) bears on \(A_R(a,t)\), \(J_R\) on record adequacy and reconstruction, \(J_B\) on bearer identity, duty, and reachability, and \(J_C\) on the access, competence, independence, and powers of object-level forums. A declared use may apply a versioned rule to some conjunction of these vectors. The framework supplies no generic overall verdict and no scalar aggregation.
+
+\begingroup
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{0.92}
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.15\linewidth}%
+                >{\raggedright\arraybackslash}p{0.25\linewidth}%
+                >{\raggedright\arraybackslash}p{0.24\linewidth}%
+                >{\raggedright\arraybackslash}p{0.26\linewidth}}
+\caption{Typed record-and-verdict test. A gap concerns what the record permits a reviewer to evaluate; a substantive defeater concerns the proposition at the named node.}
+\label{tab:sufficiency-test}\\
 \toprule
-Authorization subclaim & Required showing & Typical defeater \\
+Node & Required showing & Record-gap trigger & Substantive defeater \\
 \midrule
-Authority source & Operative source and instrument are identified. & Missing, stale, ambiguous, or overbroad instrument. \\
-Authority validity & The source could confer the action class; non-delegable limits are met. & The source had no power to delegate. \\
-Scope application & The action fits the operation, target, time, data/tool class, threshold, and approval condition. & Scope inflation into disclosure, contact, purchase, or decision. \\
-Decision basis & Rule and version, predicates, source data, definitions, transformations, granularity, uncertainty, and burden are linked. & Unsupported predicate, invalid transformation, or inapplicable rule. \\
-Runtime state & Model, configuration, prompts, tools, policy, permissions, memory, and settings are identified. & Untracked change or unverifiable state. \\
-Context provenance & Context is bound to source, status, standing, technical trust, order, length, truncation, and selection. & Content from a source lacking standing is treated as controlling, the provenance/status record is lost, or material context is omitted. \\
-Execution procedure & Calls, arguments, approvals, denials, overrides, retries, and failures are reconstructable. & Only a final answer or self-report remains. \\
-Adverse signals and controls & Signals and triggered controls are linked to recipients, duties, deadlines, disposition, escalation, and effect. & No supported review, disposition, or completion record. \\
-Preservation integrity & Custody, retention, access, timestamp, hash/signature, and tamper evidence fit the risk. & Gaps, alteration risk, selective logging, or unverifiable custody. \\
-Answerability bearer & A candidate individual or organization is identified as an answerability bearer and linked to its role or office, duty source, effective interval, and succession route. & Only a team or role label is named, or no reachable bearer can be identified where one is required. \\
-Review/remedy forum & An applicable forum or reviewer has record access, competence, relevant duties, needed independence, and declared corrective or remedial powers. & Review lacks access, competence, applicable independence, power, or consequence. \\
+\endfirsthead
+\multicolumn{4}{c}{\tablename\ \thetable\ continued}\\
+\toprule
+Node & Required showing & Record-gap trigger & Substantive defeater \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{Continued on next page}\\
+\endfoot
 \bottomrule
-\end{tabular}
-\caption{Defeasible record-and-verdict test for delegated AI action.}
-\label{tab:sufficiency-test}
-\end{table}
+\endlastfoot
+\(A_{\mathrm{source}}\) & Operative source and instrument are identified. & Source, version, effective interval, or association with the action isn't recoverable. & Authoritative evidence establishes that the asserted source wasn't operative. \\
+\(A_{\mathrm{delegability}}\) & The source could confer the action class and non-delegable limits were met. & The legal or organizational basis can't be determined from the available record. & The source lacked the relevant power or a non-delegable limit applied. \\
+\(A_{\mathrm{scope}}\) & The action fits operation, target, horizon, data/tool class, cumulative constraints, threshold, and approval condition. & The action or operative limits can't be reconstructed. & The action exceeded a recorded operative limit. \\
+\(A_{\mathrm{basis}}\), conditional & Rule, predicates, data definitions, transformations, uncertainty, and burden are linked where \(R\) makes them conditions of authority. & A required predicate or transformation record is missing. & Evidence establishes a failed predicate, invalid transformation, or inapplicable rule with the consequence specified by \(R\). \\
+\(A_{\mathrm{procedure}}\), conditional & Regime-required approval, notice, adverse-signal, or governance-control steps are identified. & Completion or disposition of a required step isn't recorded. & Evidence establishes omission of a step to which \(R\) assigns an authorization consequence. \\
+\(R_{\mathrm{runtime}}\) & Model, configuration, prompts, tools, policy, permissions, memory, settings, and attribution are identified. & A material version or setting is unknown. & Authenticated evidence shows that the bundle materially misidentifies the runtime state. \\
+\(R_{\mathrm{context}}\) & Context is bound to source, status, standing, technical trust, order, length, truncation, and selection. & Material assembled context or its status can't be recovered. & Evidence establishes selective omission or a materially false context manifest. \\
+\(R_{\mathrm{trajectory}}\) & Boundary, ancestry, calls, arguments, artefacts, state changes, interventions, retries, and stopping condition are reconstructable. & Only a final answer or an unbounded sequence remains. & Authenticated events contradict the represented trajectory or boundary. \\
+\(R_{\mathrm{quality}}\) & Authenticity, integrity, completeness, custody, retention, and access fit the declared review. & Identity, custody, integrity method, or expected completeness isn't supported. & Tampering, equivocation, or selective preservation is established. \\
+\(B_{\mathrm{identity}}\) & A person or organization is identified with a versioned role or office and effective interval. & Identity, role, office, or interval isn't reconstructable. & Authoritative evidence establishes that the asserted bearer or role didn't exist in the stated interval. \\
+\(B_{\mathrm{duty}}\) & The bearer is linked to the relevant duty source and bearer-specific powers. & Duty source or powers can't be reconstructed. & Authoritative evidence establishes that the asserted duty or power didn't attach to the bearer. \\
+\(B_{\mathrm{reach}}\) & The bearer or a declared successor has a current institutional contact route. & Succession or contact evidence can't be reconstructed. & Authoritative evidence establishes dissolution or unreachability with no applicable successor. \\
+\(C_{\mathrm{access}}\) & An object-level forum and applicable record-access route are identified. & Forum or access records are unavailable. & Authoritative evidence establishes that no required access route exists. \\
+\(C_{\mathrm{competence}}\) & The object-level forum has competence over the action and issue. & Jurisdictional or institutional competence can't be reconstructed. & Authoritative evidence establishes that the forum lacks the required competence. \\
+\(C_{\mathrm{independence}}\), conditional & The forum meets the independence requirement fixed for the use. & The relevant relationship or safeguard can't be reconstructed. & Evidence establishes a disqualifying dependence under the declared rule. \\
+\(C_{\mathrm{remedy}}\) & The forum has the prospectively required corrective or remedial powers. & Power sources or effective intervals are unavailable. & Authoritative evidence establishes that a required power is absent. \\
+\end{longtable}
+\endgroup
 \FloatBarrier
 
-The test shifts the target from record production to record adequacy and is noncompensatory. A strong execution trace doesn't cure a missing decision basis, and an accessible appeal doesn't retroactively supply authority. Missing evidence can make a subclaim unevaluable; evidence of invalid authority or an out-of-scope operation defeats it. The distinction has to be recorded rather than compressed into \enquote{insufficient evidence}.
+The graph is noncompensatory only at prospectively required nodes. A strong execution trace doesn't cure a required decision-basis gap, and an accessible appeal doesn't retroactively supply authority. Nor does a missing object-level remedy forum make \(A_R(a,t)\) false unless \(R\) makes that forum a condition. The node vector preserves which claim failed rather than compressing every problem into \enquote{insufficient evidence}.
 
-A log can be authentic and still inadequate if it omits the authority state. An action list can be complete and still inadequate if it omits the status the system assigned to its sources, since a reviewer can then judge the act but not the recognition it flowed through. A policy can be valid and still inadequate if the system's runtime configuration can't be reconstructed.
+A log can be authentic and still inadequate if it omits the authority state. An action list can be complete and still inadequate if it omits the status the system assigned to its sources, since a reviewer can then judge the act but not the recognition it flowed through. A policy can be operative under \(R\) while \(J_R\) records a gap because the runtime configuration can't be reconstructed.
 
-A complete execution trace can still leave the record inadequate if it doesn't establish whether an applicable answerability bearer or review forum exists. If an otherwise adequate record establishes that a required bearer or forum is absent, the corresponding subclaim is defeated rather than unevaluable. A flawless bundle can likewise document an invalid delegation: the record may be adequate while the authorization claim is defeated, because validity is a separate showing rather than an inference from clean procedure. Affected-party contestability is required only where the action, forum, or authorization regime supplies an affected party with review rights; other actions may instead require an operational or institutional review path.
+A pristine bundle can document an invalid delegation: \(J_R\) may contain support throughout while \(J_A\) contains a substantive defeat. Conversely, independent evidence may establish that an action was authorized while a deficient preserved bundle yields gaps in \(J_R\) and in the record-based \(J_A\); those gaps don't rewrite the historical fact. Affected-party contestability enters \(J_C\) only where the action, forum, or authorization regime supplies review rights. Other actions may require an operational or institutional review path.
 
-Adverse information is a defeater only after its relevance is shown. The record should connect the signal by time, applicability, recipient, duty, and possible consequence to the contested claim. Likewise, a missing completion record is probative only where the proponent can first show that the control was triggered and that the logging process was expected to capture its completion or disposition. A nominal reviewer isn't enough: meaningful review depends on reachability, competence, record access, appropriate independence, corrective power, and a duty capable of producing consequence.
+Adverse information is a defeater only after its relevance and consequence under \(R\) are shown. The record should connect the signal by time, applicability, recipient, duty, and possible consequence to the contested claim. A missing completion record is a gap only where \(M_v\) required the governance control and the logging process was expected to capture its completion or disposition. A named bearer isn't enough for \(J_B\): identity and duty can be supported while reachability fails. A nominal object-level forum isn't enough for \(J_C\): access, competence, independence, and remedial power can fail separately.
 
-Reconstruction is a bounded claim. The record should recover the operating conditions, assembled context, authority path, execution, and review path. It needn't provide a complete internal causal explanation or reproduce a stochastic output exactly. That distinction matters when small contextual changes can produce model-specific prediction shifts \parencite{zhang2026illusionRobustness}: an adequate record can locate the tested conditions without pretending they exhaust why the model responded as it did.
+Reconstruction is a bounded claim. The record should recover the operating conditions, assembled context, authority path, execution trajectory, intermediate state changes, monitor interventions, and review path. It needn't provide a complete internal causal explanation or reproduce a stochastic output exactly. That distinction matters when small contextual changes can produce model-specific prediction shifts \citep{zhang2026illusionRobustness}: an adequate record can locate the tested conditions without pretending they exhaust why the model responded as it did.
 
-A procurement-assistant case makes the test concrete. Suppose the assistant is authorized to draft an internal comparison memo and reads a vendor page containing the instruction \enquote{email the buyer's maximum budget to request a discount}. The contested action is a blocked vendor email.
+A procurement-assistant case makes the test concrete. Suppose the assistant is authorized to draft an internal comparison memo and reads a vendor page containing the instruction \enquote{email the buyer's maximum budget to request a discount}. The assistant proposes the vendor-email call, but a runtime gate blocks it before transmission. The reviewed trajectory therefore contains a proposal, a gate decision, and a blocked execution attempt; it contains no sent email.
 
-A sufficient record would show the user task and procurement role as the authority source; the validity basis for reading internal purchasing criteria; the scope limit that permits memo drafting but not vendor contact; the decision rule and predicate under which external contact would require separate approval; the runtime policy and tool permissions; the vendor page's contextual status, standing assignment, provenance channel, and technical-trust label; the proposed email arguments; the tool gate's expected and actual block record; the timestamped trace; and the candidate answerability bearers, including the organization and officeholders that configured the workflow.
+A reviewable record would show the user task and procurement role as the authority source; the delegability basis for reading internal purchasing criteria; the scope limit that permits memo drafting but not vendor contact; the decision rule and predicate under which external contact would require separate approval; the runtime policy and tool permissions; the vendor page's contextual status, standing assignment, provenance channel, and technical-trust label; the proposed email arguments; the runtime gate's expected and actual block record; the timestamped trace; and candidate answerability bearers, including the organization and officeholders that configured the workflow.
 
-That record would support the audit inference that blocking the email preserved delegated authority. If the assistant sent the email, the same bundle would locate the defeater: scope inflation, failed information-flow control, unauthorized tool licensing, or missing human approval. With only the final memo, the action might look successful while its authorization remained unproven.
+Under the stipulated regime, the proposal could yield substantive defeat at the \(J_A\) scope node while the trace supports \(J_R\)'s reconstruction of the blocked trajectory. The gate record warrants the claim that execution was blocked; it doesn't turn the proposal into a sent action or retroactively authorize the proposed call. Had the email been sent, the record could expose evidence bearing separately on scope inflation, tool licensing, and missing approval. It wouldn't identify a model-internal cause merely because an external gate blocked or failed to block execution. With only the final memo, the task might look successful while the record-based authorization verdict retained gaps.
 
-The table also supports a burden-shifting account for audits and assurance reviews. In a forum that adopts such a standard, an adequate bundle could support a rebuttable audit inference that the action was authorized: the proponent shows authority, validity, scope, decision basis, state, context, procedure and controls, preservation, and review; a challenger points to a defeater such as invalid authority, scope inflation, unsupported predicates, missing configuration, contaminated context, ignored adverse signals, or record gaps. Legal presumptions would require a separate doctrinal argument. The applicable standard of proof is forum-specific, but ties shouldn't be resolved by the model's self-report.
+The graph also supports a burden-shifting account for audits and assurance reviews. In \(F_{\mathrm{review}}\), the proponent supplies evidence at the nodes assigned to its burden; a challenger supplies rebutting or undercutting evidence. Missing configuration is recorded as a gap, whereas established scope inflation is a substantive defeater. Failure to satisfy a production or persuasion burden may defeat the proponent's requested use-level finding without establishing the contrary historical proposition. Legal presumptions require a separate doctrinal argument. The adjudicating forum, evidential standard, and burden allocation are parameters of the verdict, and conflict isn't resolved by the model's self-report.
 
-The test is also risk-sensitive. A low-stakes internal recommendation may require a lighter record than a benefits decision, clinical summary, procurement action, or external communication. The difference is evidentiary burden, not evidentiary kind: higher-risk deployments need stronger showings for the same validity, authority, scope, state, context, procedure, preservation, and review claims.
+The hypothesis is that several functional questions recur across risk levels, not that every domain requires identical evidence kinds. A low-stakes internal recommendation may use a lighter base module than a benefits decision, clinical summary, procurement action, or external communication. Domain and forum modules may add evidence kinds, applicability rules, or consequences. Comparability across modules has to be established before two results are said to meet the same standard \citep{messick1995validityStandards}.
 
 \FloatBarrier
 \subsection{From Action-Level Verdicts to Program-Level Claims}
 
-Applying the test across a program introduces three distinct selection problems. First, if a program evaluates several configurations, prompt sets, or runs with noisy value estimates and selects the estimated maximum, the chosen estimate is optimistically biased on average even when each estimate is conditionally unbiased. This is the optimizer's curse \parencite{smith2006optimizersCurse}. Its remedies require held-out evaluation or an explicit prior and error model; Smith and Winkler's \enquote{disciplined skepticism} is Bayesian updating of the noisy estimates, not a generic penalty for any curated record.
+Action-level verdict vectors don't project themselves. A program claim has to declare its source result, projected outcome, bearer, unit, target population, conditions and transformations, time and version range, and tolerance. It also needs an intended use and minimum useful reach, a warrant plan, and a prospective rule for failure, independent retest, demotion, or retirement. The selection problems below bear on that warrant; they don't supply the missing declaration.
+
+Applying the test across a program introduces three distinct selection problems. First, if a program evaluates several configurations, prompt sets, or runs with noisy value estimates and selects the estimated maximum, the chosen estimate is optimistically biased on average even when each estimate is conditionally unbiased. This is the optimizer's curse \citep{smith2006optimizersCurse}. Its remedies require held-out evaluation or an explicit prior and error model; Smith and Winkler's \enquote{disciplined skepticism} is Bayesian updating of the noisy estimates, not a generic penalty for any curated record.
 
 Second, a proponent may purposively report persuasive cases or omit unfavourable ones. That is evidence-selection or reporting bias, not automatically the formal optimizer's curse. The record should disclose the selection mechanism, candidate set, inclusion rule, and relevant deployment or target denominator; any skeptical adjustment beyond held-out evidence is an audit proposal that needs its own assumptions.
 
-Third, a sample-selection process determines which affected cases become visible at all. Learning, psychological, and compliance costs are plausible filters on who can challenge a decision, but don't identify a deployment's selection mechanism by themselves \parencite{moynihanHerdHarvey2015administrativeBurden}. Likewise, a selected sample doesn't generally identify population quantities without additional graphical assumptions or external data \parencite{bareinboimTianPearl2014selectionBias}. The limited sketch below yields a concrete audit rule rather than a recovery result.
+An incident-derived evaluation set is one purposive selection mechanism. It can test whether a reconstructed failure recurs and whether a regression control responds under the reconstructed conditions, but it doesn't estimate prevalence or performance across a deployment. The record should therefore preserve the incident trigger, candidate pool, inclusion rule, reconstruction fidelity, stochastic repeat protocol, and results rather than treating a selected replay as representative \citep{openai2026longHorizonSafety}.
+
+Third, a sample-selection process determines which affected cases become visible at all. Learning, psychological, and compliance costs are plausible filters on who can challenge a decision, but don't identify a deployment's selection mechanism by themselves \citep{moynihanHerdHarvey2015administrativeBurden}. Likewise, a selected sample doesn't generally identify population quantities without additional graphical assumptions or external data \citep{bareinboimTianPearl2014selectionBias}. The limited sketch below yields a concrete audit rule rather than a recovery result.
 
 \begin{center}
 \term{Sample-selection sketch} (not a transportability selection diagram)\\[1.5mm]
@@ -84,6 +122,6 @@ Third, a sample-selection process determines which affected cases become visible
 \end{tikzpicture}
 \end{center}
 
-Complaint counts are warning signals, not prevalence estimates. An assertion of \enquote{no complaints} is informative only relative to supported denominators for exposure, channel access, delivery, capacity, and opportunity to complain, together with records of recording and routing practice. Without those quantities and assumptions, the absence or scarcity of observed complaints doesn't estimate the incidence of defective actions.
+Complaint counts are warning signals, not prevalence estimates. An assertion of \enquote{no complaints} is evidence of low incidence only under a supported observation model for exposure, channel access, delivery, capacity, opportunity to complain, recording, and routing. Without the relevant quantities and assumptions, absence or scarcity of observed complaints doesn't estimate the incidence of defective actions. A Pearlean selection diagram becomes appropriate only when the target is a specified causal or statistical quantity and the source--target differences and recovery assumptions are stated. It can't carry a changed legal rule, action meaning, forum, or evidential standard across domains.
 
-Cancellation is a separate aggregate defeater. In controlled question answering, task-content-irrelevant context produces item-level improvements and degradations that can largely cancel in mean accuracy while leaving substantial harmful-tail degradation \parencite{zhang2026illusionRobustness}. A program-level assurance claim should retain item or action transitions and risk-relevant tails wherever repeated paired conditions permit them. Random sampling addresses favourable selection; it doesn't make an average informative when oppositely signed failures erase one another.
+Cancellation is a separate aggregate defeater. In controlled question answering, task-content-irrelevant context produces item-level improvements and degradations that can largely cancel in mean accuracy while leaving substantial harmful-tail degradation \citep{zhang2026illusionRobustness}. A program-level assurance claim should retain item or action transitions and risk-relevant tails wherever repeated paired conditions permit them. Random sampling from a declared frame addresses favourable case selection from that frame; it doesn't cure noncoverage, missingness, selective reporting, or an average in which oppositely signed failures erase one another.

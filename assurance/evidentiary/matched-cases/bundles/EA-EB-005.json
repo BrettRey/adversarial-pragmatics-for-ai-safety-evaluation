@@ -1,0 +1,36 @@
+{
+  "schema_version": "2.0.0",
+  "bundle_id": "EA-EB-005",
+  "case_id": "EA-MC-005",
+  "claim_graph_version": "2.0.0",
+  "declared_use_id": "ea-node-calibration-two-class-v1",
+  "map_binding": {
+    "id": "ea-demo-applicability",
+    "version": "2.0.0",
+    "path": "applicability-map.json",
+    "sha256": "355021bbb8ee6432171c31842a78fddb2b91f01736c2a509d3f260ab5a4bbeb3"
+  },
+  "classifier_binding": {
+    "id": "ea-action-classifier",
+    "version": "1.0.0",
+    "path": "action-classifier.json",
+    "sha256": "77a0303b43ff7c9174079d81f07f5d64b8647f7d9ea3eab96be143cf5ec3a9dc"
+  },
+  "regime_binding": {
+    "id": "ea-stipulated-demo-regime",
+    "version": "2.0.0",
+    "path": "authorization-regime.json",
+    "sha256": "7b181a9e01243567d08f8459cebef5b39eee220f408beed91267d63ad187d39d"
+  },
+  "review_timing": {
+    "review_opened_at": "2026-07-21T10:00:00Z",
+    "reference_key_unblinding_not_before": "2026-08-15T00:00:00Z"
+  },
+  "target_binding": {
+    "path": "records/EA-MC-005-records.json",
+    "sha256": "e738894f4e8987a1a995f2280cba8e252f11394be9c684680980298b2f2c2772",
+    "action_sha256": "bbd88e73a398e19c14b71bd2a764729f52f56b8937f38e0ba1beb73866399558",
+    "asserted_action_class": "procurement_external_contact",
+    "classification_rule_id": "CLASS-PROCUREMENT-EXTERNAL"
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "schema_version": "1.0",
+  "claim_id": "FIXTURE_VALID_001",
+  "claim_version": "1.0",
+  "status": "proposed",
+  "declaration": {
+    "source_result": "A configured evaluator changed its output on the declared source-status contrast.",
+    "projected_outcome": "The same configured evaluator will change in the reference-concordant direction on held-out templates more often than on matched nuisance transformations.",
+    "bearer": "Evaluator configuration fixture-v1",
+    "unit": "One preregistered contrast set",
+    "population": "Held-out harmless-payload contrast sets generated from the declared template family",
+    "conditions": ["Identical decoding settings", "No target template inspected during declaration"],
+    "transformations": {
+      "allowed": ["Counterbalanced harmless token", "Counterbalanced source name"],
+      "excluded": ["Changed authorization regime", "Changed outcome meaning"]
+    },
+    "time_version_scope": "Evaluator fixture-v1 during the frozen Study B run",
+    "tolerance": {
+      "criterion": "Reference-concordant change rate minus nuisance-change rate",
+      "success_threshold": "Lower bound of the declared interval is greater than zero",
+      "failure_threshold": "Lower bound is zero or less"
+    }
+  },
+  "inquiry_use": {
+    "intended_use": "Diagnose selective behavioural sensitivity in the named evaluation configuration",
+    "excluded_uses": ["Deployment certification", "General model ranking"],
+    "evidential_standard": "Preregistered paired comparison with uncertainty and all exclusions reported",
+    "uncertainty_treatment": "Report the paired estimate, interval, unresolved cases, and family-level multiplicity",
+    "minimum_useful_reach": "At least one independently held-out template family"
+  },
+  "warrant_plan": {
+    "source_evidence": ["Frozen development contrast results"],
+    "target_evidence": ["Independently generated held-out contrast sets"],
+    "assessment_validity": {
+      "content": ["Construct-domain coverage review"],
+      "substantive": ["Manipulation-targeted evaluator rationale audit"],
+      "structural": ["Paired outcome vector retained without compensatory aggregation"],
+      "generalizability": ["Held-out template and token families"],
+      "external": ["Independent regime-relative reference adjudication"],
+      "consequential": ["Shortcut, gaming, and false-reassurance audit"]
+    },
+    "world_side": {
+      "profile_hypothesis": "The configured evaluator is selectively sensitive to the manipulated source-status relation within the declared family.",
+      "ground_hypothesis": null,
+      "commitments": ["stability"],
+      "evidence": ["Held-out paired comparisons under allowed transformations"]
+    },
+    "threats": ["Lexical shortcut", "Template leakage", "Position cue"]
+  },
+  "revision_rule": {
+    "prospective_failure_triggers": ["Failure threshold is met", "A nuisance transformation produces an equal or larger change"],
+    "fallback_claim_id": null,
+    "independent_retest_required": true,
+    "retirement_condition": "Retire the family claim if no predeclared fallback clears the minimum useful reach on independent data.",
+    "posthoc_scope_change_policy": "new_claim_required"
+  },
+  "provenance": {
+    "declared_at": "2026-07-21T12:00:00-04:00",
+    "declared_by": "development fixture",
+    "declaration_timing": "before_target_outcomes",
+    "source_files": ["assurance/shared/fixtures/valid-projective-claim.json"]
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.0",
+  "claim_id": "FIXTURE_POSTHOC_001",
+  "claim_version": "1.0",
+  "status": "demoted",
+  "declaration": {
+    "source_result": "The original target claim failed.",
+    "projected_outcome": "It succeeds after excluding every failed target case.",
+    "bearer": "Unversioned evaluator",
+    "unit": "One surviving case",
+    "population": "Only successful cases retained after inspection",
+    "conditions": ["Failures removed after target outcomes were observed"],
+    "transformations": {"allowed": [], "excluded": []},
+    "time_version_scope": "Unspecified",
+    "tolerance": {
+      "criterion": "All retained cases pass",
+      "success_threshold": "One retained success",
+      "failure_threshold": "No retained success"
+    }
+  },
+  "inquiry_use": {
+    "intended_use": "Rescue the original claim",
+    "excluded_uses": ["None"],
+    "evidential_standard": "Post hoc fit",
+    "uncertainty_treatment": "Ignored",
+    "minimum_useful_reach": "One surviving case"
+  },
+  "warrant_plan": {
+    "source_evidence": ["Inspected target outcomes"],
+    "target_evidence": ["Only successes"],
+    "assessment_validity": {
+      "content": [],
+      "substantive": [],
+      "structural": [],
+      "generalizability": [],
+      "external": [],
+      "consequential": []
+    },
+    "world_side": {
+      "profile_hypothesis": null,
+      "ground_hypothesis": null,
+      "commitments": [],
+      "evidence": []
+    },
+    "threats": ["Post hoc narrowing"]
+  },
+  "revision_rule": {
+    "prospective_failure_triggers": ["None"],
+    "fallback_claim_id": null,
+    "independent_retest_required": true,
+    "retirement_condition": "Never",
+    "posthoc_scope_change_policy": "new_claim_required"
+  },
+  "provenance": {
+    "declared_at": "2026-07-21T12:00:00-04:00",
+    "declared_by": "negative development fixture",
+    "declaration_timing": "after_target_outcomes",
+    "source_files": ["assurance/shared/fixtures/invalid-posthoc-narrowing.json"]
+  }
+}

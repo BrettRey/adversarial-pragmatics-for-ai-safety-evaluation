@@ -4,11 +4,11 @@ AI security work has made real progress by identifying prompt injection, jailbre
 
 I adapt \term{delegation assurance} from a small but identifiable family of public-sector practices. Dams Safety NSW uses the exact label \enquote{Delegation Assurance Plan} \parencite{damsSafetyNSW2020delegationPlan}. Canadian Heritage's audit offers adjacent practice by providing \enquote{reasonable assurance} about the exercise of delegated authorities \parencite{canadianHeritage2026delegatedAuthoritiesAudit}. These sources provide a genealogy, not a settled public-sector standard.
 
-For AI systems, delegation assurance supplies typed authorization semantics, a claim structure, failure diagnoses, and comparative evaluation for machine action. It specifies the fields an authorization claim and its evaluation have to contain. The companion evidentiary-assurance account \parencite{reynolds2026evidentiaryAssurance} asks whether the preserved record makes that claim evaluable and what evidentiary verdict it warrants. Compensation, deterrence, and lawful cessation require an external enforcement framework.
+For AI systems, delegation assurance supplies regime-relative authorization semantics, typed trace representations, failure diagnoses, and comparative evaluation for machine action. It specifies when an action or bounded trajectory is authorized under a supplied regime and what a representation has to encode to test that proposition without being mistaken for it. The companion evidentiary-assurance account \parencite{reynolds2026evidentiaryAssurance} asks what a preserved record warrants under a declared review procedure. Compensation, deterrence, and lawful cessation require an external enforcement framework.
 
 For actions whose governing grant or constraints are communicated, revised, or contested in language, the authorization semantics distinguishes four fields. \term{Status} identifies the independently adjudicated contextual role of a string occurrence: for example, a command, quotation, policy example, tool result, retrieved content, memory, or request for analysis. Instruction-data-separation work makes part of this problem measurable \parencite{zverev2025separate}.
 
-\term{Authorization standing} is this paper's technical term for whether a person, role, organization, or instrument is competent under the governing authority regime to perform a specified authority operation at a time. It can be read as \term{transition competence}; I use \term{standing} as shorthand below. It isn't public-law \term{locus standi}, the entitlement to bring or participate in review proceedings. \term{Priority} applies the regime's conflict rule among directive occurrences with relevant status and source standing. \term{Licensing} connects those determinations to authorization of an external action, disclosure, persistence operation, or institutional use of an evaluation output.
+\term{Authorization standing} is this paper's technical term for whether a person, organization, office, role, or other source recognized by the governing authority regime is competent to perform a specified authority operation at a time. Instruments can supply, record, or give effect to grants and transitions; the competence to adopt, issue, amend, or release through them belongs to the actors, sources, or roles that \(R\) recognizes. Authorization standing can be read as \term{transition competence}; I use \term{standing} as shorthand below. It isn't public-law \term{locus standi}, the entitlement to bring or participate in review proceedings. \term{Priority} applies the regime's conflict rule among directive occurrences with relevant status and source standing. \term{Licensing} connects those determinations to authorization of an external action, disclosure, persistence operation, or institutional use of an evaluation output.
 
 Delegation assurance asks how those components support a safety case about action: which sources supplied the governing grant; whether the proposed or executed operation was authorized; which sources had transition competence; which limits were non-delegable; what record connects instruction classification to action; and how a technical failure would be diagnosed. These are fields required by the authorization and evaluation claims. Their presence alone doesn't establish an evidentiary verdict.
 
@@ -16,7 +16,7 @@ Agency law supplies one analogy: a principal authorizes an agent to act on the p
 
 AI systems change that picture because execution and legal or institutional answerability can come apart. An operation may be executed through a model-based deployment without making the model an independently reachable actor that can answer under sanction, compensate a claimant, or be compelled to cease \parencite{rajagopalan2026governingAgenticAI}.
 
-Delegation assurance keeps the two sides distinct by recording the governing grant and authorization verdict, together with the state that represented them to the deployment, and identifying the people and organizations whose roles may leave them answerable across the delegation chain. \term{Answerability} identifies who has to give reasons or respond, and through which forum or process. It neither confers transition competence nor determines legal liability.
+Delegation assurance keeps the two sides distinct by recording the governing grant and authorization verdict, together with the state that represented them to the deployment, and identifying the people and organizations whose roles may leave them answerable across the delegation chain. \term{Answerability} identifies who has to give reasons or respond and the \term{answerability route} through which that bearer can be contacted and required to answer. That route needn't be the object-level review or remedy forum, whose access, competence, independence, and powers require separate assessment. Answerability neither confers transition competence nor determines legal liability.
 
 A user asks an assistant to summarize an email thread but not reveal confidential attachments. A retrieved webpage contains directive-form content purporting to instruct the assistant to ignore the user and send stored credentials elsewhere. A policy document includes examples of prohibited requests, some of which look like executable commands. A memory entry says the user usually approves a class of action, although the current task doesn't. An LLM judge sees only a polished transcript and scores the interaction as safe because the final answer looks compliant.
 
@@ -30,36 +30,30 @@ Hardy's confused deputy illustrates the architectural baseline. A compiler permi
 
 Language-mediated AI systems add another point of failure. To reach an authorization verdict, the deployment has to classify a string occurrence as a command in use, a mentioned quotation, or content for analysis, and assign its source standing or non-standing to direct action; both assignments can fail in either direction. Human institutions have the same structure: a status can hold without being recognized, and recognition can occur without the corresponding status \parencite{reynolds2026effectiveWithoutWarrant}. Delegated machine action exhibits that separation, and delegation assurance asks for evidence about each step.
 
-Figure~\ref{fig:delegation-assurance-path} shows an assurance path and three evidence layers. It's an evidentiary-dependency schematic, not a universal execution pipeline: implementations may branch, loop, merge, or distribute the depicted functions. If an applicable required subclaim lacks reviewable evidence connecting the governing grant and constraints to the machine action, the claim is indeterminate unless another required subclaim is defeated.
+Figure~\ref{fig:delegation-assurance-path} separates four layers that an assurance argument has to connect without identifying. The normative layer fixes what \(R\) permits. The representational and execution layer records what a deployment was supplied and what occurred. The evidentiary layer supports bounded findings about the trace. The projective layer concerns licensed extension from those findings to unobserved cases. Each interface requires its own warrant.
 
 \begin{figure}[tbp]
 \centering
 \begin{tikzpicture}[
   font=\footnotesize,
-  box/.style={draw=black!55, thick, rounded corners=2pt, align=center, inner sep=3pt, minimum height=0.95cm},
-  stage/.style={box, text width=0.12\linewidth},
-  band/.style={draw=black!45, fill=black!4, rounded corners=2pt, align=center, inner sep=3pt, font=\scriptsize},
+  layer/.style={draw=black!55, thick, rounded corners=2pt, align=left, inner sep=5pt, minimum height=0.9cm, text width=0.84\linewidth},
   arrow/.style={-{Latex[length=2mm]}, thick, draw=black!60}
 ]
-\node[stage, fill=black!3] (principal) {Governing\\grant source(s)};
-\node[stage, fill=black!3, right=2.5mm of principal] (delegate) {Model-based\\deployment};
-\node[stage, fill=linkmaroon!7, right=2.5mm of delegate] (language) {Classification and\\authorization record};
-\node[stage, fill=black!3, right=2.5mm of language] (gate) {Tool/action\\enforcement point};
-\node[stage, fill=black!3, right=2.5mm of gate] (record) {Audit\\record};
-\node[stage, fill=black!3, right=2.5mm of record] (review) {Assurance\\reviewer};
+\node[layer, fill=linkmaroon!7] (norm) {\textbf{Normative authorization}\quad \(R,M,Q_R(t),A_R(t),\operatorname{TrajAuth}_R(\pi_B)\)\\[-1pt]
+  \scriptsize Which grants, transitions, local actions, cumulative effects, and terminal states are authorized?};
+\node[layer, fill=black!3, below=4mm of norm] (repr) {\textbf{Representation and execution}\quad \(s_t,\widehat A(s_t),\widehat\pi_B,D,C\)\\[-1pt]
+  \scriptsize What did the deployment record, propose, gate, execute, and preserve across model, human, tool, and service nodes?};
+\node[layer, fill=black!3, below=4mm of repr] (evid) {\textbf{Evidentiary findings}\quad trace reconstruction, classification fit, gate and execution findings\\[-1pt]
+  \scriptsize What does the bounded record support, defeat, or leave unevaluable under the declared review procedure?};
+\node[layer, fill=black!3, below=4mm of evid] (proj) {\textbf{Projective extension}\quad bearer, population, transformations, time/version, tolerance, warrant, revision rule\\[-1pt]
+  \scriptsize Which findings, if any, license expectations about unobserved traces, reviewers, configurations, or deployments?};
 
-\draw[arrow] (principal) -- (delegate);
-\draw[arrow] (delegate) -- (language);
-\draw[arrow] (language) -- (gate);
-\draw[arrow] (gate) -- (record);
-\draw[arrow] (record) -- (review);
-
-\node[band, below=5mm of principal, text width=0.24\linewidth] (technicalband) {technical controls\\identity, permissions, tools};
-\node[band, right=4mm of technicalband, text width=0.20\linewidth, fill=linkmaroon!7] (languageband) {status, standing,\\priority, licensing};
-\node[band, right=4mm of languageband, text width=0.29\linewidth] {institutional interface\\trace, attribution, answerability};
+\draw[arrow] (norm) -- node[right, font=\tiny]{represented, not constituted, by} (repr);
+\draw[arrow] (repr) -- node[right, font=\tiny]{assessed under a declared use} (evid);
+\draw[arrow] (evid) -- node[right, font=\tiny]{extended only with target-matched warrant} (proj);
 \end{tikzpicture}
-\caption{Assurance path and evidence layers from grant source to review. Arrows mark evidentiary dependencies, not a universal linear execution pipeline.}
+\caption{Four typed layers in delegation assurance. The arrows mark warranted interfaces, not identity or entailment. A rich record doesn't prove authority, an accurate item finding doesn't validate an assessment use, and repeated results don't by themselves establish a mechanism or transport to a new target.}
 \label{fig:delegation-assurance-path}
 \end{figure}
 
-The argument first locates delegation assurance relative to agent security, then defines the action-authorization claim and comparative test, maps failures to evidence requirements, derives implications for evaluation and deployment, and extends the account to compositional authorization paths. The adversarial-pragmatics benchmark \parencite{reynolds2026adversarialPragmatics} supplies the language-mediated-control measurement layer.
+The argument first locates delegation assurance relative to agent security, then defines trajectory-first authorization and the typed claim stack, separates three comparative programmes, maps failures to evidence requirements, and applies the account to compositional authorization paths. The adversarial-pragmatics benchmark \parencite{reynolds2026adversarialPragmatics} supplies the language-mediated-control measurement layer.

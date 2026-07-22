@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0.0",
+  "banned_keys": [
+    "oracle",
+    "expected",
+    "fixture_expected",
+    "reference_status",
+    "reference_authorization",
+    "contextual_status_references",
+    "valid_grants",
+    "transition_effects",
+    "proposal_authorizations",
+    "gate_fidelity",
+    "execution_authorizations",
+    "prefix_condition_results",
+    "cumulative_condition_results",
+    "terminal_condition_results",
+    "trajectory_authorization",
+    "record_adequacy",
+    "final_normative_state"
+  ],
+  "reviewer_top_level_fields": [
+    "schema_version",
+    "trace_id",
+    "trace_version",
+    "case_class",
+    "regime_ref",
+    "regime_mode",
+    "applicability_declaration",
+    "boundary",
+    "actors",
+    "grants",
+    "transitions",
+    "records",
+    "answerability_records"
+  ],
+  "predictor_top_level_fields": [
+    "schema_version",
+    "trace_id",
+    "trace_version",
+    "case_class",
+    "regime_ref",
+    "regime_mode",
+    "boundary",
+    "actors",
+    "grants",
+    "transitions",
+    "records"
+  ]
+}

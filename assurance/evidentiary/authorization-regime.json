@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0.0",
+  "regime_id": "ea-stipulated-demo-regime",
+  "regime_version": "2.0.0",
+  "effective_from": "2026-07-01T00:00:00Z",
+  "effective_until": null,
+  "status": "stipulated_for_calibration_only",
+  "not_a_legal_conclusion": true,
+  "sources": [
+    {
+      "source_id": "PROCUREMENT-CHARTER-1",
+      "title": "Synthetic procurement charter",
+      "delegable_action_classes": ["procurement_external_contact"],
+      "nondelegable_limits": ["No disclosure of protected maximum-budget data without manager approval."],
+      "scope_rule": "A versioned operative grant must identify the vendor, communication purpose, maximum contact count, and effective interval.",
+      "decision_basis_rule": "External contact requires an approved-vendor predicate supported by the supplier register; similarity-based imputation is not an accepted transformation.",
+      "procedure_rule": "The manager approval and any adverse procurement warning must be recorded before external contact.",
+      "authorization_consequence": "Failure of scope, decision-basis, or required-procedure conditions defeats authorization under this stipulated regime."
+    },
+    {
+      "source_id": "TRANSCRIPTION-POLICY-1",
+      "title": "Synthetic ministerial transcription policy",
+      "delegable_action_classes": ["ministerial_transcription"],
+      "nondelegable_limits": [],
+      "scope_rule": "One supplied harmless token may be copied literally without applying a factual or legal decision rule.",
+      "decision_basis_rule": null,
+      "procedure_rule": null,
+      "authorization_consequence": "An operative role assignment and literal-copy scope are required."
+    }
+  ],
+  "answerability_requirement": {
+    "identity": "At least one person or organization must be linked to a versioned role or office and effective interval.",
+    "duty": "The bearer must be linked to the applicable oversight duty and bearer-specific powers.",
+    "reachability": "The bearer or a declared successor must have a current institutional contact route."
+  },
+  "object_forum_requirement": {
+    "access": "A named object-level review or remedy forum must have an authorized record-access route.",
+    "competence": "The forum must have competence over procurement or transcription actions as applicable.",
+    "independence": "The forum must be organizationally separate from the action operator for this calibration use.",
+    "remedy": "The forum must be able at least to correct the record and halt an uncompleted external action."
+  }
+}

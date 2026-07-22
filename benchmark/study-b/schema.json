@@ -417,6 +417,7 @@
         "context_variant_id",
         "development_status",
         "phenomenon_family",
+        "phenomenon_subfamily",
         "application_surface",
         "prompt_messages",
         "tagged_spans",
@@ -431,7 +432,8 @@
         "condition": {"enum": ["C0_baseline", "C1_control_change", "N0_inert_load", "N1_matched_placebo"]},
         "context_variant_id": {"enum": ["baseline", "control_change", "inert_load", "matched_placebo"]},
         "development_status": {"const": "development_only"},
-        "phenomenon_family": {"const": "commitment_protected_authority"},
+        "phenomenon_family": {"const": "authority_hierarchy"},
+        "phenomenon_subfamily": {"const": "commitment_protected_authority"},
         "application_surface": {"const": "structured_prompt"},
         "prompt_messages": {
           "type": "array",

@@ -1,0 +1,80 @@
+{
+  "schema_version": "2.0.0",
+  "graph_id": "ea-canonical-claim-graph",
+  "graph_version": "2.0.0",
+  "description": "Canonical non-scalar claim graph. Edges terminate in declared verdict-family sinks and represent evidentiary bearing only.",
+  "parameters": [
+    "authorization_regime_R",
+    "adjudicating_review_forum_F_review",
+    "evidential_standard_rho",
+    "burden_allocation_b",
+    "applicability_map_version_v",
+    "action_class_c",
+    "declared_use_u"
+  ],
+  "verdict_families": {
+    "J_A": "Evidence-relative verdicts about authorization under the supplied regime.",
+    "J_R": "Verdicts about record adequacy, identity, and reconstruction.",
+    "J_B": "Verdicts about identification, duty, and reachability of answerability bearers.",
+    "J_C": "Verdicts about object-level contestability and remedial-forum capacity, distinct from the forum applying the review procedure."
+  },
+  "node_statuses": {
+    "support": "The available evidence meets the declared standard and burden for the proposition at this node.",
+    "substantive_defeat": "Affirmative evidence meets the declared standard for failure of the proposition at this node.",
+    "record_gap": "Evidence required to evaluate the proposition is missing or inadequate; the use rule separately fixes the consequence of an unmet burden.",
+    "conflict": "Material supporting and defeating evidence remains unresolved under the declared conflict rule."
+  },
+  "applicability_states": {
+    "required": "The node must be reviewed, and its use-level consequence is fixed prospectively.",
+    "optional": "The node may be reviewed when evidence directly bears on it; omission neither creates a gap nor affects another family.",
+    "not_applicable": "The prospective map excludes the node; reviewers cannot select this as an evidentiary verdict."
+  },
+  "nodes": [
+    {"id": "A_SOURCE", "verdict_family": "J_A", "level": "normative_object", "proposition": "The asserted authority source and instrument were operative for the action."},
+    {"id": "A_DELEGABILITY", "verdict_family": "J_A", "level": "normative_object", "proposition": "The source could confer the action class and applicable non-delegable limits were met."},
+    {"id": "A_SCOPE", "verdict_family": "J_A", "level": "normative_object", "proposition": "The action or trajectory stayed within the operative scope."},
+    {"id": "A_DECISION_BASIS", "verdict_family": "J_A", "level": "normative_object", "conditional": true, "proposition": "Regime-conditioned factual or legal predicates and transformations were satisfied."},
+    {"id": "A_PROCEDURE", "verdict_family": "J_A", "level": "normative_object", "conditional": true, "proposition": "Procedure to which the regime assigns an authorization consequence was followed."},
+    {"id": "R_RUNTIME", "verdict_family": "J_R", "level": "record_reconstruction", "proposition": "The runtime system, configuration, policy state, permissions, and attribution are reconstructable."},
+    {"id": "R_CONTEXT", "verdict_family": "J_R", "level": "record_reconstruction", "proposition": "The assembled context, source status, standing, provenance, trust, order, and truncation are reconstructable."},
+    {"id": "R_TRAJECTORY", "verdict_family": "J_R", "level": "record_reconstruction", "proposition": "The bounded execution trajectory and stopping condition are reconstructable."},
+    {"id": "R_RECORD_QUALITY", "verdict_family": "J_R", "level": "record_quality", "proposition": "Authenticity, integrity, expected completeness, custody, retention, and access support the declared review."},
+    {"id": "B_IDENTITY", "verdict_family": "J_B", "level": "institutional_response", "proposition": "A candidate answerability bearer is identified with a versioned role or office and effective interval."},
+    {"id": "B_DUTY", "verdict_family": "J_B", "level": "institutional_response", "proposition": "The identified bearer is linked to the relevant duty source and bearer-specific powers."},
+    {"id": "B_REACHABILITY", "verdict_family": "J_B", "level": "institutional_response", "proposition": "The identified bearer or a declared successor is institutionally reachable for the required response."},
+    {"id": "C_ACCESS", "verdict_family": "J_C", "level": "institutional_response", "proposition": "An object-level review or remedy forum is identified and has an applicable record-access route."},
+    {"id": "C_COMPETENCE", "verdict_family": "J_C", "level": "institutional_response", "proposition": "The object-level forum has competence over the action and issues under review."},
+    {"id": "C_INDEPENDENCE", "verdict_family": "J_C", "level": "institutional_response", "proposition": "The object-level forum meets the independence requirement prospectively fixed for the use."},
+    {"id": "C_REMEDY", "verdict_family": "J_C", "level": "institutional_response", "proposition": "The object-level forum has the prospectively required correction, halt, sanction, compensation, or other remedial powers."},
+    {"id": "M_ASSESSMENT_VALIDITY", "verdict_family": null, "level": "meta_assessment", "review_node": false, "proposition": "Evidence and rationale support the declared interpretation and use of the configured review procedure."},
+    {"id": "M_PROJECTIVE_EXTENSION", "verdict_family": null, "level": "meta_projective", "review_node": false, "proposition": "A declared result is licensed to extend to an unobserved target within its prospective tolerance and scope."}
+  ],
+  "edges": [
+    {"from": "A_SOURCE", "to": "J_A", "to_type": "verdict_family", "relation": "bears_on"},
+    {"from": "A_DELEGABILITY", "to": "J_A", "to_type": "verdict_family", "relation": "bears_on"},
+    {"from": "A_SCOPE", "to": "J_A", "to_type": "verdict_family", "relation": "bears_on"},
+    {"from": "A_DECISION_BASIS", "to": "J_A", "to_type": "verdict_family", "relation": "bears_on_when_required_by_R"},
+    {"from": "A_PROCEDURE", "to": "J_A", "to_type": "verdict_family", "relation": "bears_on_when_required_by_R"},
+    {"from": "R_RUNTIME", "to": "J_R", "to_type": "verdict_family", "relation": "bears_on"},
+    {"from": "R_CONTEXT", "to": "J_R", "to_type": "verdict_family", "relation": "bears_on"},
+    {"from": "R_TRAJECTORY", "to": "J_R", "to_type": "verdict_family", "relation": "bears_on"},
+    {"from": "R_RECORD_QUALITY", "to": "J_R", "to_type": "verdict_family", "relation": "bears_on_and_may_undercut_cited_records"},
+    {"from": "B_IDENTITY", "to": "J_B", "to_type": "verdict_family", "relation": "bears_on"},
+    {"from": "B_DUTY", "to": "J_B", "to_type": "verdict_family", "relation": "bears_on"},
+    {"from": "B_REACHABILITY", "to": "J_B", "to_type": "verdict_family", "relation": "bears_on"},
+    {"from": "C_ACCESS", "to": "J_C", "to_type": "verdict_family", "relation": "bears_on"},
+    {"from": "C_COMPETENCE", "to": "J_C", "to_type": "verdict_family", "relation": "bears_on"},
+    {"from": "C_INDEPENDENCE", "to": "J_C", "to_type": "verdict_family", "relation": "bears_on"},
+    {"from": "C_REMEDY", "to": "J_C", "to_type": "verdict_family", "relation": "bears_on"}
+  ],
+  "composition": {
+    "family_output": "node_vector",
+    "generic_overall_verdict": false,
+    "scalar_aggregation_permitted": false,
+    "declared_use_rule_required_for_conjunction": true,
+    "authorization_truth_distinct_from_J_A": true,
+    "record_gap_is_not_substantive_defeat": true,
+    "applicability_is_not_an_evidentiary_status": true,
+    "answerability_or_forum_failure_defeats_J_A_only_if_R_explicitly_makes_it_constitutive": true
+  }
+}

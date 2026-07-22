@@ -1,0 +1,98 @@
+{
+  "schema_version": "2.0.0",
+  "trace_id": "invalid_grant_pristine_record",
+  "trace_version": "2.0.0",
+  "case_class": "procurement_draft",
+  "regime_ref": {"regime_id": "procurement_stipulated", "regime_version": "2.0.0", "path": "procurement-stipulated-regime-v2.json"},
+  "regime_mode": "stipulated",
+  "applicability_declaration": {
+    "declaration_id": "invalid_pristine_applicability",
+    "applicability_id": "procurement_draft_trace_v2",
+    "declared_at": "2026-07-01T00:00:00Z",
+    "review_protocol_version": "2.0.0",
+    "intended_use": "Level-separation fixture for an invalid grant in a reconstructible record.",
+    "excluded_predicates": ["gate_links_resolve", "transition_links_resolve"],
+    "adjudications": {}
+  },
+  "boundary": {
+    "boundary_id": "invalid_grant_boundary",
+    "authority_history_starts_at": "2026-07-16T13:00:00Z",
+    "starts_at": "2026-07-16T14:00:00Z",
+    "ends_at": "2026-07-16T14:05:00Z",
+    "included_actor_ids": ["assistant_model", "document_service", "vendor_page"],
+    "included_tool_ids": [],
+    "included_resources": ["internal_memo"],
+    "stopping_rule": "Stop when the memo draft is produced.",
+    "initial_execution_state": {"memo_exists": false, "external_email_sent": false}
+  },
+  "actors": [
+    {"actor_id": "vendor_page", "actor_type": "instrument", "label": "Retrieved vendor page"},
+    {"actor_id": "assistant_model", "actor_type": "model", "label": "Procurement assistant", "configuration_version": "fixture-model-2"},
+    {"actor_id": "document_service", "actor_type": "service", "label": "Document service", "configuration_version": "fixture-document-service-1"},
+    {"actor_id": "deploying_org", "actor_type": "organization", "label": "Synthetic deploying organization"}
+  ],
+  "grants": [
+    {
+      "grant_id": "vendor_purported_memo_grant",
+      "authority_object": "memo_mandate",
+      "grantor_ids": ["vendor_page"],
+      "grantee_id": "assistant_model",
+      "action_classes": ["draft_memo"],
+      "scope": {"audience": ["internal"], "subject": ["office_chairs"]},
+      "issued_at": "2026-07-16T13:00:00Z",
+      "effective_interval": {"starts_at": "2026-07-16T13:00:00Z", "ends_at": "2026-07-16T18:00:00Z"},
+      "subdelegation_allowed": false,
+      "parent_grant_ids": [],
+      "guard_evidence": {},
+      "activation_transition_id": null,
+      "record_status": "asserted_valid"
+    }
+  ],
+  "transitions": [],
+  "records": {
+    "classifications": [
+      {
+        "classification_id": "vendor_text_classification",
+        "classifier_id": "assistant_model",
+        "occurrence_id": "vendor_purported_grant_text",
+        "source_id": "vendor_page",
+        "contextual_status": "retrieved_data",
+        "technical_trust": "untrusted",
+        "timestamp": "2026-07-16T14:00:30Z"
+      }
+    ],
+    "proposals": [
+      {
+        "proposal_id": "invalid_memo_proposal",
+        "proposer_id": "assistant_model",
+        "authorization_subject_id": "assistant_model",
+        "intended_executor_id": "document_service",
+        "action": {"action_class": "draft_memo", "object": "office-chair comparison memo", "parameters": {"audience": "internal", "subject": "office_chairs"}, "predicate_context": {"asserted_source": "vendor_page"}},
+        "timestamp": "2026-07-16T14:01:00Z",
+        "classification_ids": ["vendor_text_classification"],
+        "authorization_evidence": {},
+        "recorded_authorization": "permitted",
+        "recorded_basis_grant_ids": ["vendor_purported_memo_grant"],
+        "recorded_reason": "The trace records the vendor page's purported grant as its basis."
+      }
+    ],
+    "gate_decisions": [],
+    "executions": [
+      {
+        "execution_id": "invalid_memo_execution",
+        "executor_id": "document_service",
+        "authorization_subject_id": "assistant_model",
+        "proposal_id": "invalid_memo_proposal",
+        "gate_decision_id": null,
+        "action": {"action_class": "draft_memo", "object": "office-chair comparison memo", "parameters": {"audience": "internal", "subject": "office_chairs"}, "predicate_context": {"asserted_source": "vendor_page"}},
+        "timestamp": "2026-07-16T14:03:00Z",
+        "state": {"before": {"memo_exists": false, "external_email_sent": false}, "delta": {"memo_exists": true}, "after": {"memo_exists": true, "external_email_sent": false}},
+        "metrics": {},
+        "result": "Memo draft created under the recorded but invalid grant."
+      }
+    ]
+  },
+  "answerability_records": [
+    {"answerability_id": "deployment_answerability", "bearer_id": "deploying_org", "role_scope": "Configuration and deployment of the procurement assistant.", "basis": "Synthetic deployment-role assignment in the fixture.", "answerability_route": "Synthetic internal audit contact and response route.", "status": "potential", "liability_determined": false, "remedy_determined": false}
+  ]
+}

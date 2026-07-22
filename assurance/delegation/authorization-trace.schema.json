@@ -1,0 +1,414 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://brettreynolds.ca/schemas/delegation/authorization-trace-2.0.0.json",
+  "title": "Delegation authorization trace without embedded reference labels",
+  "description": "A typed record of asserted grants, proposals, gate decisions, and executions. Closed-world references live in separate oracle files.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "trace_id",
+    "trace_version",
+    "case_class",
+    "regime_ref",
+    "regime_mode",
+    "applicability_declaration",
+    "boundary",
+    "actors",
+    "grants",
+    "transitions",
+    "records",
+    "answerability_records"
+  ],
+  "properties": {
+    "schema_version": {"const": "2.0.0"},
+    "trace_id": {"$ref": "#/$defs/id"},
+    "trace_version": {"$ref": "#/$defs/version"},
+    "case_class": {"$ref": "#/$defs/id"},
+    "regime_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["regime_id", "regime_version", "path"],
+      "properties": {
+        "regime_id": {"$ref": "#/$defs/id"},
+        "regime_version": {"$ref": "#/$defs/version"},
+        "path": {"$ref": "#/$defs/nonEmpty"}
+      }
+    },
+    "regime_mode": {"enum": ["stipulated", "institutional"]},
+    "applicability_declaration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "declaration_id",
+        "applicability_id",
+        "declared_at",
+        "review_protocol_version",
+        "intended_use",
+        "excluded_predicates",
+        "adjudications"
+      ],
+      "properties": {
+        "declaration_id": {"$ref": "#/$defs/id"},
+        "applicability_id": {"$ref": "#/$defs/id"},
+        "declared_at": {"type": "string", "format": "date-time"},
+        "review_protocol_version": {"$ref": "#/$defs/version"},
+        "intended_use": {"$ref": "#/$defs/nonEmpty"},
+        "excluded_predicates": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/id"}
+        },
+        "adjudications": {
+          "type": "object",
+          "additionalProperties": {"type": "boolean"}
+        }
+      }
+    },
+    "boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "boundary_id",
+        "authority_history_starts_at",
+        "starts_at",
+        "ends_at",
+        "included_actor_ids",
+        "included_tool_ids",
+        "included_resources",
+        "stopping_rule",
+        "initial_execution_state"
+      ],
+      "properties": {
+        "boundary_id": {"$ref": "#/$defs/id"},
+        "authority_history_starts_at": {"type": "string", "format": "date-time"},
+        "starts_at": {"type": "string", "format": "date-time"},
+        "ends_at": {"type": "string", "format": "date-time"},
+        "included_actor_ids": {"$ref": "#/$defs/idList"},
+        "included_tool_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/id"}
+        },
+        "included_resources": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/nonEmpty"}
+        },
+        "stopping_rule": {"$ref": "#/$defs/nonEmpty"},
+        "initial_execution_state": {"type": "object"}
+      }
+    },
+    "actors": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["actor_id", "actor_type", "label"],
+        "properties": {
+          "actor_id": {"$ref": "#/$defs/id"},
+          "actor_type": {
+            "enum": ["person", "role", "organization", "instrument", "model", "service", "tool"]
+          },
+          "label": {"$ref": "#/$defs/nonEmpty"},
+          "configuration_version": {"$ref": "#/$defs/nonEmpty"}
+        }
+      }
+    },
+    "grants": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "grant_id",
+          "authority_object",
+          "grantor_ids",
+          "grantee_id",
+          "action_classes",
+          "scope",
+          "issued_at",
+          "effective_interval",
+          "subdelegation_allowed",
+          "parent_grant_ids",
+          "guard_evidence",
+          "activation_transition_id",
+          "record_status"
+        ],
+        "properties": {
+          "grant_id": {"$ref": "#/$defs/id"},
+          "authority_object": {"$ref": "#/$defs/id"},
+          "grantor_ids": {"$ref": "#/$defs/idList"},
+          "grantee_id": {"$ref": "#/$defs/id"},
+          "action_classes": {"$ref": "#/$defs/idList"},
+          "scope": {"type": "object", "minProperties": 1},
+          "issued_at": {"type": "string", "format": "date-time"},
+          "effective_interval": {"$ref": "#/$defs/interval"},
+          "subdelegation_allowed": {"type": "boolean"},
+          "parent_grant_ids": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {"$ref": "#/$defs/id"}
+          },
+          "guard_evidence": {"$ref": "#/$defs/evidenceMap"},
+          "activation_transition_id": {
+            "oneOf": [{"type": "null"}, {"$ref": "#/$defs/id"}]
+          },
+          "record_status": {"enum": ["asserted_valid", "asserted_invalid", "contested", "unknown"]}
+        }
+      }
+    },
+    "transitions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "transition_id",
+          "issuer_ids",
+          "operation",
+          "authority_object",
+          "normative_payload",
+          "timestamp",
+          "basis_grant_ids",
+          "guard_evidence",
+          "recorded_effect"
+        ],
+        "properties": {
+          "transition_id": {"$ref": "#/$defs/id"},
+          "issuer_ids": {"$ref": "#/$defs/idList"},
+          "operation": {"$ref": "#/$defs/authorityOperation"},
+          "authority_object": {"$ref": "#/$defs/id"},
+          "normative_payload": {"type": "object", "minProperties": 1},
+          "timestamp": {"type": "string", "format": "date-time"},
+          "basis_grant_ids": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {"$ref": "#/$defs/id"}
+          },
+          "guard_evidence": {"$ref": "#/$defs/evidenceMap"},
+          "recorded_effect": {"enum": ["asserted_effective", "asserted_ineffective", "contested", "unknown"]}
+        }
+      }
+    },
+    "records": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["classifications", "proposals", "gate_decisions", "executions"],
+      "properties": {
+        "classifications": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "classification_id",
+              "classifier_id",
+              "occurrence_id",
+              "source_id",
+              "contextual_status",
+              "technical_trust",
+              "timestamp"
+            ],
+            "properties": {
+              "classification_id": {"$ref": "#/$defs/id"},
+              "classifier_id": {"$ref": "#/$defs/id"},
+              "occurrence_id": {"$ref": "#/$defs/id"},
+              "source_id": {"$ref": "#/$defs/id"},
+              "contextual_status": {"$ref": "#/$defs/id"},
+              "technical_trust": {"enum": ["trusted", "untrusted", "mixed", "unknown"]},
+              "timestamp": {"type": "string", "format": "date-time"}
+            }
+          }
+        },
+        "proposals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "proposal_id",
+              "proposer_id",
+              "authorization_subject_id",
+              "intended_executor_id",
+              "action",
+              "timestamp",
+              "classification_ids",
+              "authorization_evidence",
+              "recorded_authorization",
+              "recorded_basis_grant_ids",
+              "recorded_reason"
+            ],
+            "properties": {
+              "proposal_id": {"$ref": "#/$defs/id"},
+              "proposer_id": {"$ref": "#/$defs/id"},
+              "authorization_subject_id": {"$ref": "#/$defs/id"},
+              "intended_executor_id": {"$ref": "#/$defs/id"},
+              "action": {"$ref": "#/$defs/action"},
+              "timestamp": {"type": "string", "format": "date-time"},
+              "classification_ids": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {"$ref": "#/$defs/id"}
+              },
+              "authorization_evidence": {"$ref": "#/$defs/evidenceMap"},
+              "recorded_authorization": {"enum": ["permitted", "prohibited", "unknown"]},
+              "recorded_basis_grant_ids": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {"$ref": "#/$defs/id"}
+              },
+              "recorded_reason": {"type": ["string", "null"]}
+            }
+          }
+        },
+        "gate_decisions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "gate_decision_id",
+              "gate_actor_id",
+              "proposal_id",
+              "decision",
+              "policy_version",
+              "timestamp",
+              "recorded_basis_grant_ids",
+              "policy_reason"
+            ],
+            "properties": {
+              "gate_decision_id": {"$ref": "#/$defs/id"},
+              "gate_actor_id": {"$ref": "#/$defs/id"},
+              "proposal_id": {"$ref": "#/$defs/id"},
+              "decision": {"enum": ["allow", "block"]},
+              "policy_version": {"$ref": "#/$defs/nonEmpty"},
+              "timestamp": {"type": "string", "format": "date-time"},
+              "recorded_basis_grant_ids": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {"$ref": "#/$defs/id"}
+              },
+              "policy_reason": {"$ref": "#/$defs/nonEmpty"}
+            }
+          }
+        },
+        "executions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "execution_id",
+              "executor_id",
+              "authorization_subject_id",
+              "proposal_id",
+              "gate_decision_id",
+              "action",
+              "timestamp",
+              "state",
+              "metrics",
+              "result"
+            ],
+            "properties": {
+              "execution_id": {"$ref": "#/$defs/id"},
+              "executor_id": {"$ref": "#/$defs/id"},
+              "authorization_subject_id": {"$ref": "#/$defs/id"},
+              "proposal_id": {"$ref": "#/$defs/id"},
+              "gate_decision_id": {
+                "oneOf": [{"type": "null"}, {"$ref": "#/$defs/id"}]
+              },
+              "action": {"$ref": "#/$defs/action"},
+              "timestamp": {"type": "string", "format": "date-time"},
+              "state": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["before", "delta", "after"],
+                "properties": {
+                  "before": {"type": "object"},
+                  "delta": {"type": "object"},
+                  "after": {"type": "object"}
+                }
+              },
+              "metrics": {
+                "type": "object",
+                "additionalProperties": {"type": "number"}
+              },
+              "result": {"$ref": "#/$defs/nonEmpty"}
+            }
+          }
+        }
+      }
+    },
+    "answerability_records": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "answerability_id",
+          "bearer_id",
+          "role_scope",
+          "basis",
+          "answerability_route",
+          "status",
+          "liability_determined",
+          "remedy_determined"
+        ],
+        "properties": {
+          "answerability_id": {"$ref": "#/$defs/id"},
+          "bearer_id": {"$ref": "#/$defs/id"},
+          "role_scope": {"$ref": "#/$defs/nonEmpty"},
+          "basis": {"$ref": "#/$defs/nonEmpty"},
+          "answerability_route": {
+            "$ref": "#/$defs/nonEmpty",
+            "description": "The contact or response route through which the bearer can be called to answer. This is not an adjudication that an object-level review or remedy forum is competent, accessible, independent, or empowered."
+          },
+          "status": {"enum": ["potential", "established", "contested"]},
+          "liability_determined": {"const": false},
+          "remedy_determined": {"const": false}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "id": {"type": "string", "pattern": "^[a-z][a-z0-9_-]*$"},
+    "nonEmpty": {"type": "string", "minLength": 1},
+    "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "idList": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/id"}
+    },
+    "interval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["starts_at", "ends_at"],
+      "properties": {
+        "starts_at": {"type": "string", "format": "date-time"},
+        "ends_at": {"type": ["string", "null"], "format": "date-time"}
+      }
+    },
+    "authorityOperation": {
+      "enum": ["adopt", "issue", "direct", "amend", "suspend", "revoke", "override", "release", "review"]
+    },
+    "evidenceMap": {
+      "type": "object",
+      "additionalProperties": {"type": "boolean"}
+    },
+    "action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action_class", "object", "parameters", "predicate_context"],
+      "properties": {
+        "action_class": {"$ref": "#/$defs/id"},
+        "object": {"$ref": "#/$defs/nonEmpty"},
+        "parameters": {"type": "object"},
+        "predicate_context": {"type": "object"}
+      }
+    }
+  }
+}

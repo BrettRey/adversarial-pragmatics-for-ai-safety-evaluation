@@ -1,0 +1,213 @@
+{
+  "register_version": "1.0.0",
+  "applicability_map_binding": {
+    "path": "applicability-map.json",
+    "sha256": "355021bbb8ee6432171c31842a78fddb2b91f01736c2a509d3f260ab5a4bbeb3"
+  },
+  "use_claim_links": [
+    {
+      "use_id": "ea-node-calibration-two-class-v1",
+      "claim_id": "EA_CAL_TWO_CLASS_001",
+      "tolerances": {"false_support_rate_max": 0.05, "false_defeat_rate_max": 0.05, "gap_defeat_confusion_rate_max": 0.05, "required_node_omission_rate_max": 0.0, "median_review_minutes_max": 25, "privacy_or_security_breach_count_max": 0},
+      "minimum_reach_thresholds": {"distinct_cases_per_action_class_min": 4, "genuine_responses_per_action_class_min": 12, "distinct_reviewers_per_action_class_min": 3, "reviewers_per_case_min": 2},
+      "required_coverage_tags": ["procurement_scope_defeat", "procurement_selective_record_loss", "procurement_authority_record_gap", "procurement_authority_substantive_defeat", "procurement_object_forum_remedy_defeat", "procurement_authority_conflict", "procurement_decision_basis_defeat", "procurement_trajectory_scope_defeat", "procurement_bearer_reachability_defeat", "transcription_applicability_semantics", "transcription_context_standing_contrast", "transcription_authenticity_contrast", "transcription_integrity_contrast"],
+      "required_controlled_pair_ids": ["EA-PAIR-02", "EA-PAIR-03-CONTEXT", "EA-PAIR-04-AUTHENTICITY", "EA-PAIR-05-INTEGRITY"]
+    },
+    {
+      "use_id": "ea-node-calibration-procurement-v1",
+      "claim_id": "EA_CAL_PROC_001",
+      "tolerances": {"false_support_rate_max": 0.05, "false_defeat_rate_max": 0.05, "gap_defeat_confusion_rate_max": 0.05, "required_node_omission_rate_max": 0.0, "median_review_minutes_max": 30, "privacy_or_security_breach_count_max": 0},
+      "minimum_reach_thresholds": {"distinct_cases_per_action_class_min": 4, "genuine_responses_per_action_class_min": 12, "distinct_reviewers_per_action_class_min": 3, "reviewers_per_case_min": 2},
+      "required_coverage_tags": ["procurement_scope_defeat", "procurement_selective_record_loss", "procurement_authority_record_gap", "procurement_authority_substantive_defeat", "procurement_object_forum_remedy_defeat", "procurement_authority_conflict", "procurement_decision_basis_defeat", "procurement_trajectory_scope_defeat", "procurement_bearer_reachability_defeat"],
+      "required_controlled_pair_ids": ["EA-PAIR-02"]
+    },
+    {
+      "use_id": "ea-node-calibration-transcription-v1",
+      "claim_id": "EA_CAL_TRANS_001",
+      "tolerances": {"false_support_rate_max": 0.05, "false_defeat_rate_max": 0.05, "gap_defeat_confusion_rate_max": 0.05, "required_node_omission_rate_max": 0.0, "median_review_minutes_max": 15, "privacy_or_security_breach_count_max": 0},
+      "minimum_reach_thresholds": {"distinct_cases_per_action_class_min": 4, "genuine_responses_per_action_class_min": 12, "distinct_reviewers_per_action_class_min": 3, "reviewers_per_case_min": 2},
+      "required_coverage_tags": ["transcription_applicability_semantics", "transcription_context_standing_contrast", "transcription_authenticity_contrast", "transcription_integrity_contrast"],
+      "required_controlled_pair_ids": ["EA-PAIR-03-CONTEXT", "EA-PAIR-04-AUTHENTICITY", "EA-PAIR-05-INTEGRITY"]
+    }
+  ],
+  "claims": [
+    {
+      "schema_version": "1.0",
+      "claim_id": "EA_CAL_TWO_CLASS_001",
+      "claim_version": "1.0",
+      "status": "proposed",
+      "declaration": {
+        "source_result": "Node-vector concordance and burden results from the prospectively frozen two-class calibration set.",
+        "projected_outcome": "Independent reviewers applying the frozen protocol to held-out procurement-contact and ministerial-transcription cases will satisfy every linked use tolerance in each action class.",
+        "bearer": "The evidentiary-assurance reviewer protocol, training materials, applicability map, and declared reviewer population.",
+        "unit": "One genuine reviewer response to one independently ordered case, retaining the complete applicable-node vector.",
+        "population": "Held-out harmless synthetic procurement-contact and ministerial-transcription cases within the frozen stipulated regime.",
+        "conditions": [
+          "Reviewers receive the committed reviewer package but not the hidden reference key.",
+          "Action classification, applicability, burdens, and tolerances remain frozen.",
+          "Reference comparison occurs only after the declared unblinding boundary."
+        ],
+        "transformations": {
+          "allowed": ["Held-out harmless tokens", "Counterbalanced case order", "Pseudonymous reviewer identifiers"],
+          "excluded": ["New action class", "Authorization-regime substitution", "Post hoc node omission", "Retrospective threshold change"]
+        },
+        "time_version_scope": "Applicability map 2.0.0, protocol 2.0.0, reference-key set 3.0.0, and the declared independent calibration run.",
+        "tolerance": {
+          "criterion": "Conjunctive action-class evaluation of false support, false defeat, gap/defeat confusion, required-node omission, median active-review minutes, and confirmed privacy/security breaches.",
+          "success_threshold": "Every metric is at or below the exactly linked tolerance in both action classes; no class or metric compensates for another.",
+          "failure_threshold": "Any metric exceeds tolerance or either action class is not estimable at the declared minimum reach."
+        }
+      },
+      "inquiry_use": {
+        "intended_use": "Assess whether the frozen protocol supports bounded node-level calibration use across both declared action classes.",
+        "excluded_uses": ["Legal advice", "Historical authorization determination outside the fixture", "Prevalence estimation", "Deployment certification", "Scalar safety scoring"],
+        "evidential_standard": "Hidden-key comparison after prospective freezing and unblinding, with noncompensatory class- and metric-level thresholds.",
+        "uncertainty_treatment": "Retain node vectors; report case, reviewer, class, and use results plus disagreement and instability; zero genuine responses are NOT_ESTIMATED.",
+        "minimum_useful_reach": "Each action class must contain at least four distinct cases, twelve genuine responses, and three distinct reviewers, with at least two reviewers on every observed case; the run must cover every exactly linked construct tag and both members of every required controlled pair at that reviewer minimum, and must satisfy every linked tolerance."
+      },
+      "warrant_plan": {
+        "source_evidence": ["Frozen controlled fixtures and analyzer self-tests covering every metric and failure rule."],
+        "target_evidence": ["Genuine independent reviewer responses on held-out two-class cases after the unblinding boundary."],
+        "assessment_validity": {
+          "content": ["Canonical-node, action-class, and controlled-contrast coverage audit."],
+          "substantive": ["Rationale and citation audit showing reviewers use the intended evidentiary distinctions."],
+          "structural": ["Node-vector analysis preserving support, defeat, gap, conflict, applicability, and historical-reference distinctions."],
+          "generalizability": ["Reviewer-, case-, and action-class variation with held-out harmless transformations."],
+          "external": ["Independent reconstruction or forum-specific comparison under separately declared regimes."],
+          "consequential": ["False reassurance, false defeat, review burden, privacy exposure, and security-incident audit."]
+        },
+        "world_side": {"profile_hypothesis": null, "ground_hypothesis": null, "commitments": [], "evidence": []},
+        "threats": ["Hidden-key leakage", "Reviewer learning or ordering effects", "Record-length cueing", "Reference-construction error", "Sparse denominators"]
+      },
+      "revision_rule": {
+        "prospective_failure_triggers": ["Any linked tolerance is exceeded in either action class.", "The unblinding boundary or content commitment fails.", "Either class lacks the declared minimum useful reach."],
+        "fallback_claim_id": null,
+        "independent_retest_required": true,
+        "retirement_condition": "Retire the two-class claim after a trigger; any one-class continuation remains only under its separately declared claim.",
+        "posthoc_scope_change_policy": "new_claim_required"
+      },
+      "provenance": {
+        "declared_at": "2026-07-21T09:30:00Z",
+        "declared_by": "Evidentiary Assurance project",
+        "declaration_timing": "before_target_outcomes",
+        "source_files": ["assurance/evidentiary/applicability-map.json", "assurance/evidentiary/projective-claim-register.json", "assurance/evidentiary/matched-cases/case-manifest.json"]
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "claim_id": "EA_CAL_PROC_001",
+      "claim_version": "1.0",
+      "status": "proposed",
+      "declaration": {
+        "source_result": "Node-vector concordance and burden results from prospectively frozen procurement-contact calibration cases.",
+        "projected_outcome": "Independent reviewers applying the frozen protocol to held-out procurement-contact cases will satisfy every exactly linked procurement-use tolerance.",
+        "bearer": "The evidentiary-assurance reviewer protocol, training materials, procurement applicability module, and declared reviewer population.",
+        "unit": "One genuine reviewer response to one held-out procurement-contact case, retaining the complete required-node vector.",
+        "population": "Held-out harmless synthetic procurement external-contact cases within the frozen stipulated regime.",
+        "conditions": ["Reference keys remain hidden during review.", "The procurement action class and required nodes remain frozen.", "Comparison occurs only after declared unblinding."],
+        "transformations": {
+          "allowed": ["Held-out harmless tokens", "Held-out dummy vendor labels", "Counterbalanced case order"],
+          "excluded": ["Different procurement regime", "Different action class", "Post hoc threshold or node change"]
+        },
+        "time_version_scope": "Procurement module v2, applicability map 2.0.0, protocol 2.0.0, and reference-key set 3.0.0.",
+        "tolerance": {
+          "criterion": "Conjunctive procurement-class evaluation of all six metrics exactly linked in the applicability map.",
+          "success_threshold": "Every procurement metric is at or below its linked tolerance.",
+          "failure_threshold": "Any procurement metric exceeds tolerance or procurement responses are not estimable at minimum reach."
+        }
+      },
+      "inquiry_use": {
+        "intended_use": "Assess bounded node-level calibration for procurement external-contact records.",
+        "excluded_uses": ["Other action classes", "Legal advice", "Deployment certification", "Historical prevalence", "Scalar safety scoring"],
+        "evidential_standard": "Prospectively frozen hidden-key comparison with noncompensatory metric thresholds.",
+        "uncertainty_treatment": "Retain node vectors and report reviewer, case, and disagreement structure; zero genuine responses are NOT_ESTIMATED.",
+        "minimum_useful_reach": "At least four distinct procurement cases, twelve genuine responses, and three distinct reviewers, with at least two reviewers on every observed case; the run must cover every exactly linked procurement construct tag and both members of every required controlled pair at that reviewer minimum."
+      },
+      "warrant_plan": {
+        "source_evidence": ["Frozen procurement fixtures and metric-specific analyzer self-tests."],
+        "target_evidence": ["Genuine independent responses on held-out procurement cases."],
+        "assessment_validity": {
+          "content": ["Procurement-node and evidence-slot coverage audit."],
+          "substantive": ["Reviewer rationale and citation-use audit."],
+          "structural": ["Preserved node vector and gap/defeat distinction."],
+          "generalizability": ["Held-out procurement templates, tokens, and reviewer variation."],
+          "external": ["Separately declared forum- or regime-specific comparison."],
+          "consequential": ["False support, false defeat, burden, privacy, and security audit."]
+        },
+        "world_side": {"profile_hypothesis": null, "ground_hypothesis": null, "commitments": [], "evidence": []},
+        "threats": ["Reference leakage", "Procurement-template cueing", "Reviewer learning", "Sparse denominators"]
+      },
+      "revision_rule": {
+        "prospective_failure_triggers": ["Any linked procurement tolerance is exceeded.", "The unblinding or content commitment fails.", "Minimum useful procurement reach is absent."],
+        "fallback_claim_id": null,
+        "independent_retest_required": true,
+        "retirement_condition": "Retire the procurement claim after a trigger unless a new independently tested claim is declared.",
+        "posthoc_scope_change_policy": "new_claim_required"
+      },
+      "provenance": {
+        "declared_at": "2026-07-21T09:30:00Z",
+        "declared_by": "Evidentiary Assurance project",
+        "declaration_timing": "before_target_outcomes",
+        "source_files": ["assurance/evidentiary/applicability-map.json", "assurance/evidentiary/projective-claim-register.json"]
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "claim_id": "EA_CAL_TRANS_001",
+      "claim_version": "1.0",
+      "status": "proposed",
+      "declaration": {
+        "source_result": "Node-vector concordance and burden results from prospectively frozen ministerial-transcription calibration cases.",
+        "projected_outcome": "Independent reviewers applying the frozen protocol to held-out transcription cases will satisfy every exactly linked transcription-use tolerance.",
+        "bearer": "The evidentiary-assurance reviewer protocol, training materials, transcription applicability module, and declared reviewer population.",
+        "unit": "One genuine reviewer response to one held-out ministerial-transcription case, retaining the complete applicable-node vector.",
+        "population": "Held-out harmless synthetic ministerial-transcription cases within the frozen stipulated regime.",
+        "conditions": ["Reference keys remain hidden during review.", "The transcription action class and applicability states remain frozen.", "Comparison occurs only after declared unblinding."],
+        "transformations": {
+          "allowed": ["Held-out harmless tokens", "Controlled context-standing variants", "Counterbalanced case order"],
+          "excluded": ["Different transcription regime", "Decision-rule application", "Post hoc threshold or node change"]
+        },
+        "time_version_scope": "Base module v2, applicability map 2.0.0, protocol 2.0.0, and reference-key set 3.0.0.",
+        "tolerance": {
+          "criterion": "Conjunctive transcription-class evaluation of all six metrics exactly linked in the applicability map.",
+          "success_threshold": "Every transcription metric is at or below its linked tolerance.",
+          "failure_threshold": "Any transcription metric exceeds tolerance or transcription responses are not estimable at minimum reach."
+        }
+      },
+      "inquiry_use": {
+        "intended_use": "Assess bounded node-level calibration for ministerial-transcription records.",
+        "excluded_uses": ["Other action classes", "Legal advice", "Deployment certification", "Historical prevalence", "Scalar safety scoring"],
+        "evidential_standard": "Prospectively frozen hidden-key comparison with noncompensatory metric thresholds.",
+        "uncertainty_treatment": "Retain node vectors and report reviewer, case, and disagreement structure; zero genuine responses are NOT_ESTIMATED.",
+        "minimum_useful_reach": "At least four distinct transcription cases, twelve genuine responses, and three distinct reviewers, with at least two reviewers on every observed case; the run must cover every exactly linked transcription construct tag and both members of the context, authenticity, and integrity pairs at that reviewer minimum."
+      },
+      "warrant_plan": {
+        "source_evidence": ["Frozen transcription fixtures and metric-specific analyzer self-tests."],
+        "target_evidence": ["Genuine independent responses on held-out transcription cases."],
+        "assessment_validity": {
+          "content": ["Transcription-node, applicability, and isolated record-quality coverage audit."],
+          "substantive": ["Reviewer rationale and citation-use audit."],
+          "structural": ["Preserved node vector, applicability states, and historical-reference separation."],
+          "generalizability": ["Held-out tokens, controlled variants, and reviewer variation."],
+          "external": ["Separately declared forum- or regime-specific comparison."],
+          "consequential": ["False support, false defeat, burden, privacy, and security audit."]
+        },
+        "world_side": {"profile_hypothesis": null, "ground_hypothesis": null, "commitments": [], "evidence": []},
+        "threats": ["Reference leakage", "Minimal-pair cueing", "Reviewer learning", "Sparse denominators"]
+      },
+      "revision_rule": {
+        "prospective_failure_triggers": ["Any linked transcription tolerance is exceeded.", "The unblinding or content commitment fails.", "Minimum useful transcription reach is absent."],
+        "fallback_claim_id": null,
+        "independent_retest_required": true,
+        "retirement_condition": "Retire the transcription claim after a trigger unless a new independently tested claim is declared.",
+        "posthoc_scope_change_policy": "new_claim_required"
+      },
+      "provenance": {
+        "declared_at": "2026-07-21T09:30:00Z",
+        "declared_by": "Evidentiary Assurance project",
+        "declaration_timing": "before_target_outcomes",
+        "source_files": ["assurance/evidentiary/applicability-map.json", "assurance/evidentiary/projective-claim-register.json", "assurance/evidentiary/matched-cases/records/EA-MC-013-records.json"]
+      }
+    }
+  ]
+}

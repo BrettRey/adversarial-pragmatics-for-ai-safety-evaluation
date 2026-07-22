@@ -1,0 +1,8 @@
+{
+  "schema_version": "2.0.0", "bundle_id": "EA-EB-018", "case_id": "EA-MC-018", "claim_graph_version": "2.0.0", "declared_use_id": "ea-node-calibration-two-class-v1",
+  "map_binding": {"id": "ea-demo-applicability", "version": "2.0.0", "path": "applicability-map.json", "sha256": "355021bbb8ee6432171c31842a78fddb2b91f01736c2a509d3f260ab5a4bbeb3"},
+  "classifier_binding": {"id": "ea-action-classifier", "version": "1.0.0", "path": "action-classifier.json", "sha256": "77a0303b43ff7c9174079d81f07f5d64b8647f7d9ea3eab96be143cf5ec3a9dc"},
+  "regime_binding": {"id": "ea-stipulated-demo-regime", "version": "2.0.0", "path": "authorization-regime.json", "sha256": "7b181a9e01243567d08f8459cebef5b39eee220f408beed91267d63ad187d39d"},
+  "review_timing": {"review_opened_at": "2026-07-21T10:00:00Z", "reference_key_unblinding_not_before": "2026-08-15T00:00:00Z"},
+  "target_binding": {"path": "records/EA-MC-018-records.json", "sha256": "1825549526b42c05fad9433f59254a155a85371f3e1a1c09507d0627d994b5c5", "action_sha256": "1e9b611776825c7ecc2fbb684e563603e84c0709364add83869fde5aea047f2b", "asserted_action_class": "ministerial_transcription", "classification_rule_id": "CLASS-MINISTERIAL-TRANSCRIPTION"}
+}

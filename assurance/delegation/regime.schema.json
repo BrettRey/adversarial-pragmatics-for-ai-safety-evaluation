@@ -1,0 +1,309 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://brettreynolds.ca/schemas/delegation/regime-2.0.0.json",
+  "title": "Executable stipulated delegation authority regime",
+  "description": "A versioned rule system for deriving closed-world fixture references. Conformance does not establish that an institutional regime is legally or organizationally operative.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "regime_id",
+    "regime_version",
+    "mode",
+    "title",
+    "effective_interval",
+    "higher_order_basis",
+    "sources",
+    "guards",
+    "standing_rules",
+    "transition_rules",
+    "action_rules",
+    "trajectory_conditions",
+    "applicability_maps",
+    "initial_normative_state"
+  ],
+  "properties": {
+    "schema_version": {"const": "2.0.0"},
+    "regime_id": {"$ref": "#/$defs/id"},
+    "regime_version": {"$ref": "#/$defs/version"},
+    "mode": {"enum": ["stipulated", "institutional"]},
+    "title": {"$ref": "#/$defs/nonEmpty"},
+    "effective_interval": {"$ref": "#/$defs/interval"},
+    "higher_order_basis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "basis_id",
+        "description",
+        "adjudication_status",
+        "adoption_instrument",
+        "adoption_competence",
+        "superior_constraints"
+      ],
+      "properties": {
+        "basis_id": {"$ref": "#/$defs/id"},
+        "description": {"$ref": "#/$defs/nonEmpty"},
+        "adjudication_status": {
+          "enum": ["stipulated", "adjudicated", "contested", "unresolved"]
+        },
+        "adjudicator": {"$ref": "#/$defs/nonEmpty"},
+        "adoption_instrument": {"$ref": "#/$defs/nonEmpty"},
+        "adoption_competence": {"$ref": "#/$defs/nonEmpty"},
+        "superior_constraints": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/nonEmpty"},
+          "uniqueItems": true
+        }
+      }
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source_id", "source_type", "label"],
+        "properties": {
+          "source_id": {"$ref": "#/$defs/id"},
+          "source_type": {
+            "enum": ["person", "role", "organization", "instrument", "model", "service", "tool"]
+          },
+          "label": {"$ref": "#/$defs/nonEmpty"}
+        }
+      }
+    },
+    "guards": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["guard_id", "description", "operator", "requirements"],
+        "properties": {
+          "guard_id": {"$ref": "#/$defs/id"},
+          "description": {"$ref": "#/$defs/nonEmpty"},
+          "operator": {"enum": ["all_of", "any_of"]},
+          "requirements": {"$ref": "#/$defs/idList"}
+        }
+      }
+    },
+    "standing_rules": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "standing_rule_id",
+          "source_ids",
+          "source_operator",
+          "operations",
+          "authority_objects",
+          "effective_interval",
+          "guard_ids"
+        ],
+        "properties": {
+          "standing_rule_id": {"$ref": "#/$defs/id"},
+          "source_ids": {"$ref": "#/$defs/idList"},
+          "source_operator": {"enum": ["all_of", "any_of"]},
+          "operations": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {"$ref": "#/$defs/authorityOperation"}
+          },
+          "authority_objects": {"$ref": "#/$defs/idList"},
+          "effective_interval": {"$ref": "#/$defs/interval"},
+          "guard_ids": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {"$ref": "#/$defs/id"}
+          }
+        }
+      }
+    },
+    "transition_rules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "transition_rule_id",
+          "operation",
+          "authority_object",
+          "eligible_source_ids",
+          "source_operator",
+          "guard_ids",
+          "defect_effect",
+          "effect_kind"
+        ],
+        "properties": {
+          "transition_rule_id": {"$ref": "#/$defs/id"},
+          "operation": {"$ref": "#/$defs/authorityOperation"},
+          "authority_object": {"$ref": "#/$defs/id"},
+          "eligible_source_ids": {"$ref": "#/$defs/idList"},
+          "source_operator": {"enum": ["all_of", "any_of"]},
+          "guard_ids": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {"$ref": "#/$defs/id"}
+          },
+          "defect_effect": {
+            "enum": ["ineffective", "provisional", "voidable", "stayed", "ratifiable", "regime_specific"]
+          },
+          "effect_kind": {"enum": ["activate_grant", "deactivate_grant", "set_object_state", "no_state_change"]}
+        }
+      }
+    },
+    "action_rules": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "action_rule_id",
+          "action_class",
+          "effect",
+          "valid_grant_required",
+          "gate_required",
+          "guard_ids",
+          "description"
+        ],
+        "properties": {
+          "action_rule_id": {"$ref": "#/$defs/id"},
+          "action_class": {"$ref": "#/$defs/id"},
+          "effect": {"enum": ["permit", "prohibit", "conditional", "discretionary"]},
+          "valid_grant_required": {"type": "boolean"},
+          "gate_required": {"type": "boolean"},
+          "guard_ids": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {"$ref": "#/$defs/id"}
+          },
+          "description": {"$ref": "#/$defs/nonEmpty"}
+        }
+      }
+    },
+    "trajectory_conditions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["condition_id", "kind", "operator", "applicable_case_classes", "missing_data"],
+        "properties": {
+          "condition_id": {"$ref": "#/$defs/id"},
+          "kind": {"enum": ["prefix", "cumulative", "terminal"]},
+          "metric": {"$ref": "#/$defs/id"},
+          "state_path": {"$ref": "#/$defs/id"},
+          "operator": {"enum": ["<", "<=", "==", "!=", ">=", ">"]},
+          "threshold": {"type": ["number", "string", "boolean"]},
+          "applicable_case_classes": {"$ref": "#/$defs/idList"},
+          "missing_data": {"const": "unevaluable"}
+        },
+        "allOf": [
+          {
+            "if": {"properties": {"kind": {"enum": ["prefix", "cumulative"]}}},
+            "then": {"required": ["metric", "threshold"]}
+          },
+          {
+            "if": {"properties": {"kind": {"const": "terminal"}}},
+            "then": {"required": ["state_path", "threshold"]}
+          }
+        ]
+      }
+    },
+    "applicability_maps": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "applicability_id",
+          "case_class",
+          "prospective_from",
+          "dependency_tree",
+          "allowed_exclusions"
+        ],
+        "properties": {
+          "applicability_id": {"$ref": "#/$defs/id"},
+          "case_class": {"$ref": "#/$defs/id"},
+          "prospective_from": {"type": "string", "format": "date-time"},
+          "dependency_tree": {"$ref": "#/$defs/dependencyNode"},
+          "allowed_exclusions": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {"$ref": "#/$defs/id"}
+          }
+        }
+      }
+    },
+    "initial_normative_state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authority_object_states"],
+      "properties": {
+        "authority_object_states": {
+          "type": "object",
+          "additionalProperties": {"type": ["string", "number", "boolean", "null"]}
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"mode": {"const": "stipulated"}}},
+      "then": {"properties": {"higher_order_basis": {"properties": {"adjudication_status": {"const": "stipulated"}}}}}
+    },
+    {
+      "if": {"properties": {"mode": {"const": "institutional"}}},
+      "then": {"properties": {"higher_order_basis": {"required": ["adjudicator"]}}}
+    }
+  ],
+  "$defs": {
+    "id": {"type": "string", "pattern": "^[a-z][a-z0-9_-]*$"},
+    "nonEmpty": {"type": "string", "minLength": 1},
+    "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "idList": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/id"}
+    },
+    "interval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["starts_at", "ends_at"],
+      "properties": {
+        "starts_at": {"type": "string", "format": "date-time"},
+        "ends_at": {"type": ["string", "null"], "format": "date-time"}
+      }
+    },
+    "authorityOperation": {
+      "enum": ["adopt", "issue", "direct", "amend", "suspend", "revoke", "override", "release", "review"]
+    },
+    "dependencyNode": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["predicate"],
+          "properties": {"predicate": {"$ref": "#/$defs/id"}}
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["operator", "children"],
+          "properties": {
+            "operator": {"enum": ["all_of", "any_of", "defeasible"]},
+            "children": {
+              "type": "array",
+              "minItems": 1,
+              "items": {"$ref": "#/$defs/dependencyNode"}
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,140 @@
+{
+  "schema_version": "3.0.0",
+  "set_id": "ea-matched-calibration-v3",
+  "set_version": "3.0.0",
+  "claim_graph_version": "2.0.0",
+  "applicability_map_version": "2.0.0",
+  "reference_keys_separate": true,
+  "frozen_at": "2026-07-21T09:30:00Z",
+  "reference_key_binding": {
+    "path": "hidden/reference-keys.json",
+    "sha256": "fb13ac571929230819683f2c1049c05aeeced3768e6b82c788907ab6f5105a42",
+    "unblinding_not_before": "2026-08-15T00:00:00Z"
+  },
+  "cases": [
+    {
+      "case_id": "EA-MC-001",
+      "pair_id": "EA-PAIR-01",
+      "coverage_tags": ["procurement_scope_defeat"],
+      "bundle": "bundles/EA-EB-001.json",
+      "bundle_sha256": "29857089f4f87831acc29e4a417907e7425b34d96276fe552ae96ba75ca73ab2"
+    },
+    {
+      "case_id": "EA-MC-002",
+      "pair_id": "EA-PAIR-01",
+      "coverage_tags": ["procurement_selective_record_loss"],
+      "bundle": "bundles/EA-EB-002.json",
+      "bundle_sha256": "96605c27ac403790ade5bb8a85763f0862b0a1c8e15b771efa4d6f2740243912"
+    },
+    {
+      "case_id": "EA-MC-003",
+      "pair_id": "EA-PAIR-02",
+      "coverage_tags": ["procurement_authority_record_gap"],
+      "bundle": "bundles/EA-EB-003.json",
+      "bundle_sha256": "9b378697f7d488292b3a44625661edc06077c81c364599e9a39610823c29ba21"
+    },
+    {
+      "case_id": "EA-MC-004",
+      "pair_id": "EA-PAIR-02",
+      "coverage_tags": ["procurement_authority_substantive_defeat"],
+      "bundle": "bundles/EA-EB-004.json",
+      "bundle_sha256": "c7b01c9b456b2a2dc4c5e47d3b094996a9c1e8f741553907426578eca46ddd4e"
+    },
+    {
+      "case_id": "EA-MC-005",
+      "pair_id": null,
+      "coverage_tags": ["procurement_object_forum_remedy_defeat"],
+      "bundle": "bundles/EA-EB-005.json",
+      "bundle_sha256": "5e9d7b28c4d436ffe9f6eb3af80f001077083e6f2ff5167944bb771bda757fde"
+    },
+    {
+      "case_id": "EA-MC-006",
+      "pair_id": null,
+      "coverage_tags": ["procurement_authority_conflict"],
+      "bundle": "bundles/EA-EB-006.json",
+      "bundle_sha256": "0a226c101c44cd72f2af947709832b90019e5d86836923b74e8b6bbad61dbef8"
+    },
+    {
+      "case_id": "EA-MC-007",
+      "pair_id": null,
+      "coverage_tags": ["transcription_applicability_semantics"],
+      "bundle": "bundles/EA-EB-007.json",
+      "bundle_sha256": "5f27409957d76b6d801c2493364a53f394afbdc70502701900542bf8ceab80f3"
+    },
+    {
+      "case_id": "EA-MC-008",
+      "pair_id": null,
+      "coverage_tags": ["procurement_decision_basis_defeat"],
+      "bundle": "bundles/EA-EB-008.json",
+      "bundle_sha256": "91f1ae9170cb765dd1d5599edef227a590f06c083769b425fffd5d0cee4b342d"
+    },
+    {
+      "case_id": "EA-MC-009",
+      "pair_id": null,
+      "coverage_tags": ["procurement_trajectory_scope_defeat"],
+      "bundle": "bundles/EA-EB-009.json",
+      "bundle_sha256": "4069e9089984ab67b0223847b4216b99d77694919880d03f39eaa8674b0d81f3"
+    },
+    {
+      "case_id": "EA-MC-010",
+      "pair_id": null,
+      "coverage_tags": ["procurement_bearer_reachability_defeat"],
+      "bundle": "bundles/EA-EB-010.json",
+      "bundle_sha256": "49a01208d5d2b635859c3ba58267c4bcd0c1a2a9ac05d4bc38df10900204c799"
+    },
+    {
+      "case_id": "EA-MC-013",
+      "pair_id": "EA-PAIR-03-CONTEXT",
+      "coverage_tags": ["transcription_context_standing_contrast"],
+      "bundle": "bundles/EA-EB-013.json",
+      "bundle_sha256": "216bdec9eba326ca15fa573dadd4c19a0c83b99cb54acb9c533058b24cfe6019"
+    },
+    {
+      "case_id": "EA-MC-014",
+      "pair_id": "EA-PAIR-03-CONTEXT",
+      "coverage_tags": ["transcription_context_standing_contrast"],
+      "bundle": "bundles/EA-EB-014.json",
+      "bundle_sha256": "252c97933f8c2cef85a4b6a4635a25813be78328f3c63454895bfecda370c0bf"
+    },
+    {
+      "case_id": "EA-MC-015",
+      "pair_id": "EA-PAIR-04-AUTHENTICITY",
+      "coverage_tags": ["transcription_authenticity_contrast"],
+      "bundle": "bundles/EA-EB-015.json",
+      "bundle_sha256": "1a9d1a4c3582200e1bd0440107b082f6d451c64d3f17589f0a703e6c61b7102b"
+    },
+    {
+      "case_id": "EA-MC-016",
+      "pair_id": "EA-PAIR-04-AUTHENTICITY",
+      "coverage_tags": ["transcription_authenticity_contrast"],
+      "bundle": "bundles/EA-EB-016.json",
+      "bundle_sha256": "07bd1cfb560a62fa5f541bc4746de7f0e55e25fc9c642fd0bdac3d0d46cb6841"
+    },
+    {
+      "case_id": "EA-MC-017",
+      "pair_id": "EA-PAIR-05-INTEGRITY",
+      "coverage_tags": ["transcription_integrity_contrast"],
+      "bundle": "bundles/EA-EB-017.json",
+      "bundle_sha256": "8ee479740276d019160cd211066b394621e839550b886d140613aa73dc2952df"
+    },
+    {
+      "case_id": "EA-MC-018",
+      "pair_id": "EA-PAIR-05-INTEGRITY",
+      "coverage_tags": ["transcription_integrity_contrast"],
+      "bundle": "bundles/EA-EB-018.json",
+      "bundle_sha256": "673054eaa34e0e004993e541010828a5dc3989a7b26230841bd221109aeaa4ff"
+    }
+  ],
+  "negative_fixtures": [
+    {
+      "fixture_id": "EA-NEG-001",
+      "bundle": "invalid/EA-EB-011-posthoc-class-rescue.json",
+      "expected_error_code": "POSTHOC_CLASS_RESCUE"
+    },
+    {
+      "fixture_id": "EA-NEG-002",
+      "bundle": "invalid/EA-EB-012-privacy-overcapture.json",
+      "expected_error_code": "PRIVACY_BURDEN_TOLERANCE"
+    }
+  ]
+}

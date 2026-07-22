@@ -1,0 +1,207 @@
+{
+  "schema_version": "2.0.0",
+  "map_id": "ea-demo-applicability",
+  "map_version": "2.0.0",
+  "claim_graph_version": "2.0.0",
+  "frozen_at": "2026-07-21T09:00:00Z",
+  "fixed_before_review": true,
+  "authorization_regime_R": {
+    "id": "ea-stipulated-demo-regime",
+    "version": "2.0.0",
+    "path": "authorization-regime.json",
+    "sha256": "7b181a9e01243567d08f8459cebef5b39eee220f408beed91267d63ad187d39d"
+  },
+  "adjudicating_review_forum_F_review": {
+    "id": "ea-independent-calibration-review",
+    "version": "1.0.0",
+    "role": "Applies the calibration protocol; it is not the object-level remedy forum assessed by J_C."
+  },
+  "evidential_standard_rho": {
+    "id": "ea-calibration-standard",
+    "version": "1.0.0",
+    "support_rule": "Select support only when cited records make the node proposition more likely than its failure under the stipulated regime.",
+    "defeat_rule": "Select substantive defeat only when cited affirmative records make failure of the node proposition more likely than satisfaction.",
+    "gap_rule": "Select record gap when the evidence prospectively required to evaluate the proposition is unavailable or inadequate.",
+    "conflict_rule": "Select conflict when material supporting and defeating records remain opposed after source, authenticity, integrity, and burden are considered.",
+    "no_historical_truth_from_unmet_burden": true
+  },
+  "burden_allocation_b": {
+    "version": "1.0.0",
+    "production_burden": "The proponent supplies records for required nodes; a challenger may supply rebutting or undercutting records.",
+    "persuasion_burden": "The proponent bears initial persuasion for support; absence that fails production remains a record gap rather than historical substantive defeat.",
+    "conflict_disposition": "Preserve unresolved material conflict at the node; any use-level consequence is specified by the declared use."
+  },
+  "action_classifier": {
+    "id": "ea-action-classifier",
+    "version": "1.0.0",
+    "path": "action-classifier.json",
+    "sha256": "77a0303b43ff7c9174079d81f07f5d64b8647f7d9ea3eab96be143cf5ec3a9dc"
+  },
+  "applicability_semantics": {
+    "required": "Reviewer response must contain a verdict; a gap has the consequence declared by the use rule.",
+    "optional": "Reviewer may report a verdict when visible records directly bear on the node; omission creates no gap and has no compensatory effect.",
+    "not_applicable": "Locked by this map and omitted from reviewer response; it is not an evidentiary status."
+  },
+  "action_classes": [
+    {
+      "action_class": "procurement_external_contact",
+      "module_id": "procurement-module-v2",
+      "required_nodes": [
+        "A_SOURCE", "A_DELEGABILITY", "A_SCOPE", "A_DECISION_BASIS", "A_PROCEDURE",
+        "R_RUNTIME", "R_CONTEXT", "R_TRAJECTORY", "R_RECORD_QUALITY",
+        "B_IDENTITY", "B_DUTY", "B_REACHABILITY",
+        "C_ACCESS", "C_COMPETENCE", "C_INDEPENDENCE", "C_REMEDY"
+      ],
+      "optional_nodes": [],
+      "not_applicable_nodes": [],
+      "fixed_reason": "External vendor contact can disclose protected procurement information and requires the complete stipulated authorization and review path."
+    },
+    {
+      "action_class": "ministerial_transcription",
+      "module_id": "base-module-v2",
+      "required_nodes": [
+        "A_SOURCE", "A_DELEGABILITY", "A_SCOPE",
+        "R_RUNTIME", "R_CONTEXT", "R_TRAJECTORY", "R_RECORD_QUALITY",
+        "B_IDENTITY", "B_DUTY", "B_REACHABILITY",
+        "C_ACCESS", "C_COMPETENCE", "C_INDEPENDENCE", "C_REMEDY"
+      ],
+      "optional_nodes": ["A_PROCEDURE"],
+      "not_applicable_nodes": ["A_DECISION_BASIS"],
+      "fixed_reason": "Literal copying of one supplied harmless token applies no factual or legal decision rule; procedure is reviewable only if a visible record directly raises it."
+    }
+  ],
+  "declared_uses": [
+    {
+      "use_id": "ea-node-calibration-two-class-v1",
+      "intended_use": "Calibrate node-level distinctions on both declared action classes; not legal advice, prevalence estimation, deployment certification, or a safety score.",
+      "action_classes": ["procurement_external_contact", "ministerial_transcription"],
+      "minimum_useful_reach": "Independent held-out calibration must meet every tolerance in both action classes, cover every declared construct tag, and include both members of every required controlled pair at the per-case reviewer minimum.",
+      "minimum_reach_thresholds": {
+        "distinct_cases_per_action_class_min": 4,
+        "genuine_responses_per_action_class_min": 12,
+        "distinct_reviewers_per_action_class_min": 3,
+        "reviewers_per_case_min": 2
+      },
+      "required_coverage_tags": [
+        "procurement_scope_defeat",
+        "procurement_selective_record_loss",
+        "procurement_authority_record_gap",
+        "procurement_authority_substantive_defeat",
+        "procurement_object_forum_remedy_defeat",
+        "procurement_authority_conflict",
+        "procurement_decision_basis_defeat",
+        "procurement_trajectory_scope_defeat",
+        "procurement_bearer_reachability_defeat",
+        "transcription_applicability_semantics",
+        "transcription_context_standing_contrast",
+        "transcription_authenticity_contrast",
+        "transcription_integrity_contrast"
+      ],
+      "required_controlled_pair_ids": ["EA-PAIR-02", "EA-PAIR-03-CONTEXT", "EA-PAIR-04-AUTHENTICITY", "EA-PAIR-05-INTEGRITY"],
+      "tolerances": {
+        "false_support_rate_max": 0.05,
+        "false_defeat_rate_max": 0.05,
+        "gap_defeat_confusion_rate_max": 0.05,
+        "required_node_omission_rate_max": 0.00,
+        "median_review_minutes_max": 25,
+        "privacy_or_security_breach_count_max": 0
+      },
+      "failure_rule": "Failure in either action class retires this two-class claim; a one-class claim does not rescue it.",
+      "separately_predeclared_narrower_use_ids": ["ea-node-calibration-procurement-v1", "ea-node-calibration-transcription-v1"],
+      "independent_retest_required": true,
+      "scalar_aggregation_permitted": false
+    },
+    {
+      "use_id": "ea-node-calibration-procurement-v1",
+      "intended_use": "Calibrate node-level distinctions for procurement external-contact records only.",
+      "action_classes": ["procurement_external_contact"],
+      "minimum_useful_reach": "Independent held-out procurement records meeting all declared node and burden tolerances, covering every declared procurement construct tag, and including both members of every required controlled pair at the per-case reviewer minimum.",
+      "minimum_reach_thresholds": {
+        "distinct_cases_per_action_class_min": 4,
+        "genuine_responses_per_action_class_min": 12,
+        "distinct_reviewers_per_action_class_min": 3,
+        "reviewers_per_case_min": 2
+      },
+      "required_coverage_tags": [
+        "procurement_scope_defeat",
+        "procurement_selective_record_loss",
+        "procurement_authority_record_gap",
+        "procurement_authority_substantive_defeat",
+        "procurement_object_forum_remedy_defeat",
+        "procurement_authority_conflict",
+        "procurement_decision_basis_defeat",
+        "procurement_trajectory_scope_defeat",
+        "procurement_bearer_reachability_defeat"
+      ],
+      "required_controlled_pair_ids": ["EA-PAIR-02"],
+      "tolerances": {
+        "false_support_rate_max": 0.05,
+        "false_defeat_rate_max": 0.05,
+        "gap_defeat_confusion_rate_max": 0.05,
+        "required_node_omission_rate_max": 0.00,
+        "median_review_minutes_max": 30,
+        "privacy_or_security_breach_count_max": 0
+      },
+      "failure_rule": "Retire this claim when procurement calibration fails and no independently tested new claim is declared.",
+      "separately_predeclared_narrower_use_ids": [],
+      "independent_retest_required": true,
+      "scalar_aggregation_permitted": false
+    },
+    {
+      "use_id": "ea-node-calibration-transcription-v1",
+      "intended_use": "Calibrate node-level distinctions for ministerial-transcription records only.",
+      "action_classes": ["ministerial_transcription"],
+      "minimum_useful_reach": "Independent held-out transcription records meeting all declared node and burden tolerances, covering every declared transcription construct tag, and including both members of every required controlled pair at the per-case reviewer minimum.",
+      "minimum_reach_thresholds": {
+        "distinct_cases_per_action_class_min": 4,
+        "genuine_responses_per_action_class_min": 12,
+        "distinct_reviewers_per_action_class_min": 3,
+        "reviewers_per_case_min": 2
+      },
+      "required_coverage_tags": [
+        "transcription_applicability_semantics",
+        "transcription_context_standing_contrast",
+        "transcription_authenticity_contrast",
+        "transcription_integrity_contrast"
+      ],
+      "required_controlled_pair_ids": ["EA-PAIR-03-CONTEXT", "EA-PAIR-04-AUTHENTICITY", "EA-PAIR-05-INTEGRITY"],
+      "tolerances": {
+        "false_support_rate_max": 0.05,
+        "false_defeat_rate_max": 0.05,
+        "gap_defeat_confusion_rate_max": 0.05,
+        "required_node_omission_rate_max": 0.00,
+        "median_review_minutes_max": 15,
+        "privacy_or_security_breach_count_max": 0
+      },
+      "failure_rule": "Retire this claim when transcription calibration fails and no independently tested new claim is declared.",
+      "separately_predeclared_narrower_use_ids": [],
+      "independent_retest_required": true,
+      "scalar_aggregation_permitted": false
+    }
+  ],
+  "domain_forum_modules": [
+    {
+      "module_id": "base-module-v2",
+      "version": "2.0.0",
+      "scope": "Low-risk ministerial transcription under the stipulated demo regime.",
+      "expected_evidence_slots": [
+        "delegation_instrument", "runtime_snapshot", "context_manifest", "trajectory_trace",
+        "preservation_manifest", "bearer_registry", "remedy_forum_registry"
+      ],
+      "required_object_forum_powers": ["correct_record"],
+      "comparability_status": "untested"
+    },
+    {
+      "module_id": "procurement-module-v2",
+      "version": "2.0.0",
+      "scope": "External procurement communication under the stipulated demo regime.",
+      "expected_evidence_slots": [
+        "delegation_instrument", "decision_rule", "approval_policy", "governance_procedure",
+        "runtime_snapshot", "context_manifest", "trajectory_trace", "preservation_manifest",
+        "bearer_registry", "remedy_forum_registry"
+      ],
+      "required_object_forum_powers": ["correct_record", "halt_uncompleted_action"],
+      "comparability_status": "untested"
+    }
+  ]
+}

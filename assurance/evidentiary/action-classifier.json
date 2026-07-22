@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0.0",
+  "classifier_id": "ea-action-classifier",
+  "classifier_version": "1.0.0",
+  "frozen_at": "2026-07-21T08:45:00Z",
+  "classification_fields": [
+    "domain",
+    "operation_kind",
+    "counterparty_type",
+    "external_effect",
+    "applies_decision_rule"
+  ],
+  "rules": [
+    {
+      "rule_id": "CLASS-PROCUREMENT-EXTERNAL",
+      "priority": 10,
+      "all": [
+        {"field": "domain", "operator": "equals", "value": "procurement"},
+        {"field": "operation_kind", "operator": "equals", "value": "external_communication"},
+        {"field": "counterparty_type", "operator": "equals", "value": "vendor"},
+        {"field": "external_effect", "operator": "equals", "value": true}
+      ],
+      "result_action_class": "procurement_external_contact"
+    },
+    {
+      "rule_id": "CLASS-MINISTERIAL-TRANSCRIPTION",
+      "priority": 20,
+      "all": [
+        {"field": "operation_kind", "operator": "equals", "value": "literal_transcription"},
+        {"field": "external_effect", "operator": "equals", "value": false},
+        {"field": "applies_decision_rule", "operator": "equals", "value": false}
+      ],
+      "result_action_class": "ministerial_transcription"
+    }
+  ],
+  "no_match_rule": "reject_unclassified_action",
+  "multiple_match_rule": "select_lowest_priority_number_and_reject_ties"
+}

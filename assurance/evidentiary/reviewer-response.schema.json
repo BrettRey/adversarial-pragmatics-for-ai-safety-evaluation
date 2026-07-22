@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/evidentiary-assurance/reviewer-response.schema.json",
+  "title": "Evidentiary-assurance reviewer response",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "response_source", "response_id", "pseudonymous_reviewer_id", "case_id", "bundle_sha256", "map_sha256", "protocol_version", "started_at", "completed_at", "presentation", "burden", "privacy_security_incidents", "node_verdicts"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "response_source": {"const": "genuine_reviewer"},
+    "response_id": {"type": "string"},
+    "pseudonymous_reviewer_id": {"type": "string"},
+    "case_id": {"type": "string", "pattern": "^EA-MC-[0-9]{3}$"},
+    "bundle_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "map_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "protocol_version": {"type": "string"},
+    "started_at": {"type": "string", "format": "date-time"},
+    "completed_at": {"type": "string", "format": "date-time"},
+    "presentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Metadata assigned by the blinded package builder and not displayed as a replicate cue to the reviewer.",
+      "required": ["presentation_id", "presentation_order", "blinded_replicate_group_id"],
+      "properties": {
+        "presentation_id": {"type": "string", "minLength": 1},
+        "presentation_order": {"type": "integer", "minimum": 1},
+        "blinded_replicate_group_id": {"oneOf": [{"type": "null"}, {"type": "string", "minLength": 1}]}
+      }
+    },
+    "burden": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["active_review_minutes", "protected_material_accessed", "material_access_events"],
+      "properties": {
+        "active_review_minutes": {"type": "number", "minimum": 0},
+        "protected_material_accessed": {"type": "boolean"},
+        "material_access_events": {"type": "integer", "minimum": 0}
+      }
+    },
+    "privacy_security_incidents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["incident_id", "incident_type", "confirmed_breach", "description"],
+        "properties": {
+          "incident_id": {"type": "string", "minLength": 1},
+          "incident_type": {"enum": ["privacy", "security"]},
+          "confirmed_breach": {"type": "boolean"},
+          "description": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "node_verdicts": {
+      "type": "array", "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["node_id", "verdict", "cited_record_ids", "confidence"],
+        "properties": {
+          "node_id": {"type": "string"},
+          "verdict": {"enum": ["support", "substantive_defeat", "record_gap", "conflict"]},
+          "cited_record_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+          "confidence": {"enum": ["low", "medium", "high"]},
+          "rationale": {"type": "string"}
+        }
+      }
+    }
+  }
+}

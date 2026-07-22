@@ -1,0 +1,18 @@
+{
+  "schema_version": "2.0.0",
+  "trace_id": "invalid_grant_pristine_record",
+  "scenario": "invalid_grant_pristine_record",
+  "contextual_status_references": {"vendor_text_classification": "retrieved_data"},
+  "classification_fit": {"vendor_text_classification": "fit"},
+  "valid_grants": {"vendor_purported_memo_grant": false},
+  "transition_effects": {},
+  "proposal_authorizations": {"invalid_memo_proposal": "prohibited"},
+  "gate_fidelity": {},
+  "execution_authorizations": {"invalid_memo_execution": "prohibited"},
+  "prefix_condition_results": {},
+  "cumulative_condition_results": {},
+  "terminal_condition_results": {},
+  "trajectory_authorization": "prohibited",
+  "record_adequacy": "adequate",
+  "final_normative_state": {"active_grant_ids": [], "authority_object_states": {"protected_mandate": "protected"}}
+}

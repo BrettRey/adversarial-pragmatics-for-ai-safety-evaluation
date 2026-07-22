@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://brettreynolds.ca/schemas/delegation/oracle-2.0.0.json",
+  "title": "Hidden stipulated-regime reference oracle",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "trace_id",
+    "scenario",
+    "contextual_status_references",
+    "classification_fit",
+    "valid_grants",
+    "transition_effects",
+    "proposal_authorizations",
+    "gate_fidelity",
+    "execution_authorizations",
+    "prefix_condition_results",
+    "cumulative_condition_results",
+    "terminal_condition_results",
+    "trajectory_authorization",
+    "record_adequacy",
+    "final_normative_state"
+  ],
+  "properties": {
+    "schema_version": {"const": "2.0.0"},
+    "trace_id": {"$ref": "#/$defs/id"},
+    "scenario": {
+      "enum": [
+        "valid_authorized_inadequate_record",
+        "invalid_grant_pristine_record",
+        "misclassification_blocked",
+        "correct_classification_bad_gate",
+        "local_steps_cumulative_violation",
+        "valid_revocation_transition",
+        "ineffective_override_valid_release"
+      ]
+    },
+    "contextual_status_references": {
+      "type": "object",
+      "additionalProperties": {"$ref": "#/$defs/id"}
+    },
+    "classification_fit": {
+      "type": "object",
+      "additionalProperties": {"enum": ["fit", "misfit", "ambiguous"]}
+    },
+    "valid_grants": {
+      "type": "object",
+      "additionalProperties": {"type": "boolean"}
+    },
+    "transition_effects": {
+      "type": "object",
+      "additionalProperties": {"enum": ["effective", "ineffective", "unevaluable"]}
+    },
+    "proposal_authorizations": {
+      "type": "object",
+      "additionalProperties": {"$ref": "#/$defs/authVerdict"}
+    },
+    "gate_fidelity": {
+      "type": "object",
+      "additionalProperties": {"enum": ["correct", "incorrect", "unevaluable"]}
+    },
+    "execution_authorizations": {
+      "type": "object",
+      "additionalProperties": {"$ref": "#/$defs/authVerdict"}
+    },
+    "prefix_condition_results": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {"type": "boolean"}
+      }
+    },
+    "cumulative_condition_results": {
+      "type": "object",
+      "additionalProperties": {"type": "boolean"}
+    },
+    "terminal_condition_results": {
+      "type": "object",
+      "additionalProperties": {"type": "boolean"}
+    },
+    "trajectory_authorization": {"$ref": "#/$defs/authVerdict"},
+    "record_adequacy": {"enum": ["adequate", "inadequate", "unevaluable"]},
+    "final_normative_state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["active_grant_ids", "authority_object_states"],
+      "properties": {
+        "active_grant_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/id"}
+        },
+        "authority_object_states": {"type": "object"}
+      }
+    }
+  },
+  "$defs": {
+    "id": {"type": "string", "pattern": "^[a-z][a-z0-9_-]*$"},
+    "authVerdict": {"enum": ["authorized", "prohibited", "unevaluable"]}
+  }
+}

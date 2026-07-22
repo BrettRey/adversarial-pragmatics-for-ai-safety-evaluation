@@ -1,5 +1,5 @@
 # Adversarial Pragmatics for AI Safety Evaluation
-<!-- SUMMARY: empirical adversarial-pragmatics benchmark; arXiv v2 public 2026-07-16; Study A gated on HREB scope response; release tag/DOI pending · status: active · updated: 2026-07-20 -->
+<!-- SUMMARY: empirical adversarial-pragmatics benchmark; arXiv v2 public 2026-07-16; Study A gated on HREB scope response; release tag/DOI pending · status: active · updated: 2026-07-21 -->
 
 Status: active research artifact. Scaffold created 2026-06-26; public arXiv identifier assigned 2026-07-01; v2 replacement public 2026-07-16.
 
@@ -32,6 +32,8 @@ Current paper stack in this repository:
 - `evidentiary-assurance.tex`: governance/legal assurance paper on action-level evidence bundles and review.
 
 On 2026-07-20, the official Hinkle automated-vehicle testimony and introduced H.R. 7390 were integrated as a targeted case in Delegation Assurance and Evidentiary Assurance. Study B now records a fictional controlled-reconstruction hook for institutional force. Study A is unchanged, and this work supplies no collection authorization. Both primary sources are archived in the central literature directory.
+
+On 2026-07-21, OpenAI's first-party report on long-horizon model safety was integrated as a bounded construct-design case. The flagship now separates source uptake, contiguous occurrence, declared recoverability, reconstruction/use, and downstream effect; Delegation Assurance separates authorization paths from bounded execution trajectories and repairs non-amplification to be grant-relative; Evidentiary Assurance adds trajectory, monitor-intervention, incident-lineage, and selected-replay records. Study B records a harmless static recoverability hook and a static-to-live projection threat, but its current schema and fixtures remain unchanged. Study A remains untouched. The complete cited page and a readable derivative are archived centrally; the source doesn't support prevalence or safeguard-efficacy claims.
 
 ## Public-Version Gap
 
@@ -151,6 +153,7 @@ submission/arxiv/adversarial-pragmatics-arxiv-source.tar.gz
   Recruitment packages will be built from v7; self-pilot v5/v6 returns stay
   local usability evidence, not field-comparable to v7.
 - Build an executable delegation-assurance harness for typed authority traces and reviewer reconstruction. The trace schema separates four fields per item: independently adjudicated authority status (genuine ambiguity admissible as a value), system-assigned status, recognitional fit or misfit, and the action produced through that recognition.
+- If the trajectory/recoverability hook advances beyond design, first specify a new schema and independently review the harmless four-arm reconstruction. Keep the static recognition query separate from any live, horizon-indexed tool harness; freeze the trajectory boundary, observer and transform, opportunity count, child-session and tool affordances, monitor intervention, and pause, operational-continuation, normative-release, restart, and stopping rules before collection.
 - Keep source verification current in `notes/source-verification.md`.
 
 ### 2026-07-13--15 Session Notes
@@ -289,3 +292,14 @@ Sources routed from a *Cognition* 2026 batch. Central index: `literature/cogniti
 - **Future instructions relax present cognitive control** [medium] — `notes/lit-cognition-2026-prospective-relaxation.md`
 - **Self-similar synthetic voices can amplify illusory truth** [medium] — `notes/lit-cognition-2026-self-voice-illusory-truth.md`
 - (cross-ref) minimal-group-partisanship — `notes/source-hooks/cognition-2026-minimal-group-partisanship.md`
+
+## 2026-07-21 Projectibility and validity excellence revision
+
+- Completed the coordinated major revision of *Adversarial Pragmatics*, *Delegation Assurance*, and *Evidentiary Assurance* under a projectibility-first, Messick-informed validity framework. The three papers remain stand-alone: AP owns the pragmatic measurement layer, DA the normative authorization layer, and EA the evidentiary review layer.
+- Added a shared typed-claim vocabulary, projective-claim schema and validator, prospective claim registers, a two-pass load-bearing-claim audit, and a dated six-standpoint adversarial stress-test record.
+- Closed the Study B false-pass routes with manifest-bound production eligibility, exact repeat inventories, per-base main-reference gates, per-arm shortcut references and evaluability gates, and 19 permanent analyzer regressions. The committed result remains `NOT_ESTIMATED`; no target outputs were created.
+- Made DA's distinction among normative reference, representation, proposal, gate, execution, result, and assessment use executable. Seven stipulated traces and hidden oracles, five semantic mutations, and three separate empirical-programme analyzers pass; no target-study outcome is claimed.
+- Made EA's four verdict vectors, prospective applicability, immutable-key opening boundary, 16 controlled cases, substantive contrast-coverage requirement, and three noncompensatory use claims executable. Nineteen analyzer self-tests pass; with zero genuine reviewer responses, every use remains `NOT_ESTIMATED`.
+- Verified all 80 unique cited sources locally and cleaned bibliography metadata. Final builds are AP 23 pages, DA 35, and EA 25; ordinary Biber and house-style checks pass, and visual QA removed three near-empty pagination artifacts.
+- Study A's data, code, and frozen analysis paths were unchanged. The executable Stage-5 exit is met, but external gates remain: independent Study B references and target runs; DA's three target programmes and institutional comparison; and EA's genuine blinded reviewer study and forum-specific review.
+- No commit, tag, push, recruitment, collection, unblinding, or target-data generation was performed in this revision.

@@ -8,7 +8,7 @@ Agent-security guidance has moved beyond ordinary chatbot safety. OWASP's agenti
 
 Prompt-injection research gives the sharpest technical motivation. Indirect prompt injection shows that LLM-integrated applications can confuse untrusted data with instructions when external content is retrieved or processed inside a larger application \parencite{greshake2023not}. AgentDojo turns that vulnerability into a dynamic evaluation environment for tool-using agents, with realistic tasks, attacks, defences, and security test cases \parencite{debenedetti2024agentdojo}.
 
-These works establish the security problem. They don't by themselves supply typed semantics for whether a concrete operation was authorized and within scope, a noncompensatory claim structure for that verdict, or diagnostics and comparative tests for the path from governing language to execution.
+These works establish the security problem. They don't by themselves supply typed semantics for whether a concrete operation or trajectory was authorized, a representation that preserves the governing regime's dependency structure, or diagnostics and comparative tests for the path from governing language to execution.
 
 \subsection{Instruction Hierarchy and Language-Mediated Authority}
 
@@ -42,7 +42,7 @@ Evaluation work supplies both tools and risks. LLM-as-judge methods can reduce g
 
 Automated-evaluator reliability is itself part of the assurance problem. LLMBar shows that fluent but instruction-violating outputs can mislead evaluators \parencite{zeng2024llmbar}. Survey work treats consistency, bias, and domain adaptation as continuing problems for LLM-as-judge systems \parencite{gu2025judgeSurvey}. Bias studies show that both human and LLM judges can be vulnerable to judgment biases and attacks on those biases \parencite{chen2024judgementBias}. Steerability results show that, when supplied with a modified safety definition, LLM judges often continue to apply trained priors rather than the supplied definition \parencite{alloula2026safetyContextual}. If their labels feed downstream decisions, the operational rubric can diverge from the declared one.
 
-Evaluation becomes part of the assurance chain when an institutional or system decision rule treats a label as evidence for a safety, compliance, or deployment claim. The record should identify who authorized that use, its scope, and the applicable decision rule. Evaluation methods contribute evidence only when their labels are scoped and validated.
+Evaluation becomes part of the assurance chain when an institutional or system decision rule treats a label as evidence for a safety, compliance, or deployment claim. The record should identify who authorized that use, its scope, and the applicable decision rule. Evaluation methods contribute evidence only when the proposed interpretation and use of their labels has a target-matched validation argument.
 
 \subsection{The Gap}
 

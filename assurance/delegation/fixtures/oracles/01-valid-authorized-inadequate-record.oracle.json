@@ -1,0 +1,18 @@
+{
+  "schema_version": "2.0.0",
+  "trace_id": "valid_authorized_inadequate_record",
+  "scenario": "valid_authorized_inadequate_record",
+  "contextual_status_references": {},
+  "classification_fit": {},
+  "valid_grants": {"memo_grant": true},
+  "transition_effects": {},
+  "proposal_authorizations": {"memo_proposal": "authorized"},
+  "gate_fidelity": {},
+  "execution_authorizations": {"memo_execution": "authorized"},
+  "prefix_condition_results": {},
+  "cumulative_condition_results": {},
+  "terminal_condition_results": {},
+  "trajectory_authorization": "authorized",
+  "record_adequacy": "inadequate",
+  "final_normative_state": {"active_grant_ids": ["memo_grant"], "authority_object_states": {"protected_mandate": "protected"}}
+}

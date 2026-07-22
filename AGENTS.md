@@ -26,6 +26,10 @@ A large class of AI safety evaluation failures are failures in language-mediated
 - Separate task success, policy compliance, safety risk, evaluator confidence, and failure attribution.
 - Treat disagreement as data: identify when disagreement is a property of the construct rather than rater noise.
 - Validate LLM-as-judge behavior rather than assuming it.
+- Keep normative references, recorded representations, item findings, sample results, assessment interpretations/uses, projective claims, and causal claims typed separately.
+- Treat validity as a property of an assessment-result interpretation and use, not as an intrinsic property of a benchmark, judge, checklist, or model.
+- Every nontrivial projection must declare its bearer, unit, population, conditions, transformations, time/version, tolerance, use, warrant plan, and prospective revision rule.
+- A post hoc scope restriction creates a new claim; it does not rescue the failed one.
 
 ## Repository Layout
 
@@ -34,6 +38,12 @@ benchmark/
   items/              # seed and later gold-set items
   rubrics/            # taxonomy, annotation protocol, codebook
   results/            # generated evaluation results, not raw API logs by default
+  coverage/           # construct-domain coverage, not a substitute for validation
+  study-b/            # controlled contrasts and prospective Study B claims
+assurance/
+  shared/             # typed claims and prospective projective-claim protocol
+  delegation/         # authorization regimes, traces, and level-separating fixtures
+  evidentiary/        # evidence bundles, applicability maps, and matched cases
 data/
   seed/               # hand-authored seed material
   processed/          # generated derived datasets
@@ -50,6 +60,8 @@ reviews/              # review-board or external review notes
 - Before adding a citation or factual claim about an organization, job posting, safety report, or research agenda, verify the source and record it in `notes/source-verification.md`.
 - New bibliographic entries belong in `references-local.bib` unless Brett explicitly asks for a central-bib update.
 - `references.bib` is a vendored public-repository snapshot of the central bibliography; update it only when refreshing the public build dependency.
+- Every cited external source should have genuine local full text or a complete local copy of the cited page recorded in `notes/cited-source-local-archive.md`.
+- Do not leave project sources in `Downloads`; move verified copies into the shared literature archive and record their exact path and hash.
 
 ## Build and Checks
 
@@ -59,6 +71,7 @@ Use XeLaTeX, not pdfLaTeX or LuaLaTeX.
 make quick
 make
 python3 scripts/validate_items.py benchmark/items/seed-items.csv
+make assurance-check
 ```
 
 Before any submission or public preprint:

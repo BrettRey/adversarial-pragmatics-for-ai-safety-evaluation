@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://brettreynolds.ca/schemas/delegation/predictive-ablation-input-1.0.0.json",
+  "title": "Predictive typed-representation ablation analysis input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "input_id", "program_id", "specification_id", "specification_version", "created_at", "design", "design_object_bindings", "observations"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "input_id": {"$ref": "#/$defs/id"},
+    "program_id": {"const": "predictive_typed_ablation"},
+    "specification_id": {"const": "DA_PRED_001_SPEC"},
+    "specification_version": {"const": "1.0.0"},
+    "created_at": {"type": "string", "format": "date-time"},
+    "design": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["split_frozen_before_outcomes", "training_trace_family_ids", "held_out_trace_family_ids", "feature_allowlist", "prediction_procedure_id", "software_version", "prediction_view_built_before_reference_join"],
+      "properties": {
+        "split_frozen_before_outcomes": {"const": true},
+        "training_trace_family_ids": {"$ref": "#/$defs/idList"},
+        "held_out_trace_family_ids": {"$ref": "#/$defs/idList"},
+        "feature_allowlist": {"$ref": "#/$defs/idList"},
+        "prediction_procedure_id": {"$ref": "#/$defs/id"},
+        "software_version": {"type": "string", "minLength": 1},
+        "prediction_view_built_before_reference_join": {"const": true}
+      }
+    },
+    "design_object_bindings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["feature_manifest", "held_out_manifest"],
+      "properties": {
+        "feature_manifest": {"$ref": "#/$defs/manifest"},
+        "held_out_manifest": {"$ref": "#/$defs/manifest"}
+      }
+    },
+    "observations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["observation_id", "family", "trace_family_id", "target", "typed_probability", "baseline_probability", "predictor_view", "prediction_locked_at", "reference_joined_at"],
+        "properties": {
+          "observation_id": {"$ref": "#/$defs/id"},
+          "family": {"enum": ["proposal_authorization", "gate_fidelity", "execution_authorization", "trajectory_authorization"]},
+          "trace_family_id": {"$ref": "#/$defs/id"},
+          "target": {"enum": [0, 1]},
+          "typed_probability": {"$ref": "#/$defs/probability"},
+          "baseline_probability": {"$ref": "#/$defs/probability"},
+          "predictor_view": {"type": "object"},
+          "prediction_locked_at": {"type": "string", "format": "date-time"},
+          "reference_joined_at": {"type": "string", "format": "date-time"}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "id": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_.-]*$"},
+    "idList": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+    "probability": {"type": "number", "minimum": 0, "maximum": 1},
+    "manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["manifest_id", "manifest_version", "frozen_at", "content", "sha256"],
+      "properties": {
+        "manifest_id": {"$ref": "#/$defs/id"},
+        "manifest_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+        "frozen_at": {"type": "string", "format": "date-time"},
+        "content": {"type": "object", "minProperties": 1},
+        "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      }
+    }
+  }
+}

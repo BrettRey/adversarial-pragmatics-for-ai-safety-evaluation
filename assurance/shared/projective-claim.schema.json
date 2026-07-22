@@ -1,0 +1,197 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://brettreynolds.ca/schemas/projective-claim-v1.schema.json",
+  "title": "Prospectively declared projective claim",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "claim_id",
+    "claim_version",
+    "status",
+    "declaration",
+    "inquiry_use",
+    "warrant_plan",
+    "revision_rule",
+    "provenance"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "claim_id": {"type": "string", "pattern": "^[A-Z][A-Z0-9_-]{2,63}$"},
+    "claim_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+$"},
+    "status": {
+      "type": "string",
+      "enum": ["proposed", "frozen", "tested", "failed", "demoted", "retired"]
+    },
+    "declaration": {"$ref": "#/$defs/declaration"},
+    "inquiry_use": {"$ref": "#/$defs/inquiryUse"},
+    "warrant_plan": {"$ref": "#/$defs/warrantPlan"},
+    "revision_rule": {"$ref": "#/$defs/revisionRule"},
+    "provenance": {"$ref": "#/$defs/provenance"}
+  },
+  "$defs": {
+    "nonEmptyString": {"type": "string", "minLength": 1},
+    "nonEmptyStrings": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/nonEmptyString"}
+    },
+    "stringList": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/nonEmptyString"}
+    },
+    "declaration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_result",
+        "projected_outcome",
+        "bearer",
+        "unit",
+        "population",
+        "conditions",
+        "transformations",
+        "time_version_scope",
+        "tolerance"
+      ],
+      "properties": {
+        "source_result": {"$ref": "#/$defs/nonEmptyString"},
+        "projected_outcome": {"$ref": "#/$defs/nonEmptyString"},
+        "bearer": {"$ref": "#/$defs/nonEmptyString"},
+        "unit": {"$ref": "#/$defs/nonEmptyString"},
+        "population": {"$ref": "#/$defs/nonEmptyString"},
+        "conditions": {"$ref": "#/$defs/nonEmptyStrings"},
+        "transformations": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["allowed", "excluded"],
+          "properties": {
+            "allowed": {"$ref": "#/$defs/stringList"},
+            "excluded": {"$ref": "#/$defs/stringList"}
+          }
+        },
+        "time_version_scope": {"$ref": "#/$defs/nonEmptyString"},
+        "tolerance": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["criterion", "success_threshold", "failure_threshold"],
+          "properties": {
+            "criterion": {"$ref": "#/$defs/nonEmptyString"},
+            "success_threshold": {"$ref": "#/$defs/nonEmptyString"},
+            "failure_threshold": {"$ref": "#/$defs/nonEmptyString"}
+          }
+        }
+      }
+    },
+    "inquiryUse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "intended_use",
+        "excluded_uses",
+        "evidential_standard",
+        "uncertainty_treatment",
+        "minimum_useful_reach"
+      ],
+      "properties": {
+        "intended_use": {"$ref": "#/$defs/nonEmptyString"},
+        "excluded_uses": {"$ref": "#/$defs/nonEmptyStrings"},
+        "evidential_standard": {"$ref": "#/$defs/nonEmptyString"},
+        "uncertainty_treatment": {"$ref": "#/$defs/nonEmptyString"},
+        "minimum_useful_reach": {"$ref": "#/$defs/nonEmptyString"}
+      }
+    },
+    "validityEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "content",
+        "substantive",
+        "structural",
+        "generalizability",
+        "external",
+        "consequential"
+      ],
+      "properties": {
+        "content": {"$ref": "#/$defs/stringList"},
+        "substantive": {"$ref": "#/$defs/stringList"},
+        "structural": {"$ref": "#/$defs/stringList"},
+        "generalizability": {"$ref": "#/$defs/stringList"},
+        "external": {"$ref": "#/$defs/stringList"},
+        "consequential": {"$ref": "#/$defs/stringList"}
+      }
+    },
+    "worldSide": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["profile_hypothesis", "ground_hypothesis", "commitments", "evidence"],
+      "properties": {
+        "profile_hypothesis": {"type": ["string", "null"]},
+        "ground_hypothesis": {"type": ["string", "null"]},
+        "commitments": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": ["stability", "causal_order", "maintenance", "corrective_control"]
+          }
+        },
+        "evidence": {"$ref": "#/$defs/stringList"}
+      }
+    },
+    "warrantPlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_evidence",
+        "target_evidence",
+        "assessment_validity",
+        "world_side",
+        "threats"
+      ],
+      "properties": {
+        "source_evidence": {"$ref": "#/$defs/nonEmptyStrings"},
+        "target_evidence": {"$ref": "#/$defs/nonEmptyStrings"},
+        "assessment_validity": {"$ref": "#/$defs/validityEvidence"},
+        "world_side": {"$ref": "#/$defs/worldSide"},
+        "threats": {"$ref": "#/$defs/nonEmptyStrings"}
+      }
+    },
+    "revisionRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "prospective_failure_triggers",
+        "fallback_claim_id",
+        "independent_retest_required",
+        "retirement_condition",
+        "posthoc_scope_change_policy"
+      ],
+      "properties": {
+        "prospective_failure_triggers": {"$ref": "#/$defs/nonEmptyStrings"},
+        "fallback_claim_id": {
+          "oneOf": [
+            {"type": "null"},
+            {"type": "string", "pattern": "^[A-Z][A-Z0-9_-]{2,63}$"}
+          ]
+        },
+        "independent_retest_required": {"const": true},
+        "retirement_condition": {"$ref": "#/$defs/nonEmptyString"},
+        "posthoc_scope_change_policy": {"const": "new_claim_required"}
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["declared_at", "declared_by", "declaration_timing", "source_files"],
+      "properties": {
+        "declared_at": {"type": "string", "format": "date-time"},
+        "declared_by": {"$ref": "#/$defs/nonEmptyString"},
+        "declaration_timing": {"const": "before_target_outcomes"},
+        "source_files": {"$ref": "#/$defs/nonEmptyStrings"}
+      }
+    }
+  }
+}

@@ -1,6 +1,6 @@
 % Project-specific references added after source verification.
 
-@article{liang2022holistic,
+@online{liang2022holistic,
   title         = {Holistic Evaluation of Language Models},
   author        = {Liang, Percy and Bommasani, Rishi and Lee, Tony and Tsipras, Dimitris and Soylu, Dilara and Yasunaga, Michihiro and Zhang, Yian and Narayanan, Deepak and Wu, Yuhuai and Kumar, Ananya and others},
   year          = {2022},
@@ -11,7 +11,7 @@
   url           = {https://arxiv.org/abs/2211.09110}
 }
 
-@article{wallace2024instruction,
+@online{wallace2024instruction,
   title         = {The Instruction Hierarchy: Training {LLMs} to Prioritize Privileged Instructions},
   author        = {Wallace, Eric and Xiao, Kai and Leike, Reimar and Weng, Lilian and Heidecke, Johannes and Beutel, Alex},
   year          = {2024},
@@ -22,7 +22,7 @@
   url           = {https://arxiv.org/abs/2404.13208}
 }
 
-@article{debenedetti2024agentdojo,
+@online{debenedetti2024agentdojo,
   title         = {{AgentDojo}: A Dynamic Environment to Evaluate Prompt Injection Attacks and Defenses for {LLM} Agents},
   author        = {Debenedetti, Edoardo and Zhang, Jie and Balunovic, Mislav and Beurer-Kellner, Luca and Fischer, Marc and Tramer, Florian},
   year          = {2024},
@@ -44,7 +44,7 @@
   url           = {https://arxiv.org/abs/2311.01011}
 }
 
-@article{mazeika2024harmbench,
+@online{mazeika2024harmbench,
   title         = {{HarmBench}: A Standardized Evaluation Framework for Automated Red Teaming and Robust Refusal},
   author        = {Mazeika, Mantas and Phan, Long and Yin, Xuwang and Zou, Andy and Wang, Zifan and Mu, Norman and Sakhaee, Elham and Li, Nathaniel and Basart, Steven and Li, Bo and Forsyth, David and Hendrycks, Dan},
   year          = {2024},
@@ -55,7 +55,7 @@
   url           = {https://arxiv.org/abs/2402.04249}
 }
 
-@article{chao2024jailbreakbench,
+@online{chao2024jailbreakbench,
   title         = {{JailbreakBench}: An Open Robustness Benchmark for Jailbreaking Large Language Models},
   author        = {Chao, Patrick and Debenedetti, Edoardo and Robey, Alexander and Andriushchenko, Maksym and Croce, Francesco and Sehwag, Vikash and Dobriban, Edgar and Flammarion, Nicolas and Pappas, George J. and Tramer, Florian and Hassani, Hamed and Wong, Eric},
   year          = {2024},
@@ -74,7 +74,7 @@
   url       = {https://aclanthology.org/2024.naacl-long.301/}
 }
 
-@article{wang2023donotanswer,
+@online{wang2023donotanswer,
   title         = {Do-Not-Answer: A Dataset for Evaluating Safeguards in {LLMs}},
   author        = {Wang, Yuxia and Li, Haonan and Han, Xudong and Nakov, Preslav and Baldwin, Timothy},
   year          = {2023},
@@ -100,7 +100,6 @@
   booktitle = {Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing},
   pages     = {2511--2522},
   year      = {2023},
-  publisher = {Association for Computational Linguistics},
   doi       = {10.18653/v1/2023.emnlp-main.153},
   url       = {https://aclanthology.org/2023.emnlp-main.153/}
 }
@@ -114,7 +113,7 @@
   url       = {https://arxiv.org/abs/2310.07641}
 }
 
-@article{zhou2023ifeval,
+@online{zhou2023ifeval,
   title         = {Instruction-Following Evaluation for Large Language Models},
   author        = {Zhou, Jeffrey and Lu, Tianjian and Mishra, Swaroop and Brahma, Siddhartha and Basu, Sujoy and Luan, Yi and Zhou, Denny and Hou, Le},
   year          = {2023},
@@ -235,12 +234,15 @@
   url         = {https://doi.org/10.6028/NIST.AI.600-1}
 }
 
+% biblatex-apa 9.20's legal drivers and official test bibliography require
+% title on legal entries, but apa.dbx does not whitelist it. The resulting
+% strict-datamodel title warnings are formatter-specific and intentional.
 @legislation{europeanUnion2024aiAct,
-  author = {{European Parliament and Council of the European Union}},
-  title  = {Regulation ({EU}) 2024/1689 of the European Parliament and of the Council of 13 June 2024 Laying Down Harmonised Rules on Artificial Intelligence ({Artificial Intelligence Act})},
-  year   = {2024},
-  date   = {2024-06-13},
-  url    = {https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng}
+  title      = {Regulation ({EU}) 2024/1689 of the European Parliament and of the Council of 13 June 2024 Laying Down Harmonised Rules on Artificial Intelligence ({Artificial Intelligence Act})},
+  shorttitle = {Artificial Intelligence Act},
+  year       = {2024},
+  date       = {2024-06-13},
+  url        = {https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng}
 }
 
 @online{canadaAIA2026,
@@ -252,19 +254,19 @@
 }
 
 @legislation{canadaEvidenceAct1985,
-  author = {{Government of Canada}},
-  title  = {Canada Evidence Act, {RSC} 1985, c {C}-5},
-  year   = {1985},
-  url    = {https://laws-lois.justice.gc.ca/eng/acts/c-5/page-3.html},
-  urldate = {2026-07-08}
+  title      = {Canada Evidence Act, {RSC} 1985, c {C}-5},
+  shorttitle = {Canada Evidence Act},
+  year       = {1985},
+  url        = {https://laws-lois.justice.gc.ca/eng/acts/c-5/page-3.html},
+  urldate    = {2026-07-08}
 }
 
 @legislation{pipeda2000,
-  author = {{Government of Canada}},
-  title  = {Personal Information Protection and Electronic Documents Act, {SC} 2000, c 5},
-  year   = {2000},
-  url    = {https://laws-lois.justice.gc.ca/eng/acts/p-8.6/page-5.html},
-  urldate = {2026-07-08}
+  title      = {Personal Information Protection and Electronic Documents Act, {SC} 2000, c 5},
+  shorttitle = {{PIPEDA}},
+  year       = {2000},
+  url        = {https://laws-lois.justice.gc.ca/eng/acts/p-8.6/page-5.html},
+  urldate    = {2026-07-08}
 }
 
 @online{canadaESignatures2025,
@@ -307,11 +309,12 @@
   author      = {{Royal Commission into the Robodebt Scheme}},
   title       = {Report of the Royal Commission into the Robodebt Scheme},
   institution = {Commonwealth of Australia},
+  type        = {Royal Commission report},
   year        = {2023},
   url         = {https://robodebt.royalcommission.gov.au/publications/report}
 }
 
-@article{south2025authenticated,
+@online{south2025authenticated,
   title         = {Authenticated Delegation and Authorized {AI} Agents},
   author        = {South, Tobin and Marro, Samuele and Hardjono, Thomas and Mahari, Robert and Whitney, Cedric Deslandes and Greenwood, Dazza and Chan, Alan and Pentland, Alex},
   year          = {2025},
@@ -358,7 +361,7 @@
   urldate = {2026-07-08}
 }
 
-@article{lee2026structuredSafetyCases,
+@online{lee2026structuredSafetyCases,
   author        = {Lee, Sung Une and Zhu, Liming and Shamsujjoha, Md and Dong, Liming and Lu, Qinghua and Chen, Jieshan and Briand, Lionel},
   title         = {A Structured Approach to Safety Case Construction for {AI} Systems},
   year          = {2026},
@@ -369,7 +372,7 @@
   url           = {https://arxiv.org/abs/2601.22773}
 }
 
-@article{gu2025judgeSurvey,
+@online{gu2025judgeSurvey,
   author        = {Gu, Jiawei and Jiang, Xuhui and Shi, Zhichao and Tan, Hexiang and Zhai, Xuehao and Xu, Chengjin and Li, Wei and Shen, Yinghan and Ma, Shengjie and Liu, Honghao and Wang, Saizhuo and Zhang, Kun and Wang, Yuanzhuo and Gao, Wen and Ni, Lionel and Guo, Jian},
   title         = {A Survey on {LLM}-as-a-Judge},
   year          = {2025},
@@ -386,7 +389,6 @@
   booktitle = {Proceedings of the 2024 Conference on Empirical Methods in Natural Language Processing},
   pages     = {8301--8327},
   year      = {2024},
-  publisher = {Association for Computational Linguistics},
   doi       = {10.18653/v1/2024.emnlp-main.474},
   url       = {https://aclanthology.org/2024.emnlp-main.474/}
 }
@@ -540,18 +542,18 @@
   author      = {{Anthropic}},
   title       = {Claude Opus 4.8 System Card},
   institution = {Anthropic},
+  type        = {System card},
   date        = {2026-05-28},
   url         = {https://www-cdn.anthropic.com/0b4915911bb0d19eca5b5ee635c80fef830a37ea.pdf},
   urldate     = {2026-07-08}
 }
 
 @legislation{sarbanesOxley404,
-  author  = {{United States Congress}},
-  title   = {Management Assessment of Internal Controls},
-  note    = {15 U.S.C. \S 7262},
-  date    = {2002-07-30},
-  url     = {https://www.law.cornell.edu/uscode/text/15/7262},
-  urldate = {2026-07-08}
+  title      = {Management Assessment of Internal Controls, 15 U.S.C. \S 7262},
+  shorttitle = {Sarbanes--Oxley Act \S 404},
+  date       = {2002-07-30},
+  url        = {https://www.law.cornell.edu/uscode/text/15/7262},
+  urldate    = {2026-07-08}
 }
 
 @online{sec2003managementReport,
@@ -562,13 +564,13 @@
   urldate = {2026-07-08}
 }
 
-@legislation{secExchangeRule13a15,
-  author  = {{U.S. Securities and Exchange Commission}},
-  title   = {Controls and Procedures},
-  note    = {17 C.F.R. \S 240.13a-15},
-  date    = {2026},
-  url     = {https://www.law.cornell.edu/cfr/text/17/240.13a-15},
-  urldate = {2026-07-08}
+@legadminmaterial{secExchangeRule13a15,
+  title      = {Controls and Procedures},
+  shorttitle = {Exchange Act Rule 13a-15},
+  citation   = {17 C.F.R. \S 240.13a-15},
+  date       = {2026},
+  url        = {https://www.law.cornell.edu/cfr/text/17/240.13a-15},
+  urldate    = {2026-07-08}
 }
 
 @inproceedings{zverev2025separate,
@@ -603,12 +605,11 @@
   volume    = {235},
   pages     = {16295--16336},
   year      = {2024},
-  publisher = {PMLR},
   url       = {https://proceedings.mlr.press/v235/greenblatt24a.html},
   urldate   = {2026-07-09}
 }
 
-@article{meinke2025scheming,
+@online{meinke2025scheming,
   author  = {Meinke, Alexander and Schoen, Bronson and Scheurer, J{\'e}r{\'e}my and Balesni, Mikita and Shah, Rusheb and Hobbhahn, Marius},
   title   = {Frontier Models Are Capable of In-Context Scheming},
   year    = {2025},
@@ -734,6 +735,7 @@
   author      = {{Office of the Chief Audit Executive, Department of Canadian Heritage}},
   title       = {Audit of Financial and Human Resource Delegation of Authorities},
   institution = {{Government of Canada}},
+  type        = {Audit report},
   year        = {2026},
   month       = may,
   url         = {https://www.canada.ca/en/canadian-heritage/corporate/publications/audits/financial-human-resource-delegation-authorities.html},
@@ -760,6 +762,14 @@
   urldate = {2026-07-20}
 }
 
+@online{openai2026longHorizonSafety,
+  author  = {{OpenAI}},
+  title   = {Safety and Alignment in an Era of Long-Horizon Models},
+  date    = {2026-07-20},
+  url     = {https://openai.com/index/safety-alignment-long-horizon-models/},
+  urldate = {2026-07-21}
+}
+
 @article{pearlBareinboim2014externalValidity,
   author  = {Pearl, Judea and Bareinboim, Elias},
   title   = {External Validity: From Do-Calculus to Transportability Across Populations},
@@ -779,7 +789,6 @@
   booktitle = {Proceedings of the 2021 ACM Conference on Fairness, Accountability, and Transparency},
   year      = {2021},
   pages     = {598--609},
-  publisher = {Association for Computing Machinery},
   doi       = {10.1145/3442188.3445921},
   url       = {https://doi.org/10.1145/3442188.3445921},
   urldate   = {2026-07-18}
@@ -817,8 +826,33 @@
   booktitle = {Proceedings of the Twenty-Eighth AAAI Conference on Artificial Intelligence},
   year      = {2014},
   pages     = {2410--2416},
-  publisher = {AAAI Press},
   doi       = {10.1609/aaai.v28i1.9074},
   url       = {https://doi.org/10.1609/aaai.v28i1.9074},
   urldate   = {2026-07-18}
+}
+
+@article{messick1995validityAssessment,
+  author  = {Messick, Samuel},
+  title   = {Validity of Psychological Assessment: {Validation} of Inferences from Persons' Responses and Performances as Scientific Inquiry into Score Meaning},
+  journal = {American Psychologist},
+  year    = {1995},
+  volume  = {50},
+  number  = {9},
+  pages   = {741--749},
+  doi     = {10.1037/0003-066X.50.9.741},
+  url     = {https://doi.org/10.1037/0003-066X.50.9.741},
+  urldate = {2026-07-21}
+}
+
+@article{messick1995validityStandards,
+  author  = {Messick, Samuel},
+  title   = {Standards of Validity and the Validity of Standards in Performance Assessment},
+  journal = {Educational Measurement: Issues and Practice},
+  year    = {1995},
+  volume  = {14},
+  number  = {4},
+  pages   = {5--8},
+  doi     = {10.1111/j.1745-3992.1995.tb00881.x},
+  url     = {https://doi.org/10.1111/j.1745-3992.1995.tb00881.x},
+  urldate = {2026-07-21}
 }

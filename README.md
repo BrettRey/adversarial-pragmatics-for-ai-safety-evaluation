@@ -22,6 +22,10 @@ For the shortest path through the project:
 4. Run `make public-check` and `make study-a-synthetic` to verify tracked pilot
    artifacts and exercise the blind build-to-analysis path without external
    data.
+5. Inspect the shared [claim-type protocol](assurance/shared/claim-types.md)
+   and run `make assurance-check` to exercise prospective projective claims,
+   Study B contrasts and result gates, authorization traces, and evidentiary
+   matched cases.
 
 Core deliverables:
 
@@ -31,7 +35,9 @@ Core deliverables:
   compliance, visible safety boundaries, refusal, and failure attribution;
 - metrics for diagnostic ambiguity and taxonomy drift;
 - a local pilot and LLM-judge validation pass;
-- supplementary documentation for model-policy, red-team, system-card, and external-assurance audiences.
+- supplementary documentation for model-policy, red-team, system-card, and external-assurance audiences;
+- typed, executable assurance artifacts that keep authorization, records,
+  assessment interpretations, projection, and causation at their proper levels.
 
 ## Current State
 
@@ -44,6 +50,11 @@ The canonical repository state contains:
 - a semantically verified Study A stamp-2 candidate with role-isolated expert
   packages, object-level analysis, synthetic regression tests, and a separate
   fail-closed collection gate;
+- four Study B development bases with exact comparison-class inventories,
+  production counterbalance constraints, a raw joint-outcome result schema,
+  and a manifest-bound, noncompensatory analysis harness whose permanent
+  regressions reject failed-call directionality, pooled shortcut cancellation,
+  equal-failure invariance, stale output-token references, and incomplete runs;
 - LaTeX source for the main paper, supplement, and two related framework papers.
 
 No external Study A ratings have been collected. HREB was asked on 16 July
@@ -51,6 +62,14 @@ No external Study A ratings have been collected. HREB was asked on 16 July
 participants. Recruitment, package distribution, and return opening remain
 closed pending its written response and the collection gate. The completed
 local pilot and judge audit remain available for inspection and job-market use.
+No Study B target outputs have been collected. The committed Study B result
+record is deliberately empty, and `make analyze-study-b` returns
+`NOT_ESTIMATED`; its synthetic unit tests are regression checks rather than
+model or assessment evidence. Production-shaped inputs are rejected unless one
+frozen manifest verifies distinct hashes for the claim, target items, lineage,
+output-blind reference review, pair and counterbalance records, shortcut policy
+and arm-specific variants, configuration, analysis policy, and exact standard
+and shortcut repeat sets. Relabelling a synthetic record is not sufficient.
 
 Public-version note: arXiv v1 (`2607.01153v1`) reflects an earlier version of
 the pilot readout. The current repository state is the canonical source for the
@@ -75,6 +94,9 @@ make public-check
 make study-a-synthetic
 make discovery-synthetic
 make discovery-naturalistic-synthetic
+make validate-delegation
+make assurance-check
+make analyze-study-b
 ```
 
 These Study A and discovery commands use deterministic synthetic fixtures only.
@@ -91,6 +113,19 @@ also run `make phase1-check` and `make study-a-freeze-ready`. Freeze readiness
 verifies the pre-collection artifact; it does not create a tag or authorize
 external returns.
 
+`make validate-delegation` executes the closed-world authorization fixtures and
+checks the three frozen Delegation Assurance programme specifications. Its
+synthetic self-tests cover passing and failing data, family noncompensation,
+split and manifest integrity, oracle masking, and explicit `NOT_ESTIMATED`
+output for a valid zero-observation input. No target-study outcomes are
+included. A future manifest-bound input can be analyzed with:
+
+```bash
+python3 scripts/analyze_delegation_programs.py \
+  --input path/to/bound-input.json \
+  --output path/to/vector-preserving-analysis.json
+```
+
 Build the main paper, supplement, and two related framework papers with:
 
 ```bash
@@ -103,10 +138,17 @@ make all-papers
 benchmark/items/seed-items.csv       # first safe, benign paired-contrast seed set
 benchmark/rubrics/taxonomy.md        # failure-mode taxonomy
 benchmark/rubrics/annotation-protocol.md
+benchmark/coverage/                   # atomic construct-domain coverage and counted gaps
+benchmark/study-b/                    # design, manifests, claims, raw-result schema, explicit no-data record
+assurance/shared/                     # typed claims and projective-claim schema
+assurance/delegation/                 # authorization traces, regimes, fixtures, and frozen empirical specifications
+assurance/evidentiary/                # evidence bundles and matched cases
 notes/project-brief.md
 notes/source-verification.md
 notes/12-pressure-test.md
 scripts/validate_items.py
+scripts/analyze_study_b.py             # manifest-bound, base-level Study B gates and summaries
+scripts/analyze_delegation_programs.py  # three noncompensatory prospective programme analyzers
 ```
 
 ## Release Checklist

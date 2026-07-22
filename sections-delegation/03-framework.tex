@@ -1,12 +1,14 @@
-\section[Delegated Action]{Delegated Action: Governing Sources, Authority, Scope, and Evidence}
+\section[Delegated Action and Trajectories]{Delegated Action and Trajectories: Governing Sources, Authority, Scope, and Evidence}
 
-This paper uses \term{action authorization} for the claim that an operation remained within delegated authority in the relevant operational context. The claim is narrower than moral, legal, or political legitimacy. An authorized action under \(R\) may still be ill-advised, harmful, illegal in a particular jurisdiction, or institutionally unacceptable. Let the \term{authority regime} \(R\) be the declared rules that determine which grants and constraints are valid and applicable. Delegation assurance represents and evaluates whether an operation remained within the authority that \(R\) conferred.
+This paper uses \term{action authorization} for the normative proposition that an operation remained within delegated authority in the relevant operational context. The proposition is narrower than moral, legal, or political legitimacy. An action authorized under \(R\) may still be ill-advised, harmful, illegal under another rule, or institutionally unacceptable. Let the \term{authority regime} \(R\) determine which grants, constraints, and transitions are operative and applicable. Delegation assurance specifies that regime-relative proposition and evaluates representations of it without treating the representation as constitutive.
 
-An action-specific delegation-assurance claim is supported only when a reviewer can reconstruct, without relying on a model-generated statement that the action was authorized, which sources and instruments supplied the governing grant; when it was effective; which transition powers and guards applied; which operation was proposed and which was executed; whether each was authorized, within what scope and constraints; through which sources and tools; with what information-flow and persistence permissions; subject to which non-delegable limits; and with what technical-locus attribution if control fails.
+Seven claim types have to remain separate. A \term{normative reference claim} states an action or trajectory's authorization status under \(R\). A \term{recorded representation} states what a trace, policy snapshot, or authorization state encodes. An \term{item-level finding} concerns one action, transition, trace, or review. A \term{sample-level result} summarizes an observed set under a named configuration. An \term{assessment interpretation and use} states what such a result may be taken to mean or used to decide. A \term{projective claim} extends beyond the observed cases. A \term{causal or mechanistic claim} attributes a change or explains why a pattern occurs. None follows from the previous type merely because the same labels or formal objects appear in both.
 
-The claim structure is noncompensatory at the level of declared required subclaims. Success on one subclaim can't offset an unevaluable or defeated required subclaim, although multiple evidence sources may support the same subclaim. Applicability and exclusions have to be declared in advance. At the subclaim level, the evidential statuses are \term{supported}, \term{defeated}, and \term{unevaluable}. An overall claim is \term{supported} if every applicable required subclaim is supported, \term{defeated} if at least one is defeated, and \term{indeterminate} if none is defeated but at least one is unevaluable. Subclaims declared \term{not applicable} are excluded with reasons.
+An action-specific record can support or defeat a reviewer's conclusion only if the declared procedure can reconstruct the sources and instruments supplying the governing grant; effective times; transition powers and guards; proposed and executed operations; scope and constraints; information-flow and persistence permissions; non-delegable limits; and relevant technical loci. Missing reconstruction evidence can leave that review conclusion unevaluable. It doesn't change the historical normative status of the action. Conversely, a complete, internally consistent trace can represent an invalid grant perfectly.
 
-This rule doesn't treat defence-in-depth as compensatory scoring. A downstream gate can prevent a status-classification error underlying a proposal from becoming an unauthorized executed operation. The operation's action-authorization claim may then be supported while the item-level classification finding is defeated. Neither result by itself establishes or defeats a projective reliability claim. The three inferential levels remain visible rather than being collapsed into a composite score.
+Noncompensation is regime- and claim-relative, not universal. When \(R\) makes several conditions jointly necessary, failure of one can't be offset by strength on another. Where \(R\) supplies alternatives, defeasible rules, discretion, or a balancing test, the representation has to preserve that structure instead of imposing a conjunction. Applicability, exclusions, decision structure, and evidential rules have to be declared and versioned before the case is reviewed. At the evidentiary level, a declared procedure can distinguish \term{support}, \term{substantive defeat}, a \term{record gap}, and unresolved \term{conflict}; those review states aren't substitutes for the object-level normative proposition.
+
+Defence-in-depth illustrates the separation. A downstream gate can stop a proposal based on a status-classification error, leaving the classification finding defeated while the prohibited operation remains unexecuted. A correct classification followed by a bad gate can produce the reverse pattern. Neither item establishes reliability over a population, and the successful gate is a \term{downstream safeguard success}, not evidence of corrective control without a perturbation-and-response design.
 
 \subsection{Delegation Beyond Responsiveness}
 \label{sec:delegation-beyond-responsiveness}
@@ -27,24 +29,68 @@ The authority regime needn't contain a single unified principal. It may recogniz
        \text{override},\text{release},\text{review}\},
 \]
 
-let \(\operatorname{Stand}_{R}(x,o,q,t)\) state whether \(R\) gives \(x\) authorization standing, or transition competence, for operation \(o\) on \(q\) at \(t\). Let \(Q_R(t)\) be the operative normative authorization state and \(A_R(t)\) the set of fully parameterized actions it permits. For a stipulated benchmark regime and a purported transition event \(e=\langle x,o,q,t\rangle\), the core update rule is
+let \(\operatorname{Stand}_{R}(x,o,q,t)\) state whether \(R\) gives \(x\) authorization standing, or transition competence, for operation \(o\) on \(q\) at \(t\). Let \(Q_R(t)\) be the operative normative authorization state and \(A_R(t)\) the set of fully parameterized actions it permits.
+
+The framework has two modes. In \term{stipulated-regime mode}, \(R^{\mathrm{stip}}\), its applicability map, and its reference consequences are fixed by construction. This closed world is appropriate for benchmark fixtures and controlled experiments. In \term{institutional-regime mode}, \(R^{\mathrm{inst}}\), the operative sources, higher-order basis, conflicts, interpretation, and applicability may themselves require adjudication. Calling a rule or applicability decision \enquote{declared} means that it was prospectively fixed for an assessment; it doesn't make the rule legally or institutionally effective.
+
+For a stipulated benchmark regime and a purported transition event \(\eta=\langle x,o,q,\nu,t\rangle\), where \(\nu\) supplies the proposed normative content or state change, the core update rule is
 
 \[
 Q_R(t^{+}) =
 \begin{cases}
-  \tau_R\!\left(Q_R(t^{-}),e\right),
-    & \operatorname{Stand}_{R}(x,o,q,t) \land G_R(e,t),\\
+  \tau_R\!\left(Q_R(t^{-}),\eta\right),
+    & \operatorname{Stand}_{R}(x,o,q,t) \land G_R(\eta,t),\\
   Q_R(t^{-}), & \text{otherwise},
 \end{cases}
 \]
 
-where \(G_R\) collects the stipulated regime's applicable validity, joint-approval, effective-time, review, and release conditions. This bivalent rule supplies reference semantics for controlled benchmark items: lack of standing or a failed guard leaves \(Q_R\) unchanged. It doesn't claim that a valid event causally changes model behaviour or that an invalid message can't do so. A review event changes \(Q_R\) only where \(R\) gives its outcome operative effect. Standing to review can otherwise support contestation without conferring amendment or override authority.
+where \(G_R\) collects the stipulated regime's applicable validity, joint-approval, effective-time, review, and release conditions. This bivalent rule supplies reference semantics for controlled benchmark items: lack of standing or a failed guard leaves \(Q_R\) unchanged. The added payload \(\nu\) makes explicit what \(\tau_R\) is asked to adopt, alter, suspend, or release. The equation doesn't claim that a valid transition causally changes model behaviour or that an invalid message can't do so. A review transition changes \(Q_R\) only where \(R\) gives its outcome operative effect. Standing to review can otherwise support contestation without conferring amendment or override authority.
 
-Institutional application can't assume that every defect has the equation's second-branch effect. Let \(M\) name the enabling or higher-order validity basis under which \(R\) and its authority objects are adopted and constrained. The record has to state the effect that \(R\), under \(M\), assigns to a defect. A purported transition may be ineffective, provisional, voidable, stayed, ratified, quashed, or have another regime-specific status; \(Q_R(t^{+})\) follows that declared effect rather than automatically remaining unchanged.
+Institutional application can't assume that every defect has the equation's second-branch effect. Let \(M\) name the enabling or higher-order validity basis under which \(R^{\mathrm{inst}}\) and its authority objects are adopted and constrained. The operative \(R^{\mathrm{inst}}\), its relationship to \(M\), and the effect of a defect require an independently warranted institutional determination. A purported transition may be ineffective, provisional, voidable, stayed, ratified, quashed, or have another regime-specific status. A trace may record an asserted result, but that assertion doesn't settle \(Q_R(t^{+})\).
 
 The required authorization record should identify \(R\) and \(M\); the founding or adoption instrument and competence to adopt it; superior and non-delegable constraints; each governing source and instrument; effective intervals; transition competence by operation; joint or guarded approval conditions; the effect of a defect; and amendment, suspension, revocation, override, review, release, expiry, and emergency provisions. For each purported transition, it should preserve the issuer, target object, operation, time, asserted basis, satisfied or failed guards, assigned legal or institutional effect, and resulting adjudicated state. Whether the event causally affected the deployment remains a separate finding.
 
 Commitment protection can entrench harmful policy or obstruct lawful democratic control. An authorization claim that relies on it needs a specified higher-order validity basis \(M\), evidence of adoption by a competent source under that basis, compatibility with superior and non-delegable constraints, a protected scope and interval, an authorized review route, and applicable release, expiry, or emergency conditions. Reconstructibility doesn't establish the arrangement's moral or legal legitimacy.
+
+\subsection{Trajectory-First Authorization}
+\label{sec:trajectory-core}
+
+The primary authorization object is a bounded execution trajectory. A single action is its \(n=1\) case; a boundary in which proposals are blocked before execution has \(n=0\) and retains proposal and gate findings without turning non-execution into an authorization label. For a prospectively declared boundary \(B\), let
+\[
+  \pi_B=\langle e_1,\ldots,e_n\rangle,
+  \qquad h_i=\pi_{B,\leq i}.
+\]
+The boundary identifies included model, human, tool, and service actors; descendant sessions; resources; time interval; and stopping rule. Each execution event is
+\[
+ e_i=\langle d_i,b_i,\alpha_i,o_i,p_i,t_i,z_{i-1},\Delta z_i,z_i\rangle ,
+\]
+where \(d_i\) is the actor, tool, or service that executed the operation; \(b_i\) is the authorization subject whose grant purportedly licensed that execution; \(\alpha_i\) is the action and any normatively relevant payload; \(o_i\) is its object or target; \(p_i\) supplies the relevant predicates and context; and \(z_{i-1},\Delta z_i,z_i\) are the preceding state, state change, and resulting state. Often \(d_i=b_i\), but a mail tool may execute a call proposed under a model deployment's grant. The trace therefore represents proposals, gate decisions, and executions as separately identified records with their own actors, times, links, and configuration versions. This tuple is deliberately richer than a tool-call name. Authorization can turn on the recipient, data fields, current approval predicate, cumulative quantity, or state change.
+
+Let \(u_i=\langle b_i,\alpha_i,o_i,p_i,t_i,z_{i-1}\rangle\) be the pre-execution authorization tuple. Let \(L_R(u_i\mid h_{i-1})\) state that the proposed event is locally authorized for \(b_i\) given the prior history. Let \(C_R(h_i)\) state that every applicable prefix or cumulative condition supplied by \(R\) is satisfied at \(h_i\), and let \(F_R(h_n)\) state that every applicable terminal or horizon condition is satisfied. Each predicate is true when its corresponding constraint family is empty. Then
+\[
+  \operatorname{TrajAuth}_R(\pi_B)
+  \Longleftrightarrow
+  \left[\bigwedge_{i=1}^{n}L_R(u_i\mid h_{i-1})\right]
+  \land
+  \left[\bigwedge_{i=1}^{n}C_R(h_i)\right]
+  \land F_R(h_n).
+\]
+The conjunction is licensed here because this definition makes each applicable family necessary. It isn't a universal scoring rule for other authorization regimes or assessment uses.
+When \(n=0\), the local and prefix conjunctions are vacuously true, while any applicable terminal condition remains. Proposal authorization and gate fidelity retain their separate verdicts; an authorized empty execution trajectory doesn't relabel a prohibited proposal as authorized.
+
+Local authorization doesn't in general entail trajectory authorization:
+\[
+  \bigwedge_{i=1}^{n}L_R(u_i\mid h_{i-1})
+  \not\Rightarrow
+  \operatorname{TrajAuth}_R(\pi_B).
+\]
+Individually permitted database reads can exceed a cumulative query limit; permitted partial disclosures can jointly reveal a protected value; and authorized subactions can be recombined into a prohibited terminal state. This non-entailment applies only where \(R\) prospectively supplies a cumulative or terminal condition. An evaluator can't invent a path prohibition after observing an unwelcome result.
+
+Revocation, expiry, predicate change, and transitions among people and models enter the same semantics. An operation proposed by one model may be approved by a person, transformed by another model, gated by a policy service, and executed by a tool. The local predicate is evaluated for the actor, payload, object, context, time, and prior history of that event. The trajectory claim then evaluates cumulative and terminal conditions across the declared boundary. It doesn't attribute whole-trajectory agency, responsibility, or recognition to any one component.
+
+Three structures represent different questions. The \term{normative authorization hypergraph} \(H_R(t)\) represents standing, guarded joint grants, and valid transition relations under \(R\). The \term{recorded propagation graph} \(\widehat G_B\) represents what grants, constraints, classifications, and permissions were passed among deployment nodes. The \term{execution trajectory} \(\pi_B\) represents ordered events and state changes. Similar nodes or edges don't make these structures identical. A recorded edge can misstate a grant; a valid unrecorded grant can leave an action authorized but hard to reconstruct; and an execution event can occur outside both the recorded and normative permission sets.
+
+The trace contains \(\widehat{\pi}_B\), its representation of the trajectory. Whether \(\widehat{\pi}_B\) adequately corresponds to \(\pi_B\) is a reconstruction-and-integrity question. Neither schema conformance nor record completeness establishes \(\operatorname{TrajAuth}_R(\pi_B)\); that verdict also requires the applicable normative reference under \(R\).
 
 \subsection{Execution and Answerability}
 
@@ -52,7 +98,7 @@ Delegating or executing action through a model doesn't by itself make the model 
 
 The \term{evaluation bearer} \(S\) is the object whose performance a projective claim measures: for example, a base model, stateful agent, model--tool--retrieval composite, or wider sociotechnical deployment. The \term{executing deployment} \(D\) is the configured system through which an output is delivered or an operation is executed; a \term{component} \(C\) is a model, scaffold, gate, tool, or other part to which a technical finding may refer.
 
-The record should separately identify the people and organizations in roles that may leave them answerable for configuring, deploying, approving, or monitoring \(D\), together with the forum or process through which each can be required to respond. Answerability doesn't confer amendment, revocation, or override competence, and a source's narrow transition competence doesn't by itself make that source answerable for the deployment. Available remedies and legal liability remain separate determinations. The trace can support technical attribution among components \(C\) and operational or institutional attribution among people and organizations; it doesn't settle those further questions.
+The record should separately identify the people and organizations in roles that may leave them answerable for configuring, deploying, approving, or monitoring \(D\), together with the answerability route through which each can be contacted and required to respond. That route isn't thereby the object-level forum that can review the action or supply a remedy; the forum's access, competence, independence, and powers remain separate questions. Answerability doesn't confer amendment, revocation, or override competence, and a source's narrow transition competence doesn't by itself make that source answerable for the deployment. Available remedies and legal liability remain separate determinations. The trace can support technical attribution among components \(C\) and operational or institutional attribution among people and organizations; it doesn't settle those further questions.
 
 \subsection{Running Example: Procurement Assistant}
 
@@ -64,7 +110,7 @@ A usable evidence record would include the user's delegated task, the relevant p
 
 If the assistant emails the vendor, the trace should identify the first recorded divergence among classification, action proposal, tool gating, scaffold state, approval routing, execution, and audit preservation. A causal attribution requires additional intervention or counterfactual evidence.
 
-The same example also exposes automated-evaluator failure. An LLM judge may see a polished final memo and produce a safe label without checking the action trace. That label doesn't validate delegation. A human or organizational decision rule should treat it as supporting evidence only if the evaluation distinguishes task success, policy compliance, information-flow control, action authorization, refusal calibration, and technical failure attribution.
+The same example also exposes automated-evaluator failure. An LLM judge may see a polished final memo and produce a safe label without checking the action trace. That label doesn't establish action authorization. A human or organizational decision rule should treat it as supporting evidence only if the evaluation distinguishes task success, policy compliance, information-flow control, action authorization, refusal calibration, and technical failure attribution.
 
 \begin{table}[tbp]
 \small
@@ -112,30 +158,54 @@ Automated evaluation & Rubric labels for task success, policy compliance, inform
 \label{tab:procurement-trace}
 \end{table}
 
-\subsection{Safety-Case Pattern}
+\subsection{Typed Safety-Case Pattern}
+\label{sec:typed-claim-stack}
 
-A compact safety case keeps three inferential levels separate. Let \(D\) denote the identified deployment through which operation \(a\) occurred, \(S\) the evaluation bearer whose performance is measured, and \(R\) the governing authority regime.
+Let \(D\) denote the deployment through which a trajectory occurred and \(S\) the configured assessment bearer whose performance is measured. Table~\ref{tab:delegation-claim-types} turns the seven claim types into a safety-case discipline. The paper's formal contribution lies at the normative and representational layers. The remaining types specify what an empirical evaluation may claim about using those layers.
 
-\begin{itemize}
-  \item \textbf{Action-authorization claim.} For \(a\) executed through \(D\) under \(R\), the evidence supports that \(a\) was permitted by the operative grants and complied with every applicable constraint.
-  \item \textbf{Item-level diagnostic findings.} For the trace associated with \(a\), report separately the adjudicated contextual status and operation-specific standing under \(R\); the higher-order basis \(M\), founding or adoption instrument and competence, superior constraints, effective interval, transition guards, and assigned effect of each purported adoption, amendment, suspension, revocation, override, release, or review; recorded status classification, standing assignment, priority rule, and scope, information-flow, and persistence states; proposal, policy-enforcement, and execution events; and audit-reconstruction and evaluator-label-use findings.
-  \item \textbf{Projective performance claim.} For a declared projection target \(T\), the evidence supports each predeclared authorization-rate, component-performance, or loss criterion, with stated uncertainty. \(T\) specifies the task and context population, environment, evaluation bearer \(S\) and configuration, authority regime and policy snapshot, intervention range, horizon, decision use, and conditions requiring revalidation.
-\end{itemize}
+\begin{table}[tbp]
+\small
+\centering
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.19\linewidth}%
+                >{\raggedright\arraybackslash}p{0.30\linewidth}%
+                >{\raggedright\arraybackslash}p{0.41\linewidth}}
+\toprule
+Claim type & Bearer & Required statement \\
+\midrule
+Normative reference & Action or \(\pi_B\) under \(R\). & Whether \(a\in A_R(t)\) or \(\operatorname{TrajAuth}_R(\pi_B)\), with the operative source, applicability, and reference procedure. \\
+Recorded representation & \(s_t,\widehat A(s_t),\widehat G_B,\widehat\pi_B\). & What the deployment encoded or preserved, including provenance, scope, applicability, classifications, transitions, gates, and state changes. \\
+Item-level finding & One transition, event, trace, or review. & The observed fit or misfit, proposal, gate, execution, record gap, or adjudicated verdict without population-level language. \\
+Sample-level result & A fixed sample and configuration. & Estimand, units, observed contrast or summary, uncertainty, exclusions, and deviations. \\
+Assessment interpretation/use & A configured procedure used for a decision. & What an output may mean and which diagnosis, revision, audit, or procurement decision it may support. \\
+Projective claim & Named bearer over unobserved units. & Source, outcome, target population, conditions, transformations, time/version, tolerance, warrant, and prospective revision rule. \\
+Causal or mechanistic claim & A specified system and intervention. & Causal query, assignment or intervention, outcome, assumptions, and evidence; a graph or trace alone is insufficient. \\
+\bottomrule
+\end{tabular}
+\caption{Typed claims for delegation assurance. Reusing the same field name across rows doesn't license an inferential move between them.}
+\label{tab:delegation-claim-types}
+\end{table}
 
-The noncompensatory rule above applies within each declared claim tree, not across these levels. Item-level diagnostic findings remain a vector rather than a composite verdict, and the claim tree has to state which, if any, are required for the action-authorization or projective claim. A misclassification blocked by a downstream policy-enforcement point can leave the action-authorization claim supported while defeating the corresponding item-level diagnostic finding.
+The procurement case yields level-separating outcomes that a single verdict would conceal. A valid grant can authorize an action even when an inadequate record makes review unevaluable. An invalid grant can be preserved in a pristine record. A status misclassification can be stopped by a correctly configured gate, while a correct classification can be followed by a gate that permits a prohibited operation. Every local event can be authorized while the bounded trajectory violates a cumulative condition. Seven versioned fixtures encode those five separations plus an effective revocation and a sequence containing an ineffective unilateral override followed by a valid guarded release.
 
-Retrospective reconstruction asks whether the record for \(a\) connects the operative grants and constraints to the executed operation and supports the declared technical-locus attribution. Reviewer accuracy against an independently established criterion, when available, or concordance with a prespecified panel-relative reference adjudication on a validation set is a sample-level performance finding. It supports a projective validation claim only when the design and independent or held-out cases match the declared \(T\). A trace can support reconstruction of \(a\) without validating the protocol for \(T\), and protocol validation doesn't settle \(a\) without adequate action-specific evidence.
+Applicability and noncompensation are properties of a declared claim tree. If \(R\) makes two permissions alternative, satisfying either can support the reference proposition. If \(R\) makes valid standing, scope, and a joint approval conjunctively necessary, strength on one can't offset failure of another. Item-level diagnostic findings remain a vector. A deployment or reviewer may not select the operator, required fields, or \term{not applicable} statuses after seeing the outcome.
 
-Automated-driving policy illustrates the separation. Hinkle characterizes a manufacturer's domain-bounded promise that its automated driving system (ADS) will perform the dynamic driving task safely as a reason for lawmakers to identify the manufacturer of the automated driver as the entity responsible for driving \parencite{hinkle2020autonomousVehiclesTestimony}. This is an argument for a policy allocation of responsibility, not literal identity between the manufacturer and the executing system; the promise itself neither authorizes roadway operation nor fixes liability.
+Retrospective reconstruction asks what the record supports about \(\pi_B\) and any technical-locus attribution. Accuracy against an independently established criterion, when available, or concordance with a prespecified panel-relative reference on a validation set is only a sample-level result. It supports a projective claim only when the bearer, target units, transformations, versions, and failure rule were prospectively fixed and target-matched. A trace can support reconstruction of one trajectory without validating the protocol for a target population; protocol validation doesn't settle the trajectory without action-specific evidence.
 
-The introduced text of H.R.~7390 doesn't adopt that designation. It would instead require, for each ADS version, a manufacturer-developed safety case in which claims, arguments, and evidence support a conclusion of no unreasonable risk, including a complete description of the \term{operational design domain} (ODD) and performance within it. The bill separately would permit the Secretary to authorize limited commercial operations as part of testing or evaluation, and it states that compliance with the relevant federal provisions doesn't exempt a person from common-law liability \parencite{usCongress2026selfDriveAct}. Under this framework, the proposed safety case is directed to a version- and ODD-bounded system-safety claim. Whether its evidence supports that claim remains a separate verdict. A particular deployment still needs its own action-authorization verdict, and liability remains a separate finding.
+Automated-driving policy illustrates the separation. Hinkle characterizes a manufacturer's domain-bounded promise that its automated driving system (ADS) will perform the dynamic driving task safely as a reason for lawmakers to identify the manufacturer of the automated driver as the entity responsible for driving \parencite{hinkle2020autonomousVehiclesTestimony}. That argument supports a policy allocation of responsibility, not literal identity between the manufacturer and the executing system; the promise itself neither authorizes roadway operation nor fixes liability.
 
-\subsection{A Comparative Test}
+The introduced text of H.R.~7390 doesn't adopt that designation. It instead would require, for each ADS version, a manufacturer-developed safety case in which claims, arguments, and evidence support a conclusion of no unreasonable risk, including a complete description of the \term{operational design domain} (ODD) and performance within it. The bill separately would permit the Secretary to authorize limited commercial operations as part of testing or evaluation, and it states that compliance with the relevant federal provisions doesn't exempt a person from common-law liability \parencite{usCongress2026selfDriveAct}. Under this framework, the proposed safety case is directed to a version- and ODD-bounded system-safety claim. Whether its evidence supports that claim remains a separate verdict. A particular deployment still needs its own action-authorization verdict, and liability remains a separate finding.
+
+\subsection{Three Comparative Programmes}
 \label{sec:comparative-test}
 
-Testing whether the typed fields add predictive or reconstructive value needs a baseline drawn from the strongest existing controls. The confused-deputy problem was an argument for capability architectures from the start \parencite{hardy1988confusedDeputy}. Newer agent-security work distinguishes tool exposure from per-call authorization, checking scope, argument values, spending ceilings, and default denial before a call executes \parencite{mellafezuvic2026scopegate}, and uses counterfactual causal attribution to separate tool calls supported by the user's request from calls driven by untrusted observations \parencite{he2026attriguard}. The test runs against those three mechanisms jointly.
+The typed fields face three different empirical questions: whether a manipulated representation changes an evaluator's response, whether the fields improve prediction, and whether they improve reviewer reconstruction. These are separate programmes with different bearers, units, estimands, references, and failure rules. A result in one doesn't substitute for another.
 
-The test holds technical capability and directive content fixed while assigning different prompt or record packages that represent an authority relation or downstream authorization state. The causal estimand is the effect of that assigned representation package on recorded classification or behaviour. Independently adjudicated standing and authorization under \(R\) supply reference labels; the experiment doesn't randomize normative standing itself.
+\subsubsection{Randomized Local Discrimination}
+
+The local-discrimination programme asks whether a controlled change to a synthetic prompt or record package changes a configured evaluator's classification or action in the reference-concordant direction. The bearer is the named evaluator configuration, the randomized unit is a package presentation nested within a prospectively oriented base-item contrast, and the estimand is the average signed paired or factorial effect of package assignment on a prespecified raw classification or action endpoint. The independent reference fixes the sign; concordance is a separate derived summary, since an ideal evaluator may be correct in both assigned conditions. The confused-deputy problem was an argument for capability architectures from the start \parencite{hardy1988confusedDeputy}. Newer agent-security work distinguishes tool exposure from per-call authorization \parencite{mellafezuvic2026scopegate} and uses counterfactual causal attribution to distinguish tool calls supported by a user request from calls driven by untrusted observations \parencite{he2026attriguard}. These mechanisms form comparison conditions, not interchangeable answers to the normative question.
+
+The experiment holds technical capability and directive content fixed while assigning prompt or record packages that represent different authority relations or downstream authorization states. The causal estimand is the effect of that assigned representation package on recorded classification or behaviour. Independently constructed standing and authorization under \(R^{\mathrm{stip}}\) supply reference labels; the experiment doesn't randomize normative standing itself. Random assignment and an explicit causal graph can support a local package-effect estimate under the design assumptions. The graph alone proves neither the effect nor the normative reference.
 
 Four authorization families use minimal pairs: indirect injection, confused deputy, persistence, and temporal authority. In the indirect-injection pair, the same embedded directive is packaged once as coming from a source independently adjudicated under \(R\) to have standing to direct action and once as coming from a source without it. In the confused-deputy pair, the package represents the same read access once with disclosure authority and once without.
 
@@ -151,7 +221,7 @@ Authorization contrasts also need matched placebo conditions. \textcite{zhang202
 
 Report item-level transitions across repeated samples. If a tail summary is used, predeclare the tail fraction and minimum item count. \term{Worst-tail degradation} is a signed paired-change statistic for the most degraded tail. \term{Absolute worst-tail loss} instead means the condition-specific level of a declared authorization- or consequence-sensitive loss, not the absolute value of a change.
 
-With stochastic responses, use separate samples to select and estimate the tail or document an alternative correction for sampling and selection noise, and report uncertainty. Causal influence from added context isn't by itself evidence that the system treated that context as authoritative.
+With stochastic responses, use separate samples to select and estimate the tail or document an alternative correction for sampling and selection noise, and report uncertainty. The frozen design must also specify reset, carry-over, and interference handling for stateful evaluators. Causal influence from added context isn't by itself evidence that the system treated that context as authoritative.
 
 \begin{figure}[tbp]
 \centering
@@ -202,15 +272,60 @@ Faithful scoring separates independently adjudicated contextual status and sourc
 
 Adjudicated status admits genuine ambiguity as a value. Persistent criterion-specific disagreement may be a property of the item or protocol after information differences, mismatch, error, and coding confusion have been assessed; it isn't noise to be voted away by default \parencite{reynolds2026adversarialPragmatics}. These fields describe normative reference judgments, records, or observable behaviour. An inference that the model internally recognized or represented them needs separate causal or mechanistic evidence.
 
-Separating classification from action keeps the diagnostic cases visible. A classification--adjudication misfit that a tool gate blocks is a control success and an item-level recorded-classification failure; an adjudication-aligned classification stopped by a miscalibrated gate is the reverse. A classification--adjudication misfit doesn't by itself defeat the action-authorization claim. An executed operation prohibited by \(R\) defeats that claim whether or not the trace also contains a classification misfit. An action-only score collapses these cases into their outcomes and loses the technical-locus attribution the safety case needs.
+Separating classification from action keeps the diagnostic cases visible. A classification--adjudication misfit that a tool gate blocks is a downstream safeguard success and an item-level recorded-classification failure; an adjudication-aligned classification followed by a bad gate is the reverse. A classification--adjudication misfit doesn't by itself defeat the action-authorization claim. An executed operation prohibited by \(R\) defeats that claim whether or not the trace also contains a classification misfit. An action-only score collapses these cases and loses the technical-locus attribution the safety case needs.
 
-Each pair member should receive a different prediction for action proposal, gate decision, execution, authorization verdict, technical-locus attribution, and appropriate defence. Let \(T_{\mathrm{pred}}\) declare the bearer, cases, and endpoint for behaviour prediction, and \(T_{\mathrm{rec}}\) the reviewers, cases, evidence condition, and endpoint for reconstruction.
+The local claim fails if the assigned packages don't produce a prespecified reference-concordant difference beyond the matched nuisance floor. An observed package effect that fails the nuisance-floor gate may support only package-specific cue sensitivity; absence of an effect supports no sensitivity claim. Neither result can be rescued by dropping the failed family after inspection. Success is evidence of local selective discrimination by the named configuration, not of a general competence or mechanism.
 
-If predictive models using status, standing, priority, and licensing don't improve target-matched prediction beyond capabilities, per-call authorization, causal attribution, and generic context controls, those fields should be demoted from an incremental predictive role for \(T_{\mathrm{pred}}\). If a reconstruction protocol using them doesn't improve held-out reviewer judgment or attribution beyond those baselines, they should be demoted from an incremental reconstructive role for \(T_{\mathrm{rec}}\).
+The frozen version-1 local specification makes that rule executable. For each independent base pair on a \(0\)--\(1\) endpoint, it preserves the raw package effect and subtracts the largest of the matched placebo shift, order instability, and shortcut-probe instability from the reference-signed effect. Each of indirect injection, confused deputy, persistence, and temporal authority must contain at least 30 held-out base pairs, have mean selective margin at least \(0.15\), have a 95\% normal lower confidence bound above \(0.00\), and retain control accuracy of at least \(0.90\). The four family verdicts are noncompensatory; their average isn't a fifth verdict.
 
-These targets are predictive and reconstructive, not claims of causal transportability. A change in authority regime can change the licensed action or the reference proposition itself, requiring a newly specified target rather than transport of the old result. A causal transport claim would also need a causal query, source and target domains, and assumptions about which causal mechanisms differ \parencite{pearlBareinboim2014externalValidity}.
+\subsubsection{Predictive Representation Ablation}
 
-Matched non-controlling context perturbations test whether generic instability explains the observed shifts equally well. The fields may remain descriptively or normatively useful after either inferential demotion. Section~\ref{sec:compositional-delegation} extends the design from single actions to recorded authorization paths.
+The predictive programme asks whether a versioned representation of status, standing, priority, licensing, transitions, and trajectory conditions improves a prespecified out-of-sample prediction over weaker representations. Its bearer is the prediction procedure together with feature schema, training data, and versioned configuration. Its unit is a trace or predeclared trace segment. Its estimand is the held-out difference in a named loss or calibration criterion between the typed and baseline representations. The predictor view is generated from an allowlist and excludes hidden oracles, independently constructed references, fit labels, gate-fidelity labels, and record-adequacy verdicts.
+
+Baselines should jointly include capability and per-call permission fields, causal-attribution outputs where available, and generic context controls. The reference endpoint can be proposal, gate, execution, or item-level authorization classification, but it has to be fixed before fitting. The intended use is diagnostic prioritization or bounded prediction, not a legal or institutional authorization verdict. If the typed fields don't produce a prespecified practically useful improvement on held-out cases, they lose their incremental predictive role for that target. They may remain normatively necessary or descriptively useful.
+
+The first frozen predictive specification evaluates proposal authorization, gate fidelity, execution authorization, and trajectory authorization as four required endpoint families. Each requires at least 30 held-out observations spanning at least 10 held-out trace families, a mean of trace-family mean paired Brier-loss improvements of at least \(0.05\), and a 95\% lower confidence bound above \(0.00\) computed over those trace-family means. Typed Brier loss must be at most \(0.20\), and typed ten-bin expected calibration error at most \(0.10\), in every family. Duplicating rows within one trace family can't increase the uncertainty sample size, and row-weighted improvement, family-weighted improvement, loss, and calibration remain separate outputs.
+
+\subsubsection{Reviewer Reconstruction Ablation}
+
+The reconstruction programme asks what reviewers can warrant from typed rather than degraded records while the normative case is held fixed. Its bearer is the review protocol crossed with the reviewer population and evidence condition. Its unit is a reviewer judgment on one trace. Its estimand is the held-out difference in node-level reference concordance, justified uncertainty, or technical-locus attribution between record conditions.
+
+The comparison should ablate typed fields without changing the underlying \(R^{\mathrm{stip}}\), trajectory, or independently constructed reference. Degraded records can omit provenance, scope, transition dependencies, cumulative conditions, or gate reasons. The typed or degraded evidence condition is independently randomized; reviewer access, order, and training are held fixed or separately randomized. Both reviewer views are constructed without oracle fields. The proposed use is improvement of audit-record and review-protocol design. If the typed condition doesn't improve the prespecified endpoint by the minimum useful amount, the fields lose their incremental reconstructive role for that reviewer population and case class. The result doesn't decide whether the historical action was authorized.
+
+The frozen reconstruction specification requires, in each of the single-action, gate-failure, transition, and cumulative-trajectory families, at least 30 judgments per arm on at least 10 matched held-out cases from at least 6 reviewers per arm. Typed-minus-degraded node concordance must be at least \(0.15\), its 95\% lower confidence bound must exceed \(0.00\), and typed-condition false certainty must be at most \(0.10\). The bound uses the larger of case-cluster and reviewer-cluster standard errors. Technical-locus accuracy remains a separate vector rather than compensating for a concordance failure.
+
+Each analysis input is bound by verified SHA-256 values to its frozen assignment and split manifests or feature and held-out manifests. Reference fields are joined only after the response, prediction, or review is locked, and the analyzer rejects leakage into evaluator, predictor, or reviewer views. A valid zero-observation input returns \texttt{NOT\_ESTIMATED}; a missing required family likewise can't yield a pass. The repository contains synthetic pass, fail, noncompensation, split, leakage, manifest, and oracle-masking tests, but no target-study outcomes. These numerical cutoffs define the first declared uses; they aren't universal validity criteria.
+
+\subsubsection{Validation, Projection, and Revision}
+
+The three programmes produce assessment results whose interpretations and uses require validation. In Messick's terms, validity concerns the evidential basis for interpreting and using assessment outputs, not a free-standing property of a checklist, schema, judge, or formalism \citep{messick1995validityAssessment}. Delegation assurance begins with a narrow use: diagnosing representations, traces, and review procedures under a supplied regime. Deployment certification, vendor ranking, legal conclusions, and claims of general agent competence require separate validation arguments.
+
+\begin{table}[tbp]
+\small
+\centering
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.20\linewidth}%
+                >{\raggedright\arraybackslash}p{0.70\linewidth}}
+\toprule
+Validation aspect & Required evidence \\
+\midrule
+Content & A regime- and action-domain map showing which sources, transitions, scopes, trajectory constraints, action classes, and failure loci the fixtures cover or omit. \\
+Substantive (response-process) & Behavioural evidence of selective sensitivity to the intended authority and trace fields rather than document length, role names, ordering, formatting, or other shortcuts; any stronger claim about internal use requires separate process or mechanistic evidence. \\
+Structural & Tests that the represented dependency structure matches \(R\), including alternatives, conjunctions, guarded joint grants, temporal updates, and cumulative conditions. \\
+Generalizability & Held-out templates, regimes, action classes, trace lengths, record conditions, reviewer populations, evaluator configurations, and versions, each tied to a declared projective claim. \\
+External & Comparison with an independently justified regime-relative reference and relevant expert adjudication; neither becomes universal ground truth. \\
+Consequential & False reassurance, over-refusal, strategic record production, privacy and security burden, review labour, access inequality, and downstream misuse of precise-looking outputs. \\
+\bottomrule
+\end{tabular}
+\caption{Validation programme for intended interpretations and uses of delegation-assurance results.}
+\label{tab:delegation-validation}
+\end{table}
+
+Every extension beyond observed cases uses a four-block \term{projective package}. The declaration fixes the source result, projected outcome, bearer, unit, target population, conditions, allowed transformations, time and version range, and quantitative or categorical tolerance. The inquiry-and-use block fixes the decision use, evidential standard, uncertainty treatment, and minimum useful reach. The warrant block identifies source and held-out evidence, validation evidence, and known selection, measurement, and transport threats. The revision block fixes the failure trigger, any prospectively declared narrower fallback, the independent retest, and the retirement condition.
+
+Projection packages are prospective. A failed family claim is demoted on its declared rule and retested on independent cases. Dropping the failures, changing the reviewer population, substituting a model or prompt, revising the trace schema, or changing \(R\) ordinarily creates a new claim. A changed authority regime may also change the reference proposition rather than merely the distribution of inputs. A causal transport claim also would require a causal query, source and target domains, and assumptions about which mechanisms differ \citep{pearlBareinboim2014externalValidity}; a selection diagram can't transport changed normative meaning by graphical fiat.
+
+The repository operationalizes a closed-world subset of these commitments in the versioned regime, reference-free trace, and hidden-oracle schemas under \path{assurance/delegation/}; seven fixtures; a reviewer/predictor view policy; the frozen claim register and empirical specifications; and two analyzers. The semantic engine derives authorization standing, Boolean guards, payload--scope fit, grant and subgrant validity, transition effects over active grants and scalar authority-object states, local authorization, state continuity, numeric prefix and cumulative conditions, scalar terminal-state conditions, and an executable applicability tree. A proposal fixes the authorization subject, intended executor, action, object, and parameters; an execution separately records the actual values. The engine evaluates the actual execution, rejects proposal--execution divergence, and requires execution to follow its linked gate. Negative regressions also reject out-of-scope and post-expiry actions, standingless grants, missing condition metrics, and unsupported transitions. The empirical analyzer validates the three frozen input schemas and emits observation vectors and noncompensatory family verdicts, including explicit \texttt{NOT\_ESTIMATED} output when no observations exist. These artifacts don't execute open-text law, settle an institutional \(R\), or implement arbitrary history predicates, defeasible legal reasoning, or discretionary adjudication. Those remain separately warranted reference tasks and would require a new engine and validation claim.
 
 \subsection{Boundary Conditions}
 

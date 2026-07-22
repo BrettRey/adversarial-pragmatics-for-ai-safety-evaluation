@@ -1,21 +1,17 @@
 \section{Benchmark Construction}
 \label{sec:benchmark-construction}
 
-The benchmark's target design is tightly controlled paired comparison. A
-future minimal pair should hold the surface string, payload, and response space
-as constant as possible while changing one control dimension: source role,
-authority level, pragmatic status, scope condition, reference resolution,
-speech-act force, application surface, or refusal status. This follows
+The benchmark's target design combines construct-domain coverage with tightly controlled paired comparison. A future minimal pair should hold the operative string, harmless payload, response space, and nuisance features as constant as possible while changing one declared control dimension: source role, authority relation, pragmatic status, scope condition, reference resolution, speech-act force, application surface, or refusal status. This follows
 verifiable instruction-following evaluation, in which target behaviour is
 specified before outputs are inspected \parencite{zhou2023ifeval}, but
 extends it to contrasts whose correctness depends on source, embedding, and
 pragmatic status.
 
-Items should be constructed under five constraints. First, each item names the source of the relevant language. Second, each item has a contrast item that tests the same string, payload, or response space under a different embedding or authority relation. Third, the expected behaviour is stated before model outputs are inspected; for controlled authority items, an independently specified authorization record defines the licensed action, while observed model behaviour tests whether the model responds accordingly. Fourth, the response labels are shared across the contrast whenever possible. Fifth, examples should use harmless payloads unless a verified safety policy and review process justify a more realistic item.
+Items should be constructed under seven constraints. First, each item names the source of the relevant language. Second, each item has a contrast item that tests the same operative string, payload, or response space under a different embedding or authority relation. Third, the expected behaviour is stated before model outputs are inspected; for controlled authority items, an independently specified authorization record defines the licensed action, while observed model behaviour tests whether the response changes in the reference-concordant direction. Fourth, response labels are shared across the contrast whenever possible. Fifth, examples use harmless payloads unless a verified safety policy and review process justify a more realistic item. Sixth, tokens, source names, order, and syntactic forms are counterbalanced rather than allowed to predict the answer. Seventh, every controlling change has a declared nuisance or placebo comparison that should preserve the reference.
 
 The current seed file, \texttt{benchmark/items/seed-items.csv}, contains 18 development items. It uses colour-token payloads such as \mention{BLUE} and \mention{GREEN}, protected dummy tokens such as \mention{ZETA-42}, and dummy secrets such as \mention{ALPHA-000}. These preserve the control structure of prompt-injection, exfiltration, and refusal cases while avoiding operational unsafe content.
 
-Toy payloads support claims about control structure, object-label stability, and the behaviour of the declared measurement procedure. They don't yet support claims about deployed prompt-injection resistance, harmful-request refusal, or real-world agent-security robustness. Those claims require realistic wrappers and independent policy review.
+Toy payloads preserve the control structure needed to test object-label stability and the declared measurement procedure. The current single-application pilot establishes neither stability nor broader use. It doesn't support claims about deployed prompt-injection resistance, harmful-request refusal, or real-world agent-security robustness. Those claims require realistic wrappers and independent policy review.
 
 The seed set now includes paired prompt contrasts spanning webpage text,
 document text, email body, tool output, dummy private state, and policy text.
@@ -42,6 +38,32 @@ Each item records the control dimension, context source, source role, authority 
 \label{fig:evaluation-pipeline}
 \end{figure}
 
-Figure~\ref{fig:evaluation-pipeline} shows how that schema makes the benchmark auditable in two directions. From the prompt and metadata, an evaluator can see which contrast is being tested. From a model output, an evaluator can identify which component failed: source sensitivity, mention/use robustness, scope interpretation, refusal calibration, risk classification, or the safety policy layer.
+Figure~\ref{fig:evaluation-pipeline} shows how that schema makes the benchmark auditable in two directions. From the prompt and metadata, an evaluator can see which contrast is being tested. From a model output, an evaluator can locate a candidate failure locus~-- source sensitivity, mention/use robustness, scope interpretation, refusal calibration, risk classification, or the safety-policy layer~-- for further adjudication. The response alone need not identify the internal process or uniquely determine the causal explanation.
 
-Study B supplies the next controlled construction stage. Its four current bases yield 16 development fixtures. Those fixtures feed a 12-base construction pilot; lessons from that pilot then inform a planned 24-base, four-condition development set, or 96 items. Its job is to test contrast integrity, the taxonomy, expert-evaluation protocol, validator, and scoring routes before item generation scales up. A 300--800-item benchmark would be a later expansion, large enough to broaden phenomenon coverage but still contingent on close expert adjudication and error analysis at the earlier stages.
+Study B supplies the next controlled construction stage. Its four current bases and 16 conditions occupy one narrow region of the public construct-domain matrix: stipulated temporal authority in a structured-prompt wrapper. Construction expands only to fill a declared coverage gap or enable a planned comparison. Each matrix row records one primary family, subfamily, boundary relation, source and authority relation, pragmatic-status relation, directive-force relation, criterion role, horizon, controlling, nuisance, and placebo transformation, payload family, application surface, priority, rationale, and required and represented base counts.
+
+The 12-base construction pilot and any later count implement those design choices; they aren't evidence of content coverage. Before new items are written, the versioned matrix records both covered and planned cells. Evaluator confidence is ancillary evidence of criterion uncertainty, never a row's primary construct.
+
+\subsection{Validation argument for interpretation and use}
+
+Validity attaches here to an interpretation and use of results from a configured assessment, not to a benchmark, judge, checklist, or model in the abstract \citep{messick1995validityAssessment}. Four proposed interpretations and uses remain separate: criterion-separated records may flag item or rubric defects for adjudication; evaluator-route outputs may be used diagnostically only after route-specific validation; controlled contrasts may support configuration-specific behavioural conclusions only after their prospective gates clear; and independently adjudicated records may support reference or taxonomy decisions only within their declared regimes and construct domains. Evidence for one doesn't validate the others. The evidence programme has six mutually constraining aspects:
+
+\begin{table}[!htbp]
+\centering
+\caption{Validation architecture for the benchmark's initial interpretation and use.}
+\label{tab:validation-architecture}
+\begin{tabular}{p{0.16\linewidth}p{0.74\linewidth}}
+\toprule
+Aspect & Evidence required before the corresponding interpretation is used \\
+\midrule
+Content & Expert-reviewed construct-domain coverage, with omitted families, surfaces, criteria, and boundary cases recorded rather than hidden by item counts. \\
+Substantive & Evidence that evaluators use the declared authority, quotation, indirectness, and policy distinctions rather than answer tokens or other shortcuts; rationales are diagnostic evidence, not privileged access to a true reasoning process. \\
+Structural & Tests that the criterion-separated response vector and any noncompensatory decision rule match the intended construct; numerical availability alone never licenses aggregation. \\
+Generalizability & Held-out templates, payloads, evaluator procedures, model configurations, application surfaces, and trajectory lengths, each attached to a separately declared projective claim. \\
+External & Convergent comparison with independently justified regime-relative references, expert adjudication, and rule-aided checks where appropriate; discriminant cases in which surface similarity should not preserve the reference, score, or family; and direct target runs in every realistic wrapper claimed. None is treated as context-free ground truth. \\
+Consequential & Analysis of error asymmetries, gaming, benchmark overfitting, false reassurance, evaluator labour, privacy burden, and downstream misuse of apparently precise results. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Reader-supplied utilities, deployment base rates, or aggregate rules create a new interpretation and use. They require an explicit decision context and their own structural and consequential evidence; the raw response vector doesn't validate them automatically.

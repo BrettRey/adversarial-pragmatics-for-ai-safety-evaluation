@@ -38,7 +38,7 @@ RESPONSES_ARG = $(if $(RESPONSES),--responses $(RESPONSES),)
 SUMMARY_DIR_ARG = $(if $(SUMMARY_DIR),--summary-dir $(SUMMARY_DIR),)
 
 # Targets
-.PHONY: all all-papers clean distclean view view-supplement view-delegation view-evidentiary delegation evidentiary help test validate-items validate-study-b privacy-check public-check phase1-check pilot-local pilot-smoke pilot-diagnose pilot-review-app pilot-ingest-adjudication pilot-adjudication-report pilot-figures pilot-judge-validation fake-dev-calibration study-a-synthetic study-a-self-pilot study-a-self-pilot-report study-a-judge-audit study-a-production-build study-a-manifest-stamp1 study-a-manifest-stamp2 study-a-manifest-verify study-a-freeze-ready study-a-collection-ready discovery-synthetic discovery-naturalistic-synthetic
+.PHONY: all all-papers clean distclean view view-supplement view-delegation view-evidentiary delegation evidentiary help test validate-items validate-study-b analyze-study-b validate-claims validate-delegation validate-sources assurance-check privacy-check public-check phase1-check pilot-local pilot-smoke pilot-diagnose pilot-review-app pilot-ingest-adjudication pilot-adjudication-report pilot-figures pilot-judge-validation fake-dev-calibration study-a-synthetic study-a-self-pilot study-a-self-pilot-report study-a-judge-audit study-a-production-build study-a-manifest-stamp1 study-a-manifest-stamp2 study-a-manifest-verify study-a-freeze-ready study-a-collection-ready discovery-synthetic discovery-naturalistic-synthetic
 
 # Default target: build the paper and supplement PDFs
 all: $(MAIN).pdf $(SUPPLEMENT).pdf
@@ -150,11 +150,53 @@ test:
 
 validate-items: test
 
-# Validate the design-only Study B commitment-protected fixtures.
+# Validate the Study B development design and the production-result contract.
 validate-study-b:
 	@echo "==> Validating Study B development fixtures..."
 	python3 scripts/validate_study_b.py
 	python3 -m unittest scripts.test_validate_study_b
+	python3 -m unittest scripts.test_validate_study_b_excellence
+	python3 -m unittest scripts.test_analyze_study_b
+	$(MAKE) analyze-study-b
+
+# The committed record intentionally contains no target observations. This target
+# validates schema v1.1 and must report NOT_ESTIMATED until target data exist;
+# production-shaped inputs are rejected unless all frozen object and repeat hashes bind.
+analyze-study-b:
+	@echo "==> Checking Study B production-result record..."
+	python3 scripts/analyze_study_b.py benchmark/study-b/production-results.no-target-data.json
+
+# Validate the shared prospective projective-claim protocol. The negative
+# fixture must fail; the validator's self-test checks both directions.
+validate-claims:
+	@echo "==> Validating prospective projective-claim protocol..."
+	python3 scripts/validate_claim_register.py --self-test
+	python3 scripts/validate_claim_register.py benchmark/study-b/claim-register.json
+	python3 scripts/validate_claim_register.py assurance/delegation/projective-claim-register.json
+	python3 scripts/validate_claim_register.py assurance/evidentiary/projective-claim-register.json
+
+# Validate the Delegation Assurance semantics and all three frozen prospective
+# empirical programmes. Synthetic tests exercise pass, fail, noncompensation,
+# manifest integrity, split leakage, oracle masking, and zero-data output.
+validate-delegation:
+	@echo "==> Validating Delegation Assurance artifacts..."
+	python3 scripts/validate_delegation_artifacts.py
+	python3 scripts/analyze_delegation_programs.py --validate-specs
+	python3 -m unittest scripts.test_validate_delegation_artifacts
+	python3 -m unittest scripts.test_analyze_delegation_programs
+
+validate-sources:
+	@echo "==> Verifying cited-source local archive and hashes..."
+	python3 scripts/check_cited_source_archive.py
+
+# Run the projectibility/assurance artifacts for all three papers. These checks
+# use only tracked schemas and harmless synthetic fixtures.
+assurance-check: validate-claims validate-sources validate-study-b validate-delegation
+	@echo "==> Validating excellence-revision assurance artifacts..."
+	python3 scripts/validate_study_b_excellence.py
+	python3 scripts/validate_evidentiary_artifacts.py
+	python3 scripts/analyze_evidentiary_calibration.py --self-test
+	python3 scripts/analyze_evidentiary_calibration.py
 
 # Verify the frozen historical pilot and local-only data boundary before Study A.
 privacy-check:
@@ -307,7 +349,8 @@ help:
 	@echo "  make view-evidentiary - Open evidentiary-assurance paper PDF"
 	@echo "  make all-papers - Build all three paper PDFs"
 	@echo "  make test     - Validate benchmark seed items"
-	@echo "  make validate-study-b - Validate design-only Study B fixtures and invariants"
+	@echo "  make validate-study-b - Validate Study B design, pair/balance invariants, and result harness"
+	@echo "  make analyze-study-b - Verify the manifest-bound target record (currently NOT_ESTIMATED)"
 	@echo "  make privacy-check - Verify local-only research paths are Git-protected"
 	@echo "  make public-check - Verify tracked benchmark and pilot artifacts from a fresh clone"
 	@echo "  make phase1-check - Verify the frozen historical 54-row pilot"

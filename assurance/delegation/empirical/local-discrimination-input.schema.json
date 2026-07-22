@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://brettreynolds.ca/schemas/delegation/local-discrimination-input-1.0.0.json",
+  "title": "Local discrimination analysis input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "input_id", "program_id", "specification_id", "specification_version", "created_at", "design", "design_object_bindings", "observations"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "input_id": {"$ref": "#/$defs/id"},
+    "program_id": {"const": "local_discrimination"},
+    "specification_id": {"const": "DA_LOCAL_001_SPEC"},
+    "specification_version": {"const": "1.0.0"},
+    "created_at": {"type": "string", "format": "date-time"},
+    "design": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["frozen_before_responses", "assignment_randomized", "reset_policy", "carryover_detected", "development_base_item_ids", "held_out_base_item_ids"],
+      "properties": {
+        "frozen_before_responses": {"const": true},
+        "assignment_randomized": {"const": true},
+        "reset_policy": {"const": "reset_before_each_presentation"},
+        "carryover_detected": {"const": false},
+        "development_base_item_ids": {"$ref": "#/$defs/idList"},
+        "held_out_base_item_ids": {"$ref": "#/$defs/idList"}
+      }
+    },
+    "design_object_bindings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["assignment_manifest", "split_manifest"],
+      "properties": {
+        "assignment_manifest": {"$ref": "#/$defs/manifest"},
+        "split_manifest": {"$ref": "#/$defs/manifest"}
+      }
+    },
+    "observations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["observation_id", "family", "base_item_id", "reference_direction", "baseline_endpoint", "authority_endpoint", "placebo_endpoint", "order_reversal_endpoint", "shortcut_endpoint", "control_correct", "reset_confirmed", "evaluator_view", "response_locked_at", "reference_joined_at"],
+        "properties": {
+          "observation_id": {"$ref": "#/$defs/id"},
+          "family": {"enum": ["indirect_injection", "confused_deputy", "persistence", "temporal_authority"]},
+          "base_item_id": {"$ref": "#/$defs/id"},
+          "reference_direction": {"enum": [-1, 1]},
+          "baseline_endpoint": {"$ref": "#/$defs/probability"},
+          "authority_endpoint": {"$ref": "#/$defs/probability"},
+          "placebo_endpoint": {"$ref": "#/$defs/probability"},
+          "order_reversal_endpoint": {"$ref": "#/$defs/probability"},
+          "shortcut_endpoint": {"$ref": "#/$defs/probability"},
+          "control_correct": {"type": "boolean"},
+          "reset_confirmed": {"const": true},
+          "evaluator_view": {"type": "object"},
+          "response_locked_at": {"type": "string", "format": "date-time"},
+          "reference_joined_at": {"type": "string", "format": "date-time"}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "id": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_.-]*$"},
+    "idList": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+    "probability": {"type": "number", "minimum": 0, "maximum": 1},
+    "manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["manifest_id", "manifest_version", "frozen_at", "content", "sha256"],
+      "properties": {
+        "manifest_id": {"$ref": "#/$defs/id"},
+        "manifest_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+        "frozen_at": {"type": "string", "format": "date-time"},
+        "content": {"type": "object", "minProperties": 1},
+        "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      }
+    }
+  }
+}

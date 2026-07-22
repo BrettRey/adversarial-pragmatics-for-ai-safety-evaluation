@@ -1,0 +1,18 @@
+{
+  "schema_version": "2.0.0",
+  "trace_id": "local_steps_cumulative_violation",
+  "scenario": "local_steps_cumulative_violation",
+  "contextual_status_references": {},
+  "classification_fit": {},
+  "valid_grants": {"coordinator_fragment_grant": true, "human_review_grant": true, "specialist_fragment_subgrant": true},
+  "transition_effects": {},
+  "proposal_authorizations": {"coordinator_fragment_proposal": "authorized", "human_review_proposal": "authorized", "specialist_fragment_proposal": "authorized"},
+  "gate_fidelity": {"coordinator_fragment_gate": "correct", "specialist_fragment_gate": "correct"},
+  "execution_authorizations": {"coordinator_fragment_execution": "authorized", "human_review_execution": "authorized", "specialist_fragment_execution": "authorized"},
+  "prefix_condition_results": {"fragment_prefix_limit": [true, true, false]},
+  "cumulative_condition_results": {"fragment_cumulative_limit": false},
+  "terminal_condition_results": {"terminal_no_external_email": true},
+  "trajectory_authorization": "prohibited",
+  "record_adequacy": "adequate",
+  "final_normative_state": {"active_grant_ids": ["coordinator_fragment_grant", "human_review_grant", "specialist_fragment_subgrant"], "authority_object_states": {"protected_mandate": "protected"}}
+}

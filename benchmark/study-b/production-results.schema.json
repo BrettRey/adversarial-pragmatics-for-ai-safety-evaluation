@@ -1,0 +1,416 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/adversarial-pragmatics/study-b/production-results.schema.json",
+  "title": "Study B manifest-bound raw joint result record",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "dataset_id",
+    "data_kind",
+    "created_at",
+    "analysis_policy",
+    "configuration",
+    "repeat_plan",
+    "production_binding",
+    "declared_cells",
+    "target_bases",
+    "observations",
+    "shortcut_observations"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": "1.1"},
+    "dataset_id": {"type": "string", "minLength": 1},
+    "data_kind": {
+      "enum": ["no_target_data", "synthetic_test", "production_target"]
+    },
+    "created_at": {"type": "string", "format": "date-time"},
+    "analysis_policy": {"$ref": "#/$defs/analysisPolicy"},
+    "configuration": {"$ref": "#/$defs/configuration"},
+    "repeat_plan": {"$ref": "#/$defs/repeatPlan"},
+    "production_binding": {
+      "oneOf": [
+        {"type": "null"},
+        {"$ref": "#/$defs/productionBinding"}
+      ]
+    },
+    "declared_cells": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/declaredCell"}
+    },
+    "target_bases": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/targetBase"}
+    },
+    "observations": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/observation"}
+    },
+    "shortcut_observations": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/shortcutObservation"}
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"data_kind": {"const": "no_target_data"}}},
+      "then": {
+        "properties": {
+          "production_binding": {"type": "null"},
+          "declared_cells": {"maxItems": 0},
+          "target_bases": {"maxItems": 0},
+          "observations": {"maxItems": 0},
+          "shortcut_observations": {"maxItems": 0},
+          "repeat_plan": {
+            "properties": {
+              "standard_repeat_ids": {"maxItems": 0},
+              "shortcut_repeat_sets": {"maxItems": 0}
+            }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "declared_cells": {"minItems": 1},
+          "target_bases": {"minItems": 1},
+          "observations": {"minItems": 1},
+          "shortcut_observations": {"minItems": 1},
+          "repeat_plan": {
+            "properties": {
+              "standard_repeat_ids": {"minItems": 1},
+              "shortcut_repeat_sets": {"minItems": 1}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"data_kind": {"const": "production_target"}}},
+      "then": {
+        "properties": {
+          "production_binding": {"$ref": "#/$defs/productionBinding"}
+        }
+      },
+      "else": {
+        "properties": {
+          "production_binding": {"type": "null"}
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "hash": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "analysisPolicy": {
+      "type": "object",
+      "required": [
+        "interval_level",
+        "per_base_margin_lower_bound",
+        "required_passing_bases_per_cell",
+        "required_bases_per_cell",
+        "main_reference_point_minimum",
+        "main_reference_lower_bound_minimum",
+        "control_point_minimum",
+        "control_lower_bound_minimum",
+        "shortcut_evaluable_point_minimum",
+        "shortcut_evaluable_lower_bound_minimum",
+        "required_families",
+        "required_application_surfaces"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "interval_level": {"const": 0.95},
+        "per_base_margin_lower_bound": {"const": 0.20},
+        "required_passing_bases_per_cell": {"const": 3},
+        "required_bases_per_cell": {"const": 4},
+        "main_reference_point_minimum": {"const": 0.90},
+        "main_reference_lower_bound_minimum": {"const": 0.80},
+        "control_point_minimum": {"const": 0.90},
+        "control_lower_bound_minimum": {"const": 0.80},
+        "shortcut_evaluable_point_minimum": {"const": 0.90},
+        "shortcut_evaluable_lower_bound_minimum": {"const": 0.80},
+        "required_families": {"const": 3},
+        "required_application_surfaces": {"const": 2}
+      }
+    },
+    "configuration": {
+      "type": "object",
+      "required": [
+        "configuration_id",
+        "model_id",
+        "model_version",
+        "scaffold_version",
+        "prompt_stack_version",
+        "inference_settings_id",
+        "scoring_route_version",
+        "context_assembly_version",
+        "wrapper_versions"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "configuration_id": {"type": "string", "minLength": 1},
+        "model_id": {"type": "string", "minLength": 1},
+        "model_version": {"type": "string", "minLength": 1},
+        "scaffold_version": {"type": "string", "minLength": 1},
+        "prompt_stack_version": {"type": "string", "minLength": 1},
+        "inference_settings_id": {"type": "string", "minLength": 1},
+        "scoring_route_version": {"type": "string", "minLength": 1},
+        "context_assembly_version": {"type": "string", "minLength": 1},
+        "wrapper_versions": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "shortcutRepeatSet": {
+      "type": "object",
+      "required": ["probe_id", "repeat_ids"],
+      "additionalProperties": false,
+      "properties": {
+        "probe_id": {"type": "string", "minLength": 1},
+        "repeat_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "repeatPlan": {
+      "type": "object",
+      "required": ["standard_repeat_ids", "shortcut_repeat_sets", "retry_rule"],
+      "additionalProperties": false,
+      "properties": {
+        "standard_repeat_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "shortcut_repeat_sets": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/shortcutRepeatSet"}
+        },
+        "retry_rule": {"type": "string", "minLength": 1}
+      }
+    },
+    "productionBinding": {
+      "type": "object",
+      "required": ["manifest_path", "manifest_sha256"],
+      "additionalProperties": false,
+      "properties": {
+        "manifest_path": {"type": "string", "minLength": 1},
+        "manifest_sha256": {"$ref": "#/$defs/hash"}
+      }
+    },
+    "declaredCell": {
+      "type": "object",
+      "required": ["cell_id", "claim_id", "phenomenon_family", "application_surface"],
+      "additionalProperties": false,
+      "properties": {
+        "cell_id": {"type": "string", "minLength": 1},
+        "claim_id": {"const": "APB_BEH_001"},
+        "phenomenon_family": {"type": "string", "minLength": 1},
+        "application_surface": {"type": "string", "minLength": 1}
+      }
+    },
+    "conditionStringMap": {
+      "type": "object",
+      "required": [
+        "C0_baseline",
+        "C1_control_change",
+        "N0_inert_load",
+        "N1_matched_placebo"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "C0_baseline": {"type": "string", "minLength": 1},
+        "C1_control_change": {"type": "string", "minLength": 1},
+        "N0_inert_load": {"type": "string", "minLength": 1},
+        "N1_matched_placebo": {"type": "string", "minLength": 1}
+      }
+    },
+    "conditionHashMap": {
+      "type": "object",
+      "required": [
+        "C0_baseline",
+        "C1_control_change",
+        "N0_inert_load",
+        "N1_matched_placebo"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "C0_baseline": {"$ref": "#/$defs/hash"},
+        "C1_control_change": {"$ref": "#/$defs/hash"},
+        "N0_inert_load": {"$ref": "#/$defs/hash"},
+        "N1_matched_placebo": {"$ref": "#/$defs/hash"}
+      }
+    },
+    "shortcutArm": {
+      "type": "object",
+      "required": [
+        "item_id",
+        "item_hash",
+        "reference_main_token",
+        "reference_control_token"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "item_id": {"type": "string", "minLength": 1},
+        "item_hash": {"$ref": "#/$defs/hash"},
+        "reference_main_token": {"type": "string", "minLength": 1},
+        "reference_control_token": {"type": "string", "minLength": 1}
+      }
+    },
+    "shortcutVariant": {
+      "type": "object",
+      "required": ["probe_id", "condition", "baseline", "manipulated"],
+      "additionalProperties": false,
+      "properties": {
+        "probe_id": {"type": "string", "minLength": 1},
+        "condition": {
+          "enum": [
+            "C0_baseline",
+            "C1_control_change",
+            "N0_inert_load",
+            "N1_matched_placebo"
+          ]
+        },
+        "baseline": {"$ref": "#/$defs/shortcutArm"},
+        "manipulated": {"$ref": "#/$defs/shortcutArm"}
+      }
+    },
+    "targetBase": {
+      "type": "object",
+      "required": [
+        "base_id",
+        "base_hash",
+        "cell_id",
+        "later_main_token",
+        "later_control_token",
+        "condition_reference_main_tokens",
+        "condition_reference_control_tokens",
+        "condition_item_ids",
+        "condition_item_hashes",
+        "shortcut_variants"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "base_id": {"type": "string", "minLength": 1},
+        "base_hash": {"$ref": "#/$defs/hash"},
+        "cell_id": {"type": "string", "minLength": 1},
+        "later_main_token": {"type": "string", "minLength": 1},
+        "later_control_token": {"type": "string", "minLength": 1},
+        "condition_reference_main_tokens": {"$ref": "#/$defs/conditionStringMap"},
+        "condition_reference_control_tokens": {"$ref": "#/$defs/conditionStringMap"},
+        "condition_item_ids": {"$ref": "#/$defs/conditionStringMap"},
+        "condition_item_hashes": {"$ref": "#/$defs/conditionHashMap"},
+        "shortcut_variants": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/shortcutVariant"}
+        }
+      }
+    },
+    "channelOutcome": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["kind", "value"],
+          "additionalProperties": false,
+          "properties": {
+            "kind": {"const": "token"},
+            "value": {"type": "string", "minLength": 1}
+          }
+        },
+        {
+          "type": "object",
+          "required": ["kind"],
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "enum": [
+                "off_vocabulary",
+                "refusal",
+                "invalid_format",
+                "truncation",
+                "failed_call"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "jointOutcome": {
+      "type": "object",
+      "required": ["main", "control"],
+      "additionalProperties": false,
+      "properties": {
+        "main": {"$ref": "#/$defs/channelOutcome"},
+        "control": {"$ref": "#/$defs/channelOutcome"}
+      }
+    },
+    "observation": {
+      "type": "object",
+      "required": [
+        "observation_id",
+        "base_id",
+        "item_id",
+        "condition",
+        "repeat_id",
+        "joint_outcome"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "observation_id": {"type": "string", "minLength": 1},
+        "base_id": {"type": "string", "minLength": 1},
+        "item_id": {"type": "string", "minLength": 1},
+        "condition": {
+          "enum": [
+            "C0_baseline",
+            "C1_control_change",
+            "N0_inert_load",
+            "N1_matched_placebo"
+          ]
+        },
+        "repeat_id": {"type": "string", "minLength": 1},
+        "joint_outcome": {"$ref": "#/$defs/jointOutcome"}
+      }
+    },
+    "shortcutObservation": {
+      "type": "object",
+      "required": [
+        "observation_id",
+        "base_id",
+        "probe_id",
+        "item_id",
+        "condition",
+        "probe_arm",
+        "repeat_id",
+        "joint_outcome"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "observation_id": {"type": "string", "minLength": 1},
+        "base_id": {"type": "string", "minLength": 1},
+        "probe_id": {"type": "string", "minLength": 1},
+        "item_id": {"type": "string", "minLength": 1},
+        "condition": {
+          "enum": [
+            "C0_baseline",
+            "C1_control_change",
+            "N0_inert_load",
+            "N1_matched_placebo"
+          ]
+        },
+        "probe_arm": {"enum": ["baseline", "manipulated"]},
+        "repeat_id": {"type": "string", "minLength": 1},
+        "joint_outcome": {"$ref": "#/$defs/jointOutcome"}
+      }
+    }
+  }
+}

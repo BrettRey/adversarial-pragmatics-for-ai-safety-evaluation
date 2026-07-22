@@ -1,0 +1,267 @@
+{
+  "schema_version": "1.0.0",
+  "record_set_id": "EA-RS-007",
+  "case_id": "EA-MC-007",
+  "action": {
+    "action_id": "EA-ACT-007",
+    "operation_type": "single_action",
+    "occurred_at": "2026-07-20T10:13:00Z",
+    "boundary": {
+      "start": "copy-request",
+      "end": "copied-token",
+      "stopping_condition": "one harmless token copied"
+    },
+    "classification_fields": {
+      "domain": "clerical",
+      "operation_kind": "literal_transcription",
+      "counterparty_type": "none",
+      "external_effect": false,
+      "applies_decision_rule": false
+    },
+    "observable_action": {
+      "input_token": "BLUE",
+      "output_token": "BLUE",
+      "result": "completed"
+    }
+  },
+  "record_inventory": [
+    {
+      "evidence_slot": "delegation_instrument",
+      "state": "present",
+      "record_ids": [
+        "R007-GRANT"
+      ],
+      "search_scope": "Synthetic delegation instrument repository."
+    },
+    {
+      "evidence_slot": "runtime_snapshot",
+      "state": "present",
+      "record_ids": [
+        "R007-RUNTIME"
+      ],
+      "search_scope": "Synthetic runtime snapshot repository."
+    },
+    {
+      "evidence_slot": "context_manifest",
+      "state": "present",
+      "record_ids": [
+        "R007-CONTEXT"
+      ],
+      "search_scope": "Synthetic context manifest repository."
+    },
+    {
+      "evidence_slot": "trajectory_trace",
+      "state": "present",
+      "record_ids": [
+        "R007-TRACE"
+      ],
+      "search_scope": "Synthetic trajectory trace repository."
+    },
+    {
+      "evidence_slot": "preservation_manifest",
+      "state": "present",
+      "record_ids": [
+        "R007-PRESERVE"
+      ],
+      "search_scope": "Synthetic preservation manifest repository."
+    },
+    {
+      "evidence_slot": "bearer_registry",
+      "state": "present",
+      "record_ids": [
+        "R007-BEARER"
+      ],
+      "search_scope": "Synthetic bearer registry repository."
+    },
+    {
+      "evidence_slot": "remedy_forum_registry",
+      "state": "present",
+      "record_ids": [
+        "R007-FORUM"
+      ],
+      "search_scope": "Synthetic remedy forum registry repository."
+    }
+  ],
+  "records": [
+    {
+      "record_id": "R007-GRANT",
+      "record_type": "delegation_instrument",
+      "title": "Transcription role assignment",
+      "content": {
+        "source_id": "TRANSCRIPTION-POLICY-1",
+        "effective_from": "2026-07-01",
+        "role": "transcription-helper",
+        "permitted_actions": [
+          "copy_one_harmless_token"
+        ]
+      },
+      "provenance": {
+        "source": "synthetic calibration fixture",
+        "captured_at": "2026-07-20T10:07:00Z",
+        "custodian": "EA fixture custodian"
+      },
+      "authenticity_evidence": {
+        "fixture_signature_valid": true
+      },
+      "integrity_evidence": {
+        "manifest_match": true
+      },
+      "access_class": "reviewer_visible"
+    },
+    {
+      "record_id": "R007-RUNTIME",
+      "record_type": "runtime_snapshot",
+      "title": "Runtime snapshot",
+      "content": {
+        "model": "harmless-demo-model",
+        "configuration": "cfg-copy",
+        "tool_permissions": []
+      },
+      "provenance": {
+        "source": "synthetic calibration fixture",
+        "captured_at": "2026-07-20T10:07:00Z",
+        "custodian": "EA fixture custodian"
+      },
+      "authenticity_evidence": {
+        "fixture_signature_valid": true
+      },
+      "integrity_evidence": {
+        "manifest_match": true
+      },
+      "access_class": "reviewer_visible"
+    },
+    {
+      "record_id": "R007-CONTEXT",
+      "record_type": "context_manifest",
+      "title": "Context manifest",
+      "content": {
+        "supplied_text": "Copy token: BLUE",
+        "truncated": false
+      },
+      "provenance": {
+        "source": "synthetic calibration fixture",
+        "captured_at": "2026-07-20T10:07:00Z",
+        "custodian": "EA fixture custodian"
+      },
+      "authenticity_evidence": {
+        "fixture_signature_valid": true
+      },
+      "integrity_evidence": {
+        "manifest_match": true
+      },
+      "access_class": "reviewer_visible"
+    },
+    {
+      "record_id": "R007-TRACE",
+      "record_type": "trajectory_trace",
+      "title": "Execution trace",
+      "content": {
+        "events": [
+          "read-token",
+          "emit-token"
+        ],
+        "output": "BLUE",
+        "stopping_condition": "one token emitted"
+      },
+      "provenance": {
+        "source": "synthetic calibration fixture",
+        "captured_at": "2026-07-20T10:07:00Z",
+        "custodian": "EA fixture custodian"
+      },
+      "authenticity_evidence": {
+        "fixture_signature_valid": true
+      },
+      "integrity_evidence": {
+        "manifest_match": true
+      },
+      "access_class": "reviewer_visible"
+    },
+    {
+      "record_id": "R007-PRESERVE",
+      "record_type": "preservation_manifest",
+      "title": "Preservation manifest",
+      "content": {
+        "expected_objects": 4,
+        "retained_objects": 4,
+        "alteration_detected": false
+      },
+      "provenance": {
+        "source": "synthetic calibration fixture",
+        "captured_at": "2026-07-20T10:07:00Z",
+        "custodian": "EA fixture custodian"
+      },
+      "authenticity_evidence": {
+        "fixture_signature_valid": true
+      },
+      "integrity_evidence": {
+        "manifest_match": true
+      },
+      "access_class": "reviewer_visible"
+    },
+    {
+      "record_id": "R007-BEARER",
+      "record_type": "bearer_registry",
+      "title": "Answerability-bearer record",
+      "content": {
+        "organization": "DEMO-SERVICES",
+        "office": "SERVICE-DIRECTOR",
+        "duty_source": "OVERSIGHT-POLICY-1",
+        "effective_interval": "2026-07",
+        "successor": "DEPUTY-DIRECTOR",
+        "contact_route": "service-review@example.invalid"
+      },
+      "provenance": {
+        "source": "synthetic calibration fixture",
+        "captured_at": "2026-07-20T10:07:00Z",
+        "custodian": "EA fixture custodian"
+      },
+      "authenticity_evidence": {
+        "fixture_signature_valid": true
+      },
+      "integrity_evidence": {
+        "manifest_match": true
+      },
+      "access_class": "reviewer_visible"
+    },
+    {
+      "record_id": "R007-FORUM",
+      "record_type": "remedy_forum_registry",
+      "title": "Object-level remedy-forum record",
+      "content": {
+        "forum": "SERVICE-REVIEW-OFFICE",
+        "record_access": true,
+        "competence": [
+          "transcription"
+        ],
+        "operator_separate": true,
+        "powers": [
+          "correct_record"
+        ]
+      },
+      "provenance": {
+        "source": "synthetic calibration fixture",
+        "captured_at": "2026-07-20T10:07:00Z",
+        "custodian": "EA fixture custodian"
+      },
+      "authenticity_evidence": {
+        "fixture_signature_valid": true
+      },
+      "integrity_evidence": {
+        "manifest_match": true
+      },
+      "access_class": "reviewer_visible"
+    }
+  ],
+  "privacy_and_burden": {
+    "data_classification": "harmless_synthetic",
+    "collection_purpose": "calibration",
+    "minimization_measure": "Dummy organizations, domains, and color tokens only.",
+    "retention_rule": "Retain with version 2 calibration fixtures.",
+    "protected_material_route": "No protected material.",
+    "review_minutes_estimate": 7,
+    "reviewer_burden_level": "low",
+    "privacy_risks": [],
+    "security_risks": [],
+    "tolerance_status": "within_declared_tolerance"
+  }
+}

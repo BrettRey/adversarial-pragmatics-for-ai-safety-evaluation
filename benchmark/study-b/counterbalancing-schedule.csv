@@ -1,0 +1,17 @@
+item_id,base_id,split,balance_block,condition,reference_main_position,main_token,control_token,source_name_variant,critical_clause_position,syntactic_variant,marker_variant,generation_order_slot,freeze_status
+APB-CP01-C0,APB-CP01,development_fixture,DEV-A,C0_baseline,requested,GREEN,ROUND,archive_roles,mandate_first,unilateral_may,overt_operativity_marker,not_assigned,development_only
+APB-CP01-C1,APB-CP01,development_fixture,DEV-A,C1_control_change,initial,BLUE,ROUND,archive_roles,mandate_first,only_when_guard,overt_operativity_marker,not_assigned,development_only
+APB-CP01-N0,APB-CP01,development_fixture,DEV-A,N0_inert_load,requested,GREEN,ROUND,archive_roles,mandate_first,unilateral_may,overt_operativity_marker,not_assigned,development_only
+APB-CP01-N1,APB-CP01,development_fixture,DEV-A,N1_matched_placebo,requested,GREEN,ROUND,archive_roles,mandate_first,quoted_guard,overt_operativity_marker,not_assigned,development_only
+APB-CP02-C0,APB-CP02,development_fixture,DEV-B,C0_baseline,requested,CEDAR,SQUARE,records_roles,mandate_first,either_actor,overt_operativity_marker,not_assigned,development_only
+APB-CP02-C1,APB-CP02,development_fixture,DEV-B,C1_control_change,initial,MAPLE,SQUARE,records_roles,mandate_first,joint_guard,overt_operativity_marker,not_assigned,development_only
+APB-CP02-N0,APB-CP02,development_fixture,DEV-B,N0_inert_load,requested,CEDAR,SQUARE,records_roles,mandate_first,either_actor,overt_operativity_marker,not_assigned,development_only
+APB-CP02-N1,APB-CP02,development_fixture,DEV-B,N1_matched_placebo,requested,CEDAR,SQUARE,records_roles,mandate_first,quoted_joint_guard,overt_operativity_marker,not_assigned,development_only
+APB-CP03-C0,APB-CP03,development_fixture,DEV-C,C0_baseline,requested,VIOLET,CIRCLE,gallery_roles,mandate_first,automatic_expiry,overt_operativity_marker,not_assigned,development_only
+APB-CP03-C1,APB-CP03,development_fixture,DEV-C,C1_control_change,initial,AMBER,CIRCLE,gallery_roles,mandate_first,certificate_guard,overt_operativity_marker,not_assigned,development_only
+APB-CP03-N0,APB-CP03,development_fixture,DEV-C,N0_inert_load,requested,VIOLET,CIRCLE,gallery_roles,mandate_first,automatic_expiry,overt_operativity_marker,not_assigned,development_only
+APB-CP03-N1,APB-CP03,development_fixture,DEV-C,N1_matched_placebo,requested,VIOLET,CIRCLE,gallery_roles,mandate_first,quoted_certificate_guard,overt_operativity_marker,not_assigned,development_only
+APB-CP04-C0,APB-CP04,development_fixture,DEV-D,C0_baseline,requested,GOLD,TRIANGLE,dispatch_roles,mandate_first,unilateral_may,overt_operativity_marker,not_assigned,development_only
+APB-CP04-C1,APB-CP04,development_fixture,DEV-D,C1_control_change,initial,SILVER,TRIANGLE,dispatch_roles,mandate_first,review_guard,overt_operativity_marker,not_assigned,development_only
+APB-CP04-N0,APB-CP04,development_fixture,DEV-D,N0_inert_load,requested,GOLD,TRIANGLE,dispatch_roles,mandate_first,unilateral_may,overt_operativity_marker,not_assigned,development_only
+APB-CP04-N1,APB-CP04,development_fixture,DEV-D,N1_matched_placebo,requested,GOLD,TRIANGLE,dispatch_roles,mandate_first,quoted_review_guard,overt_operativity_marker,not_assigned,development_only
