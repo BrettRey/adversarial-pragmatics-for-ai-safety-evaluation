@@ -2,7 +2,7 @@
 
 This repository contains Brett Reynolds's empirical evaluation paper project:
 
-**Adversarial Pragmatics for AI Safety Evaluation: A Benchmark for Instruction Conflict, Embedded Commands, and Policy Ambiguity**
+**Adversarial Pragmatics for AI Safety Evaluation: A Diagnostic Framework and Seed Benchmark for Language-Mediated Control**
 
 ## Project Frame
 

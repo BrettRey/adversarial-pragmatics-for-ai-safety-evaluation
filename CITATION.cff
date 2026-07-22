@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "If you use this benchmark, protocol, or manuscript draft, please cite it as below."
-title: "Adversarial Pragmatics for AI Safety Evaluation: A Benchmark for Instruction Conflict, Embedded Commands, and Policy Ambiguity"
+title: "Adversarial Pragmatics for AI Safety Evaluation: A Diagnostic Framework and Seed Benchmark for Language-Mediated Control"
 authors:
   - family-names: Reynolds
     given-names: Brett

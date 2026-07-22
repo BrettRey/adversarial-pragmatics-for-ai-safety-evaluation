@@ -17,9 +17,52 @@ Evaluation labels function here as inference licenses, but a single label can co
 
 Projectibility (what observing some features licenses us to predict about others; \citep{Goodman1955,reynolds2026kindsProjectibilityProfiles}) attaches to a specified bearer and target, not to \enquote{the label} indiscriminately. A wrapper can change the reference; a judge-prompt change outside the enumerated measurement family creates a new measurement bearer; and a model or version change creates a new behavioural bearer.
 
+Figure~\ref{fig:evidence-chain} sets out the chain those bearers sit on. Each link is a separate inference with its own warrant, and a single pass/fail label compresses all of them into one number.
+
+\begin{figure}[tbp]
+\centering
+\begin{tikzpicture}[
+  font=\footnotesize,
+  stage/.style={draw=black!55, thick, rounded corners=2pt, align=center,
+                inner sep=4pt, text width=0.50\linewidth, minimum height=0.62cm},
+  arrow/.style={-{Latex[length=2mm]}, thick, draw=black!60},
+  note/.style={font=\scriptsize, align=left, text=linkmaroon}
+]
+\node[stage, fill=linkmaroon!7] (regime) {\textbf{Stipulated regime}\\[-1pt]
+  \scriptsize what the declared policy and authority relations permit};
+\node[stage, fill=black!3, below=3.5mm of regime] (ref) {\textbf{Licensed reference}\\[-1pt]
+  \scriptsize the expected behaviour for this item};
+\node[stage, fill=black!3, below=3.5mm of ref] (resp) {\textbf{Model response}\\[-1pt]
+  \scriptsize one configuration, one item, one realized output};
+\node[stage, fill=black!3, below=3.5mm of resp] (judg) {\textbf{Criterion-specific judgments}\\[-1pt]
+  \scriptsize task, policy, risk, refusal, attribution, uncertainty};
+\node[stage, fill=black!3, below=3.5mm of judg] (route) {\textbf{Scoring route}\\[-1pt]
+  \scriptsize expert adjudication, rule-aided check, or LLM judge};
+\node[stage, fill=black!3, below=3.5mm of route] (use) {\textbf{Interpretation and use}\\[-1pt]
+  \scriptsize what a result is claimed to license, and for whom};
+\node[stage, fill=linkmaroon!7, below=3.5mm of use] (proj) {\textbf{Projected target}\\[-1pt]
+  \scriptsize unobserved items, models, wrappers, evaluators, times};
+
+\draw[arrow] (regime) -- node[right, note]{adjudicated, not read off} (ref);
+\draw[arrow] (ref) -- node[right, note]{fixed output-blind} (resp);
+\draw[arrow] (resp) -- node[right, note]{criteria kept separate} (judg);
+\draw[arrow] (judg) -- node[right, note]{route validated per criterion} (route);
+\draw[arrow] (route) -- node[right, note]{validity attaches here} (use);
+\draw[arrow] (use) -- node[right, note]{declared bearer and warrant} (proj);
+\end{tikzpicture}
+\caption{The evidence chain for one evaluation result. Edge labels name what each step requires; none of them is automatic. The reference bearer governs the top two links, the behavioural bearer the response, the measurement bearer the judgments and scoring route, and the taxonomic bearer the category assignment running alongside. A failure at any link is a different diagnosis, and the four bearers can fail independently of one another.}
+\label{fig:evidence-chain}
+\end{figure}
+
 This paper treats those distinctions as separate evaluation targets. It starts from a small, auditable benchmark and develops controlled tests of when configured systems and evaluators respond selectively to the distinctions the benchmark purports to manipulate. The design emphasizes diagnosis over ranking: it can expose over-refusal, under-refusal, shortcut sensitivity, and instability in the reference, taxonomy, or assessment procedure without forcing them into one performance scale.
 
 The core construct is \term{adversarial pragmatics}: safety-relevant model behaviour under cases where instruction status, source authority, quotation, scope, reference, speech-act force, or policy category has to be inferred from language use. The phrase names a narrow evaluation target: cases where the failure can't be diagnosed without saying how a string was embedded, attributed, scoped, or taken up.
+
+Two parts of that label need pinning down. \term{Pragmatics} is meant functionally, not disciplinarily: the phenomena are grouped by their role in determining which linguistic material licenses which action, so the set cuts across what's usually divided among semantics, pragmatics, discourse interpretation, and institutional authorization. \term{Adversarial} describes the evaluation conditions, not the speaker. Several items involve benign ambiguity or a metalinguistic analysis request with no hostile intent; what makes them adversarial is that they're built to separate readings a single label would merge.
+
+Scope here is narrower than the construct. The seed items are English, and they assume current chat-role, tool-output, and instruction-priority conventions. The framework should carry to other languages and interfaces, but the reference judgments won't carry automatically: quotation marking, deixis, politeness, indirectness, and source attribution vary across languages and across application surfaces, so each such move is a new reference claim needing its own adjudication.
+
+Criterion-separated, projectibility-typed measurement is needed for language-mediated safety evaluation, and it's implementable now. That's the paper's principal claim, and it's methodological rather than empirical. The seed benchmark demonstrates implementability on a deliberately small artifact; it doesn't independently validate the framework. The pilot's value lies in the item, reference, and evaluator defects it exposes, not in any score it produces.
 
 This paper initially supports a narrow use: diagnosing items, rubrics, criterion conflicts, evaluator disagreement, and the behaviour of named model configurations in controlled evaluation work. The evidence doesn't warrant standalone deployment certification, vendor ranking, a universal safety score, or a claim about general model competence. Each would be a new interpretation and use requiring its own evidence.
 
@@ -27,5 +70,5 @@ This paper initially supports a narrow use: diagnosing items, rubrics, criterion
 \noindent\fbox{%
 \begin{minipage}{0.94\linewidth}
 \small
-\textbf{Artifact and pilot findings.} The release includes 18 seed items in eight paired contrasts plus one diagnostic contrast, schema and paired-contrast validators, a local Ollama runner, rule-aided diagnostic scripts, an adjudication review app, an LLM-judge validation script, sanitized row-level and aggregate pilot summaries, and reproducibility commands. The seed contrasts vary a designated control dimension but don't all hold every other prompt feature fixed, so they aren't claimed as strict minimal pairs. The local seed pilot produced 54 item--model rows: 36 full task successes, 46 policy-compliant outputs, and 12/24 eligible paired-contrast passes. A first LLM-judge validation pass showed exact agreement with the author's labels of 66.7--98.1\% by label family, but those labels are heavily skewed, so most figures sit at or near majority-class base rates. Under favourable judge conditions, safety-risk agreement fell below the majority-class baseline, and exact agreement was zero on author-labelled risk rows and partial task successes.
+\textbf{Artifact and pilot findings.} The release includes 18 seed items in eight paired contrasts plus one diagnostic contrast, schema and paired-contrast validators, a local Ollama runner, rule-aided diagnostic scripts, an adjudication review app, an LLM-judge validation script, sanitized row-level and aggregate pilot summaries, and reproducibility commands. The seed contrasts vary a designated control dimension but don't all hold every other prompt feature fixed, so they aren't claimed as strict minimal pairs. The local seed pilot produced 54 item--model rows: 36 full task successes, 46 policy-compliant outputs, and 12/24 eligible joint pair completions. A first LLM-judge validation pass showed exact agreement with the author's labels of 66.7--98.1\% by label family, but those labels are heavily skewed, so most figures sit at or near majority-class base rates. Under favourable judge conditions, safety-risk agreement fell below the majority-class baseline, and exact agreement was zero on author-labelled risk rows and partial task successes.
 \end{minipage}}

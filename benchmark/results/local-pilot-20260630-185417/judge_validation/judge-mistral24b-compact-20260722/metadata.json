@@ -1,0 +1,160 @@
+{
+  "command": "scripts/run_llm_judge_validation.py --model mistral-small:24b-instruct-2501-q4_K_M --prompt-variant compact --judge-run-id judge-mistral24b-compact-20260722 --temperature 0 --seed 1 --summary-dir /private/tmp/claude-502/-Users-brettreynolds-projects-LLM-CLI-projects-papers-development-adversarial-pragmatics-for-ai-safety-evaluation/20acbe1d-6be9-40d0-9afe-c9314d1ec0a0/scratchpad/judge-summaries",
+  "created_at": "2026-07-22T18:30:28Z",
+  "cwd": "/Users/brettreynolds/projects/LLM-CLI-projects/papers/development/adversarial-pragmatics-for-ai-safety-evaluation",
+  "git": {
+    "head": {
+      "ok": true,
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "1a378de"
+    },
+    "status_short": {
+      "ok": true,
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "M .gitignore\n M AGENTS.md\n M CITATION.cff\n M CLAUDE.md\n M DECISIONS.md\n M GEMINI.md\n M LICENSE.md\n M Makefile\n M README.md\n M STATUS.md\n M adversarial-pragmatics-for-ai-safety-evaluation.tex\n M assurance/evidentiary/action-classifier.json\n M assurance/evidentiary/action-classifier.schema.json\n M assurance/evidentiary/applicability-map.json\n M assurance/evidentiary/applicability-map.schema.json\n M assurance/evidentiary/authorization-regime.json\n M assurance/evidentiary/authorization-regime.schema.json\n M assurance/evidentiary/claim-graph.json\n M assurance/evidentiary/evidence-bundle.schema.json\n M assurance/evidentiary/matched-cases/bundles/EA-EB-001.json\n M assurance/evidentiary/matched-cases/bundles/EA-EB-002.json\n M assurance/evidentiary/matched-cases/bundles/EA-EB-003.json\n M assurance/evidentiary/matched-cases/bundles/EA-EB-004.json\n M assurance/evidentiary/matched-cases/bundles/EA-EB-005.json\n M assurance/evidentiary/matched-cases/bundles/EA-EB-006.json\n M assurance/evidentiary/matched-cases/bundles/EA-EB-007.json\n M assurance/evidentiary/matched-cases/bundles/EA-EB-008.json\n M assurance/evidentiary/matched-cases/bundles/EA-EB-009.json\n M assurance/evidentiary/matched-cases/bundles/EA-EB-010.json\n M assurance/evidentiary/matched-cases/bundles/EA-EB-013.json\n M assurance/evidentiary/matched-cases/bundles/EA-EB-014.json\n M assurance/evidentiary/matched-cases/bundles/EA-EB-015.json\n M assurance/evidentiary/matched-cases/bundles/EA-EB-016.json\n M assurance/evidentiary/matched-cases/bundles/EA-EB-017.json\n M assurance/evidentiary/matched-cases/bundles/EA-EB-018.json\n M assurance/evidentiary/matched-cases/case-manifest.json\n M assurance/evidentiary/matched-cases/hidden/reference-keys.json\n M assurance/evidentiary/matched-cases/invalid/EA-EB-011-posthoc-class-rescue.json\n M assurance/evidentiary/matched-cases/invalid/EA-EB-012-privacy-overcapture.json\n M assurance/evidentiary/matched-cases/records/EA-MC-001-records.json\n M assurance/evidentiary/matched-cases/records/EA-MC-002-records.json\n M assurance/evidentiary/matched-cases/records/EA-MC-003-records.json\n M assurance/evidentiary/matched-cases/records/EA-MC-004-records.json\n M assurance/evidentiary/matched-cases/records/EA-MC-005-records.json\n M assurance/evidentiary/matched-cases/records/EA-MC-006-records.json\n M assurance/evidentiary/matched-cases/records/EA-MC-007-records.json\n M assurance/evidentiary/matched-cases/records/EA-MC-008-records.json\n M assurance/evidentiary/matched-cases/records/EA-MC-009-records.json\n M assurance/evidentiary/matched-cases/records/EA-MC-010-records.json\n M assurance/evidentiary/matched-cases/records/EA-MC-011-records.json\n M assurance/evidentiary/matched-cases/records/EA-MC-012-records.json\n M assurance/evidentiary/matched-cases/records/EA-MC-013-records.json\n M assurance/evidentiary/matched-cases/records/EA-MC-014-records.json\n M assurance/evidentiary/matched-cases/records/EA-MC-015-records.json\n M assurance/evidentiary/matched-cases/records/EA-MC-016-records.json\n M assurance/evidentiary/matched-cases/records/EA-MC-017-records.json\n M assurance/evidentiary/matched-cases/records/EA-MC-018-records.json\n M assurance/evidentiary/matched-cases/reviewer-package.json\n M assurance/evidentiary/projective-claim-register.json\n M assurance/evidentiary/record-set.schema.json\n M assurance/evidentiary/reference-key.schema.json\n M assurance/evidentiary/reviewer-protocol.md\n M assurance/evidentiary/reviewer-response.schema.json\n M assurance/evidentiary/unblinding-record.schema.json\n M evidentiary-assurance.tex\n M notes/cited-source-local-archive.md\n M notes/project-brief.md\n M references-local.bib\n M scripts/analyze_evidentiary_calibration.py\n M scripts/run_llm_judge_validation.py\n M scripts/validate_evidentiary_artifacts.py\n M sections-delegation/02-existing-work.tex\n M sections-evidentiary/01-introduction.tex\n M sections-evidentiary/02-evidence-primitives.tex\n M sections-evidentiary/03-governance-law.tex\n M sections-evidentiary/04-technical-mechanisms.tex\n M sections-evidentiary/05-research-program.tex\n M sections-evidentiary/05-sufficiency-test.tex\n M sections-evidentiary/06-conclusion.tex\n M sections/01-evaluation-problem.tex\n M sections/02-pass-fail.tex\n M sections/03-taxonomy.tex\n M sections/04-benchmark-construction.tex\n M sections/05-annotation-rater-roles.tex\n M sections/06-experiments.tex\n M sections/07-metrics.tex\n M sections/07a-limitations-next-steps.tex\n M sections/10-code-data-availability.tex\n M submission/arxiv/metadata.md\n M supplement.tex\n?? assurance/evidentiary/matched-cases/bundles/EA-EB-019.json\n?? assurance/evidentiary/matched-cases/bundles/EA-EB-020.json\n?? assurance/evidentiary/matched-cases/bundles/EA-EB-021.json\n?? assurance/evidentiary/matched-cases/bundles/EA-EB-022.json\n?? assurance/evidentiary/matched-cases/records/EA-MC-019-records.json\n?? assurance/evidentiary/matched-cases/records/EA-MC-020-records.json\n?? assurance/evidentiary/matched-cases/records/EA-MC-021-records.json\n?? assurance/evidentiary/matched-cases/records/EA-MC-022-records.json\n?? benchmark/results/local-pilot-20260630-185417/\n?? reviews/delegation-assurance-referee-triage-2026-07-22.md\n?? scripts/build_evidentiary_new_fixtures.py\n?? scripts/judge_agreement_intervals.py\n?? scripts/stamp_evidentiary_artifacts.py\n?? submission/venue-decision-2026-07-22.md"
+    }
+  },
+  "judge_run_id": "judge-mistral24b-compact-20260722",
+  "ollama": {
+    "tags": {
+      "models": [
+        {
+          "capabilities": [
+            "completion",
+            "tools"
+          ],
+          "details": {
+            "context_length": 32768,
+            "embedding_length": 5120,
+            "families": [
+              "llama"
+            ],
+            "family": "llama",
+            "format": "gguf",
+            "parameter_size": "23.6B",
+            "parent_model": "",
+            "quantization_level": "Q4_K_M"
+          },
+          "digest": "8039dd90c1138d772437a0779a33b7349efd5d9cca71edcd26e4dd463f90439d",
+          "model": "mistral-small:24b-instruct-2501-q4_K_M",
+          "modified_at": "2026-07-15T20:13:38.959597696-04:00",
+          "name": "mistral-small:24b-instruct-2501-q4_K_M",
+          "size": 14333921662
+        },
+        {
+          "capabilities": [
+            "completion",
+            "tools"
+          ],
+          "details": {
+            "context_length": 32768,
+            "embedding_length": 4096,
+            "families": [
+              "llama"
+            ],
+            "family": "llama",
+            "format": "gguf",
+            "parameter_size": "7.2B",
+            "parent_model": "",
+            "quantization_level": "Q4_K_M"
+          },
+          "digest": "6577803aa9a036369e481d648a2baebb381ebc6e897f2bb9a766a2aa7bfbc1cf",
+          "model": "mistral:7b-instruct-v0.3-q4_K_M",
+          "modified_at": "2026-07-15T20:09:45.224478262-04:00",
+          "name": "mistral:7b-instruct-v0.3-q4_K_M",
+          "size": 4372824384
+        },
+        {
+          "capabilities": [
+            "completion",
+            "tools",
+            "thinking"
+          ],
+          "details": {
+            "context_length": 202752,
+            "embedding_length": 2048,
+            "families": [
+              "glm4moelite"
+            ],
+            "family": "glm4moelite",
+            "format": "gguf",
+            "parameter_size": "29.9B",
+            "parent_model": "glm-4.7-flash:latest",
+            "quantization_level": "Q4_K_M"
+          },
+          "digest": "4475827791a269b02c8ec49b1c3bc1abb5846bacf3fae015b75d33986322d8f6",
+          "model": "glm-4.7-flash:q4_K_M",
+          "modified_at": "2026-06-30T18:41:02.209174927-04:00",
+          "name": "glm-4.7-flash:q4_K_M",
+          "size": 19019270897
+        },
+        {
+          "capabilities": [
+            "completion"
+          ],
+          "details": {
+            "families": [
+              "gemma3"
+            ],
+            "family": "gemma3",
+            "format": "gguf",
+            "parameter_size": "12.2B",
+            "parent_model": "",
+            "quantization_level": "Q4_K_M"
+          },
+          "digest": "f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a",
+          "model": "gemma3:12b",
+          "modified_at": "2026-06-30T18:36:54.309609695-04:00",
+          "name": "gemma3:12b",
+          "size": 8149190253
+        },
+        {
+          "capabilities": [
+            "completion",
+            "tools",
+            "thinking"
+          ],
+          "details": {
+            "context_length": 40960,
+            "embedding_length": 4096,
+            "families": [
+              "qwen3"
+            ],
+            "family": "qwen3",
+            "format": "gguf",
+            "parameter_size": "8.2B",
+            "parent_model": "",
+            "quantization_level": "Q4_K_M"
+          },
+          "digest": "500a1f067a9f782620b40bee6f7b0c89e17ae61f686b92c24933e4ca4b2b8b41",
+          "model": "qwen3:8b",
+          "modified_at": "2026-06-30T18:34:56.166967473-04:00",
+          "name": "qwen3:8b",
+          "size": 5225388164
+        }
+      ]
+    },
+    "url": "http://127.0.0.1:11434",
+    "version": {
+      "ok": true,
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "ollama version is 0.31.1"
+    }
+  },
+  "row_count": 54,
+  "run_dir": "/Users/brettreynolds/projects/LLM-CLI-projects/papers/development/adversarial-pragmatics-for-ai-safety-evaluation/benchmark/results/local-pilot-20260630-185417",
+  "script_version": "0.1.0",
+  "settings": {
+    "judge_model": "mistral-small:24b-instruct-2501-q4_K_M",
+    "keep_alive": "5m",
+    "limit": null,
+    "num_predict": 512,
+    "prompt_variant": "compact",
+    "seed": 1,
+    "temperature": 0.0,
+    "timeout": 180
+  }
+}

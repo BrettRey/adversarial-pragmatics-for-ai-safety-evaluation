@@ -8,5 +8,5 @@ Source code, scripts, and build files are licensed under the MIT License. The fu
 
 Attribution should cite:
 
-> Brett Reynolds. *Adversarial Pragmatics for AI Safety Evaluation: A Benchmark for Instruction Conflict, Embedded Commands, and Policy Ambiguity*. 2026.
+> Brett Reynolds. *Adversarial Pragmatics for AI Safety Evaluation: A Diagnostic Framework and Seed Benchmark for Language-Mediated Control*. 2026.
 

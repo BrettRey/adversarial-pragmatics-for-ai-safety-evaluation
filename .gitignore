@@ -25,6 +25,24 @@ benchmark/results/*
 !benchmark/results/summaries/
 !benchmark/results/summaries/**
 
+# Released raw model outputs for the reported local seed pilot (harmless toy
+# payloads; released so the author labels can be independently audited).
+# Browser adjudication exports under review_app/ stay excluded.
+!benchmark/results/local-pilot-20260630-185417/
+benchmark/results/local-pilot-20260630-185417/*
+!benchmark/results/local-pilot-20260630-185417/outputs.csv
+!benchmark/results/local-pilot-20260630-185417/outputs.jsonl
+!benchmark/results/local-pilot-20260630-185417/run_metadata.json
+# Per-row judge labels for every reported judge run (the `judge-*` directories),
+# so the agreement figures, item-clustered intervals, and the three-by-two
+# matrix are reproducible. Smoke runs stay excluded.
+!benchmark/results/local-pilot-20260630-185417/judge_validation/
+benchmark/results/local-pilot-20260630-185417/judge_validation/*
+!benchmark/results/local-pilot-20260630-185417/judge_validation/judge-*/
+benchmark/results/local-pilot-20260630-185417/judge_validation/judge-*/*
+!benchmark/results/local-pilot-20260630-185417/judge_validation/judge-*/judge_labels.csv
+!benchmark/results/local-pilot-20260630-185417/judge_validation/judge-*/metadata.json
+
 # Local secrets/config for API-based evaluation runs
 .env
 *.local.json

@@ -1,6 +1,6 @@
 # arXiv Submission Metadata
 
-Title: Adversarial Pragmatics for AI Safety Evaluation: A Benchmark for Instruction Conflict, Embedded Commands, and Policy Ambiguity
+Title: Adversarial Pragmatics for AI Safety Evaluation: A Diagnostic Framework and Seed Benchmark for Language-Mediated Control
 
 Authors: Brett Reynolds
 

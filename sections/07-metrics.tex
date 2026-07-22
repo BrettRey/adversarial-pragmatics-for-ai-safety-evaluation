@@ -1,7 +1,7 @@
 \section{Metrics}
 \label{sec:metrics}
 
-The benchmark reports a vector of eight metric families. Each is reported by phenomenon family, application surface, criterion, and named configuration before any decision-specific aggregation is considered. In the seed pilot only paired-contrast pass, refusal outcome, and judge validation are exercised; the remaining families are prospective, awaiting Study~B and repeated adjudication passes (Section~\ref{sec:limitations}).
+The benchmark reports a vector of eight metric families. Each is reported by phenomenon family, application surface, criterion, and named configuration before any decision-specific aggregation is considered. In the seed pilot only joint pair completion, refusal outcome, and judge validation are exercised; the remaining families are prospective, awaiting Study~B and repeated adjudication passes (Section~\ref{sec:limitations}).
 
 Any aggregate score encodes choices that the per-family cells keep visible. Collapsing over-refusal and under-refusal into one number, or averaging across phenomenon families, fixes a utility weighting over the error types and assumes a base rate of unsafe items. Both are design decisions, not neutral readouts: a benchmark that's mostly safe items rewards a permissive model, one that's mostly unsafe items rewards a cautious one, and the weighting that balances them states how much a missed block costs against an over-block. A decision maker may propose a utility, base rate, and decision rule for a specified deployment, but that proposal is a new assessment use requiring structural and consequential validation. It isn't a latent universal score recoverable from the raw vector.
 
@@ -14,7 +14,7 @@ label for the pair to count as correct. It's stricter than item accuracy: a
 model that always outputs \mention{BLUE}, always refuses, or always ignores
 untrusted content will fail pairs where the expected behaviour changes across
 variants. The seed-pilot statistic is reported more narrowly as a
-\term{paired-contrast pass}: it applies the joint success-and-compliance rule
+\term{joint pair completion}: it applies the joint success-and-compliance rule
 to broader development contrasts without claiming that they isolate one causal
 dimension.
 

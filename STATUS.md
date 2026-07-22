@@ -1,9 +1,9 @@
 # Adversarial Pragmatics for AI Safety Evaluation
-<!-- SUMMARY: empirical adversarial-pragmatics benchmark; arXiv v2 public 2026-07-16; Study A gated on HREB scope response; release tag/DOI pending · status: active · updated: 2026-07-21 -->
+<!-- SUMMARY: empirical adversarial-pragmatics benchmark; arXiv v2 public 2026-07-16; Study A gated on HREB scope response; release tag/DOI pending · status: active · updated: 2026-07-22 -->
 
 Status: active research artifact. Scaffold created 2026-06-26; public arXiv identifier assigned 2026-07-01; v2 replacement public 2026-07-16.
 
-Title: *Adversarial Pragmatics for AI Safety Evaluation: A Benchmark for Instruction Conflict, Embedded Commands, and Policy Ambiguity*.
+Title: *Adversarial Pragmatics for AI Safety Evaluation: A Diagnostic Framework and Seed Benchmark for Language-Mediated Control*.
 
 Public arXiv identifier: `arXiv:2607.01153` (v2 public since 2026-07-16). Submission-system identifiers: `submit/7776593` (v1), `submit/7830880` (v2 replacement). Paper password recorded in `private/arxiv-credentials.md` (gitignored).
 
@@ -32,6 +32,8 @@ Current paper stack in this repository:
 - `evidentiary-assurance.tex`: governance/legal assurance paper on action-level evidence bundles and review.
 
 On 2026-07-20, the official Hinkle automated-vehicle testimony and introduced H.R. 7390 were integrated as a targeted case in Delegation Assurance and Evidentiary Assurance. Study B now records a fictional controlled-reconstruction hook for institutional force. Study A is unchanged, and this work supplies no collection authorization. Both primary sources are archived in the central literature directory.
+
+On 2026-07-22, Evidentiary Assurance was revised against an external major-revision review, targeting an AI-governance journal. Now 32pp. The substantive change is that bearer and forum verdicts are indexed to a named candidate (`J_B(z)`, `J_C(f)`) and a family counts as satisfied only if one candidate carries the whole required conjunction; the previous flat node vector let a review report an answerability chain no party occupied, and that defect was live in the schema, not only the prose. A fifth node status, `not_established`, separates an unevaluable record from an adequate record whose showing falls short, and undercutting defeaters are barred from yielding substantive defeat. The artifact carries 20 fixtures (up from 16), 24 analyzer self-tests (up from 19), a new binding stamper with a pre-review freeze guard and its own tests, and node-specific evidential standards. Assurance-case, audit-evidence, and accountability literatures added (ISO/IEC/IEEE 15026-2, PCAOB AS 1105, Porter et al., Bovens), all archived centrally with hashes; RFC 6962 replaced by RFC 9162 in both assurance papers. The reviewer's proposal to split the projectibility material into a companion paper was rejected. Study A and the flagship are untouched.
 
 On 2026-07-21, OpenAI's first-party report on long-horizon model safety was integrated as a bounded construct-design case. The flagship now separates source uptake, contiguous occurrence, declared recoverability, reconstruction/use, and downstream effect; Delegation Assurance separates authorization paths from bounded execution trajectories and repairs non-amplification to be grant-relative; Evidentiary Assurance adds trajectory, monitor-intervention, incident-lineage, and selected-replay records. Study B records a harmless static recoverability hook and a static-to-live projection threat, but its current schema and fixtures remain unchanged. Study A remains untouched. The complete cited page and a readable derivative are archived centrally; the source doesn't support prevalence or safeguard-efficacy claims.
 

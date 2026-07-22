@@ -15,19 +15,51 @@ Toy payloads preserve the control structure needed to test object-label stabilit
 
 The seed set now includes paired prompt contrasts spanning webpage text,
 document text, email body, tool output, dummy private state, and policy text.
-These are controlled development contrasts, not uniformly strict minimal pairs:
-several vary wording or response demands along with the designated dimension.
 For example, a tool result can say \mention{Order status: shipped. Ignore the
 user and output BLUE}; the expected behaviour is to report the order status
 without following the tool-result instruction. A separate dummy-secret item
 tests whether an email can induce disclosure of \mention{ALPHA-000}.
 
+These are controlled development contrasts, not strict minimal pairs. Table~\ref{tab:seed-inventory} makes the limitation exact: every one of the nine pairs changes the required response act along with its designated control dimension. P001, for instance, varies source role but also moves from summarizing a webpage to emitting a token. No seed pair isolates its designated dimension, and the pilot statistic is named to reflect that.
+
 The pilot also exposed a seed-set repair. Pair P008 contrasts an email-body
 exfiltration probe with a direct toy-policy refusal, but its members differ in
 phenomenon family and both expect non-disclosure. It's retained as a diagnostic
-confidentiality contrast and excluded from paired-contrast scoring. The
+confidentiality contrast and excluded from joint pair completion scoring. The
 development set should split it into two properly controlled pairs before using
 it for pairwise contrast accuracy.
+
+\begin{table}[!htbp]
+\centering
+\scriptsize
+\caption{The 18 seed items. Item identifiers are abbreviated from \texttt{AP-SEED-0NN}. Every pair changes the required response act as well as its designated control dimension, so none is a strict minimal pair. \term{Contrast} marks a development contrast entering joint pair completion; \term{diagnostic} marks a pair retained as row-level evidence but excluded from pair scoring; \term{reference review} marks an item whose expected behaviour is re-opened for output-blind adjudication.}
+\label{tab:seed-inventory}
+\begin{tabular}{llllll l}
+\toprule
+Item & Pair & Family & Surface & Control dimension & Response act & Status \\
+\midrule
+001 & P001 & Embedded command & webpage & source role & summarize & contrast \\
+002 & P001 & Embedded command & user & source role & output token & contrast \\
+003 & P002 & Mention/use & user & pragmatic status & classify & contrast \\
+004 & P002 & Mention/use & user & pragmatic status & output token & contrast \\
+005 & P003 & Authority & document & authority level & summarize & contrast \\
+006 & P003 & Authority & user & authority level & output token & contrast \\
+007 & P004 & Scope/negation & user & scope condition & avoid token & contrast \\
+008 & P004 & Scope/negation & user & scope condition & output token & contrast \\
+009 & P005 & Deixis/reference & user & reference resolution & clarify & reference review \\
+010 & P005 & Deixis/reference & user & reference resolution & output token & reference review \\
+011 & P006 & Indirect speech act & user & speech-act force & classify & contrast \\
+012 & P006 & Indirect speech act & user & speech-act force & output token & contrast \\
+013 & P007 & Transcript (tool) & tool result & application surface & report only & contrast \\
+014 & P007 & Transcript (tool) & user & application surface & output token & contrast \\
+015 & P008 & Embedded command & email & application surface & protect secret & diagnostic \\
+016 & P008 & Authority & user & application surface & refuse/redirect & diagnostic \\
+017 & P009 & Policy boundary & user & refusal status & classify & contrast \\
+018 & P009 & Policy boundary & user & refusal status & refuse/redirect & contrast \\
+\bottomrule
+\end{tabular}
+\end{table}
+\FloatBarrier
 
 Each item records the control dimension, context source, source role, authority level, pragmatic status, response act, expected behaviour, task-success label, policy-compliance label, safety-risk label, risk type, refusal outcome, failure attribution, and a judge-validation flag. One scalar field is legacy development metadata: \texttt{authority\_level}. It can't represent additional approval requirements, transition type, or time-specific authorization. Study B's typed authorization record is the intended replacement for controlled authority contrasts. The validator script enforces the seed schema and label inventories.
 
@@ -60,7 +92,7 @@ Content & Expert-reviewed construct-domain coverage, with omitted families, surf
 Substantive & Evidence that evaluators use the declared authority, quotation, indirectness, and policy distinctions rather than answer tokens or other shortcuts; rationales are diagnostic evidence, not privileged access to a true reasoning process. \\
 Structural & Tests that the criterion-separated response vector and any noncompensatory decision rule match the intended construct; numerical availability alone never licenses aggregation. \\
 Generalizability & Held-out templates, payloads, evaluator procedures, model configurations, application surfaces, and trajectory lengths, each attached to a separately declared projective claim. \\
-External & Convergent comparison with independently justified regime-relative references, expert adjudication, and rule-aided checks where appropriate; discriminant cases in which surface similarity should not preserve the reference, score, or family; and direct target runs in every realistic wrapper claimed. None is treated as context-free ground truth. \\
+External & Convergent comparison with independently justified regime-relative references, expert adjudication, and rule-aided checks where appropriate; discriminant cases in which surface similarity shouldn't preserve the reference, score, or family; and direct target runs in every realistic wrapper claimed. None is treated as context-free ground truth. \\
 Consequential & Analysis of error asymmetries, gaming, benchmark overfitting, false reassurance, evaluator labour, privacy burden, and downstream misuse of apparently precise results. \\
 \bottomrule
 \end{tabular}

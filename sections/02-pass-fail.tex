@@ -10,4 +10,28 @@ The same issue appears on the evaluator side. LLM-as-judge methods can approxima
 
 Judge priors set a further limit. In one benchmark, judges given modified safety definitions changed an average of 5\% of their predictions, although faithful application required changes above 15\%. Reframing the same rubric as neutral classification more than doubled steerability, locating the resistance in the judge's trained safety boundary rather than in task comprehension \parencite{alloula2026safetyContextual}. A rubric is followed where it already agrees with the judge.
 
-The benchmark separates response-level judgments that are often collapsed: task success, policy compliance, visible safety risk, refusal outcome, failure attribution, and criterion-scoped uncertainty. Risk types and other criterion-specific classifications refine those judgments. Source sensitivity is different: it is derived from response patterns across controlled source contrasts rather than assigned to a single response. The annotation protocol treats disagreement among the resulting labels as an item or protocol diagnostic rather than as noise to be averaged away. A response can be task-successful but policy-noncompliant, policy-compliant but unhelpfully over-refusing, or safe but evidence of a grader's failure to distinguish a quoted instruction from an enacted one.
+The benchmark separates response-level judgments that are often collapsed: task success, policy compliance, visible safety risk, refusal outcome, failure attribution, and criterion-scoped uncertainty. Risk types and other criterion-specific classifications refine those judgments. Source sensitivity is different: it's derived from response patterns across controlled source contrasts rather than assigned to a single response. The annotation protocol treats disagreement among the resulting labels as an item or protocol diagnostic rather than as noise to be averaged away. A response can be task-successful but policy-noncompliant, policy-compliant but unhelpfully over-refusing, or safe but evidence of a grader's failure to distinguish a quoted instruction from an enacted one.
+
+Table~\ref{tab:comparators} sets those separations against six neighbouring benchmarks. The advantage claimed here isn't scale: every one of them is larger, several by orders of magnitude, and each covers ground this seed set doesn't. It's diagnostic resolution. Only two of the six score task success apart from policy compliance, none annotates pragmatic status alongside source role, and only one measures its own grader's error. The columns where this benchmark scores N are as informative as the ones where it scores Y. Its references are author-written rather than independently adjudicated, and the seed set carries no nuisance or placebo transformations. Those are the two gaps Study A and Study B exist to close, and they're why the pilot is reported as a development artifact rather than a validated measurement instrument.
+
+\begin{table}[!htbp]
+\centering
+\scriptsize
+\caption{What neighbouring benchmarks separate. Y = yes, P = partial, N = no or not reported; entries are read from each paper and the partial cases are bounded in its text. Columns: (a) task success scored apart from policy or safety compliance; (b) source role and pragmatic status both annotated; (c) expected behaviour adjudicated independently of the item author; (d) grader or judge error itself measured; (e) nuisance or placebo transformations that shouldn't change the expected answer; (f) transcript-level failure attribution; (g) an item may stay unresolved rather than being forced to a binary.}
+\label{tab:comparators}
+\begin{tabular}{lccccccc}
+\toprule
+Benchmark & (a) & (b) & (c) & (d) & (e) & (f) & (g) \\
+\midrule
+SEP \citep{zverev2025separate} & N & P & N & N & P & N & N \\
+AgentDojo \citep{debenedetti2024agentdojo} & Y & P & N & N & P & N & N \\
+IHEval \citep{zhang2025iheval} & P & P & N & N & Y & P & N \\
+BIPIA \citep{yi2025bipia} & P & N & N & N & P & N & N \\
+InjecAgent \citep{zhan2024injecagent} & P & P & N & N & P & P & Y \\
+Tensor Trust \citep{toyer2023tensor} & Y & P & P & Y & P & N & N \\
+\midrule
+This paper (seed) & Y & Y & N & Y & N & P & Y \\
+\bottomrule
+\end{tabular}
+\end{table}
+\FloatBarrier

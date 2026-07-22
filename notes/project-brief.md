@@ -8,7 +8,7 @@ This project should read as a concrete evaluation artifact, not as a disciplinar
 
 ## Working Title
 
-**Adversarial Pragmatics for AI Safety Evaluation: A Benchmark for Instruction Conflict, Embedded Commands, and Policy Ambiguity**
+**Adversarial Pragmatics for AI Safety Evaluation: A Diagnostic Framework and Seed Benchmark for Language-Mediated Control**
 
 Alternate strategic title:
 

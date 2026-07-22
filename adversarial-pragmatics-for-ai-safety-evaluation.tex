@@ -3,15 +3,16 @@
 % House style preamble
 \input{.house-style/preamble.tex}
 \usepackage{placeins}
+\usetikzlibrary{arrows.meta,positioning}
 \fancyhead[L]{\small\scshape Adversarial Pragmatics}
 
 % Update PDF metadata
 \hypersetup{
-  pdftitle={Adversarial Pragmatics for AI Safety Evaluation: A Benchmark for Instruction Conflict, Embedded Commands, and Policy Ambiguity},
+  pdftitle={Adversarial Pragmatics for AI Safety Evaluation: A Diagnostic Framework and Seed Benchmark for Language-Mediated Control},
   pdfkeywords={AI safety evaluation, adversarial pragmatics, instruction hierarchy, prompt injection, assessment validity, construct-domain coverage, LLM judges}
 }
 
-\title{Adversarial Pragmatics for AI Safety Evaluation: A Benchmark for Instruction Conflict, Embedded Commands, and Policy Ambiguity}
+\title{Adversarial Pragmatics for AI Safety Evaluation: A Diagnostic Framework and Seed Benchmark for Language-Mediated Control}
 \author{Brett Reynolds \orcidlink{0000-0003-0073-7195}%
 \thanks{I used OpenAI Codex and Anthropic Claude extensively in drafting and revising the paper. I reviewed, edited, and approved all the material and take full responsibility for the final text and conclusions. \href{mailto:brett.reynolds@humber.ca}{brett.reynolds@humber.ca}}\\
 Humber Polytechnic \& University of Toronto}
@@ -23,9 +24,9 @@ Humber Polytechnic \& University of Toronto}
 \begin{abstract}
 Safety evaluations for language models increasingly depend on judgments about ambiguous natural-language behaviour: whether a model has followed an instruction, refused appropriately, complied with a policy, resisted an embedded command, or misreported progress in an agentic task. Existing benchmarks often compress these distinctions into pass/fail labels, obscuring whether failures arise from capability limits, policy ambiguity, instruction conflict, scaffold failure, or unstable evaluator judgments.
 
-\term{Adversarial pragmatics}, as defined here, is safety-relevant model behaviour in cases involving instruction conflict, embedded commands, quotation, scope ambiguity, deixis, indirect speech acts, and multi-turn agent transcripts. This paper introduces a benchmark and annotation protocol for those cases.
+\term{Adversarial pragmatics}, as defined here, is safety-relevant model behaviour in cases involving instruction conflict, embedded commands, quotation, scope ambiguity, deixis, and indirect speech acts. It's designed to extend to multi-turn agent transcripts, which the seed set represents only by a single-turn tool-result contrast. This paper introduces a diagnostic framework, a seed benchmark, and an annotation protocol for those cases.
 
-The contribution is empirical and methodological: a linguistically controlled taxonomy, an 18-item seed benchmark with validator-enforced metadata, a 54-row local seed pilot, an expert-evaluation protocol that keeps task, policy, risk, refusal, attribution, and uncertainty judgments separate, and metrics for derived source sensitivity, assessment-route error, diagnostic ambiguity, and taxonomy drift. The benchmark separates four inference targets that a single \enquote{label} can otherwise conceal: the regime-relative reference, configured-system behaviour, the interpretation of evaluator outputs, and taxonomic assignment. Its initial intended use is diagnosis of items, rubrics, evaluator disagreement, and configured model behaviour in controlled evaluation work, not standalone deployment certification, vendor ranking, or general safety scoring. In the pilot, a rubric-aided LLM judge graded all 54 outputs, including 18 of its own, with expected-behaviour fields visible and still missed the safety-relevant minority classes.
+The contribution is empirical and methodological: a linguistically controlled taxonomy, an 18-item seed benchmark with validator-enforced metadata, a 54-row local seed pilot, an expert-evaluation protocol that keeps task, policy, risk, refusal, attribution, and uncertainty judgments separate, and metrics for derived source sensitivity, assessment-route error, diagnostic ambiguity, and taxonomy drift. The benchmark separates four inference targets that a single \enquote{label} can otherwise conceal: the regime-relative reference, configured-system behaviour, the interpretation of evaluator outputs, and taxonomic assignment. Its initial intended use is diagnosis of items, rubrics, evaluator disagreement, and configured model behaviour in controlled evaluation work, not standalone deployment certification, vendor ranking, or general safety scoring. In the pilot, a rubric-aided LLM judge graded all 54 outputs, including 18 of its own, with expected-behaviour fields visible and still missed the safety-relevant minority classes. Once agreement intervals are clustered by item rather than by row, its chance-corrected agreement is indistinguishable from a constant labeller in four of the six label families. Rejudging the same objects across three judge models and two rubric conditions leaves that failure intact: no configuration recovers partial task success, and the strongest cell reaches its aggregate advantage partly by never emitting the label at all.
 \end{abstract}
 
 \noindent\textbf{Keywords:} AI safety evaluation; adversarial pragmatics; instruction hierarchy; prompt injection; assessment validity; construct-domain coverage; LLM judges

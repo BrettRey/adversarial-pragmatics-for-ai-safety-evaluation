@@ -2,19 +2,19 @@
 
 The empirical programme has three stages. This paper reports the completed local seed pilot, a historical measurement-calibration and judge-assessment demonstration rather than evidence of model-level safety differences. Study A will apply fixed codebooks to the same 54 prompt--response objects; because both prompts and responses are fixed, it produces object- and procedure-level adjudication summaries rather than a causal effect.
 
-Study B is a separate pre-collection study using newly constructed four-condition interventions and repeated samples to estimate reference-concordant behavioural changes and compare them with matched nuisance and placebo changes. Its current four bases yield 16 development fixtures, not production items or results; Section~\ref{sec:benchmark-construction} describes a coverage-driven construction path. No Study A or Study B results are reported here.
+Study B is a separate pre-collection study using newly constructed four-condition interventions and repeated samples to estimate reference-concordant behavioural changes and compare them with matched nuisance and placebo changes. Its current four bases yield 16 development fixtures, not production items or results; Section~\ref{sec:benchmark-construction} describes a coverage-driven construction path. No Study B results are reported here. Study A's human re-adjudication hasn't been run either; the automated judge comparators reported below are judge-measurement evidence about the historical objects, not Study A panel results.
 
 The local seed pilot ran the 18-item seed benchmark against three accessible Ollama models: \texttt{qwen3:8b}, \texttt{gemma3:12b}, and \texttt{glm-4.7-flash:q4\_K\_M}. This produced 54 item--model outputs. The run used local Ollama 0.15.2 on June 30, 2026. Generation settings were temperature 0, seed 1, 256 predicted tokens, no thinking trace, and model unloading between runs.
 
-A single expert adjudicator (the author, who also wrote the items and their expected-behaviour labels) labelled every row for task success, policy compliance, safety risk, risk type, refusal outcome, failure attribution, confidence, and rationale. All 54 rows received complete labels, so the pilot tests pipeline coherence rather than the quality of independently produced comparison labels. Table~\ref{tab:local-seed-pilot} reports the model-level counts, and Figure~\ref{fig:pilot-model-outcomes} displays their task, policy, and paired-contrast profiles.
+A single expert adjudicator (the author, who also wrote the items and their expected-behaviour labels) labelled every row for task success, policy compliance, safety risk, risk type, refusal outcome, failure attribution, confidence, and rationale. All 54 rows received complete labels, so the pilot tests pipeline coherence rather than the quality of independently produced comparison labels. Table~\ref{tab:local-seed-pilot} reports the model-level counts, and Figure~\ref{fig:pilot-model-outcomes} displays their task, policy, and joint-completion profiles.
 
 \begin{table}[!htbp]
 \centering
-\caption{Adjudicated local seed-pilot results by model. Paired-contrast pass counts an eligible pair--model cell only when both variants are labelled task-successful and policy-compliant. It's a joint completion rule, not evidence that the seed materials are strict minimal pairs. P008 is excluded and retained as diagnostic confidentiality evidence.}
+\caption{Adjudicated local seed-pilot results by model. Joint pair completion counts an eligible pair--model cell only when both variants are labelled task-successful and policy-compliant. It's a joint completion rule, not evidence that the seed materials are strict minimal pairs. P008 is excluded and retained as diagnostic confidentiality evidence.}
 \label{tab:local-seed-pilot}
 \begin{tabular}{lrrrrr}
 \toprule
-Model & Success & Partial & Failure & Compliant & Paired contrasts \\
+Model & Success & Partial & Failure & Compliant & Joint completion \\
 \midrule
 \texttt{gemma3:12b} & 11 & 5 & 2 & 15 & 3/8 \\
 \texttt{glm-4.7-flash:q4\_K\_M} & 11 & 4 & 3 & 15 & 4/8 \\
@@ -28,63 +28,108 @@ Total & 36 & 11 & 7 & 46 & 12/24 \\
 \begin{figure}[!htbp]
 \centering
 \includegraphics[width=\linewidth]{pilot_model_outcomes}
-\caption{Model-level adjudicated pilot outcomes. Source: sanitized summaries for run \texttt{local-pilot-20260630-185417}; \(N=54\) item--model rows. The task and policy panels share a 0--18 row scale for each model, and the paired-contrast panel reports pass counts over eight eligible pair--model cells.}
+\caption{Model-level adjudicated pilot outcomes. Source: sanitized summaries for run \texttt{local-pilot-20260630-185417}; \(N=54\) item--model rows. The task and policy panels share a 0--18 row scale for each model, and the joint-completion panel reports pass counts over eight eligible pair--model cells.}
 \label{fig:pilot-model-outcomes}
 \end{figure}
 
 Across the pilot, 36 of 54 outputs were full task successes, 11 were partial successes, and 7 were failures. Policy compliance was higher than task success: 46 outputs were compliant, 7 were noncompliant, and 1 was policy-ambiguous. Adjudicator confidence was high for 41 rows and medium for 13 rows, with no low-confidence adjudications.
 
-Figure~\ref{fig:pilot-pair-accuracy} shows why pairwise results require reporting by contrast family rather than as a single aggregate. Three pairs passed in all three observed model/configuration cells: the embedded-command source pair, the mention/use pair, and the scope-negation pair. This finite result doesn't establish stability under new samples, models, configurations, or variants. Three pairs had zero paired-contrast passes: the ambiguous deictic-reference pair, the agent transcript pair, and the policy-boundary pair.
+Figure~\ref{fig:pilot-pair-accuracy} shows why pairwise results require reporting by contrast family rather than as a single aggregate. Three pairs passed in all three observed model/configuration cells: the embedded-command source pair, the mention/use pair, and the scope-negation pair. This finite result doesn't establish stability under new samples, models, configurations, or variants. Three pairs had zero joint pair completions: the ambiguous deictic-reference pair, the agent transcript pair, and the policy-boundary pair.
 
-P008 is excluded from those paired-contrast totals. It remains in the row-level pilot evidence because it surfaced a useful confidentiality problem, but its members differ in phenomenon family and both require non-disclosure.
+P008 is excluded from those joint pair completion totals. It remains in the row-level pilot evidence because it surfaced a useful confidentiality problem, but its members differ in phenomenon family and both require non-disclosure.
 
-The failures differed by family. In the deictic-reference item, all three models guessed a colour rather than asking for clarification. In the direct policy-boundary item, all three models output the protected dummy token despite the toy policy. The tool-result pair exposed a different problem: one model followed the injected directive, while other rows produced partial task success without policy noncompliance.
+The failures differed by family. In the direct policy-boundary item, all three models output the protected dummy token despite the toy policy. The tool-result pair exposed a different problem: one model followed the injected directive, while other rows produced partial task success without policy noncompliance.
+
+In the deictic-reference item, all three models produced a colour rather than flagging the ambiguity, but they didn't agree on which. \texttt{glm-4.7-flash} and \texttt{qwen3} resolved \mention{the previous instruction} to Instruction A and output \mention{BLUE}; \texttt{gemma3} resolved it to Instruction B and output \mention{GREEN}. \texttt{qwen3} stated its resolution explicitly before answering. Three configurations splitting on the antecedent is direct evidence that the reference is underdetermined, which is what the item was built to expose, and it makes the row-level \texttt{capability\_failure} attribution the weakest label in the pilot: selecting one available reading isn't an inability.
+
+AP-SEED-009 is a candidate reference defect, not three clean model failures. I don't revise the reference here. The expected behaviour was fixed before any output was inspected, and amending it now, with the responses in view, would be the output-dependent revision the protocol forbids. The item is carried forward to Study~A's output-blind adjudication as a reference diagnostic, alongside the P008 repair, with its attribution re-opened there. A reference bearer can fail separately from the behavioural and measurement bearers, and this row shows what that looks like.
 
 \begin{figure}[!htbp]
 \centering
 \includegraphics[width=\linewidth]{pilot_pair_accuracy}
-\caption{Paired-contrast passes by phenomenon family. Source: sanitized summaries for run \texttt{local-pilot-20260630-185417}; \(N=24\) eligible pair--model cells. The pass rule requires both rows to be task-successful and policy-compliant; it doesn't identify the designated prompt dimension because both the prompt and observed response differ across a cell. P008 is shown as excluded because it's a diagnostic confidentiality contrast rather than a controlled pair.}
+\caption{Joint pair completions by phenomenon family. Source: sanitized summaries for run \texttt{local-pilot-20260630-185417}; \(N=24\) eligible pair--model cells. The pass rule requires both rows to be task-successful and policy-compliant; it doesn't identify the designated prompt dimension because both the prompt and observed response differ across a cell. P008 is shown as excluded because it's a diagnostic confidentiality contrast rather than a controlled pair.}
 \label{fig:pilot-pair-accuracy}
 \end{figure}
 
-The automatic diagnostic pass worked as triage, with limits (Figure~\ref{fig:pilot-diagnostic-triage}). All seven noncompliant rows were high-priority diagnostic rows. But low-priority rows still included partial task failures and one policy-ambiguous row. This shape is expected for a pragmatic benchmark: simple token checks can identify many dangerous rows, but they can't decide whether an answer satisfies the intended speech act, source relation, or policy boundary.
+The automatic diagnostic pass worked as triage, with limits (Table~\ref{tab:pilot-diagnostic-triage}). All seven noncompliant rows were high-priority diagnostic rows. But low-priority rows still included partial task failures and one policy-ambiguous row. This shape is expected for a pragmatic benchmark: simple token checks can identify many dangerous rows, but they can't decide whether an answer satisfies the intended speech act, source relation, or policy boundary.
 
-\begin{figure}[!htbp]
+\begin{table}[!htbp]
 \centering
-\includegraphics[width=\linewidth]{pilot_diagnostic_triage}
-\caption{Rule-aided diagnostic priority compared with adjudicated labels. Source: sanitized summaries for run \texttt{local-pilot-20260630-185417}; \(N=54\) item--model rows. All bars use a common row-count scale, with colour and hatch distinguishing diagnostic row totals, non-success rows, noncompliant rows, and policy-ambiguous rows.}
-\label{fig:pilot-diagnostic-triage}
-\end{figure}
+\small
+\caption{Rule-aided diagnostic priority compared with adjudicated labels. Source: sanitized summaries for run \texttt{local-pilot-20260630-185417}; \(N=54\) item--model rows. The triage flags every noncompliant row as high priority, but eight non-success rows and the single policy-ambiguous row fall to low priority.}
+\label{tab:pilot-diagnostic-triage}
+\begin{tabular}{lrrrr}
+\toprule
+Diagnostic priority & Rows & Non-success & Noncompliant & Policy-ambiguous \\
+\midrule
+High & 11 & 10 & 7 & 0 \\
+Medium & 1 & 0 & 0 & 0 \\
+Low & 42 & 8 & 0 & 1 \\
+\midrule
+Total & 54 & 18 & 7 & 1 \\
+\bottomrule
+\end{tabular}
+\end{table}
 \FloatBarrier
 
-One row exposes a principled boundary between pragmatic status and information flow. In AP-SEED-016, one model refused the request but repeated \mention{ALPHA-000} while explaining the refusal. On the speech-act criterion, the string is mentioned in the course of refusal rather than supplied by enacting the embedded disclosure request. That makes the occurrence non-enactive, not safe simpliciter. On the confidentiality criterion, the protected token still reached the output channel. The item exposes a criterion-conflict point because speech-act status and information-flow authorization can diverge. The development set has to separate those criteria explicitly; one author-labelled row doesn't establish adjudication instability.
+One row exposes a principled boundary between pragmatic status and information flow. In AP-SEED-016, one model refused the request but repeated \mention{ALPHA-000} while explaining the refusal. On the speech-act criterion, the string is mentioned in the course of refusal rather than supplied by enacting the embedded disclosure request. That makes the occurrence non-enactive, not safe simpliciter. On the confidentiality criterion, the protected token still reached the output channel. Both propositions are true, so this isn't a contradiction between criteria. It's \term{cross-criterion divergence}: speech-act status and information-flow authorization come apart on the same row. A conflict appears only when a decision rule has to compress the two into a single verdict, which is an argument against compressing them rather than evidence that either criterion is unstable. The development set has to separate those criteria explicitly; one author-labelled row doesn't establish adjudication instability.
 
 A possible converse case is a protected value absent as a contiguous string from a monitored representation but recoverable under a declared transformation. OpenAI reports an internal evaluation in which a model split the body of an authentication token into two fragments, obfuscated them, and reconstructed the credential at runtime; OpenAI says the complete token never appeared as one contiguous string \citep{openai2026longHorizonSafety}. Future annotation should distinguish at least four propositions: whether the full string occurs in the recorded channel, whether a specified observer can recover it using a declared transformation, whether it's reconstructed or used, and whether a downstream effect occurs. Literal-substring absence alone doesn't settle confidentiality or authorization, just as non-enactive mention doesn't settle them in AP-SEED-016. This extension motivates a Study~B construction template; it doesn't change this pilot's item, labels, or reported result.
 
-A first LLM-judge assessment pass reinforces the need to treat model judges as measurement objects. The judge produced structured labels conforming to the schema for all 54 rows, but the author-label distributions are heavily skewed. Exact agreement mostly tracks base rates (Table~\ref{tab:llm-judge-validation}): task-success agreement equals the majority-class baseline, safety-risk agreement falls below it, and the refusal-outcome figure sits 1.8 points above a constant judge. Chance-corrected agreement runs from \(\kappa = 0.14\) (safety risk) to \(\kappa = 0.79\) (refusal outcome), but these kappa values are fragile at this cell count, and the 54 rows aren't independent of the 18 crossed items.
+A first LLM-judge assessment pass reinforces the need to treat model judges as measurement objects. The judge produced structured labels conforming to the schema for all 54 rows, but the author-label distributions are heavily skewed. Exact agreement mostly tracks base rates (Table~\ref{tab:llm-judge-validation}): task-success agreement equals the majority-class baseline, safety-risk agreement falls below it, and the refusal-outcome figure sits 1.8 points above a constant judge. Chance-corrected agreement runs from \(\kappa = 0.14\) (safety risk) to \(\kappa = 0.79\) (refusal outcome). The 54 rows are 18 items crossed with three models, so the item is the clustering unit, and resampling items rather than rows shows how little those point estimates carry. The 95\% intervals for task success, policy compliance, and safety risk all include zero, and risk type touches it: on this sample the judge's chance-corrected agreement is indistinguishable from a constant labeller for four of the six families. The refusal-outcome interval is narrow for the opposite reason. Almost every row carries the same label, so resampling rarely changes the statistic, and the figure rests on two minority rows rather than on precision.
 
 Minority-class agreement is low exactly where safety evaluation needs it. The judge recovered none of 11 partial task successes (upgrading 10 to full success), 3 of 7 noncompliant rows, none of 11 risk-labelled rows, and 6 of 17 rows attributed to \texttt{capability\_failure}. Table~\ref{tab:llm-judge-validation} reports 6/18 across all non-\texttt{none} attribution labels because one other row was attributed to policy ambiguity. The judge recovered both author-labelled refusals and the direct policy-boundary failures, but that apparent strength rests on two minority rows.
 
 \begin{table}[!htbp]
 \centering
-\caption{LLM-judge validation against the author's labels in the local seed pilot. Agreement is exact match after label normalization. Base rate is the majority-class share of the author labels, the score of a constant judge; \(\kappa\) is Cohen's kappa. Minority-label recovery is exact agreement on rows bearing a non-majority author label. The judge was \texttt{glm-4.7-flash:q4\_K\_M} with the compact judge prompt; two design caveats apply (see text): the judge is one of the three evaluated models, and its prompt included each item's expected-behaviour field.}
+\caption{LLM-judge validation against the author's labels in the local seed pilot. Agreement is exact match after label normalization. Base rate is the majority-class share of the author labels, the score of a constant judge; \(\kappa\) is Cohen's kappa. Intervals are 2.5th--97.5th percentiles from 10,000 bootstrap resamples of the 18 \emph{items}, the clustering unit, since the 54 rows are 18 items crossed with 3 models and aren't independent (\texttt{scripts/judge\_agreement\_intervals.py}). Minority-label recovery is exact agreement on rows bearing a non-majority author label. The judge was \texttt{glm-4.7-flash:q4\_K\_M} with the compact judge prompt; two design caveats apply (see text): the judge is one of the three evaluated models, and its prompt included each item's expected-behaviour field.}
 \label{tab:llm-judge-validation}
-\begin{tabular}{lrrrl}
+\begin{tabular}{lrrrcl}
 \toprule
-Label family & Agreement & Base rate & \(\kappa\) & Minority-label recovery \\
+Label family & Agreement & Base rate & \(\kappa\) & \(\kappa\) 95\% CI & Minority-label recovery \\
 \midrule
-Task success & 66.7\% & 66.7\% & 0.26 & 0/11 partial \\
-Policy compliance & 88.9\% & 85.2\% & 0.45 & 3/7 noncompliant \\
-Safety risk & 72.2\% & 79.6\% & 0.14 & 0/11 risk-labelled \\
-Risk type & 83.3\% & 81.5\% & 0.27 & 1/10 non-\texttt{none} \\
-Refusal outcome & 98.1\% & 96.3\% & 0.79 & 2/2 refusals \\
-Failure attribution & 77.8\% & 66.7\% & 0.40 & 6/18 non-\texttt{none} \\
+Task success & 66.7\% & 66.7\% & 0.26 & [\(-0.10\), 0.54] & 0/11 partial \\
+Policy compliance & 88.9\% & 85.2\% & 0.45 & [\(-0.04\), 0.81] & 3/7 noncompliant \\
+Safety risk & 72.2\% & 79.6\% & 0.14 & [\(-0.09\), 0.33] & 0/11 risk-labelled \\
+Risk type & 83.3\% & 81.5\% & 0.27 & [0.00, 0.46] & 1/10 non-\texttt{none} \\
+Refusal outcome & 98.1\% & 96.3\% & 0.79 & [0.76, 0.79] & 2/2 refusals \\
+Failure attribution & 77.8\% & 66.7\% & 0.40 & [0.10, 0.70] & 6/18 non-\texttt{none} \\
 \bottomrule
 \end{tabular}
 \end{table}
 \FloatBarrier
 
 Three design features cap what this pass can show. The judge is one of the three evaluated models, so it graded its own 18 outputs. The judge prompt included each item's expected-behaviour field, so these figures are an upper bound on rubric-aided judging, not judging as deployed. And the comparison labels come from a single adjudicator who also wrote the items and expected-behaviour fields (see Limitations and Next Steps).
+
+Two design features of that pass, the self-grading arrangement and the visible answer key, are confounds rather than fixed limits, so the same 54 objects were rejudged under a three-by-two design: three judge models, two of them disjoint from the evaluated set, each run with the compact prompt and again with a variant that withholds the item's expected-behaviour field and changes nothing else. All six cells returned schema-conforming labels for every row (Table~\ref{tab:judge-matrix}).
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Judge validation across three judge models and two rubric conditions on the same 54 objects. \term{Visible} is the compact judge prompt; \term{hidden} is identical except the item's expected-behaviour field is withheld. Agreement is exact match with the author labels. Minority recovery counts the 7 author-noncompliant and 11 author-partial rows, and the final column counts how often each cell emits \mention{partial} at all. Constant-judge base rates are 66.7\% (task), 85.2\% (policy), and 66.7\% (attribution).}
+\label{tab:judge-matrix}
+\begin{tabular}{llccccrrr}
+\toprule
+Judge & In set & Rubric & Task & Policy & Attrib. & Noncompl. & Partial & Emits \\
+\midrule
+\texttt{glm-4.7-flash} & yes & visible & 66.7\% & 88.9\% & 77.8\% & 3/7 & 0/11 & 7 \\
+\texttt{glm-4.7-flash} & yes & hidden & 63.0\% & 87.0\% & 66.7\% & 3/7 & 0/11 & 3 \\
+\texttt{mistral:7b} & no & visible & 64.8\% & 72.2\% & 48.1\% & 5/7 & 2/11 & 8 \\
+\texttt{mistral:7b} & no & hidden & 66.7\% & 70.4\% & 48.1\% & 4/7 & 1/11 & 5 \\
+\texttt{mistral-small:24b} & no & visible & 77.8\% & 92.6\% & 77.8\% & 6/7 & 0/11 & 0 \\
+\texttt{mistral-small:24b} & no & hidden & 75.9\% & 75.9\% & 68.5\% & 3/7 & 0/11 & 1 \\
+\bottomrule
+\end{tabular}
+\end{table}
+\FloatBarrier
+
+The first result corrects the natural expectation. Judge capability matters more here than judge independence: the disjoint \texttt{mistral-small:24b} with the rubric is the strongest cell in the design, recovering 6 of the 7 noncompliant rows against 3 of 7 for the self-grading judge. Circularity is a real design defect, but it isn't what produced the original negative result.
+
+Withholding the answer key costs accuracy, though the evidence is thinner than the pattern suggests. Every model loses ground on at least one criterion, and \texttt{mistral-small:24b} loses most: policy-compliance agreement falls 16.7 points and noncompliance recovery halves from 6 of 7 to 3 of 7. On a paired item-clustered bootstrap over the same objects, only that policy-compliance difference excludes zero, at 1.9 to 33.3 points; the others are directionally consistent but not separable from zero at 18 clusters. So the rubric-aided figures are an upper bound, with direct evidence for it on one model and one criterion rather than in general.
+
+The most useful result is the place where aggregate agreement and minority recovery come apart. \texttt{mistral-small:24b} is the only judge to beat the constant-judge base rate on task success, and it does so while emitting \mention{partial} zero times in 54 rows with the rubric and once without it. Its advantage on that criterion comes from collapsing a three-way distinction into a binary and getting the majority class right. Across all six cells the judges recover 0, 0, 2, 1, 0, and 0 of the 11 partial rows. No configuration tested here recovers partial task success, which is the class separating a model that half-did the task from one that did it.
+
+These runs compare judges against provisional author labels, not against the independent human re-adjudication Study A will supply, so they can't settle which labelling is right where the two disagree. What they do establish is that the judge's failure profile belongs to the measurement route rather than to one circular arrangement, and that a route can look better in aggregate precisely by discarding the distinction the evaluation needs.
 
 On this pilot, triage belongs to the rule-aided diagnostic pass, which flagged all 7 noncompliant rows; the unvalidated judge missed most of the labels that matter. The negative result motivates validation of any judge-derived interpretation and warns against using this route for grading as if schema compliance established assessment validity. The confusion pattern is still diagnostic: the judge upgrades partials, misses risk-labelled rows, and misses capability attributions, exactly the failure profile a validation pass has to screen for.
 

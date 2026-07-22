@@ -1,0 +1,97 @@
+{
+  "command": "scripts/run_llm_judge_validation.py --run-dir benchmark/results/local-pilot-20260630-185417 --model glm-4.7-flash:q4_K_M --prompt-variant compact --judge-run-id judge-validation-glm-compact-20260701 --timeout 240",
+  "created_at": "2026-07-01T14:29:31Z",
+  "cwd": "/Users/brettreynolds/projects/LLM-CLI-projects/papers/active/adversarial-pragmatics-for-ai-safety-evaluation",
+  "git": {
+    "head": {
+      "ok": true,
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "b80a45d"
+    },
+    "status_short": {
+      "ok": true,
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "M Makefile\n M benchmark/results/README.md\n M benchmark/results/summaries/README.md\n?? benchmark/results/summaries/local-pilot-20260630-185417-judge-validation-confusion.csv\n?? benchmark/results/summaries/local-pilot-20260630-185417-judge-validation-phenomenon-summary.csv\n?? benchmark/results/summaries/local-pilot-20260630-185417-judge-validation-readout.md\n?? benchmark/results/summaries/local-pilot-20260630-185417-judge-validation-summary.csv\n?? scripts/run_llm_judge_validation.py"
+    }
+  },
+  "judge_run_id": "judge-validation-glm-compact-20260701",
+  "ollama": {
+    "tags": {
+      "models": [
+        {
+          "details": {
+            "families": [
+              "glm4moelite"
+            ],
+            "family": "glm4moelite",
+            "format": "gguf",
+            "parameter_size": "29.9B",
+            "parent_model": "",
+            "quantization_level": "Q4_K_M"
+          },
+          "digest": "4475827791a269b02c8ec49b1c3bc1abb5846bacf3fae015b75d33986322d8f6",
+          "model": "glm-4.7-flash:q4_K_M",
+          "modified_at": "2026-06-30T18:41:02.209174927-04:00",
+          "name": "glm-4.7-flash:q4_K_M",
+          "size": 19019270897
+        },
+        {
+          "details": {
+            "families": [
+              "gemma3"
+            ],
+            "family": "gemma3",
+            "format": "gguf",
+            "parameter_size": "12.2B",
+            "parent_model": "",
+            "quantization_level": "Q4_K_M"
+          },
+          "digest": "f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a",
+          "model": "gemma3:12b",
+          "modified_at": "2026-06-30T18:36:54.309609695-04:00",
+          "name": "gemma3:12b",
+          "size": 8149190253
+        },
+        {
+          "details": {
+            "families": [
+              "qwen3"
+            ],
+            "family": "qwen3",
+            "format": "gguf",
+            "parameter_size": "8.2B",
+            "parent_model": "",
+            "quantization_level": "Q4_K_M"
+          },
+          "digest": "500a1f067a9f782620b40bee6f7b0c89e17ae61f686b92c24933e4ca4b2b8b41",
+          "model": "qwen3:8b",
+          "modified_at": "2026-06-30T18:34:56.166967473-04:00",
+          "name": "qwen3:8b",
+          "size": 5225388164
+        }
+      ]
+    },
+    "url": "http://127.0.0.1:11434",
+    "version": {
+      "ok": true,
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "ollama version is 0.15.2"
+    }
+  },
+  "row_count": 54,
+  "run_dir": "/Users/brettreynolds/projects/LLM-CLI-projects/papers/active/adversarial-pragmatics-for-ai-safety-evaluation/benchmark/results/local-pilot-20260630-185417",
+  "script_version": "0.1.0",
+  "settings": {
+    "judge_model": "glm-4.7-flash:q4_K_M",
+    "keep_alive": "5m",
+    "limit": null,
+    "num_predict": 512,
+    "prompt_variant": "compact",
+    "seed": 7,
+    "temperature": 0.0,
+    "timeout": 240
+  }
+}

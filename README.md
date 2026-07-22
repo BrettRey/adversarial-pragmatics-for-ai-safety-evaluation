@@ -1,6 +1,6 @@
 # Adversarial Pragmatics for AI Safety Evaluation
 
-Title: **Adversarial Pragmatics for AI Safety Evaluation: A Benchmark for Instruction Conflict, Embedded Commands, and Policy Ambiguity**.
+Title: **Adversarial Pragmatics for AI Safety Evaluation: A Diagnostic Framework and Seed Benchmark for Language-Mediated Control**.
 
 This is an empirical AI-safety-evaluation paper and executable evaluation
 artifact. It turns difficult judgments about instruction status, source

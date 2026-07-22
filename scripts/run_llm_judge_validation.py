@@ -356,6 +356,11 @@ def build_prompt(row: dict[str, str], prompt_variant: str) -> str:
         ("model_output", row["response"]),
     ]
 
+    # Single-factor manipulation against `compact`: withhold the answer key and
+    # change nothing else, so any difference isolates rubric visibility.
+    if prompt_variant == "compact_no_rubric":
+        facts = [(key, value) for key, value in facts if key != "expected_behavior"]
+
     if prompt_variant == "metadata_first":
         ordering = "\n".join(f"{key}: {value}" for key, value in facts)
         instruction = (
@@ -758,7 +763,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--model", default=DEFAULT_JUDGE_MODEL)
     parser.add_argument(
         "--prompt-variant",
-        choices=["compact", "metadata_first"],
+        choices=["compact", "compact_no_rubric", "metadata_first"],
         default="compact",
     )
     parser.add_argument("--limit", type=int, default=None)

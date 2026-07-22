@@ -1,0 +1,115 @@
+{
+  "command": "scripts/run_local_pilot.py --models qwen3:8b gemma3:12b glm-4.7-flash:q4_K_M",
+  "created_at": "2026-06-30T22:54:17Z",
+  "cwd": "/Users/brettreynolds/projects/LLM-CLI-projects/papers/active/adversarial-pragmatics-for-ai-safety-evaluation",
+  "git": {
+    "head": {
+      "ok": true,
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "2ba3bdc"
+    },
+    "status_short": {
+      "ok": true,
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "M Makefile\n M benchmark/README.md\n M benchmark/results/README.md\n M notes/source-verification.md\n M sections/01-evaluation-problem.tex\n M sections/06-experiments.tex\n M sections/07-metrics.tex\n M sections/09-conclusion.tex\n?? notes/local-pilot-infrastructure-plan.md\n?? scripts/run_local_pilot.py"
+    }
+  },
+  "ollama": {
+    "models_requested": [
+      "qwen3:8b",
+      "gemma3:12b",
+      "glm-4.7-flash:q4_K_M"
+    ],
+    "tags": {
+      "models": [
+        {
+          "details": {
+            "families": [
+              "glm4moelite"
+            ],
+            "family": "glm4moelite",
+            "format": "gguf",
+            "parameter_size": "29.9B",
+            "parent_model": "",
+            "quantization_level": "Q4_K_M"
+          },
+          "digest": "4475827791a269b02c8ec49b1c3bc1abb5846bacf3fae015b75d33986322d8f6",
+          "model": "glm-4.7-flash:q4_K_M",
+          "modified_at": "2026-06-30T18:41:02.209174927-04:00",
+          "name": "glm-4.7-flash:q4_K_M",
+          "size": 19019270897
+        },
+        {
+          "details": {
+            "families": [
+              "gemma3"
+            ],
+            "family": "gemma3",
+            "format": "gguf",
+            "parameter_size": "12.2B",
+            "parent_model": "",
+            "quantization_level": "Q4_K_M"
+          },
+          "digest": "f4031aab637d1ffa37b42570452ae0e4fad0314754d17ded67322e4b95836f8a",
+          "model": "gemma3:12b",
+          "modified_at": "2026-06-30T18:36:54.309609695-04:00",
+          "name": "gemma3:12b",
+          "size": 8149190253
+        },
+        {
+          "details": {
+            "families": [
+              "qwen3"
+            ],
+            "family": "qwen3",
+            "format": "gguf",
+            "parameter_size": "8.2B",
+            "parent_model": "",
+            "quantization_level": "Q4_K_M"
+          },
+          "digest": "500a1f067a9f782620b40bee6f7b0c89e17ae61f686b92c24933e4ca4b2b8b41",
+          "model": "qwen3:8b",
+          "modified_at": "2026-06-30T18:34:56.166967473-04:00",
+          "name": "qwen3:8b",
+          "size": 5225388164
+        }
+      ]
+    },
+    "url": "http://127.0.0.1:11434",
+    "version": {
+      "ok": true,
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "ollama version is 0.15.2"
+    }
+  },
+  "output_dir": "/Users/brettreynolds/projects/LLM-CLI-projects/papers/active/adversarial-pragmatics-for-ai-safety-evaluation/benchmark/results/local-pilot-20260630-185417",
+  "platform": {
+    "machine": "arm64",
+    "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+    "processor": "arm"
+  },
+  "python": "3.14.5 (main, May 10 2026, 10:21:34) [Clang 21.0.0 (clang-2100.0.123.102)]",
+  "run_id": "local-pilot-20260630-185417",
+  "script_version": "0.1.0",
+  "settings": {
+    "items": "/Users/brettreynolds/projects/LLM-CLI-projects/papers/active/adversarial-pragmatics-for-ai-safety-evaluation/benchmark/items/seed-items.csv",
+    "keep_alive": "2m",
+    "limit": null,
+    "models": [
+      "qwen3:8b",
+      "gemma3:12b",
+      "glm-4.7-flash:q4_K_M"
+    ],
+    "num_predict": 256,
+    "ollama_url": "http://127.0.0.1:11434",
+    "resume": false,
+    "seed": 1,
+    "temperature": 0.0,
+    "think": false,
+    "timeout": 300,
+    "unload_between_models": true
+  }
+}

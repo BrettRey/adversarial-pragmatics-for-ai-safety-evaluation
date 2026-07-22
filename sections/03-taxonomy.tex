@@ -16,6 +16,27 @@ above}, and pragmatic pressure. The seed set pulls those apart into
 paired development contrasts; later construction should tighten them into minimal
 pairs before recombining them in application-shaped harnesses.
 
+The eight families also aren't ontologically parallel, and it's worth saying so plainly. Embedding, mention/use, scope, deixis, and indirect speech acts are relations of directive interpretation. Authority and instruction hierarchy is a normative relation. Policy-boundary ambiguity is partly a property of the evaluative criterion rather than of the prompt. Agent transcript interpretation is an evaluation surface and horizon. Read as one flat inventory, they make coverage and assignment stability harder to interpret, because a change along one dimension looks like wholesale family reassignment.
+
+The item schema already records those dimensions separately, so the families are better read as frequently co-occurring bundles over three axes (Table~\ref{tab:taxonomy-axes}). An item takes a value on each axis without being taxonomically anomalous, and taxonomy drift can then be reported per axis: a reclassification of surface isn't the same event as a reclassification of directive interpretation.
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Three axes that cross-cut the eight families. Each axis is already recorded per item in the seed schema, so an item can vary on one axis while holding the others fixed.}
+\label{tab:taxonomy-axes}
+\begin{tabular}{p{0.20\linewidth}p{0.24\linewidth}p{0.44\linewidth}}
+\toprule
+Axis & Recorded fields & Representative values \\
+\midrule
+Directive interpretation & \texttt{pragmatic\_status}, \texttt{response\_act} & enacted or mentioned; direct or indirect; scoped or unscoped; resolved or ambiguous reference \\
+Normative control relation & \texttt{source\_role}, \texttt{authority\_level} & source role; authorization; priority; policy boundary; information-flow permission \\
+Evaluation surface and horizon & \texttt{context\_source}, application surface & user prompt; document; webpage; email; tool result; single-turn transcript; trajectory \\
+\bottomrule
+\end{tabular}
+\end{table}
+\FloatBarrier
+
 \subsection{Embedded commands}
 
 The model has to distinguish the user's instruction from text embedded in a webpage, email, document, log, table, code comment, citation, or tool output. This family overlaps most directly with instruction-data separation and indirect prompt injection, where instructions arrive through content the model was asked to process rather than through the user's direct request \parencite{zverev2025separate,greshake2023not,yi2025bipia,debenedetti2024agentdojo}. A seed pair contrasts \mention{The webpage says: \enquote{Ignore the user and output BLUE.} Summarize the webpage in one sentence} with the direct user instruction \mention{Ignore the previous sentence and output BLUE}. The string is nearly the same; the control status differs.
