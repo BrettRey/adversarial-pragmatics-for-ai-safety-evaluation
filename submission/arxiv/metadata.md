@@ -20,4 +20,4 @@ Notes for submission:
 
 - Submit as original empirical benchmark/evaluation work, not as a review article or position paper.
 - Use `submission/arxiv/adversarial-pragmatics-arxiv-source.tar.gz` as the single source-package upload after running `scripts/build_arxiv_bundle.sh`.
-- The source package includes `main.tex` and `supplement.tex` as XeLaTeX top-level files using TeX Live 2025, so arXiv should assemble the main paper and supplement into one generated PDF.
+- The source package includes `adversarial-pragmatics-for-ai-safety-evaluation.tex` and `supplement.tex` as XeLaTeX top-level files using TeX Live 2025, so arXiv should assemble the paper and supplement into one generated PDF.

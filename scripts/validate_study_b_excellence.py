@@ -717,7 +717,10 @@ def claim_errors(path: Path, schema_path: Path) -> list[str]:
 
 
 def prose_errors() -> list[str]:
-    paths = [ROOT / "main.tex", *sorted((ROOT / "sections").glob("*.tex"))]
+    paths = [
+        ROOT / "adversarial-pragmatics-for-ai-safety-evaluation.tex",
+        *sorted((ROOT / "sections").glob("*.tex")),
+    ]
     text = "\n".join(path.read_text(encoding="utf-8") for path in paths)
     forbidden = {
         "label projectibility": "the four projective bearers must remain separate",

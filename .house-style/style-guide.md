@@ -45,7 +45,7 @@ The condensed directive for `.tex` edits. Full per-rule detail in the sections b
 ## Tools
 
 - `/check-style` - Slash command to audit a file for violations
-- `.house-style/check-style.py main.tex` - Linter script
+- `.house-style/check-style.py adversarial-pragmatics-for-ai-safety-evaluation.tex` - Linter script
 <!-- /claude-rule -->
 
 ## Quarto Quick Reference (Agent Brief)

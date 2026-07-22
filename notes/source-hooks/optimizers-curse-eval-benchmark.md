@@ -1,4 +1,4 @@
-# Source hook: optimizer's curse -> benchmark/eval paper (main.tex)
+# Source hook: optimizer's curse -> benchmark/eval paper (adversarial-pragmatics-for-ai-safety-evaluation.tex)
 - Central note: `literature/smith-winkler-2006-optimizers-curse.notes.md`
 - Cite: Smith & Winkler 2006 (`smith2006optimizersCurse`); optionally Gelman 2026 post (`gelman2026optimizersCurse`). Both in `references-local.bib`.
 

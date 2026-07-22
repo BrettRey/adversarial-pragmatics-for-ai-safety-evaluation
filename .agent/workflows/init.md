@@ -38,7 +38,7 @@ This workflow orients you to the project. Use it at the start of any new session
 - `outline.md`, `PLAN.md`, `docs/`, `notes/`
 
 **For current draft:**
-- `main.tex` (or the largest `*.tex` in the repo root)
+- `adversarial-pragmatics-for-ai-safety-evaluation.tex` (or the largest `*.tex` in the repo root)
 
 **For bibliography:**
 - `references.bib` or `refs.bib`
@@ -57,11 +57,11 @@ pdftotext "PATH/filename.pdf" - | rg -n "keyword"
 ## Full Initialization (New to Project)
 
 1. **Read `CLAUDE.md` and `AGENTS.md` (if present)** — overview, build commands, house style
-2. **Skim the main TeX file** (`main.tex` or equivalent) for structure and macro conventions
+2. **Skim the primary TeX file** (`adversarial-pragmatics-for-ai-safety-evaluation.tex` or equivalent) for structure and macro conventions
 3. **Locate bibliography + figure folders** so you know where to add assets
 4. **Run a quick build** (optional, if you have TeX installed)
    - `make quick` or `make`
-   - otherwise: `latexmk -pdf main.tex`
+   - otherwise: `latexmk -pdf adversarial-pragmatics-for-ai-safety-evaluation.tex`
 
 ## Process Reminders
 

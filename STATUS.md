@@ -26,7 +26,7 @@ Current artifact:
 
 Current paper stack in this repository:
 
-- `main.tex`: empirical adversarial-pragmatics seed benchmark and pilot.
+- `adversarial-pragmatics-for-ai-safety-evaluation.tex`: empirical adversarial-pragmatics seed benchmark and pilot.
 - `supplement.tex`: schema, item inventory, protocol, reproducibility notes, and sanitized pilot summaries.
 - `delegation-assurance.tex`: framework paper on status, priority, licensing, and evidence standards for delegated machine action.
 - `evidentiary-assurance.tex`: governance/legal assurance paper on action-level evidence bundles and review.
@@ -57,7 +57,7 @@ Use XeLaTeX.
 make
 make all-papers
 make test
-python3 .house-style/check-style.py main.tex delegation-assurance.tex evidentiary-assurance.tex supplement.tex
+python3 .house-style/check-style.py adversarial-pragmatics-for-ai-safety-evaluation.tex delegation-assurance.tex evidentiary-assurance.tex supplement.tex
 ```
 
 Build the arXiv source package with:
@@ -303,3 +303,12 @@ Sources routed from a *Cognition* 2026 batch. Central index: `literature/cogniti
 - Verified all 80 unique cited sources locally and cleaned bibliography metadata. Final builds are AP 23 pages, DA 35, and EA 25; ordinary Biber and house-style checks pass, and visual QA removed three near-empty pagination artifacts.
 - Study A's data, code, and frozen analysis paths were unchanged. The executable Stage-5 exit is met, but external gates remain: independent Study B references and target runs; DA's three target programmes and institutional comparison; and EA's genuine blinded reviewer study and forum-specific review.
 - No commit, tag, push, recruitment, collection, unblinding, or target-data generation was performed in this revision.
+
+## 2026-07-22 Filename and outreach-preparation session
+
+- The projectibility-first assurance revision described above was subsequently committed and pushed as `95e927b`.
+- Renamed the Adversarial Pragmatics entry point and generated artifact family from generic `main.*` names to `adversarial-pragmatics-for-ai-safety-evaluation.*`. Delegation Assurance and Evidentiary Assurance already had useful filenames and remain unchanged; the supplement remains `supplement.*`.
+- Updated the Makefile, validators, cited-source scanner, project instructions, status and workflow references, source hook, arXiv bundler, and submission metadata. The regenerated arXiv package uses `adversarial-pragmatics-for-ai-safety-evaluation.tex` as its first top-level source. Historical records and one external project's genuine `main.tex` path remain unchanged.
+- Forced fresh XeLaTeX/Biber builds produced AP 23 pages, DA 35 pages, EA 25 pages, and the supplement 10 pages. House style, `make assurance-check`, final-log scans, an independent filename audit, and clean-extraction arXiv builds all pass. The rebuilt DA and EA hashes were refreshed in the cited-source archive.
+- Drafted `correspondence/2026-07-22-trustai-founder-outreach.md`: a product-specific false-green stress-test proposal leading, if there is interest, to a bounded paid two-week pilot on one harmless shadow ERP/MCP workflow. No outreach was sent in this session.
+- The filename rename, its reviewed plan, the TrustAI draft, and other pre-existing untracked working files remain uncommitted. No tag, release, recruitment, collection, unblinding, or target-data generation occurred.

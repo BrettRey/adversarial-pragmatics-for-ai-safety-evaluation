@@ -11,7 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / "notes/cited-source-local-archive.md"
 TEX_GLOBS = (
-    "main.tex",
+    "adversarial-pragmatics-for-ai-safety-evaluation.tex",
     "sections/*.tex",
     "delegation-assurance.tex",
     "sections-delegation/*.tex",

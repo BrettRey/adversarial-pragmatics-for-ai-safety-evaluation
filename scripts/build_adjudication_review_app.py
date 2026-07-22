@@ -103,6 +103,7 @@ FAILURE_OPTIONS = [
     "scaffold_failure",
     "goal_drift",
     "misreporting",
+    "omitted_information",
     "grader_error",
     "taxonomy_instability",
     "item_wording_problem",

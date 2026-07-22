@@ -4,7 +4,7 @@
 # Configuration
 LATEX = xelatex
 BIBER = biber
-MAIN = main
+MAIN = adversarial-pragmatics-for-ai-safety-evaluation
 SUPPLEMENT = supplement
 DELEGATION = delegation-assurance
 EVIDENTIARY = evidentiary-assurance

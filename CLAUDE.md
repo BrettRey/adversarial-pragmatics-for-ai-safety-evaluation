@@ -76,7 +76,7 @@ make assurance-check
 
 Before any submission or public preprint:
 
-- Run the central style checker on `main.tex`.
+- Run the central style checker on `adversarial-pragmatics-for-ai-safety-evaluation.tex`.
 - Run the benchmark validator.
 - Verify all sources in `notes/source-verification.md`.
 - Ensure raw model outputs, API logs, and any sensitive examples are not committed unless intentionally sanitized.

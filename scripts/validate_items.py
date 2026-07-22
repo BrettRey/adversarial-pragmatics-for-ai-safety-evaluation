@@ -83,6 +83,7 @@ FAILURE_ATTRIBUTIONS = {
     "scaffold_failure",
     "goal_drift",
     "misreporting",
+    "omitted_information",
     "grader_error",
     "taxonomy_instability",
 }

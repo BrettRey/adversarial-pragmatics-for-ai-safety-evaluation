@@ -8,7 +8,8 @@ BUNDLE="$ROOT/submission/arxiv/adversarial-pragmatics-arxiv-source.tar.gz"
 rm -rf "$OUT_DIR"
 mkdir -p "$OUT_DIR/sections" "$OUT_DIR/figures"
 
-cp "$ROOT/main.tex" "$OUT_DIR/main.tex"
+cp "$ROOT/adversarial-pragmatics-for-ai-safety-evaluation.tex" \
+  "$OUT_DIR/adversarial-pragmatics-for-ai-safety-evaluation.tex"
 cp "$ROOT/supplement.tex" "$OUT_DIR/supplement.tex"
 cp "$ROOT/.house-style/preamble.tex" "$OUT_DIR/preamble.tex"
 cp "$ROOT/references.bib" "$OUT_DIR/references.bib"
@@ -43,7 +44,7 @@ do
 done
 
 perl -0pi -e 's/\\input\{\.house-style\/preamble\.tex\}/\\input\{preamble.tex\}/g' \
-  "$OUT_DIR/main.tex" "$OUT_DIR/supplement.tex"
+  "$OUT_DIR/adversarial-pragmatics-for-ai-safety-evaluation.tex" "$OUT_DIR/supplement.tex"
 perl -0pi -e 's/\\setmainfont\{EB Garamond\}\[\n  Numbers=OldStyle,\n  Ligatures=TeX,\n  BoldFont=\{EB Garamond\},\n\]/\\setmainfont{EBGaramond-Regular.otf}[\n  Numbers=OldStyle,\n  Ligatures=TeX,\n  ItalicFont=EBGaramond-Italic.otf,\n  BoldFont=EBGaramond-Bold.otf,\n  BoldItalicFont=EBGaramond-BoldItalic.otf,\n]/g' \
   "$OUT_DIR/preamble.tex"
 perl -0pi -e 's/\\newfontfamily\\ipafont\{Charis SIL\}/\\newfontfamily\\ipafont{CharisSIL-Regular.ttf}[\n  ItalicFont=CharisSIL-Italic.ttf,\n  BoldFont=CharisSIL-Bold.ttf,\n  BoldItalicFont=CharisSIL-BoldItalic.ttf,\n]/g' \
@@ -55,7 +56,7 @@ perl -0pi -e 's/\\setmonofont\{Inconsolata\}\[Scale=MatchLowercase\]/\\setmonofo
 perl -0pi -e 's/\\IfFileExists\{references-standalone\.bib\}\s*\n\s*\{\\addbibresource\{references-standalone\.bib\}\}\s*\n\s*\{\\addbibresource\{references\.bib\}\\IfFileExists\{references-local\.bib\}\{\\addbibresource\{references-local\.bib\}\}\{\}\}/% Bibliography resources are declared explicitly in each arXiv top-level TeX file./g' \
   "$OUT_DIR/preamble.tex"
 perl -0pi -e 's/(\\input\{preamble\.tex\}\n)/$1\\addbibresource{references.bib}\n\\addbibresource{references-local.bib}\n/' \
-  "$OUT_DIR/main.tex" "$OUT_DIR/supplement.tex"
+  "$OUT_DIR/adversarial-pragmatics-for-ai-safety-evaluation.tex" "$OUT_DIR/supplement.tex"
 
 cat > "$OUT_DIR/00README.json" <<'JSON'
 {
@@ -66,7 +67,7 @@ cat > "$OUT_DIR/00README.json" <<'JSON'
   "texlive_version": 2025,
   "sources": [
     {
-      "filename": "main.tex",
+      "filename": "adversarial-pragmatics-for-ai-safety-evaluation.tex",
       "usage": "toplevel"
     },
     {
