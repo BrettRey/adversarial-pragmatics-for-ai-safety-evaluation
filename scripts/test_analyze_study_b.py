@@ -352,7 +352,7 @@ class StudyBAnalysisTests(unittest.TestCase):
         result = self.analyze(payload)
         self.assertEqual(result["analysis_status"], "NOT_ESTIMATED")
         self.assertEqual(result["evidence_status"], "NO_TARGET_EVIDENCE")
-        self.assertEqual(result["behavioural_claim_gate"], "NOT_ESTIMATED")
+        self.assertEqual(result["behavioural_claim"]["status"], "NOT_ESTIMATED")
 
     def test_synthetic_cell_passes_but_remains_non_evidential(self) -> None:
         result = self.analyze(synthetic_payload())
@@ -360,11 +360,24 @@ class StudyBAnalysisTests(unittest.TestCase):
         self.assertEqual(result["production_eligibility"], "NOT_APPLICABLE_SYNTHETIC")
         self.assertEqual(result["cell_results"][0]["cell_gate"], "PASS")
         self.assertEqual(result["scope_gate"]["gate"], "FAIL")
-        self.assertEqual(result["behavioural_claim_gate"], "FAIL")
+        # The claim reports an estimand; it is not a pass/fail effect gate.
+        claim = result["behavioural_claim"]
+        self.assertEqual(claim["status"], "ESTIMAND_REPORTED")
+        self.assertFalse(claim["scope_in_range"])
+        self.assertFalse(claim["in_scope_and_evaluable"])
+        self.assertNotIn("gate", claim)
+        family = result["cell_results"][0]["family_selective_margin"]
+        self.assertEqual(family["floor_position"], "interval_above_floor")
+        self.assertNotIn("gate", family)
         self.assertEqual(result["simultaneous_uncertainty"]["binomial_proportions_in_family"], 260)
         base = result["cell_results"][0]["base_results"][0]
         self.assertEqual(base["base_gate"], "PASS")
         self.assertEqual(base["main_reference_gate"]["gate"], "PASS")
+        # The selective margin is a reported estimand with a design floor, no gate.
+        margin = base["selective_margin"]
+        self.assertNotIn("gate", margin)
+        self.assertEqual(margin["design_floor"], 0.20)
+        self.assertEqual(margin["floor_position"], "interval_above_floor")
         self.assertEqual(
             set(base["primary_summaries"]),
             {
@@ -549,7 +562,11 @@ class StudyBAnalysisTests(unittest.TestCase):
         self.assertEqual(result["evidence_status"], "MANIFEST_BOUND_PRODUCTION_TARGET_ANALYSIS")
         self.assertEqual(result["production_eligibility"], "VERIFIED_MANIFEST_BOUND")
         self.assertEqual(result["scope_gate"]["gate"], "PASS")
-        self.assertEqual(result["behavioural_claim_gate"], "PASS")
+        claim = result["behavioural_claim"]
+        self.assertEqual(claim["status"], "ESTIMAND_REPORTED")
+        self.assertTrue(claim["in_scope_and_evaluable"])
+        self.assertIn("pooled_selective_margin", claim)
+        self.assertEqual(len(claim["family_selective_margins"]), 6)
 
     def test_placeholder_configuration_is_rejected_even_when_bound(self) -> None:
         payload = synthetic_payload()

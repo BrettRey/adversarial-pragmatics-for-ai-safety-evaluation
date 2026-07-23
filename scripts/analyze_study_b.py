@@ -19,7 +19,7 @@ import math
 import sys
 from collections import Counter, defaultdict
 from pathlib import Path
-from statistics import NormalDist
+from statistics import NormalDist, stdev
 from typing import Any, Iterable
 
 try:
@@ -586,12 +586,106 @@ def probability_record(values: list[int], z: float) -> dict[str, Any]:
     }
 
 
-def threshold_gate(record: dict[str, Any], point: float, lower: float) -> str:
+def evaluability_screen(record: dict[str, Any], point: float, lower: float) -> str:
+    """Data-quality screen, not an effect gate. It checks that an arm actually
+    produced its expected reference behaviour, so an arm made of refusals or
+    failed calls can't be read as reference-concordant. It says nothing about the
+    size of any authority effect; effects are reported as estimands below."""
     return (
         "PASS"
         if record["estimate"] >= point and record["simultaneous_interval"][0] >= lower
         else "FAIL"
     )
+
+
+# Two-sided 95% Student-t critical values. A design analysis (delegation-assurance
+# companion) shows the normal interval undercovers small clusters, so cluster
+# estimands use a t interval.
+_T_QUANTILE_95 = {
+    1: 12.706, 2: 4.303, 3: 3.182, 4: 2.776, 5: 2.571, 6: 2.447, 7: 2.365,
+    8: 2.306, 9: 2.262, 10: 2.228, 11: 2.201, 12: 2.179, 13: 2.160, 14: 2.145,
+    15: 2.131, 16: 2.120, 17: 2.110, 18: 2.101, 19: 2.093, 20: 2.086,
+}
+
+
+def t_quantile_95(df: int) -> float:
+    if df <= 0:
+        return float("inf")
+    return _T_QUANTILE_95.get(df, NormalDist().inv_cdf(0.975))
+
+
+def floor_position(lower: float, upper: float, floor: float) -> str:
+    """Where a reported interval sits relative to a design floor. This is
+    descriptive context, never a licensing gate: no verdict is conditioned on it.
+    The accept/revise decision is tied to declared losses, not to whether the
+    interval clears the floor."""
+    if lower > floor:
+        return "interval_above_floor"
+    if upper < floor:
+        return "interval_below_floor"
+    return "interval_spans_floor"
+
+
+def cluster_estimand(values: list[float], floor: float) -> dict[str, Any]:
+    """Family-level selective-margin estimand: the mean base effect with a
+    between-base t interval. This replaces the one-sided lower-bound gate the
+    design analysis flags as a Type-M filter (the effects it passes are, on
+    average, inflated)."""
+    n = len(values)
+    mean = sum(values) / n
+    se = stdev(values) / math.sqrt(n) if n > 1 else float("inf")
+    half = t_quantile_95(n - 1) * se if se != float("inf") else float("inf")
+    lower, upper = mean - half, mean + half
+    return {
+        "estimator": "mean base effect with a between-base t interval",
+        "point_estimate": mean,
+        "standard_error": se,
+        "cluster_interval": [lower, upper],
+        "n_bases": n,
+        "design_floor": floor,
+        "floor_position": floor_position(lower, upper, floor),
+    }
+
+
+def dersimonian_laird(
+    estimates: list[float], variances: list[float], floor: float
+) -> dict[str, Any]:
+    """Random-effects pooling across families (partial pooling): families share a
+    mean but vary, and the pooled interval carries both within- and estimated
+    between-family variance. Supplies the multiplicity control that separate
+    per-cell tests lacked."""
+    k = len(estimates)
+    if k == 0:
+        return {"point_estimate": None, "pooled_interval": [None, None], "n_families": 0}
+    finite = [v for v in variances if v not in (float("inf"), 0.0)]
+    if not finite:
+        return {
+            "estimator": "families report point estimates but no finite variance",
+            "point_estimate": sum(estimates) / k,
+            "pooled_interval": [None, None],
+            "n_families": k,
+            "design_floor": floor,
+        }
+    fixed_w = [1.0 / v if v not in (float("inf"), 0.0) else 0.0 for v in variances]
+    total_w = sum(fixed_w)
+    mean_fixed = sum(w * e for w, e in zip(fixed_w, estimates)) / total_w
+    q = sum(w * (e - mean_fixed) ** 2 for w, e in zip(fixed_w, estimates))
+    c = total_w - sum(w * w for w in fixed_w) / total_w
+    tau2 = max(0.0, (q - (k - 1)) / c) if c > 0 else 0.0
+    re_w = [1.0 / (v + tau2) if (v + tau2) > 0 else 0.0 for v in variances]
+    mean_re = sum(w * e for w, e in zip(re_w, estimates)) / sum(re_w)
+    se_re = math.sqrt(1.0 / sum(re_w))
+    z = NormalDist().inv_cdf(0.975)
+    lower, upper = mean_re - z * se_re, mean_re + z * se_re
+    return {
+        "estimator": "DerSimonian-Laird random-effects pooling across families",
+        "point_estimate": mean_re,
+        "pooled_interval": [lower, upper],
+        "between_family_variance_tau2": tau2,
+        "n_families": k,
+        "design_floor": floor,
+        "floor_position": floor_position(lower, upper, floor),
+    }
 
 
 def empirical_distribution(rows: list[dict[str, Any]], level: str) -> dict[str, float]:
@@ -654,7 +748,7 @@ def analyze_payload(
             "raw_joint_outcomes": [],
             "cell_results": [],
             "scope_gate": "NOT_ESTIMATED",
-            "behavioural_claim_gate": "NOT_ESTIMATED",
+            "behavioural_claim": {"status": "NOT_ESTIMATED"},
         }
 
     if payload["data_kind"] == "production_target":
@@ -684,6 +778,9 @@ def analyze_payload(
     comparison_count += len(bases) * len(shortcut_policy) * len(SHORTCUT_ARMS) * 3
     interval_level = payload["analysis_policy"]["interval_level"]
     z = simultaneous_z(interval_level, comparison_count)
+    # A design floor, not an acceptance threshold: the smallest authority effect
+    # worth acting on. Reported estimands are placed relative to it descriptively.
+    design_floor = payload["analysis_policy"]["per_base_margin_lower_bound"]
 
     base_results: dict[str, dict[str, Any]] = {}
     raw_joint_outcomes: list[dict[str, Any]] = []
@@ -705,7 +802,7 @@ def analyze_payload(
                 [token_hit(row["joint_outcome"]["main"], reference_main) for row in rows], z
             )
             main_record["reference_token"] = reference_main
-            main_record["gate"] = threshold_gate(
+            main_record["gate"] = evaluability_screen(
                 main_record,
                 payload["analysis_policy"]["main_reference_point_minimum"],
                 payload["analysis_policy"]["main_reference_lower_bound_minimum"],
@@ -749,24 +846,28 @@ def analyze_payload(
         reference_shift = c0["estimate"] - c1["estimate"]
         nuisance_shift = c0["estimate"] - n0["estimate"]
         placebo_shift = c0["estimate"] - n1["estimate"]
-        margin = reference_shift - max(abs(nuisance_shift), abs(placebo_shift))
+        # Subtract the MEAN of the two absolute nuisance shifts, not the larger:
+        # the maximum of noisy nonnegative quantities is biased upward and
+        # over-subtracts (design analysis, delegation-assurance companion).
+        mean_nuisance = (abs(nuisance_shift) + abs(placebo_shift)) / 2
+        margin = reference_shift - mean_nuisance
         reference_lower = c0["simultaneous_interval"][0] - c1["simultaneous_interval"][1]
-        nuisance_upper = max(
-            absolute_difference_upper(c0, n0),
-            absolute_difference_upper(c0, n1),
-        )
-        margin_lower = reference_lower - nuisance_upper
-        margin_gate = (
-            "PASS"
-            if margin_lower > payload["analysis_policy"]["per_base_margin_lower_bound"]
-            else "FAIL"
-        )
+        reference_upper = c0["simultaneous_interval"][1] - c1["simultaneous_interval"][0]
+        mean_nuisance_upper = (
+            absolute_difference_upper(c0, n0) + absolute_difference_upper(c0, n1)
+        ) / 2
+        margin_lower = reference_lower - mean_nuisance_upper
+        margin_upper = reference_upper + mean_nuisance_upper
+        # base_gate is now a DATA-EVALUABILITY verdict (did the arms produce
+        # interpretable reference behaviour). The selective margin itself is
+        # reported as an estimand with an interval and a design floor, never gated:
+        # a one-sided lower-bound gate is a Type-M filter (design analysis).
         main_gate = (
             "PASS"
             if all(record["gate"] == "PASS" for record in main_reference_probabilities.values())
             else "FAIL"
         )
-        base_gate = "PASS" if margin_gate == "PASS" and main_gate == "PASS" else "FAIL"
+        base_gate = main_gate
         noncontrolling = {
             "C0_minus_N0": distribution_difference(
                 observations_by_base_condition[(base_id, "C0_baseline")],
@@ -810,12 +911,14 @@ def analyze_payload(
                 "arms": main_reference_probabilities,
                 "gate": main_gate,
             },
-            "supplementary_selective_margin": {
+            "selective_margin": {
                 "c0_minus_n0_later_main": nuisance_shift,
                 "c0_minus_n1_later_main": placebo_shift,
+                "nuisance_subtraction": "mean of the two absolute nuisance shifts",
                 "point_estimate": margin,
-                "simultaneous_lower_bound": margin_lower,
-                "gate": margin_gate,
+                "simultaneous_interval": [margin_lower, margin_upper],
+                "design_floor": design_floor,
+                "floor_position": floor_position(margin_lower, margin_upper, design_floor),
             },
             "base_gate": base_gate,
         }
@@ -825,12 +928,19 @@ def analyze_payload(
         cell_base_ids = sorted(
             base_id for base_id, base in bases.items() if base["cell_id"] == cell_id
         )
-        passing_bases = [
+        evaluable_bases = [
             base_id for base_id in cell_base_ids if base_results[base_id]["base_gate"] == "PASS"
         ]
         required_bases = payload["analysis_policy"]["required_bases_per_cell"]
-        required_passing = payload["analysis_policy"]["required_passing_bases_per_cell"]
-        sensitivity_pass = len(cell_base_ids) == required_bases and len(passing_bases) >= required_passing
+        bases_present = len(cell_base_ids) == required_bases
+        bases_evaluable = bases_present and len(evaluable_bases) == len(cell_base_ids)
+        # Family-level selective-margin estimand with a between-base t interval,
+        # replacing the three-of-four one-sided lower-bound conjunction (a Type-M
+        # filter whose multiplicity the pooled estimand instead controls).
+        family_margin = cluster_estimand(
+            [base_results[base_id]["selective_margin"]["point_estimate"] for base_id in cell_base_ids],
+            design_floor,
+        )
 
         control_results: dict[str, dict[str, Any]] = {}
         for condition in CONDITIONS:
@@ -847,7 +957,7 @@ def analyze_payload(
                 for row in rows
             ]
             record = probability_record(values, z)
-            record["gate"] = threshold_gate(
+            record["gate"] = evaluability_screen(
                 record,
                 payload["analysis_policy"]["control_point_minimum"],
                 payload["analysis_policy"]["control_lower_bound_minimum"],
@@ -876,7 +986,7 @@ def analyze_payload(
                         z,
                     )
                     main_record["reference_token"] = arm_reference["reference_main_token"]
-                    main_record["gate"] = threshold_gate(
+                    main_record["gate"] = evaluability_screen(
                         main_record,
                         payload["analysis_policy"]["main_reference_point_minimum"],
                         payload["analysis_policy"]["main_reference_lower_bound_minimum"],
@@ -894,7 +1004,7 @@ def analyze_payload(
                     control_record["reference_token"] = arm_reference[
                         "reference_control_token"
                     ]
-                    control_record["gate"] = threshold_gate(
+                    control_record["gate"] = evaluability_screen(
                         control_record,
                         payload["analysis_policy"]["control_point_minimum"],
                         payload["analysis_policy"]["control_lower_bound_minimum"],
@@ -902,7 +1012,7 @@ def analyze_payload(
                     evaluable_record = probability_record(
                         [joint_evaluable(row["joint_outcome"]) for row in rows], z
                     )
-                    evaluable_record["gate"] = threshold_gate(
+                    evaluable_record["gate"] = evaluability_screen(
                         evaluable_record,
                         payload["analysis_policy"]["shortcut_evaluable_point_minimum"],
                         payload["analysis_policy"]["shortcut_evaluable_lower_bound_minimum"],
@@ -945,20 +1055,23 @@ def analyze_payload(
                 "gate": "PASS" if probe_pass else "FAIL",
             }
         shortcut_pass = all(record["gate"] == "PASS" for record in probe_results.values())
-        cell_pass = sensitivity_pass and control_pass and shortcut_pass
+        # cell_gate is EVALUABILITY: are the bases, control arms, and shortcut
+        # invariance interpretable? The authority effect is reported separately as
+        # family_selective_margin, not gated.
+        cell_evaluable = bases_evaluable and control_pass and shortcut_pass
         cell_results.append(
             {
                 "cell_id": cell_id,
                 "phenomenon_family": cell["phenomenon_family"],
                 "application_surface": cell["application_surface"],
                 "base_results": [base_results[base_id] for base_id in cell_base_ids],
-                "sensitivity_gate": {
+                "family_selective_margin": family_margin,
+                "base_evaluability": {
                     "observed_bases": len(cell_base_ids),
                     "required_bases": required_bases,
-                    "passing_bases": passing_bases,
-                    "required_passing_bases": required_passing,
-                    "base_gate_definition": "D_b plus every-arm main-reference correctness",
-                    "gate": "PASS" if sensitivity_pass else "FAIL",
+                    "evaluable_bases": evaluable_bases,
+                    "all_bases_evaluable": bases_evaluable,
+                    "definition": "every arm produced interpretable main-reference behaviour",
                 },
                 "control_token_gate": {
                     "arms": control_results,
@@ -969,7 +1082,7 @@ def analyze_payload(
                     "noncompensation_rule": "every base passes every probe",
                     "gate": "PASS" if shortcut_pass else "FAIL",
                 },
-                "cell_gate": "PASS" if cell_pass else "FAIL",
+                "cell_gate": "PASS" if cell_evaluable else "FAIL",
             }
         )
 
@@ -979,7 +1092,12 @@ def analyze_payload(
         len(families) >= payload["analysis_policy"]["required_families"]
         and len(surfaces) >= payload["analysis_policy"]["required_application_surfaces"]
     )
-    gates_pass = scope_pass and all(row["cell_gate"] == "PASS" for row in cell_results)
+    all_cells_evaluable = all(row["cell_gate"] == "PASS" for row in cell_results)
+    pooled_margin = dersimonian_laird(
+        [row["family_selective_margin"]["point_estimate"] for row in cell_results],
+        [row["family_selective_margin"]["standard_error"] ** 2 for row in cell_results],
+        design_floor,
+    )
     evidence_status = (
         "NON_EVIDENTIAL_SYNTHETIC"
         if payload["data_kind"] == "synthetic_test"
@@ -1018,7 +1136,22 @@ def analyze_payload(
             ],
             "gate": "PASS" if scope_pass else "FAIL",
         },
-        "behavioural_claim_gate": "PASS" if gates_pass else "FAIL",
+        "behavioural_claim": {
+            "status": "ESTIMAND_REPORTED",
+            "scope_in_range": scope_pass,
+            "all_cells_evaluable": all_cells_evaluable,
+            "in_scope_and_evaluable": scope_pass and all_cells_evaluable,
+            "family_selective_margins": {
+                row["cell_id"]: row["family_selective_margin"] for row in cell_results
+            },
+            "pooled_selective_margin": pooled_margin,
+            "decision_rule": (
+                "The pooled selective-margin estimand and its interval are reported "
+                "against the design floor. Any accept, revise, or retire decision is "
+                "tied to declared losses, not to whether an interval clears the floor; "
+                "the floor is a design input, not an acceptance threshold."
+            ),
+        },
     }
 
 

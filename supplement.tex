@@ -309,7 +309,7 @@ review. (d) N: programmatic scoring is treated as removing grader bias, and the
 error-type classifier isn't validated. (e) Y: instruction strictness is varied
 as a factor that shouldn't change the expected answer, alongside aligned and
 reference controls. (f) P: an error-type taxonomy is reported in aggregate and
-isn't validated. (g) N: seeking clarification is explicitly penalised.
+isn't validated. (g) N: seeking clarification is explicitly penalized.
 
 \textbf{BIPIA} \citep{yi2025bipia}. (a) P: attack success appears in the model
 table while utility appears only in the defence evaluation. (d) N: scoring
@@ -342,15 +342,57 @@ different dataset sizes across their preprint and published versions, and one
 gives inconsistent tool counts within a single version, so a scale column would
 require version-specific caveats that the comparison doesn't depend on.
 
-\section{Study B decision gates}
+\section{Study B design floors and estimands}
 
-These gates are declared in the machine-readable claim register before any production outcome is viewed. The main paper states one of them illustratively; the full set is reproduced here.
+An earlier version of the claim register froze quantitative pass/fail gates
+before any target data. This paper keeps the numbers but not the gates, for the
+reasons the companion delegation-assurance design analysis sets out
+\citep{reynolds2026delegationAssurance,gelman2014types}. Conditioning a verdict
+on whether an interval lower bound clears a positive threshold selects inflated
+effects, a Type-M error; subtracting the largest of several nuisance shifts
+over-subtracts, because the maximum of noisy nonnegative quantities is biased
+upward; a ten-bin calibration error computed on thirty cases rejects a
+well-calibrated predictor most of the time; and taking the larger of two
+one-way cluster standard errors undercovers a crossed design.
 
-The claim register supplies quantitative and categorical failure gates before production outcomes are viewed. For each untouched base, the behavioural margin subtracts the larger absolute nuisance or placebo shift from the (C0-C1) later-main shift. A decrease in the old token isn't enough: the complete base gate also requires main-reference correctness in every arm. In every claimed family-by-surface cell, at least three of four independent bases must have a simultaneous 95\% interval lower bound above 0.20 for the margin and, in each arm, main-reference correctness of at least 0.90 with a lower bound of at least 0.80. The three-of-four rule attaches to this complete base gate, so a refusal or failed call in (C1) cannot count as reference-concordant merely because the old-token rate falls. Every cell-arm separately needs control-token correctness of at least 0.90 with a lower bound of at least 0.80.
+The operative rule is an estimand with reported uncertainty. Study B estimates
+the family-level authority effect, the average over base pairs of the
+reference-signed package effect, as a single multilevel model with partial
+pooling across families and bases. Pooling supplies the multiplicity control
+that separate per-cell tests lacked, and it shrinks the noisy per-cell effects
+toward the family mean rather than letting the largest one clear a gate. The
+estimate is reported with cluster-robust uncertainty, and any decision ties to
+declared losses and to that estimate, not to whether a realized interval clears
+a line.
 
-Every blocking shortcut probe is gated base by base rather than pooled. Its two arms have separately frozen item hashes and concrete main and control references, including the swapped references for the output-vocabulary probe. Main-reference correctness, control-reference correctness, and joint evaluability must each reach 0.90 with lower bounds of at least 0.80 in both arms; the absolute reference-concordance shift and its simultaneous upper bound must both stay at or below 0.10. Every base must pass every probe, so opposite effects cannot cancel and equal failures don't count as invariance. These requirements are conjunctive, not components of a pooled score. A reference claim stops at any independently confirmed reference change under a preserving transform. A measurement claim needs at least 30 independent target cases per claimed class, class-specific precision and recall of at least 0.80 with lower bounds of at least 0.70, and bounded perturbation sensitivity. A taxonomic claim needs overall and family-specific retention and interval floors while preserving boundary cases. If a predeclared fallback has less than the minimum useful reach, the claim is retired rather than narrowed to triviality.
+The frozen numbers become design floors. The 0.20 margin is the smallest
+authority effect worth acting on, the 0.90 correctness a target precision, and
+the thirty-per-class count a design input; they set how many bases, repeats,
+and cases the design needs under the design analysis, not thresholds a realized
+interval has to clear. The margin subtracts a modelled or mean nuisance shift
+rather than the largest one. The shortcut probes are reported as invariance
+estimates with uncertainty, and a reference change under a preserving transform
+retires the corresponding reference claim. The released analyzer
+(\path{scripts/analyze_study_b.py}) and claim register implement this form: a
+per-base selective-margin estimand, a between-base cluster estimand per family,
+random-effects pooling across families, and correctness levels kept as
+data-evaluability screens rather than effect gates.
 
-The production-result schema preserves the raw joint main/control outcome and its marginals, including off-vocabulary, refusal, invalid-format, truncation, and failed-call classes; all remain in the applicable denominators. The analysis harness computes all six declared primary summaries before the supplementary base and shortcut gates: raw distributions, the \(C0-C1\) later-main contrast, control-token uptake by arm, condition-specific joint correctness, the \(C0-N0\) and \(C0-N1\) signed distribution shifts and total-variation distances, and the matched \(C1-N1\) operativity contrast. A production record is eligible only when one frozen manifest hash-binds the claim, target items, lineage, output-blind reference reviews, pair and counterbalance records, shortcut variants, exact configuration, analysis policy, and exact standard and per-probe repeat sets. Missing or extra repeats, placeholder configuration fields, unknown items, or a changed object hash block analysis. The harness then applies the expanded simultaneous uncertainty family and all gates conjunctively. The committed result record contains no target observations, so it returns \texttt{NOT\_ESTIMATED}; synthetic regression tests are marked non-evidential and cannot be relabelled into production evidence.
+The provenance requirements are unchanged, because they were never the error.
+The production-result schema preserves the raw joint main/control outcome and
+its marginals, including off-vocabulary, refusal, invalid-format, truncation,
+and failed-call classes, all kept in the applicable denominators. The analysis
+harness computes the six declared primary summaries: raw distributions, the
+\(C0-C1\) later-main contrast, control-token uptake by arm, condition-specific
+joint correctness, the \(C0-N0\) and \(C0-N1\) signed shifts and total-variation
+distances, and the matched \(C1-N1\) operativity contrast. A production record
+is eligible only when one frozen manifest hash-binds the claim, target items,
+lineage, output-blind reference reviews, pair and counterbalance records,
+shortcut variants, configuration, analysis policy, and repeat sets; missing or
+extra repeats, placeholder fields, unknown items, or a changed object hash block
+analysis. The committed record contains no target observations, so it returns
+\texttt{NOT\_ESTIMATED}; synthetic regression tests are non-evidential and can't
+be relabelled as production evidence.
 
 \section{Reproducibility commands}
 

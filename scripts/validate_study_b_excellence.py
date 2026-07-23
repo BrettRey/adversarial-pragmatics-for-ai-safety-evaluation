@@ -693,12 +693,24 @@ def claim_errors(path: Path, schema_path: Path) -> list[str]:
                 errors.append(f"claims: {claim_id} bearer improperly contains target-varying material {phrase!r}")
 
     success = behavioural.get("declaration", {}).get("tolerance", {}).get("success_threshold", "")
+    criterion = behavioural.get("declaration", {}).get("tolerance", {}).get("criterion", "")
     minimum = behavioural.get("inquiry_use", {}).get("minimum_useful_reach", "")
-    for required in ("three of four", "95%", "0.20", "0.90", "0.80", "family", "surface", "shortcut"):
+    # The success threshold reports an estimand against design floors and ties the
+    # decision to declared losses; it no longer conditions a verdict on a one-sided
+    # lower bound clearing a threshold (a Type-M filter) or on a three-of-four
+    # conjunction. The evaluability floors (0.90/0.80) and coverage still appear.
+    for required in (
+        "estimand", "design floor", "declared losses",
+        "0.20", "0.90", "0.80", "family", "surface", "shortcut",
+    ):
         if required.lower() not in success.lower():
             errors.append(f"claims: APB_BEH_001 success threshold omits {required!r}")
     if "75% of untouched target bases" in success:
         errors.append("claims: APB_BEH_001 retains the pooled compensatory base gate")
+    if "pass the complete base gate" in success.lower() or "three of four" in success.lower():
+        errors.append("claims: APB_BEH_001 retains the three-of-four lower-bound gate")
+    if "type-m" not in criterion.lower():
+        errors.append("claims: APB_BEH_001 criterion omits the Type-M rationale for dropping the lower-bound gate")
     for required in ("three pragmatic families", "two application surfaces", "four independently written"):
         if required.lower() not in minimum.lower():
             errors.append(f"claims: APB_BEH_001 minimum reach omits {required!r}")

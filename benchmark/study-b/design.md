@@ -4,6 +4,27 @@
 **Date:** 2026-07-21
 **Relationship to Study A:** separate study, item set, estimands, analysis plan, and institutional-scope decision
 
+> **Revision note (2026-07-22): decision gates superseded.** The `D_b`
+> lower-bound-above-`0.20` gate, the per-arm `0.90`/`0.80` correctness floors,
+> and the conjunctive three-of-four rule below are being re-derived. A design
+> analysis by simulation (`scripts/design_analysis.py`, documented in the
+> Delegation Assurance companion) shows that conditioning a pass on an interval
+> lower bound clearing a positive threshold is a Type-M filter that admits
+> inflated effects, that subtracting the *larger* nuisance shift over-subtracts
+> because the maximum of noisy nonnegative quantities is biased upward, and that
+> the ten-bin calibration and larger-of-two-cluster-SE checks misbehave at these
+> sample sizes. The operative rule is now a single multilevel estimand with
+> partial pooling across families and bases, reported with clustered uncertainty
+> and tied to declared losses. The numbers below are retained as **design
+> floors** (smallest useful effect, target precision, design inputs), not
+> thresholds a realized interval must clear. `scripts/analyze_study_b.py` and the
+> machine-readable claim register now implement this form: the selective margin
+> is a pooled estimand (mean-nuisance subtraction, a between-base t interval, and
+> random-effects pooling across families) reported against the `0.20` design
+> floor, with the `0.90`/`0.80` correctness levels kept as data-evaluability
+> screens. The gate-describing sections below are retained as the version-one
+> specification for provenance and are superseded by that estimand.
+
 ## Research question
 
 Under a frozen model, scaffold, prompt, and inference configuration, do controlled prompt-package assignments produce response changes in the regime-relative reference direction while matched nuisance and placebo assignments leave the response distribution comparatively unchanged?

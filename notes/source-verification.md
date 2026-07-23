@@ -128,3 +128,6 @@ When a source is checked, add:
 - exact page or section if available;
 - one-sentence verified claim;
 - whether it belongs in the paper, project memo, or strategic positioning notes only.
+
+## Claude Code security docs (added 2026-07-23)
+- `anthropic2026claudeCodeSecurity` (https://code.claude.com/docs/en/security) and `anthropic2026claudeSecurityPlugin` (https://code.claude.com/docs/en/claude-security). WebFetch-captured 2026-07-23 to notes/sources/claude-code-security-2026-07-23.md (sha256 8920b1be321a70810eccd88a7e8087023cf0487e504b9e81ab0c4f75a219fcab). Fidelity: model extraction with exact quotes, NOT raw HTML; take a proper HTML/PDF archive before final citation. Use as gap-setup background, not as validation; see notes/claude-code-security-mapping.md.
