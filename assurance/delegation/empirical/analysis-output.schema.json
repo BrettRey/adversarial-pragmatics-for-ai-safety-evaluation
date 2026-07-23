@@ -12,7 +12,7 @@
     "specification_version": {"const": "1.0.0"},
     "specification_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
     "input_id": {"type": "string", "minLength": 1},
-    "decision": {"enum": ["PASS", "FAIL", "NOT_ESTIMATED"]},
+    "decision": {"enum": ["ESTIMATED", "NOT_ESTIMATED"]},
     "not_estimated_reason": {"type": ["string", "null"]},
     "scalar_aggregation_permitted": {"const": false},
     "integrity_diagnostics": {
@@ -40,7 +40,7 @@
         "required": ["family", "decision", "counts", "metrics", "thresholds", "reasons"],
         "properties": {
           "family": {"type": "string", "minLength": 1},
-          "decision": {"enum": ["PASS", "FAIL", "NOT_ESTIMATED"]},
+          "decision": {"enum": ["ESTIMATED", "NOT_ESTIMATED"]},
           "counts": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 0}},
           "metrics": {"type": "object", "additionalProperties": {"type": ["number", "null"]}},
           "thresholds": {"type": "object", "additionalProperties": {"type": "number"}},

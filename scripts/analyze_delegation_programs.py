@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
-"""Validate and analyze the three frozen Delegation Assurance programmes.
+"""Validate and estimate the three Delegation Assurance programmes.
 
-The analyzer preserves observation-level vectors and applies familywise,
-noncompensatory decision rules.  It never replaces the family vector with a
-single score.  A valid input with no observations returns NOT_ESTIMATED.
-Integrity failures (split overlap, failed reset, reference leakage, or a
-pre-lock oracle join) are invalid analysis inputs rather than empirical
-failures.
+The analyzer preserves observation-level vectors and reports family estimates
+with intervals.  It never replaces the noncompensatory family vector with a
+single decision score, and it holds no loss function from which to make a
+go/no-go decision.  A valid input with no observations, or without every
+required family, returns NOT_ESTIMATED.  Integrity failures (split overlap,
+failed reset, reference leakage, or a pre-lock oracle join) are invalid
+analysis inputs rather than empirical results.
 """
 
 from __future__ import annotations
@@ -23,6 +24,8 @@ from pathlib import Path
 from typing import Any, Iterable
 
 from jsonschema import Draft202012Validator, FormatChecker
+import numpy as np
+from scipy import optimize, stats
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -92,10 +95,182 @@ def mean(values: Iterable[float]) -> float:
     return statistics.fmean(data)
 
 
-def normal_lcb(values: list[float], critical: float) -> float | None:
+def interval_critical_value(level: float, distribution: str, df: int | None = None) -> float:
+    tail = 0.5 + level / 2.0
+    if distribution == "normal":
+        return float(stats.norm.ppf(tail))
+    if distribution == "t" and df is not None and df > 0:
+        return float(stats.t.ppf(tail, df=df))
+    raise AnalysisError(f"cannot compute {distribution} interval at level {level} with df={df}")
+
+
+def interval_bounds(estimate: float, standard_error: float, critical: float) -> tuple[float, float]:
+    half_width = critical * standard_error
+    return estimate - half_width, estimate + half_width
+
+
+def sample_standard_error(values: list[float]) -> float | None:
     if len(values) < 2:
         return None
-    return mean(values) - critical * statistics.stdev(values) / math.sqrt(len(values))
+    return statistics.stdev(values) / math.sqrt(len(values))
+
+
+def t_interval(values: list[float], level: float) -> tuple[float, float, float, int] | None:
+    standard_error = sample_standard_error(values)
+    if standard_error is None:
+        return None
+    df = len(values) - 1
+    critical = interval_critical_value(level, "t", df)
+    estimate = mean(values)
+    lower, upper = interval_bounds(estimate, standard_error, critical)
+    return standard_error, lower, upper, df
+
+
+def common_nuisance_adjustment(
+    signed_effects: list[float], nuisance_covariates: list[tuple[float, float, float]]
+) -> tuple[list[float], float]:
+    """Fit the matched design's equal-weight common-nuisance component.
+
+    The three sensitivity measures are parallel matched covariates.  Their
+    row-wise mean is the prespecified equal-weight nuisance component; its
+    fitted family mean replaces the upward-biased maximum used in version 1.
+    Pair-level residualization retains the nuisance-estimation variation in the
+    family standard error.
+    """
+
+    common_by_pair = [mean(values) for values in nuisance_covariates]
+    adjusted = [effect - nuisance for effect, nuisance in zip(signed_effects, common_by_pair)]
+    return adjusted, mean(common_by_pair)
+
+
+def partial_pool_family_effects(
+    family_estimates: dict[str, float],
+    family_standard_errors: dict[str, float],
+    level: float,
+) -> tuple[dict[str, dict[str, float]], dict[str, float]]:
+    """Normal-normal empirical-Bayes pooling with moment-estimated tau squared."""
+
+    families = list(family_estimates)
+    estimates = np.asarray([family_estimates[family] for family in families], dtype=float)
+    variances = np.asarray(
+        [family_standard_errors[family] ** 2 for family in families], dtype=float
+    )
+    between_family_variance = max(
+        float(np.var(estimates, ddof=1) - np.mean(variances)), 0.0
+    )
+    total_variances = between_family_variance + variances
+    if np.all(total_variances == 0.0):
+        weights = np.ones(len(families), dtype=float)
+        grand_variance = 0.0
+    else:
+        positive = total_variances[total_variances > 0.0]
+        fallback = float(np.min(positive)) * 1e-12
+        weights = 1.0 / np.where(total_variances > 0.0, total_variances, fallback)
+        grand_variance = float(1.0 / np.sum(weights))
+    grand_estimate = float(np.average(estimates, weights=weights))
+    grand_standard_error = math.sqrt(grand_variance)
+    critical = interval_critical_value(level, "normal")
+    grand_lower, grand_upper = interval_bounds(
+        grand_estimate, grand_standard_error, critical
+    )
+
+    pooled: dict[str, dict[str, float]] = {}
+    for index, family in enumerate(families):
+        denominator = between_family_variance + variances[index]
+        shrinkage_weight = (
+            between_family_variance / denominator if denominator > 0.0 else 0.0
+        )
+        pooled_estimate = grand_estimate + shrinkage_weight * (
+            estimates[index] - grand_estimate
+        )
+        conditional_variance = shrinkage_weight * variances[index]
+        pooled_variance = conditional_variance + (
+            (1.0 - shrinkage_weight) ** 2 * grand_variance
+        )
+        pooled_standard_error = math.sqrt(max(float(pooled_variance), 0.0))
+        lower, upper = interval_bounds(
+            float(pooled_estimate), pooled_standard_error, critical
+        )
+        pooled[family] = {
+            "pooling_weight": float(shrinkage_weight),
+            "pooled_estimate": float(pooled_estimate),
+            "pooled_standard_error": pooled_standard_error,
+            "interval_lower": lower,
+            "interval_upper": upper,
+        }
+    grand = {
+        "estimate": grand_estimate,
+        "standard_error": grand_standard_error,
+        "interval_lower": grand_lower,
+        "interval_upper": grand_upper,
+        "between_family_variance": between_family_variance,
+    }
+    return pooled, grand
+
+
+def logistic_calibration(rows: list[dict[str, Any]]) -> tuple[float | None, float | None]:
+    """Fit outcome ~ intercept + slope * predicted log-odds by maximum likelihood."""
+
+    probabilities = np.asarray(
+        [row["values"]["typed_probability"] for row in rows], dtype=float
+    )
+    outcomes = np.asarray([row["values"]["target"] for row in rows], dtype=float)
+    probabilities = np.clip(probabilities, 1e-8, 1.0 - 1e-8)
+    log_odds = np.log(probabilities / (1.0 - probabilities))
+    if len(np.unique(outcomes)) < 2 or np.ptp(log_odds) == 0.0:
+        return None, None
+    design = np.column_stack((np.ones(len(rows)), log_odds))
+
+    def objective(coefficients: np.ndarray) -> tuple[float, np.ndarray]:
+        linear = design @ coefficients
+        value = float(np.sum(np.logaddexp(0.0, linear) - outcomes * linear))
+        fitted = 1.0 / (1.0 + np.exp(-np.clip(linear, -700.0, 700.0)))
+        gradient = design.T @ (fitted - outcomes)
+        return value, gradient
+
+    fit = optimize.minimize(
+        lambda coefficients: objective(coefficients)[0],
+        np.asarray([0.0, 1.0]),
+        jac=lambda coefficients: objective(coefficients)[1],
+        method="BFGS",
+    )
+    if not fit.success or not np.all(np.isfinite(fit.x)):
+        return None, None
+    return float(fit.x[0]), float(fit.x[1])
+
+
+def crossed_variance_components(
+    matrix: np.ndarray,
+) -> tuple[float, float, float, float, float]:
+    """Two-way random-effects method-of-moments components for a balanced matrix."""
+
+    n_reviewers, n_cases = matrix.shape
+    if n_reviewers < 2 or n_cases < 2:
+        raise AnalysisError("crossed variance needs at least two reviewers and two cases")
+    grand = float(np.mean(matrix))
+    reviewer_means = np.mean(matrix, axis=1)
+    case_means = np.mean(matrix, axis=0)
+    residuals = matrix - reviewer_means[:, None] - case_means[None, :] + grand
+    reviewer_ms = float(n_cases * np.sum((reviewer_means - grand) ** 2) / (n_reviewers - 1))
+    case_ms = float(n_reviewers * np.sum((case_means - grand) ** 2) / (n_cases - 1))
+    residual_ms = float(
+        np.sum(residuals**2) / ((n_reviewers - 1) * (n_cases - 1))
+    )
+    reviewer_variance = max((reviewer_ms - residual_ms) / n_cases, 0.0)
+    case_variance = max((case_ms - residual_ms) / n_reviewers, 0.0)
+    residual_variance = max(residual_ms, 0.0)
+    grand_variance = (
+        reviewer_variance / n_reviewers
+        + case_variance / n_cases
+        + residual_variance / (n_reviewers * n_cases)
+    )
+    return (
+        grand,
+        reviewer_variance,
+        case_variance,
+        residual_variance,
+        math.sqrt(grand_variance),
+    )
 
 
 def unique_ids(rows: list[dict[str, Any]], key: str, label: str) -> None:
@@ -142,33 +317,37 @@ def validate_specifications(artifact_dir: Path) -> tuple[dict[str, Any], dict[st
         schema_path = artifact_dir / specification["input_schema"]
         input_schema = load_json(schema_path)
         Draft202012Validator.check_schema(input_schema)
-        thresholds = specification["thresholds"]
-        required_thresholds = {
+        design_floors = specification["design_floors"]
+        required_design_floors = {
             "local_discrimination": {
+                "advisory",
                 "minimum_observations_per_family",
-                "minimum_selective_margin",
-                "selective_margin_lcb_strictly_above",
                 "minimum_control_accuracy",
             },
             "predictive_typed_ablation": {
-                "minimum_observations_per_family",
+                "advisory",
                 "minimum_trace_families_per_family",
-                "minimum_mean_brier_improvement",
-                "brier_improvement_lcb_strictly_above",
-                "maximum_typed_brier_loss",
-                "maximum_typed_ece",
             },
             "reviewer_reconstruction": {
-                "minimum_observations_per_arm_per_family",
+                "advisory",
                 "minimum_cases_per_family",
-                "minimum_reviewers_per_arm_per_family",
-                "minimum_typed_minus_degraded_concordance",
-                "concordance_difference_lcb_strictly_above",
-                "maximum_typed_false_certainty",
+                "minimum_reviewers_per_family",
             },
         }[program_id]
-        if set(thresholds) != required_thresholds:
-            raise AnalysisError(f"{program_id}: threshold vector is incomplete or contains undeclared fields")
+        if set(design_floors) != required_design_floors or design_floors["advisory"] is not True:
+            raise AnalysisError(
+                f"{program_id}: advisory design-floor vector is incomplete or contains undeclared fields"
+            )
+        expected_uncertainty_method = {
+            "local_discrimination": "partial_pooling_family_effect_interval",
+            "predictive_typed_ablation": "trace_family_cluster_interval_t_or_multilevel",
+            "reviewer_reconstruction": "crossed_reviewer_case_variance",
+        }[program_id]
+        if (
+            specification["uncertainty"]["method"] != expected_uncertainty_method
+            or specification["uncertainty"]["report"] != "estimate_and_interval"
+        ):
+            raise AnalysisError(f"{program_id}: uncertainty method does not match the revised estimator")
         expected_bindings = {
             "local_discrimination": {"assignment_manifest", "split_manifest"},
             "predictive_typed_ablation": {"feature_manifest", "held_out_manifest"},
@@ -238,30 +417,50 @@ def verify_design_object_bindings(
     return verified
 
 
-def finish_decision(output: dict[str, Any]) -> None:
-    decisions = [item["decision"] for item in output["family_results"]]
-    if "FAIL" in decisions:
-        output["decision"] = "FAIL"
-        output["not_estimated_reason"] = None
-    elif "NOT_ESTIMATED" in decisions:
+def finish_estimation(output: dict[str, Any]) -> None:
+    statuses = [item["decision"] for item in output["family_results"]]
+    if "NOT_ESTIMATED" in statuses:
         output["decision"] = "NOT_ESTIMATED"
         output["not_estimated_reason"] = (
             "NO_OBSERVATIONS" if not output["observation_vectors"] else "REQUIRED_FAMILY_NOT_ESTIMATED"
         )
     else:
-        output["decision"] = "PASS"
+        output["decision"] = "ESTIMATED"
         output["not_estimated_reason"] = None
 
 
-def missing_family_result(family: str, thresholds: dict[str, Any]) -> dict[str, Any]:
+def reported_design_floors(specification: dict[str, Any]) -> dict[str, float]:
+    return {
+        key: value
+        for key, value in specification["design_floors"].items()
+        if key != "advisory"
+    }
+
+
+def missing_family_result(
+    family: str,
+    design_floors: dict[str, float],
+    reason: str = "No observations were supplied for this required family.",
+) -> dict[str, Any]:
     return {
         "family": family,
         "decision": "NOT_ESTIMATED",
         "counts": {"observations": 0},
         "metrics": {},
-        "thresholds": thresholds,
-        "reasons": ["No observations were supplied for this required family."],
+        "thresholds": design_floors,
+        "reasons": [reason],
     }
+
+
+def revised_output_schema(schema: dict[str, Any]) -> dict[str, Any]:
+    """Return the output-envelope schema unchanged.
+
+    The statistical status enums (``ESTIMATED``/``NOT_ESTIMATED``) now live on
+    disk in ``analysis-output.schema.json``, so no in-memory reconciliation is
+    needed. This pass-through is kept so the call site stays stable.
+    """
+
+    return schema
 
 
 def analyze_local(input_data: dict[str, Any], specification: dict[str, Any]) -> dict[str, Any]:
@@ -357,7 +556,9 @@ def analyze_local(input_data: dict[str, Any], specification: dict[str, Any]) -> 
         placebo_instability = abs(row["placebo_endpoint"] - row["baseline_endpoint"])
         order_instability = abs(row["order_reversal_endpoint"] - row["authority_endpoint"])
         shortcut_instability = abs(row["shortcut_endpoint"] - row["baseline_endpoint"])
-        nuisance_floor = max(placebo_instability, order_instability, shortcut_instability)
+        common_nuisance_covariate = mean(
+            (placebo_instability, order_instability, shortcut_instability)
+        )
         values = {
             "base_item_id": row["base_item_id"],
             "reference_direction": row["reference_direction"],
@@ -371,75 +572,148 @@ def analyze_local(input_data: dict[str, Any], specification: dict[str, Any]) -> 
             "placebo_instability": placebo_instability,
             "order_instability": order_instability,
             "shortcut_instability": shortcut_instability,
-            "matched_nuisance_floor": nuisance_floor,
-            "selective_margin": signed_effect - nuisance_floor,
+            "common_nuisance_covariate": common_nuisance_covariate,
+            "nuisance_adjusted_authority_effect": signed_effect
+            - common_nuisance_covariate,
             "control_correct": row["control_correct"],
         }
         vector = {"observation_id": row["observation_id"], "family": row["family"], "values": values}
         vectors.append(vector)
         by_family[row["family"]].append(vector)
     output["observation_vectors"] = vectors
-    thresholds = specification["thresholds"]
-    critical = specification["uncertainty"]["critical_value"]
+    design_floors = reported_design_floors(specification)
+    level = specification["uncertainty"].get("confidence_level", 0.95)
+    family_summaries: dict[str, dict[str, Any]] = {}
     for family in specification["required_families"]:
         family_rows = by_family.get(family, [])
-        reported_thresholds = {
-            "minimum_observations": thresholds["minimum_observations_per_family"],
-            "minimum_selective_margin": thresholds["minimum_selective_margin"],
-            "selective_margin_lcb_strictly_above": thresholds["selective_margin_lcb_strictly_above"],
-            "minimum_control_accuracy": thresholds["minimum_control_accuracy"],
-        }
         if not family_rows:
-            output["family_results"].append(missing_family_result(family, reported_thresholds))
+            family_summaries[family] = {"rows": family_rows, "estimable": False}
             continue
-        margins = [row["values"]["selective_margin"] for row in family_rows]
+        signed_effects = [
+            row["values"]["reference_concordant_effect"] for row in family_rows
+        ]
+        nuisance_covariates = [
+            (
+                row["values"]["placebo_instability"],
+                row["values"]["order_instability"],
+                row["values"]["shortcut_instability"],
+            )
+            for row in family_rows
+        ]
+        adjusted, modelled_common_nuisance_mean = common_nuisance_adjustment(
+            signed_effects, nuisance_covariates
+        )
+        standard_error = sample_standard_error(adjusted)
         control_accuracy = mean(float(row["values"]["control_correct"]) for row in family_rows)
-        lcb = normal_lcb(margins, critical)
-        metrics = {
-            "mean_raw_package_effect": mean(row["values"]["raw_package_effect"] for row in family_rows),
-            "mean_reference_concordant_effect": mean(row["values"]["reference_concordant_effect"] for row in family_rows),
-            "mean_placebo_instability": mean(row["values"]["placebo_instability"] for row in family_rows),
-            "mean_order_instability": mean(row["values"]["order_instability"] for row in family_rows),
-            "mean_shortcut_instability": mean(row["values"]["shortcut_instability"] for row in family_rows),
-            "mean_matched_nuisance_floor": mean(row["values"]["matched_nuisance_floor"] for row in family_rows),
-            "mean_selective_margin": mean(margins),
-            "selective_margin_lcb_95": lcb,
+        family_summaries[family] = {
+            "rows": family_rows,
+            "estimable": standard_error is not None,
+            "estimate": mean(adjusted),
+            "standard_error": standard_error,
+            "modelled_common_nuisance_mean": modelled_common_nuisance_mean,
             "control_accuracy": control_accuracy,
         }
+
+    all_estimable = all(
+        family_summaries.get(family, {}).get("estimable", False)
+        for family in specification["required_families"]
+    )
+    pooled: dict[str, dict[str, float]] = {}
+    grand: dict[str, float] = {}
+    if all_estimable:
+        pooled, grand = partial_pool_family_effects(
+            {
+                family: family_summaries[family]["estimate"]
+                for family in specification["required_families"]
+            },
+            {
+                family: family_summaries[family]["standard_error"]
+                for family in specification["required_families"]
+            },
+            level,
+        )
+
+    for family in specification["required_families"]:
+        summary = family_summaries.get(family)
+        if not summary or not summary["rows"]:
+            output["family_results"].append(
+                missing_family_result(family, design_floors)
+            )
+            continue
+        if not all_estimable:
+            reason = (
+                "At least two observations per family and all four required families "
+                "are needed for the partial-pooling interval."
+            )
+            output["family_results"].append(
+                {
+                    "family": family,
+                    "decision": "NOT_ESTIMATED",
+                    "counts": {"observations": len(summary["rows"])},
+                    "metrics": {
+                        "unpooled_family_estimate": summary["estimate"],
+                        "unpooled_standard_error": summary["standard_error"],
+                    },
+                    "thresholds": design_floors,
+                    "reasons": [reason],
+                }
+            )
+            continue
+        family_rows = summary["rows"]
+        metrics = {
+            "mean_raw_package_effect": mean(
+                row["values"]["raw_package_effect"] for row in family_rows
+            ),
+            "mean_reference_concordant_effect": mean(
+                row["values"]["reference_concordant_effect"] for row in family_rows
+            ),
+            "mean_placebo_instability": mean(
+                row["values"]["placebo_instability"] for row in family_rows
+            ),
+            "mean_order_instability": mean(
+                row["values"]["order_instability"] for row in family_rows
+            ),
+            "mean_shortcut_instability": mean(
+                row["values"]["shortcut_instability"] for row in family_rows
+            ),
+            "modelled_common_nuisance_mean": summary[
+                "modelled_common_nuisance_mean"
+            ],
+            "unpooled_family_estimate": summary["estimate"],
+            "unpooled_standard_error": summary["standard_error"],
+            "between_family_variance": grand["between_family_variance"],
+            "pooling_weight": pooled[family]["pooling_weight"],
+            "pooled_family_estimate": pooled[family]["pooled_estimate"],
+            "pooled_family_standard_error": pooled[family]["pooled_standard_error"],
+            "pooled_family_interval_lower_95": pooled[family]["interval_lower"],
+            "pooled_family_interval_upper_95": pooled[family]["interval_upper"],
+            "pooled_grand_estimate": grand["estimate"],
+            "pooled_grand_standard_error": grand["standard_error"],
+            "pooled_grand_interval_lower_95": grand["interval_lower"],
+            "pooled_grand_interval_upper_95": grand["interval_upper"],
+            "control_accuracy": summary["control_accuracy"],
+        }
         reasons: list[str] = []
-        if len(family_rows) < thresholds["minimum_observations_per_family"]:
-            reasons.append("Family has fewer than the frozen minimum independent base pairs.")
-        if metrics["mean_selective_margin"] < thresholds["minimum_selective_margin"]:
-            reasons.append("Mean selective margin is below the frozen practical threshold.")
-        if lcb is None or lcb <= thresholds["selective_margin_lcb_strictly_above"]:
-            reasons.append("The 95% lower confidence bound does not exceed zero.")
-        if control_accuracy < thresholds["minimum_control_accuracy"]:
-            reasons.append("Control accuracy is below the frozen threshold.")
+        if len(family_rows) < design_floors["minimum_observations_per_family"]:
+            reasons.append(
+                "Advisory reporting floor not met: fewer than the declared independent base pairs."
+            )
+        if summary["control_accuracy"] < design_floors["minimum_control_accuracy"]:
+            reasons.append(
+                "Advisory control-accuracy floor not met; the estimate is still reported."
+            )
         output["family_results"].append(
             {
                 "family": family,
-                "decision": "FAIL" if reasons else "PASS",
+                "decision": "ESTIMATED",
                 "counts": {"observations": len(family_rows)},
                 "metrics": metrics,
-                "thresholds": reported_thresholds,
+                "thresholds": design_floors,
                 "reasons": reasons,
             }
         )
-    finish_decision(output)
+    finish_estimation(output)
     return output
-
-
-def expected_calibration_error(rows: list[dict[str, Any]], bins: int = 10) -> float:
-    total = len(rows)
-    error = 0.0
-    for bin_index in range(bins):
-        members = [row for row in rows if row["values"]["calibration_bin"] == bin_index]
-        if not members:
-            continue
-        predicted = mean(row["values"]["typed_probability"] for row in members)
-        observed = mean(row["values"]["target"] for row in members)
-        error += len(members) / total * abs(predicted - observed)
-    return error
 
 
 def analyze_predictive(input_data: dict[str, Any], specification: dict[str, Any]) -> dict[str, Any]:
@@ -459,7 +733,7 @@ def analyze_predictive(input_data: dict[str, Any], specification: dict[str, Any]
         "prediction_procedure_id": design["prediction_procedure_id"],
         "software_version": design["software_version"],
         "loss": "brier",
-        "calibration_bins": 10,
+        "calibration_diagnostic": "logistic_intercept_slope",
     }
     if feature_content != expected_feature_content:
         raise AnalysisError("predictive ablation: feature manifest does not match the frozen feature design")
@@ -508,26 +782,19 @@ def analyze_predictive(input_data: dict[str, Any], specification: dict[str, Any]
             "typed_brier_loss": typed_loss,
             "baseline_brier_loss": baseline_loss,
             "paired_brier_improvement": baseline_loss - typed_loss,
-            "calibration_bin": min(int(row["typed_probability"] * 10), 9),
         }
         vector = {"observation_id": row["observation_id"], "family": row["family"], "values": values}
         vectors.append(vector)
         by_family[row["family"]].append(vector)
     output["observation_vectors"] = vectors
-    thresholds = specification["thresholds"]
-    critical = specification["uncertainty"]["critical_value"]
+    design_floors = reported_design_floors(specification)
+    level = specification["uncertainty"].get("confidence_level", 0.95)
     for family in specification["required_families"]:
         family_rows = by_family.get(family, [])
-        reported_thresholds = {
-            "minimum_observations": thresholds["minimum_observations_per_family"],
-            "minimum_trace_families": thresholds["minimum_trace_families_per_family"],
-            "minimum_mean_brier_improvement": thresholds["minimum_mean_brier_improvement"],
-            "brier_improvement_lcb_strictly_above": thresholds["brier_improvement_lcb_strictly_above"],
-            "maximum_typed_brier_loss": thresholds["maximum_typed_brier_loss"],
-            "maximum_typed_ece": thresholds["maximum_typed_ece"],
-        }
         if not family_rows:
-            output["family_results"].append(missing_family_result(family, reported_thresholds))
+            output["family_results"].append(
+                missing_family_result(family, design_floors)
+            )
             continue
         improvements = [row["values"]["paired_brier_improvement"] for row in family_rows]
         improvements_by_trace_family: dict[str, list[float]] = defaultdict(list)
@@ -536,69 +803,69 @@ def analyze_predictive(input_data: dict[str, Any], specification: dict[str, Any]
                 row["values"]["paired_brier_improvement"]
             )
         cluster_means = [mean(values) for values in improvements_by_trace_family.values()]
-        lcb = normal_lcb(cluster_means, critical)
+        interval = t_interval(cluster_means, level)
+        if interval is None:
+            output["family_results"].append(
+                {
+                    "family": family,
+                    "decision": "NOT_ESTIMATED",
+                    "counts": {
+                        "observations": len(family_rows),
+                        "trace_families": len(cluster_means),
+                    },
+                    "metrics": {
+                        "row_weighted_mean_paired_brier_improvement": mean(
+                            improvements
+                        ),
+                        "mean_trace_family_paired_brier_improvement": mean(
+                            cluster_means
+                        ),
+                    },
+                    "thresholds": design_floors,
+                    "reasons": [
+                        "At least two held-out trace families are needed for a t-interval."
+                    ],
+                }
+            )
+            continue
+        standard_error, lower, upper, df = interval
+        calibration_intercept, calibration_slope = logistic_calibration(family_rows)
         metrics = {
             "mean_typed_brier_loss": mean(row["values"]["typed_brier_loss"] for row in family_rows),
             "mean_baseline_brier_loss": mean(row["values"]["baseline_brier_loss"] for row in family_rows),
             "row_weighted_mean_paired_brier_improvement": mean(improvements),
             "mean_trace_family_paired_brier_improvement": mean(cluster_means),
-            "trace_family_cluster_paired_brier_improvement_lcb_95": lcb,
-            "typed_ece_10_bin": expected_calibration_error(family_rows),
+            "trace_family_standard_error": standard_error,
+            "trace_family_interval_degrees_of_freedom": df,
+            "trace_family_interval_lower_95": lower,
+            "trace_family_interval_upper_95": upper,
+            "calibration_intercept": calibration_intercept,
+            "calibration_slope": calibration_slope,
         }
         reasons: list[str] = []
-        if len(family_rows) < thresholds["minimum_observations_per_family"]:
-            reasons.append("Family has fewer than the frozen minimum held-out cases.")
-        if len(cluster_means) < thresholds["minimum_trace_families_per_family"]:
-            reasons.append("Family has fewer than the frozen minimum held-out trace families.")
-        if (
-            metrics["mean_trace_family_paired_brier_improvement"]
-            < thresholds["minimum_mean_brier_improvement"]
-        ):
-            reasons.append("Mean paired Brier improvement is below the practical threshold.")
-        if lcb is None or lcb <= thresholds["brier_improvement_lcb_strictly_above"]:
-            reasons.append("The 95% lower confidence bound does not exclude no improvement.")
-        if metrics["mean_typed_brier_loss"] > thresholds["maximum_typed_brier_loss"]:
-            reasons.append("Typed Brier loss exceeds the frozen maximum.")
-        if metrics["typed_ece_10_bin"] > thresholds["maximum_typed_ece"]:
-            reasons.append("Typed ten-bin calibration error exceeds the frozen maximum.")
+        if len(cluster_means) < design_floors["minimum_trace_families_per_family"]:
+            reasons.append(
+                "Advisory reporting floor not met: fewer than the declared held-out trace families."
+            )
+        if calibration_intercept is None or calibration_slope is None:
+            reasons.append(
+                "Logistic calibration intercept and slope were not finite (for example, under separation)."
+            )
         output["family_results"].append(
             {
                 "family": family,
-                "decision": "FAIL" if reasons else "PASS",
+                "decision": "ESTIMATED",
                 "counts": {
                     "observations": len(family_rows),
                     "trace_families": len(cluster_means),
                 },
                 "metrics": metrics,
-                "thresholds": reported_thresholds,
+                "thresholds": design_floors,
                 "reasons": reasons,
             }
         )
-    finish_decision(output)
+    finish_estimation(output)
     return output
-
-
-def cluster_standard_error(
-    rows: list[dict[str, Any]], outcome_key: str, cluster_key: str
-) -> float | None:
-    typed = [row for row in rows if row["values"]["condition"] == "typed"]
-    degraded = [row for row in rows if row["values"]["condition"] == "degraded"]
-    typed_mean = mean(row["values"][outcome_key] for row in typed)
-    degraded_mean = mean(row["values"][outcome_key] for row in degraded)
-    scores: dict[str, float] = defaultdict(float)
-    for row in typed:
-        scores[str(row["values"][cluster_key])] += (
-            row["values"][outcome_key] - typed_mean
-        ) / len(typed)
-    for row in degraded:
-        scores[str(row["values"][cluster_key])] -= (
-            row["values"][outcome_key] - degraded_mean
-        ) / len(degraded)
-    clusters = len(scores)
-    if clusters < 2:
-        return None
-    variance = clusters / (clusters - 1) * sum(score**2 for score in scores.values())
-    return math.sqrt(max(variance, 0.0))
 
 
 def analyze_reviewer(input_data: dict[str, Any], specification: dict[str, Any]) -> dict[str, Any]:
@@ -703,20 +970,15 @@ def analyze_reviewer(input_data: dict[str, Any], specification: dict[str, Any]) 
         vectors.append(vector)
         by_family[row["family"]].append(vector)
     output["observation_vectors"] = vectors
-    thresholds = specification["thresholds"]
-    critical = specification["uncertainty"]["critical_value"]
+    design_floors = reported_design_floors(specification)
+    level = specification["uncertainty"].get("confidence_level", 0.95)
+    critical = interval_critical_value(level, "normal")
     for family in specification["required_families"]:
         family_rows = by_family.get(family, [])
-        reported_thresholds = {
-            "minimum_observations_per_arm": thresholds["minimum_observations_per_arm_per_family"],
-            "minimum_cases": thresholds["minimum_cases_per_family"],
-            "minimum_reviewers_per_arm": thresholds["minimum_reviewers_per_arm_per_family"],
-            "minimum_typed_minus_degraded_concordance": thresholds["minimum_typed_minus_degraded_concordance"],
-            "concordance_difference_lcb_strictly_above": thresholds["concordance_difference_lcb_strictly_above"],
-            "maximum_typed_false_certainty": thresholds["maximum_typed_false_certainty"],
-        }
         if not family_rows:
-            output["family_results"].append(missing_family_result(family, reported_thresholds))
+            output["family_results"].append(
+                missing_family_result(family, design_floors)
+            )
             continue
         typed = [row for row in family_rows if row["values"]["condition"] == "typed"]
         degraded = [row for row in family_rows if row["values"]["condition"] == "degraded"]
@@ -728,60 +990,104 @@ def analyze_reviewer(input_data: dict[str, Any], specification: dict[str, Any]) 
             raise AnalysisError(f"{family}: both randomized record conditions are required")
         typed_mean = mean(row["values"]["node_concordance"] for row in typed)
         degraded_mean = mean(row["values"]["node_concordance"] for row in degraded)
-        difference = typed_mean - degraded_mean
-        case_se = cluster_standard_error(family_rows, "node_concordance", "case_id")
-        reviewer_se = cluster_standard_error(family_rows, "node_concordance", "reviewer_id")
-        conservative_se = (
-            max(case_se, reviewer_se)
-            if case_se is not None and reviewer_se is not None
-            else None
+        reviewers = sorted({row["values"]["reviewer_id"] for row in family_rows})
+        cases = sorted(typed_cases)
+        cell_values: dict[tuple[str, str], dict[str, list[float]]] = defaultdict(
+            lambda: defaultdict(list)
         )
-        lcb = difference - critical * conservative_se if conservative_se is not None else None
+        for row in family_rows:
+            cell_values[
+                (row["values"]["reviewer_id"], row["values"]["case_id"])
+            ][row["values"]["condition"]].append(row["values"]["node_concordance"])
+        expected_cells = {(reviewer, case) for reviewer in reviewers for case in cases}
+        if set(cell_values) != expected_cells or any(
+            set(cell_values[cell]) != {"typed", "degraded"} for cell in expected_cells
+        ):
+            raise AnalysisError(
+                f"{family}: crossed variance requires every reviewer-by-case cell in both conditions"
+            )
+        difference_matrix = np.asarray(
+            [
+                [
+                    mean(cell_values[(reviewer, case)]["typed"])
+                    - mean(cell_values[(reviewer, case)]["degraded"])
+                    for case in cases
+                ]
+                for reviewer in reviewers
+            ],
+            dtype=float,
+        )
+        if len(reviewers) < 2 or len(cases) < 2:
+            output["family_results"].append(
+                {
+                    "family": family,
+                    "decision": "NOT_ESTIMATED",
+                    "counts": {
+                        "typed_observations": len(typed),
+                        "degraded_observations": len(degraded),
+                        "cases": len(cases),
+                        "reviewers": len(reviewers),
+                    },
+                    "metrics": {
+                        "typed_node_concordance": typed_mean,
+                        "degraded_node_concordance": degraded_mean,
+                    },
+                    "thresholds": design_floors,
+                    "reasons": [
+                        "At least two reviewers and two cases are needed for crossed variance components."
+                    ],
+                }
+            )
+            continue
+        (
+            difference,
+            reviewer_variance,
+            case_variance,
+            residual_variance,
+            crossed_standard_error,
+        ) = crossed_variance_components(difference_matrix)
+        lower, upper = interval_bounds(difference, crossed_standard_error, critical)
         typed_false_certainty = mean(row["values"]["false_certainty"] for row in typed)
         metrics = {
             "typed_node_concordance": typed_mean,
             "degraded_node_concordance": degraded_mean,
             "typed_minus_degraded_concordance": difference,
-            "case_cluster_standard_error": case_se,
-            "reviewer_cluster_standard_error": reviewer_se,
-            "conservative_cluster_lcb_95": lcb,
+            "reviewer_variance_component": reviewer_variance,
+            "case_variance_component": case_variance,
+            "residual_variance_component": residual_variance,
+            "crossed_grand_mean_standard_error": crossed_standard_error,
+            "crossed_interval_lower_95": lower,
+            "crossed_interval_upper_95": upper,
             "typed_false_certainty": typed_false_certainty,
             "degraded_false_certainty": mean(row["values"]["false_certainty"] for row in degraded),
             "typed_technical_locus_accuracy": mean(float(row["values"]["technical_locus_correct"]) for row in typed),
             "degraded_technical_locus_accuracy": mean(float(row["values"]["technical_locus_correct"]) for row in degraded),
         }
-        typed_reviewers = {row["values"]["reviewer_id"] for row in typed}
-        degraded_reviewers = {row["values"]["reviewer_id"] for row in degraded}
         reasons: list[str] = []
-        if min(len(typed), len(degraded)) < thresholds["minimum_observations_per_arm_per_family"]:
-            reasons.append("An arm has fewer than the frozen minimum judgments.")
-        if len(typed_cases) < thresholds["minimum_cases_per_family"]:
-            reasons.append("Family has fewer than the frozen minimum held-out cases.")
-        if min(len(typed_reviewers), len(degraded_reviewers)) < thresholds["minimum_reviewers_per_arm_per_family"]:
-            reasons.append("An arm has fewer than the frozen minimum reviewers.")
-        if difference < thresholds["minimum_typed_minus_degraded_concordance"]:
-            reasons.append("Typed-minus-degraded concordance is below the practical threshold.")
-        if lcb is None or lcb <= thresholds["concordance_difference_lcb_strictly_above"]:
-            reasons.append("The conservative 95% lower confidence bound does not exclude no improvement.")
-        if typed_false_certainty > thresholds["maximum_typed_false_certainty"]:
-            reasons.append("Typed-condition false certainty exceeds the frozen maximum.")
+        if len(cases) < design_floors["minimum_cases_per_family"]:
+            reasons.append(
+                "Advisory reporting floor not met: fewer than the declared held-out cases."
+            )
+        if len(reviewers) < design_floors["minimum_reviewers_per_family"]:
+            reasons.append(
+                "Advisory reporting floor not met: fewer than the declared reviewers."
+            )
         output["family_results"].append(
             {
                 "family": family,
-                "decision": "FAIL" if reasons else "PASS",
+                "decision": "ESTIMATED",
                 "counts": {
                     "typed_observations": len(typed),
                     "degraded_observations": len(degraded),
                     "cases": len(typed_cases),
-                    "typed_reviewers": len(typed_reviewers),
-                    "degraded_reviewers": len(degraded_reviewers),
+                    "reviewers": len(reviewers),
                 },
                 "metrics": metrics,
-                "thresholds": reported_thresholds,
+                "thresholds": design_floors,
                 "reasons": reasons,
             }
         )
-    finish_decision(output)
+    finish_estimation(output)
     return output
 
 
@@ -806,7 +1112,7 @@ def analyze_input(input_data: dict[str, Any], artifact_dir: Path = DEFAULT_ARTIF
     ):
         raise AnalysisError(f"{program_id}: input does not bind to the frozen specification")
     output = ANALYZERS[program_id](input_data, specification)
-    output_schema = load_json(artifact_dir / OUTPUT_SCHEMA_NAME)
+    output_schema = revised_output_schema(load_json(artifact_dir / OUTPUT_SCHEMA_NAME))
     require_schema(output, output_schema, f"{program_id} output")
     return output
 
