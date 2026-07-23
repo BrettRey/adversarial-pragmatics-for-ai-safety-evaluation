@@ -38,10 +38,23 @@ RESPONSES_ARG = $(if $(RESPONSES),--responses $(RESPONSES),)
 SUMMARY_DIR_ARG = $(if $(SUMMARY_DIR),--summary-dir $(SUMMARY_DIR),)
 
 # Targets
-.PHONY: all all-papers clean distclean view view-supplement view-delegation view-evidentiary delegation evidentiary help test validate-items validate-study-b analyze-study-b validate-claims validate-delegation validate-sources assurance-check privacy-check public-check phase1-check pilot-local pilot-smoke pilot-diagnose pilot-review-app pilot-ingest-adjudication pilot-adjudication-report pilot-figures pilot-judge-validation fake-dev-calibration study-a-synthetic study-a-self-pilot study-a-self-pilot-report study-a-judge-audit study-a-production-build study-a-manifest-stamp1 study-a-manifest-stamp2 study-a-manifest-verify study-a-freeze-ready study-a-collection-ready discovery-synthetic discovery-naturalistic-synthetic design-analysis
+.PHONY: all all-papers clean distclean view view-supplement view-delegation view-evidentiary delegation evidentiary help test validate-items validate-study-b analyze-study-b validate-claims validate-delegation validate-sources assurance-check privacy-check public-check phase1-check pilot-local pilot-smoke pilot-diagnose pilot-review-app pilot-ingest-adjudication pilot-adjudication-report pilot-figures pilot-judge-validation fake-dev-calibration study-a-synthetic study-a-self-pilot study-a-self-pilot-report study-a-judge-audit study-a-production-build study-a-manifest-stamp1 study-a-manifest-stamp2 study-a-manifest-verify study-a-freeze-ready study-a-collection-ready discovery-synthetic discovery-naturalistic-synthetic design-analysis vendor-bib
+
+# Central house bibliography, vendored into this repo as references.bib so the
+# public/arXiv build is self-contained.
+CENTRAL_BIB ?= ../../../.house-style/references.bib
 
 # Default target: build the paper and supplement PDFs
 all: $(MAIN).pdf $(SUPPLEMENT).pdf
+
+# Refresh the vendored references.bib from the portfolio central bib. Run this
+# (a maintainer action, in Brett's portfolio checkout) after /push-bib moves
+# entries into the central bib, so the self-contained build can resolve them.
+# references-local.bib should hold only entries not yet pushed to central.
+vendor-bib:
+	@test -f "$(CENTRAL_BIB)" || { echo "central bib not found at $(CENTRAL_BIB); set CENTRAL_BIB=..."; exit 1; }
+	cp "$(CENTRAL_BIB)" references.bib
+	@echo "==> Vendored references.bib refreshed: $$(grep -c '^@' references.bib) entries from $(CENTRAL_BIB)"
 
 # Full build sequence with bibliography
 $(MAIN).pdf: $(MAIN).tex $(SECTION_TEX) references.bib references-local.bib
