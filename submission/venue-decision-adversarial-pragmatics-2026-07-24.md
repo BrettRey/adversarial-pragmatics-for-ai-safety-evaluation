@@ -11,8 +11,8 @@
 - [x] Date checked: 2026-07-24
 - [x] Decision owner: Brett
 - [x] Assisting agent/model: Claude Opus 5 (1M context), with a four-agent parallel verification sweep over 16 journals
-- [x] Recommendation status: **proposed**
-- [ ] Final decision: submit / retarget / revise before target choice / defer
+- [x] Recommendation status: **approved** (Brett, 2026-07-24: "JAIR")
+- [x] Final decision: **submit to JAIR**, after arXiv v3. LRE is not pursued.
 
 Standing constraint applied before the shortlist was built: **journals only, no
 conferences or workshops** (Brett, 2026-07-24). This is severe for this paper.
@@ -135,8 +135,8 @@ Ethics.
 Resolution:
 
 - [ ] Risks resolved before package work.
-- [ ] Risks accepted explicitly by Brett.
-- [x] **Awaiting Brett's choice between JAIR and LRE.**
+- [x] **Risks accepted explicitly by Brett**: he chose JAIR on 2026-07-24, which takes the Springer CC-BY preprint conflict off the table entirely rather than accepting it. The remaining risks are the JAIR scope-stretch question and the 18-item evidential-base objection, both live.
+- [ ] Risks unresolved: pause.
 
 ## Evidence And Motivation Test
 
@@ -179,8 +179,8 @@ Resolution:
 
 ## Package Authorization
 
-- [ ] Venue decision approved before target-specific package work begins.
-- [ ] Brett has approved the target or explicitly delegated the decision.
+- [x] Venue decision approved before target-specific package work begins.
+- [x] Brett has approved the target (2026-07-24).
 - [ ] Unresolved risks copied into the pre-submission checklist.
 - [ ] Record linked from `DECISIONS.md` and `STATUS.md` if submission proceeds.
 
