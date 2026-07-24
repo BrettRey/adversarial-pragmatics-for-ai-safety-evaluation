@@ -345,15 +345,16 @@ require version-specific caveats that the comparison doesn't depend on.
 \section{Study B design floors and estimands}
 
 An earlier version of the claim register froze quantitative pass/fail gates
-before any target data. This paper keeps the numbers but not the gates, for the
-reasons the companion delegation-assurance design analysis sets out
-\citep{reynolds2026delegationAssurance,gelman2014types}. Conditioning a verdict
-on whether an interval lower bound clears a positive threshold selects inflated
-effects, a Type-M error; subtracting the largest of several nuisance shifts
-over-subtracts, because the maximum of noisy nonnegative quantities is biased
-upward; a ten-bin calibration error computed on thirty cases rejects a
-well-calibrated predictor most of the time; and taking the larger of two
-one-way cluster standard errors undercovers a crossed design.
+before any target data. This paper keeps the numbers but not the gates. Two
+defects in the frozen forms are enough to retire them, and neither needs target
+data to establish. Conditioning a verdict on whether an interval lower bound
+clears a positive threshold selects inflated effects, a Type-M error
+\citep{gelman2014types}, and the frozen threshold sat above zero rather than at
+it, which exaggerates more than the standard case. Subtracting the largest of
+several nuisance shifts over-subtracts, because the maximum of noisy
+nonnegative quantities is biased upward. A companion delegation-assurance paper
+quantifies both by simulation under its own declared design parameters
+\citep{reynolds2026delegationAssurance}.
 
 The operative rule is an estimand with reported uncertainty. Study B estimates
 the family-level authority effect, the average over base pairs of the
