@@ -58,8 +58,8 @@ reviews/              # review-board or external review notes
 
 - Do not cite the setup prompt as if it verifies its linked claims.
 - Before adding a citation or factual claim about an organization, job posting, safety report, or research agenda, verify the source and record it in `notes/source-verification.md`.
-- New bibliographic entries belong in `references-local.bib` unless Brett explicitly asks for a central-bib update.
-- `references.bib` is a vendored public-repository snapshot of the central bibliography; update it only when refreshing the public build dependency.
+- New bibliographic entries belong in `references-local.bib` unless Brett explicitly asks for a central-bib update. `references-local.bib` is append-only across agents: add entries, never overwrite the whole file with just your own, or you drop every other paper's sources.
+- `references.bib` is a vendored full mirror of the portfolio central bib, kept as a real file (not a symlink) so the public/arXiv build is self-contained. `/push-bib` moves local entries into the central bib but does NOT refresh this vendored copy, so after any `/push-bib` run `make vendor-bib` (refreshes `references.bib` from central; `CENTRAL_BIB` overridable). Skipping it silently breaks every build in the repo, since the moved entries then live only in central, which no paper's build reads.
 - Every cited external source should have genuine local full text or a complete local copy of the cited page recorded in `notes/cited-source-local-archive.md`.
 - Do not leave project sources in `Downloads`; move verified copies into the shared literature archive and record their exact path and hash.
 

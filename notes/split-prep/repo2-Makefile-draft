@@ -1,0 +1,154 @@
+# Makefile for LaTeX paper compilation and assurance-artifact checks
+# Delegation Assurance and Evidentiary Assurance
+#
+# DRAFT, not yet placed as this repository's Makefile. Derived by reading the CURRENT
+# Makefile in adversarial-pragmatics-for-ai-safety-evaluation (2026-07-24) and keeping only
+# the delegation/evidentiary-relevant targets. A sibling agent is refactoring that Makefile
+# into per-paper blocks concurrently -- re-sync this draft against the refactored version
+# before using it; do not treat it as final without that check.
+
+# Configuration
+LATEX = xelatex
+BIBER = biber
+DELEGATION = delegation-assurance
+EVIDENTIARY = evidentiary-assurance
+OUTDIR = .
+DELEGATION_SECTION_TEX = $(wildcard sections-delegation/*.tex)
+EVIDENTIARY_SECTION_TEX = $(wildcard sections-evidentiary/*.tex)
+
+.PHONY: all clean distclean view-delegation view-evidentiary delegation evidentiary help \
+        validate-claims validate-delegation validate-evidentiary validate-sources \
+        assurance-check design-analysis vendor-bib
+
+# Central house bibliography, vendored into this repo as references.bib so the
+# public build is self-contained.
+CENTRAL_BIB ?= ../../../.house-style/references.bib
+
+# Default target: build both paper PDFs
+all: $(DELEGATION).pdf $(EVIDENTIARY).pdf
+
+# Refresh the vendored references.bib from the portfolio central bib. Run this
+# (a maintainer action, in Brett's portfolio checkout) after /push-bib moves
+# entries into the central bib, so the self-contained build can resolve them.
+# references-local.bib should hold only entries not yet pushed to central.
+vendor-bib:
+	@test -f "$(CENTRAL_BIB)" || { echo "central bib not found at $(CENTRAL_BIB); set CENTRAL_BIB=..."; exit 1; }
+	cp "$(CENTRAL_BIB)" references.bib
+	@echo "==> Vendored references.bib refreshed: $$(grep -c '^@' references.bib) entries from $(CENTRAL_BIB)"
+
+$(DELEGATION).pdf: $(DELEGATION).tex $(DELEGATION_SECTION_TEX) references.bib references-local.bib
+	@echo "==> First delegation-assurance LaTeX pass..."
+	$(LATEX) -output-directory=$(OUTDIR) $(DELEGATION).tex
+	@echo "==> Running Biber for delegation-assurance..."
+	$(BIBER) $(DELEGATION)
+	@echo "==> Second delegation-assurance LaTeX pass..."
+	$(LATEX) -output-directory=$(OUTDIR) $(DELEGATION).tex
+	@echo "==> Third delegation-assurance LaTeX pass..."
+	$(LATEX) -output-directory=$(OUTDIR) $(DELEGATION).tex
+	@echo "==> Build complete: $(DELEGATION).pdf"
+
+delegation: $(DELEGATION).pdf
+
+$(EVIDENTIARY).pdf: $(EVIDENTIARY).tex $(EVIDENTIARY_SECTION_TEX) references.bib references-local.bib
+	@echo "==> First evidentiary-assurance LaTeX pass..."
+	$(LATEX) -output-directory=$(OUTDIR) $(EVIDENTIARY).tex
+	@echo "==> Running Biber for evidentiary-assurance..."
+	$(BIBER) $(EVIDENTIARY)
+	@echo "==> Second evidentiary-assurance LaTeX pass..."
+	$(LATEX) -output-directory=$(OUTDIR) $(EVIDENTIARY).tex
+	@echo "==> Third evidentiary-assurance LaTeX pass..."
+	$(LATEX) -output-directory=$(OUTDIR) $(EVIDENTIARY).tex
+	@echo "==> Build complete: $(EVIDENTIARY).pdf"
+
+evidentiary: $(EVIDENTIARY).pdf
+
+# Clean build artifacts (keep PDFs)
+clean:
+	@echo "==> Cleaning build artifacts..."
+	rm -f $(DELEGATION).aux $(DELEGATION).bbl $(DELEGATION).bcf $(DELEGATION).blg $(DELEGATION).log
+	rm -f $(DELEGATION).out $(DELEGATION).run.xml $(DELEGATION).toc $(DELEGATION).fdb_latexmk
+	rm -f $(DELEGATION).fls $(DELEGATION).synctex.gz
+	rm -f $(EVIDENTIARY).aux $(EVIDENTIARY).bbl $(EVIDENTIARY).bcf $(EVIDENTIARY).blg $(EVIDENTIARY).log
+	rm -f $(EVIDENTIARY).out $(EVIDENTIARY).run.xml $(EVIDENTIARY).toc $(EVIDENTIARY).fdb_latexmk
+	rm -f $(EVIDENTIARY).fls $(EVIDENTIARY).synctex.gz
+	@echo "==> Clean complete"
+
+distclean: clean
+	@echo "==> Removing PDFs..."
+	rm -f $(DELEGATION).pdf $(EVIDENTIARY).pdf
+	@echo "==> Deep clean complete"
+
+view-delegation: $(DELEGATION).pdf
+	@echo "==> Opening delegation-assurance PDF..."
+	open $(DELEGATION).pdf
+
+view-evidentiary: $(EVIDENTIARY).pdf
+	@echo "==> Opening evidentiary-assurance PDF..."
+	open $(EVIDENTIARY).pdf
+
+# Validate the shared prospective projective-claim protocol against both papers'
+# registers. assurance/shared/ is a duplicate of the copy kept in the sibling
+# flagship-benchmark repository (adversarial-pragmatics-for-ai-safety-evaluation);
+# keep both copies in sync by hand until/unless a shared-package mechanism exists.
+validate-claims:
+	@echo "==> Validating prospective projective-claim protocol..."
+	python3 scripts/validate_claim_register.py --self-test
+	python3 scripts/validate_claim_register.py assurance/delegation/projective-claim-register.json
+	python3 scripts/validate_claim_register.py assurance/evidentiary/projective-claim-register.json
+
+# Validate the Delegation Assurance semantics and all three frozen prospective
+# empirical programmes. Synthetic tests exercise pass, fail, noncompensation,
+# manifest integrity, split leakage, oracle masking, and zero-data output.
+validate-delegation:
+	@echo "==> Validating Delegation Assurance artifacts..."
+	python3 scripts/validate_delegation_artifacts.py
+	python3 scripts/analyze_delegation_programs.py --validate-specs
+	python3 -m unittest scripts.test_validate_delegation_artifacts
+	python3 -m unittest scripts.test_analyze_delegation_programs
+	python3 -m unittest scripts.test_design_analysis
+
+design-analysis:
+	@echo "==> Running delegation design analysis (standard profile)..."
+	python3 scripts/design_analysis.py --profile standard
+
+# Validate the Evidentiary Assurance claim graph, applicability map, fixtures,
+# and calibration analyser.
+validate-evidentiary:
+	@echo "==> Validating Evidentiary Assurance artifacts..."
+	python3 scripts/stamp_evidentiary_artifacts.py --check
+	python3 scripts/validate_evidentiary_artifacts.py
+	python3 scripts/analyze_evidentiary_calibration.py --self-test
+	python3 scripts/analyze_evidentiary_calibration.py
+	python3 -m unittest scripts.test_stamp_evidentiary_artifacts
+
+# TODO at execution time: a repo-local equivalent of the flagship repository's
+# check_cited_source_archive.py / notes/cited-source-local-archive.md, scoped to
+# this repository's own two .tex files instead of all three. Not drafted here
+# because both the script and the archive note are mid-edit in the source
+# repository at split time; seed this repo's archive from the DA/EA entries in
+# that file rather than starting from zero.
+validate-sources:
+	@echo "==> validate-sources not yet implemented for this repository; see TODO above"
+	@exit 1
+
+# Run all executable assurance artifacts for both papers.
+assurance-check: validate-claims validate-delegation validate-evidentiary
+	@echo "==> All Delegation/Evidentiary Assurance artifacts validated."
+
+# Show available targets
+help:
+	@echo "Available targets:"
+	@echo "  make                  - Build both PDFs (default)"
+	@echo "  make delegation       - Build delegation-assurance.pdf"
+	@echo "  make evidentiary      - Build evidentiary-assurance.pdf"
+	@echo "  make view-delegation  - Open delegation-assurance.pdf (macOS only)"
+	@echo "  make view-evidentiary - Open evidentiary-assurance.pdf (macOS only)"
+	@echo "  make clean            - Remove build artifacts (keep PDFs)"
+	@echo "  make distclean        - Remove everything including PDFs"
+	@echo "  make vendor-bib       - Refresh references.bib from the portfolio central bib"
+	@echo "  make validate-claims  - Validate the shared projective-claim protocol"
+	@echo "  make validate-delegation  - Validate Delegation Assurance artifacts"
+	@echo "  make design-analysis  - Run delegation design analysis by simulation"
+	@echo "  make validate-evidentiary - Validate Evidentiary Assurance artifacts"
+	@echo "  make assurance-check  - Run all executable assurance-artifact checks"
+	@echo "  make help             - Show this help message"

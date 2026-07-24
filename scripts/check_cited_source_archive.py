@@ -1,8 +1,16 @@
 #!/usr/bin/env python3
-"""Verify that every source cited by the three papers has an intact local copy."""
+"""Verify that every source cited by the three papers has an intact local copy.
+
+By default this checks the pooled manifest against all three papers' sources,
+exactly as before. Pass --paper {ap,delegation,evidentiary} to instead check
+one paper's own sources against the manifest rows attributed to that paper
+(via the manifest's "Cited by" column) -- the scope a future single-paper repo
+would run after a split. Default (no flag) behaviour is unchanged.
+"""
 
 from __future__ import annotations
 
+import argparse
 import hashlib
 import re
 from pathlib import Path
@@ -18,8 +26,26 @@ TEX_GLOBS = (
     "evidentiary-assurance.tex",
     "sections-evidentiary/*.tex",
 )
+# Per-paper scopes for --paper. Slugs match the eventual repo split (AP alone;
+# DA+EA together) and the load-bearing-claim-audit.csv per-paper file slugs.
+PAPER_TEX_GLOBS: dict[str, tuple[str, ...]] = {
+    "ap": ("adversarial-pragmatics-for-ai-safety-evaluation.tex", "sections/*.tex"),
+    "delegation": ("delegation-assurance.tex", "sections-delegation/*.tex"),
+    "evidentiary": ("evidentiary-assurance.tex", "sections-evidentiary/*.tex"),
+}
+# Labels as they appear in the manifest's "Cited by" column.
+PAPER_LABELS: dict[str, str] = {
+    "ap": "Adversarial Pragmatics",
+    "delegation": "Delegation Assurance",
+    "evidentiary": "Evidentiary Assurance",
+}
+# biblatex provides sentence-initial capitalized forms (\Textcite, \Parencite,
+# \Autocite, ...). The command name must therefore accept an optional capital on
+# its first letter, or cited sources go undetected and the coverage figure
+# silently overstates completeness.
 CITE_RE = re.compile(
-    r"\\(?:cite|citep|textcite|parencite|citealt|citeauthor|citeyear|autocite)"
+    r"\\(?:[Cc]ite|[Cc]itep|[Tt]extcite|[Pp]arencite|[Cc]itealt"
+    r"|[Cc]iteauthor|[Cc]iteyear|[Aa]utocite)"
     r"(?:\[[^\]]*\]){0,2}\{([^}]+)\}"
 )
 ROW_RE = re.compile(r"^\| `([^`]+)` \|", re.MULTILINE)
@@ -28,20 +54,26 @@ HASH_RE = re.compile(r"`([0-9a-f]{64})`")
 COVERAGE_RE = re.compile(r"Coverage: \*\*(\d+)/(\d+) cited sources")
 
 
-def tex_files() -> list[Path]:
+def tex_files(globs: tuple[str, ...] = TEX_GLOBS) -> list[Path]:
     files: set[Path] = set()
-    for pattern in TEX_GLOBS:
+    for pattern in globs:
         files.update(ROOT.glob(pattern))
     return sorted(files)
 
 
-def cited_keys() -> set[str]:
+def cited_keys(globs: tuple[str, ...] = TEX_GLOBS) -> set[str]:
     keys: set[str] = set()
-    for path in tex_files():
+    for path in tex_files(globs):
         text = path.read_text(encoding="utf-8")
         for match in CITE_RE.finditer(text):
             keys.update(key.strip() for key in match.group(1).split(",") if key.strip())
     return keys
+
+
+def row_cited_by(row: str) -> str:
+    """Return the raw "Cited by" cell text for a manifest inventory row."""
+    cells = row.split("|")
+    return cells[3].strip() if len(cells) > 3 else ""
 
 
 def manifest_rows() -> dict[str, str]:
@@ -70,21 +102,33 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def main() -> int:
+def main(paper: str | None = None) -> int:
     manifest_text = MANIFEST.read_text(encoding="utf-8")
-    rows = manifest_rows()
-    cited = cited_keys()
+    all_rows = manifest_rows()
     problems: list[str] = []
+    label = PAPER_LABELS[paper] if paper else None
+    scope_note = f" (paper={paper})" if paper else ""
 
-    coverage = COVERAGE_RE.search(manifest_text)
-    if not coverage:
-        problems.append("manifest coverage declaration is missing")
+    if paper:
+        # Scoped mode: this paper's own sources against the manifest rows
+        # attributed to it. The pooled Coverage: N/N declaration describes the
+        # whole 3-paper inventory and isn't decomposed per paper, so it's
+        # skipped here rather than compared against a subset count.
+        cited = cited_keys(PAPER_TEX_GLOBS[paper])
+        rows = {key: row for key, row in all_rows.items() if label in row_cited_by(row)}
     else:
-        numerator, denominator = (int(value) for value in coverage.groups())
-        if numerator != denominator or denominator != len(rows):
-            problems.append(
-                f"coverage says {numerator}/{denominator}, but inventory has {len(rows)} rows"
-            )
+        cited = cited_keys()
+        rows = all_rows
+
+        coverage = COVERAGE_RE.search(manifest_text)
+        if not coverage:
+            problems.append("manifest coverage declaration is missing")
+        else:
+            numerator, denominator = (int(value) for value in coverage.groups())
+            if numerator != denominator or denominator != len(rows):
+                problems.append(
+                    f"coverage says {numerator}/{denominator}, but inventory has {len(rows)} rows"
+                )
 
     missing_rows = sorted(cited - rows.keys())
     if missing_rows:
@@ -116,14 +160,14 @@ def main() -> int:
                 )
 
     if problems:
-        print("CITED SOURCE ARCHIVE: FAIL")
+        print(f"CITED SOURCE ARCHIVE{scope_note}: FAIL")
         for problem in problems:
             print(f"- {problem}")
         return 1
 
     unused = sorted(rows.keys() - cited)
     print(
-        f"CITED SOURCE ARCHIVE: PASS ({len(cited)} cited keys; "
+        f"CITED SOURCE ARCHIVE{scope_note}: PASS ({len(cited)} cited keys; "
         f"{len(rows)} locally verified inventory rows)"
     )
     if unused:
@@ -134,5 +178,20 @@ def main() -> int:
     return 0
 
 
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--paper",
+        choices=sorted(PAPER_LABELS),
+        default=None,
+        help=(
+            "Restrict the check to one paper's own sources (sections/section "
+            "directory) and the manifest rows attributed to it. Omit for "
+            "today's default: all three papers against the full manifest."
+        ),
+    )
+    return parser.parse_args(argv)
+
+
 if __name__ == "__main__":
-    raise SystemExit(main())
+    raise SystemExit(main(parse_args().paper))

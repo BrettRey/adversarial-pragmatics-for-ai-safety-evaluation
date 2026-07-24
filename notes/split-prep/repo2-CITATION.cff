@@ -1,0 +1,58 @@
+# DRAFT CITATION.cff for the new Delegation Assurance + Evidentiary Assurance repository.
+# Not yet placed at its final path. Replace REPO2_NAME and REPO2_URL once the repository
+# name is decided (see open-questions.md, item 1).
+#
+# Why `type: software` and `references:` here, not `type: dataset` or a bare `type: article`
+# at the root:
+#
+# The CFF 1.2.0 schema restricts the ROOT-level `type` key to exactly two values,
+# `software` or `dataset` (verified against the schema guide,
+# github.com/citation-file-format/citation-file-format/blob/1.2.0/schema-guide.md).
+# There is no root-level `article` type. The current AP repo's CITATION.cff sets
+# `type: dataset` at the root, which fit AP (a benchmark/data artifact with an
+# accompanying manuscript). This repository is different: it holds two manuscripts and
+# their supporting executable artifacts (schemas, fixtures, validators), with no primary
+# dataset. `type: software` (the schema default) better describes the repository itself --
+# the executable artifact is what a citation to the *repository* actually points at.
+#
+# Neither paper should be named as the repository's single `preferred-citation`: CFF
+# allows only one `preferred-citation` block, and privileging either Delegation Assurance
+# or Evidentiary Assurance over the other would misrepresent a repository built to hold
+# them as a pair. Instead, both are listed under `references:` (a list, unlimited size),
+# which is the correct field for "other works this citation file should point readers to"
+# without picking a favourite. Each entry uses `type: unpublished` because, at draft time,
+# neither paper has been submitted (Delegation Assurance's venue decision is approved but
+# submission has not happened; Evidentiary Assurance has been through two review rounds
+# under an unnamed AI-governance-journal target with no venue-decision record yet -- see
+# open-questions.md item 4). Update each entry's `type` to `article` and add `doi`,
+# `journal`, `volume`, and `issue` fields once accepted; do not leave `unpublished` sitting
+# in a citation file for a paper that has since been published.
+
+cff-version: 1.2.0
+message: "If you use this repository's schemas, fixtures, validators, or manuscript drafts, please cite the relevant paper below."
+title: "Delegation Assurance and Evidentiary Assurance"
+authors:
+  - family-names: Reynolds
+    given-names: Brett
+    orcid: "https://orcid.org/0000-0003-0073-7195"
+type: software
+date-released: "REPLACE-WITH-SPLIT-DATE"
+license: "CC-BY-4.0"
+repository-code: "https://github.com/BrettRey/REPO2_NAME"
+references:
+  - type: unpublished
+    title: "Delegation Assurance for AI Systems: Typed Authorization Semantics and Comparative Evaluation"
+    authors:
+      - family-names: Reynolds
+        given-names: Brett
+        orcid: "https://orcid.org/0000-0003-0073-7195"
+    year: 2026
+    notes: "Targeting Minds and Machines (Springer); not yet submitted as of the 2026-07-24 venue decision record."
+  - type: unpublished
+    title: "Evidentiary Assurance for Delegated Authority in AI Systems"
+    authors:
+      - family-names: Reynolds
+        given-names: Brett
+        orcid: "https://orcid.org/0000-0003-0073-7195"
+    year: 2026
+    notes: "Through two external-review rounds (major to minor revision) targeting an AI-governance journal as of 2026-07-24; no venue-decision record filed yet."

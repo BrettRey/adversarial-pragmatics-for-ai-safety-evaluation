@@ -38,7 +38,7 @@ RESPONSES_ARG = $(if $(RESPONSES),--responses $(RESPONSES),)
 SUMMARY_DIR_ARG = $(if $(SUMMARY_DIR),--summary-dir $(SUMMARY_DIR),)
 
 # Targets
-.PHONY: all all-papers clean distclean view view-supplement view-delegation view-evidentiary delegation evidentiary help test validate-items validate-study-b analyze-study-b validate-claims validate-delegation validate-sources assurance-check privacy-check public-check phase1-check pilot-local pilot-smoke pilot-diagnose pilot-review-app pilot-ingest-adjudication pilot-adjudication-report pilot-figures pilot-judge-validation fake-dev-calibration study-a-synthetic study-a-self-pilot study-a-self-pilot-report study-a-judge-audit study-a-production-build study-a-manifest-stamp1 study-a-manifest-stamp2 study-a-manifest-verify study-a-freeze-ready study-a-collection-ready discovery-synthetic discovery-naturalistic-synthetic design-analysis vendor-bib
+.PHONY: all all-papers clean distclean view view-supplement view-delegation view-evidentiary delegation evidentiary help test test-ap test-delegation test-evidentiary validate-items validate-study-b analyze-study-b validate-claims validate-claims-ap validate-claims-delegation validate-claims-evidentiary validate-delegation validate-sources validate-sources-ap validate-sources-delegation validate-sources-evidentiary assurance-check assurance-check-ap assurance-check-delegation assurance-check-evidentiary privacy-check public-check phase1-check pilot-local pilot-smoke pilot-diagnose pilot-review-app pilot-ingest-adjudication pilot-adjudication-report pilot-figures pilot-judge-validation fake-dev-calibration study-a-synthetic study-a-self-pilot study-a-self-pilot-report study-a-judge-audit study-a-production-build study-a-manifest-stamp1 study-a-manifest-stamp2 study-a-manifest-verify study-a-freeze-ready study-a-collection-ready discovery-synthetic discovery-naturalistic-synthetic design-analysis vendor-bib
 
 # Central house bibliography, vendored into this repo as references.bib so the
 # public/arXiv build is self-contained.
@@ -156,14 +156,30 @@ view-evidentiary: $(EVIDENTIARY).pdf
 	@echo "==> Opening evidentiary-assurance PDF..."
 	open $(EVIDENTIARY).pdf
 
-# Validate the benchmark seed file
-test:
+# --- Per-paper fast test suites (test remains the aggregate below, so
+# existing muscle memory and CI keep working). Each block is self-contained
+# so a future repo split can lift a paper's block out wholesale. ---
+
+# AP (adversarial-pragmatics): validate the benchmark seed file.
+test-ap:
 	@echo "==> Validating benchmark seed items..."
 	python3 scripts/validate_items.py benchmark/items/seed-items.csv
+
+# DA (delegation-assurance): no delegation-specific check currently lives in
+# the fast 'test' target (DA's own suite is under validate-delegation). This
+# placeholder keeps the three-paper suite shape symmetric for a future split.
+test-delegation:
+	@echo "==> No delegation-assurance-specific checks in the fast 'test' target (see validate-delegation)."
+
+# EA (evidentiary-assurance): freeze-guard tests for the artifact stamper.
+test-evidentiary:
 	@echo "==> Evidentiary stamper freeze-guard tests..."
 	python3 -m unittest scripts.test_stamp_evidentiary_artifacts
 
-validate-items: test
+# Aggregate: runs all three papers' fast suites (unchanged external behaviour).
+test: test-ap test-delegation test-evidentiary
+
+validate-items: test-ap
 
 # Validate the Study B development design and the production-result contract.
 validate-study-b:
@@ -181,14 +197,30 @@ analyze-study-b:
 	@echo "==> Checking Study B production-result record..."
 	python3 scripts/analyze_study_b.py benchmark/study-b/production-results.no-target-data.json
 
-# Validate the shared prospective projective-claim protocol. The negative
-# fixture must fail; the validator's self-test checks both directions.
-validate-claims:
-	@echo "==> Validating prospective projective-claim protocol..."
+# --- Per-paper prospective projective-claim registers (validate-claims
+# remains the aggregate). Each block is self-contained for a future split;
+# the shared validator's self-test (negative fixture must fail) checks
+# assurance/shared, not one paper's register, but travels with the AP block
+# since it has to live somewhere. ---
+
+# AP: shared validator self-test plus the Study B claim register.
+validate-claims-ap:
+	@echo "==> Validating prospective projective-claim protocol (self-test + AP register)..."
 	python3 scripts/validate_claim_register.py --self-test
 	python3 scripts/validate_claim_register.py benchmark/study-b/claim-register.json
+
+# DA (delegation-assurance): projective-claim register.
+validate-claims-delegation:
+	@echo "==> Validating prospective projective-claim protocol (DA register)..."
 	python3 scripts/validate_claim_register.py assurance/delegation/projective-claim-register.json
+
+# EA (evidentiary-assurance): projective-claim register.
+validate-claims-evidentiary:
+	@echo "==> Validating prospective projective-claim protocol (EA register)..."
 	python3 scripts/validate_claim_register.py assurance/evidentiary/projective-claim-register.json
+
+# Aggregate: runs all three papers' claim-register checks (unchanged external behaviour).
+validate-claims: validate-claims-ap validate-claims-delegation validate-claims-evidentiary
 
 # Validate the Delegation Assurance semantics and all three frozen prospective
 # empirical programmes. Synthetic tests exercise pass, fail, noncompensation,
@@ -209,15 +241,53 @@ validate-sources:
 	@echo "==> Verifying cited-source local archive and hashes..."
 	python3 scripts/check_cited_source_archive.py
 
-# Run the projectibility/assurance artifacts for all three papers. These checks
-# use only tracked schemas and harmless synthetic fixtures.
-assurance-check: validate-claims validate-sources validate-study-b validate-delegation
-	@echo "==> Validating excellence-revision assurance artifacts..."
+# Per-paper cited-source checks. scripts/check_cited_source_archive.py takes a
+# --paper scope, so each paper's archive can be verified on its own. These are
+# the split-ready pieces: at a repo split, each repo keeps only its own target
+# and drops the aggregate above.
+#
+# Not wired into assurance-check-ap/-evidentiary yet. Both currently fail on a
+# stale delegation-assurance.pdf hash (AP and EA each cite the DA manuscript,
+# whose PDF is being rebuilt in a concurrent session), and that failure belongs
+# to DA's build, not to AP's or EA's assurance suite. Wire them in once the DA
+# manuscript settles and the manifest hash is refreshed.
+validate-sources-ap:
+	@echo "==> Verifying cited-source local archive (AP)..."
+	python3 scripts/check_cited_source_archive.py --paper ap
+
+validate-sources-delegation:
+	@echo "==> Verifying cited-source local archive (Delegation Assurance)..."
+	python3 scripts/check_cited_source_archive.py --paper delegation
+
+validate-sources-evidentiary:
+	@echo "==> Verifying cited-source local archive (Evidentiary Assurance)..."
+	python3 scripts/check_cited_source_archive.py --paper evidentiary
+
+# --- Per-paper assurance suites (assurance-check remains the aggregate).
+# Each block is self-contained for a future split. These checks use only
+# tracked schemas and harmless synthetic fixtures. ---
+
+# AP: claim register, Study B validation, and Study B excellence-revision checks.
+assurance-check-ap: validate-claims-ap validate-study-b
+	@echo "==> Validating excellence-revision assurance artifacts (AP Study B)..."
 	python3 scripts/validate_study_b_excellence.py
+
+# DA (delegation-assurance): claim register and Delegation Assurance artifacts.
+assurance-check-delegation: validate-claims-delegation validate-delegation
+
+# EA (evidentiary-assurance): claim register and evidentiary calibration/stamper checks.
+assurance-check-evidentiary: validate-claims-evidentiary
+	@echo "==> Validating excellence-revision assurance artifacts (EA calibration)..."
 	python3 scripts/stamp_evidentiary_artifacts.py --check
 	python3 scripts/validate_evidentiary_artifacts.py
 	python3 scripts/analyze_evidentiary_calibration.py --self-test
 	python3 scripts/analyze_evidentiary_calibration.py
+
+# Aggregate: runs all three papers' assurance suites, plus validate-sources
+# over all three papers' cited-source archives at once. Per-paper equivalents
+# now exist (validate-sources-ap/-delegation/-evidentiary) for use at a split;
+# see the note above them for why they are not yet dependencies here.
+assurance-check: assurance-check-ap assurance-check-delegation assurance-check-evidentiary validate-sources
 
 # Verify the frozen historical pilot and local-only data boundary before Study A.
 privacy-check:
@@ -225,21 +295,21 @@ privacy-check:
 	python3 scripts/check_private_boundaries.py
 
 # Verify only tracked artifacts so this target works from a fresh clone.
-public-check: test privacy-check
+public-check: test-ap privacy-check
 	@echo "==> Verifying tracked pilot artifact integrity..."
 	python3 scripts/check_pilot_integrity.py --public-only
 
-phase1-check: test privacy-check
+phase1-check: test-ap privacy-check
 	@echo "==> Verifying frozen local pilot..."
 	python3 scripts/check_pilot_integrity.py
 
 # Run the seed benchmark against the default local Ollama model set
-pilot-local: test
+pilot-local: test-ap
 	@echo "==> Running local Ollama pilot..."
 	python3 scripts/run_local_pilot.py --models $(PILOT_MODELS)
 
 # Run a two-item smoke test without committing generated outputs
-pilot-smoke: test
+pilot-smoke: test-ap
 	@echo "==> Running local Ollama pilot smoke test..."
 	python3 scripts/run_local_pilot.py --limit 2 --run-id $(PILOT_SMOKE_RUN_ID) --out-dir benchmark/results/_scratch --models $(PILOT_MODELS)
 
@@ -369,9 +439,24 @@ help:
 	@echo "  make evidentiary - Build evidentiary-assurance paper PDF"
 	@echo "  make view-evidentiary - Open evidentiary-assurance paper PDF"
 	@echo "  make all-papers - Build all three paper PDFs"
-	@echo "  make test     - Validate benchmark seed items"
+	@echo "  make test     - Run all three papers' fast test suites (aggregate; see test-ap/test-delegation/test-evidentiary)"
+	@echo "  make test-ap  - Validate AP benchmark seed items"
+	@echo "  make test-delegation - No DA-specific fast check today (see validate-delegation)"
+	@echo "  make test-evidentiary - Run EA stamper freeze-guard tests"
 	@echo "  make validate-study-b - Validate Study B design, pair/balance invariants, and result harness"
 	@echo "  make analyze-study-b - Verify the manifest-bound target record (currently NOT_ESTIMATED)"
+	@echo "  make validate-claims - Validate prospective projective-claim registers (aggregate; see validate-claims-ap/-delegation/-evidentiary)"
+	@echo "  make validate-claims-ap - Validate AP's claim register (plus the shared validator self-test)"
+	@echo "  make validate-claims-delegation - Validate DA's claim register"
+	@echo "  make validate-claims-evidentiary - Validate EA's claim register"
+	@echo "  make validate-sources - Verify the cited-source local archive and hashes (all three papers)"
+	@echo "  make validate-sources-ap - Verify AP's cited-source archive only"
+	@echo "  make validate-sources-delegation - Verify DA's cited-source archive only"
+	@echo "  make validate-sources-evidentiary - Verify EA's cited-source archive only"
+	@echo "  make assurance-check - Run all three papers' assurance/projectibility checks (aggregate; see assurance-check-ap/-delegation/-evidentiary)"
+	@echo "  make assurance-check-ap - Run AP's assurance checks (claims, Study B, Study B excellence)"
+	@echo "  make assurance-check-delegation - Run DA's assurance checks (claims, Delegation Assurance artifacts)"
+	@echo "  make assurance-check-evidentiary - Run EA's assurance checks (claims, evidentiary calibration/stamper)"
 	@echo "  make privacy-check - Verify local-only research paths are Git-protected"
 	@echo "  make public-check - Verify tracked benchmark and pilot artifacts from a fresh clone"
 	@echo "  make phase1-check - Verify the frozen historical 54-row pilot"

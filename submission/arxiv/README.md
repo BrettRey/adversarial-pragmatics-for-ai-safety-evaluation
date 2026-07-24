@@ -1,9 +1,9 @@
 # arXiv Submission Package
 
-Recommended categories:
+Categories (must match the live v2 record; a replacement cannot change the primary category without moderator intervention):
 
-- Primary: `cs.AI`
-- Cross-list: `cs.CL`
+- Primary: `cs.CL`
+- Cross-list: `cs.AI`, `cs.SE`
 
 Build the source package from the repository root:
 
