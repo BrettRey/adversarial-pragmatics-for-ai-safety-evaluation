@@ -1,5 +1,5 @@
 # Venue Decision Record: Adversarial Pragmatics
-<!-- SUMMARY: proposes JAIR primary and Language Resources and Evaluation second for the flagship, turning on an unresolvable Springer CC-BY preprint conflict - status: proposed, awaiting Brett - updated: 2026-07-24 -->
+<!-- SUMMARY: JAIR approved for the flagship over Language Resources and Evaluation, avoiding an unresolvable Springer CC-BY preprint conflict; arXiv v3 required before submission - status: approved, package work not started - updated: 2026-07-24 -->
 
 ## Record
 
