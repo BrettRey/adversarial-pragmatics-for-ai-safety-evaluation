@@ -62,10 +62,38 @@ therefore been shaped by a venue that was never chosen.
       route costs nothing and permits self-archiving after embargo.
 - [x] At least three recent venue articles make the match concrete.
 
-**The decisive fit fact.** EA's nearest cited neighbour has a journal home here.
-Cobbe & Singh, "Reviewable Automated Decision-Making," *Computer Law & Security
-Review* (2020), `10.1016/j.clsr.2020.105475`. EA currently cites only the FAccT
-sibling (Cobbe, Lee & Singh 2021).
+**The genre fit, confirmed against primary texts (2026-07-24).** Four recent
+CLSR articles were retrieved and read in full (open-access self-archived copies;
+ScienceDirect blocks automated retrieval even for hybrid-OA articles). CLSR
+publishes across a spectrum, not one doctrinal mode:
+
+- pure doctrinal with no apparatus (Sargeant 2026; Metikoš et al. 2026);
+- law-plus-CS joint apparatus grounded in named real systems (Cabay, Vandamme &
+  Debeir 2025, which imports an ML-auditing typology from outside law in
+  precisely the way EA imports assurance-case and evidence-law vocabulary);
+- CS-majority comparative apparatus with coded matrices and heatmaps
+  (Rintamäki et al. 2026).
+
+So "CLSR only wants doctrinal legal analysis" is wrong: two of four carry real
+formal apparatus. **Length is also not the binding constraint** the earlier
+draft of this record assumed. Two of the four run well past the stated
+6,000-15,000 ceiling, so EA's ~14,780 words is unremarkable.
+
+**Correction to an earlier claim in this record.** A previous version called the
+Cobbe & Singh CLSR paper ("Reviewable Automated Decision-Making," 2020,
+`10.1016/j.clsr.2020.105475`) the "decisive fit fact." That was too strong. It
+establishes that CLSR has hosted this framework; it does not establish that
+CLSR's current cohort is building on it. None of the four sampled 2025-26
+papers cites either Cobbe & Singh 2020 or Cobbe, Lee & Singh 2021. Four papers
+is a small, theme-selected sample, so this is a caution rather than a refutation,
+but the fit case now rests on genre match, not on a citation chain.
+
+Archived copies (central literature archive, SHA-256 in
+`/tmp/claude-agent-output/clsr-profile.md`):
+`cabay_vandamme_debeir_2025_looking-through-the-crack-clsr.pdf`,
+`sargeant_2026_mind-the-gap-clsr.pdf`,
+`rintamaki_etal_2026_impact-assessment-gdpr-vs-aiact-preprint.pdf`,
+`metikos_2026_enabling-contestation-dissertation.pdf`.
 
 Recent comparable venue articles or signals (CLSR 2025-2026; 221 works published
 since 2025-01-01, of which 40 hit accountability, audit, evidence, oversight, or
@@ -158,18 +186,34 @@ Resolution:
 
 ### Stop condition
 
-Do not build a CLSR package until EA engages the reviewability literature as the
-conversation it joins. Concretely: page one should say that reviewability tells
-an institution which records to keep and in what form, and that this leaves
-open what a kept record warrants about whether the action was authorized, which
-is the question a contested case turns on. That is EA's contribution stated in
-the venue's own terms, and the paper already contains it; it just isn't on
-page one and isn't attached to anyone's position.
+Two requirements, the second confirmed against primary texts on 2026-07-24 and
+now the more important of the pair.
 
-This is layer (a) in the ledger's diagnosis, presentation rather than substance:
-the field-internal payoff exists and is currently buried in program frame. The
-work is a re-aimed opening plus a genuine reading of Cobbe & Singh 2020 and the
-2025-26 CLSR accountability cluster, not new research.
+**1. Join a conversation.** Page one should say that reviewability tells an
+institution which records to keep and in what form, and that this leaves open
+what a kept record warrants about whether the action was authorized, which is
+what a contested case turns on. EA already contains that point; it isn't on
+page one and isn't attached to anyone's position. EA cites Cobbe, Lee & Singh
+once, in `sections-evidentiary/01-introduction.tex:11`, as background.
+
+**2. Run the apparatus against one sustained, named, real case.** This is the
+sharper gap. In every apparatus-bearing paper in the CLSR sample, the typology
+or matrix is cashed out against fully concrete, named, real systems or statutes
+*from opening to conclusion*: EUIPO and BOIP's actual trademark search engines
+against actual case law; the UK's actual DUAA reform against actual CJEU cases;
+30 real jurisdictions' actual DPA guidance. None invents standalone symbolic
+notation the way EA's Figure 1 does (`R`, `F_review`, ρ, `b`, `c`, `u`, `J_A`,
+`J_B`, `J_C` are new coinages), and none leans on a hypothetical for its central
+illustration. EA's throughline is a hypothetical procurement-assistant vignette,
+with Robodebt and the Hinkle testimony appearing as passing illustrations.
+
+The fix is available without new research: EA already has two real cases in
+hand. Promote one, most plausibly Robodebt, from illustration to spine, and run
+the four verdict vectors against it end to end. A reader then sees the apparatus
+do work on a case they recognise, which is what the sampled papers all do.
+
+This remains layer (a) in the ledger's diagnosis, presentation rather than
+substance. The payoff exists and is buried in program frame.
 
 ## Evidence And Motivation Test
 
