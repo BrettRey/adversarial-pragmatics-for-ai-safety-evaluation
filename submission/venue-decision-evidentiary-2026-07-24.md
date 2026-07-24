@@ -111,7 +111,7 @@ record on 2026-07-22 and were not re-checked today.
 
 | Venue | Why plausible | Why not chosen now | Fallback status |
 |---|---|---|---|
-| **ACM FAccT** | The actual home of the reviewability conversation EA extends; Cobbe, Lee & Singh 2021 is the paper EA is closest to | Conference, and the DA record fixed a "journals only, no conferences" constraint. Whether that constraint binds EA is an open question for Brett, not a settled fact | **Strongest alternative if the journals-only rule doesn't bind** |
+| **ACM FAccT** | The actual home of the reviewability conversation EA extends; Cobbe, Lee & Singh 2021 is the paper EA is closest to | **Out on a standing constraint, settled by Brett 2026-07-24: journals only, no conferences, portfolio-wide.** No conference funding, and he won't present online. This is why the CLSR route matters: it's where the same authors published the same framework | Out |
 | **Big Data & Society** (SAGE) | Broad accountability and governance readership, OA, no obvious length bar | Not verified today. Its readership skews social-scientific and empirical; EA is formal and normative | Unverified second |
 | **Ethics and Information Technology** (Springer) | Long-standing home for normative analysis of computing | Not verified today. EA's normativity is deontic (authorization) rather than moral, the same mismatch that ruled out AI and Ethics | Unverified third |
 | **Artificial Intelligence and Law** (Springer) | Scope names "evaluation and auditing techniques for legal AI systems"; no length limit (inherited) | EA doesn't model legal reasoning; it uses evidence law as a source of distinctions. Six-day median to first decision reads as a high desk-reject rate (inherited) | Weak |
@@ -208,13 +208,19 @@ work is a re-aimed opening plus a genuine reading of Cobbe & Singh 2020 and the
 - [ ] Unresolved risks copied into the pre-submission checklist.
 - [ ] Record linked from `DECISIONS.md` and `STATUS.md` if submission proceeds.
 
-Two questions for Brett before this record can be completed:
+Resolved 2026-07-24:
 
-1. Does the "journals only, no conferences" constraint from the Delegation
-   Assurance record bind Evidentiary Assurance too? FAccT is where this
-   conversation actually happens, and EA's nearest neighbour is a FAccT paper.
-2. If CLSR is approved, is the subscription route acceptable, or is gold OA
-   wanted at USD 3,760?
+1. **Journals only, no conferences, portfolio-wide.** Brett's standing
+   constraint, not a per-paper call: no conference funding, and he won't present
+   online. FAccT is out, and so is every proceedings venue. Recorded in the
+   `venue-selection` skill's standing lessons.
+2. **CLSR approved in principle**, pending a read of recent CLSR articles to
+   confirm the journal publishes work of this shape. That check is running.
+
+Still open:
+
+- Subscription route or gold OA at USD 3,760.
+- The stop condition above, which is the real gate.
 
 Decision summary for `DECISIONS.md`, to be added only if Brett approves:
 
