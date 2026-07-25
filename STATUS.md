@@ -3,6 +3,10 @@
 
 Status: active research artifact. Scaffold created 2026-06-26; public arXiv identifier assigned 2026-07-01; v2 replacement public 2026-07-16.
 
+## Deferred: two corpus follow-ups (2026-07-25)
+
+The naturalistic-pragmatic-extremes-v2 corpus has (1) a detection blind spot for scope expansion the user never objected to, since all 33 `scope_and_authorization` cases are found via user-resistance signals, and (2) **no model or effort field on any of its 777 entries**, so Opus-at-xhigh and haiku-at-low are both filed as "claude". Details and the proposed assistant-first-mention pass: `notes/2026-07-25-corpus-followups.md`. Neither started.
+
 Title: *Adversarial Pragmatics for AI Safety Evaluation: A Diagnostic Framework and Seed Benchmark for Language-Mediated Control*.
 
 Public arXiv identifier: `arXiv:2607.01153` (v2 public since 2026-07-16). Submission-system identifiers: `submit/7776593` (v1), `submit/7830880` (v2 replacement). Paper password recorded in `private/arxiv-credentials.md` (gitignored).
