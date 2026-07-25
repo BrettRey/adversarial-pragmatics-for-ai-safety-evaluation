@@ -8,6 +8,22 @@ Coverage: **104/104 cited sources have genuine local full text or a complete loc
 
 “Local complete cited page” means the citation is to the webpage, standard, statute, or draft itself and the complete cited object was captured—not merely its metadata or abstract. SHA-256 values identify the exact verified file as of the date above.
 
+### Self-citation convention
+
+Rows for Reynolds manuscripts point at a **frozen dated snapshot or a posted
+version**, never at a live build output in the repo. Hashing a sibling paper's
+own `.pdf` makes the manifest churn on every rebuild of either paper, which
+produced repeated false failures in `make validate-sources`. It's also
+dishonest: a row claims to pin the version cited while the file underneath it
+changes.
+
+`reynolds2026adversarialPragmatics` already did this correctly by pointing at
+the frozen `2607.01153v1.pdf`. `reynolds2026delegationAssurance` and
+`reynolds2026evidentiaryAssurance` were repointed to dated snapshots on
+2026-07-25. Refresh a snapshot deliberately, with a new date in the filename,
+when the cited content actually changes; when either paper gets a public
+identifier, replace the snapshot with the posted version, as AP does.
+
 ## Inventory
 
 | Key | Title | Cited by | Archive status | Local source | DOI / persistent ID | Authoritative locator | SHA-256 |
@@ -86,9 +102,9 @@ Coverage: **104/104 cited sources have genuine local full text or a complete loc
 | `rashid2026recommenderActor` | From Recommender to Actor: The Normative Boundary When RAG Tools Become Tool-Calling Agents | Delegation Assurance | local full text | [rashid2026recommenderActor.pdf](</Users/brettreynolds/projects/LLM-CLI-projects/literature/rashid2026recommenderActor.pdf>) | DOI 10.1007/s11023-026-09782-z | [source](https://doi.org/10.1007/s11023-026-09782-z) | `e862bc1786481ba7051aa9419a1859e4e350a3675211ce46f87d89caa750fb20` |
 | `recanati2001open` | Open Quotation | Adversarial Pragmatics | local full text | [Recanati-OpenQuotation-2001.pdf](</Users/brettreynolds/projects/LLM-CLI-projects/literature/Recanati-OpenQuotation-2001.pdf>) | DOI 10.1093/mind/110.439.637 | [source](https://doi.org/10.1093/mind/110.439.637) | `ea869374ec077092f36a59c32f9e57db992c73e79a48c1813ff8a8a821a15be1` |
 | `reynolds2026adversarialPragmatics` | Adversarial Pragmatics for AI Safety Evaluation: A Diagnostic Framework and Seed Benchmark for Language-Mediated Control | Delegation Assurance, Evidentiary Assurance | local manuscript | [2607.01153v1.pdf](</Users/brettreynolds/projects/LLM-CLI-projects/papers/development/adversarial-pragmatics-for-ai-safety-evaluation/submission/arxiv/version-history/2607.01153v1.pdf>) | arXiv 2607.01153 | [source](https://arxiv.org/abs/2607.01153) | `3f980366505390c8e6a1cf53a3f32ff86c975aca3e05e08250208c5e7f815d4f` |
-| `reynolds2026delegationAssurance` | Delegation Assurance for AI Systems: Typed Authorization Semantics and Comparative Evaluation | Adversarial Pragmatics, Evidentiary Assurance | local manuscript | [delegation-assurance.pdf](</Users/brettreynolds/projects/LLM-CLI-projects/papers/development/adversarial-pragmatics-for-ai-safety-evaluation/delegation-assurance.pdf>) | — | — | `f77d6247d8e5f46fddac615ab54af5daef06ec99370865cbe40aee87f1d4bc64` |
+| `reynolds2026delegationAssurance` | Delegation Assurance for AI Systems: Typed Authorization Semantics and Comparative Evaluation | Adversarial Pragmatics, Evidentiary Assurance | local manuscript | [reynolds-delegation-assurance-2026-07-25.pdf](</Users/brettreynolds/projects/LLM-CLI-projects/literature/reynolds-delegation-assurance-2026-07-25.pdf>) | — | — | `659e9f3408e485769af283a28ebdb5a5f1c80a00a4d74f93d3b92027cdaae4e5` |
 | `reynolds2026effectiveWithoutWarrant` | Effective without Warrant: Causal-Normative Networks and the Social Life of Status | Delegation Assurance | local manuscript | [reynolds-effective-without-warrant-2026-07-14.pdf](</Users/brettreynolds/projects/LLM-CLI-projects/papers/queue/effective-without-warrant/reynolds-effective-without-warrant-2026-07-14.pdf>) | — | [source](https://philarchive.org/rec/REYEWW) | `92f8c48e6aac52d63f852bad90a54676ecb0b1103f4e9f83259f5af01df509e4` |
-| `reynolds2026evidentiaryAssurance` | Evidentiary Assurance for Delegated Authority in AI Systems | Adversarial Pragmatics, Delegation Assurance | local manuscript | [evidentiary-assurance.pdf](</Users/brettreynolds/projects/LLM-CLI-projects/papers/development/adversarial-pragmatics-for-ai-safety-evaluation/evidentiary-assurance.pdf>) | — | — | `71bc1ad1ff080e802d74d304bb632463e2fe102fd8b35b3528fc6141132d3fe7` |
+| `reynolds2026evidentiaryAssurance` | Evidentiary Assurance for Delegated Authority in AI Systems | Adversarial Pragmatics, Delegation Assurance | local manuscript | [reynolds-evidentiary-assurance-2026-07-25.pdf](</Users/brettreynolds/projects/LLM-CLI-projects/literature/reynolds-evidentiary-assurance-2026-07-25.pdf>) | — | — | `71bc1ad1ff080e802d74d304bb632463e2fe102fd8b35b3528fc6141132d3fe7` |
 | `reynolds2026kindsProjectibilityProfiles` | Kinds as Projectibility Profiles: Support Grades and Demotion Rules | Adversarial Pragmatics, Delegation Assurance, Evidentiary Assurance | local manuscript | [Kinds_as_Projectibility_Profiles-Support_Grades_and_Demotion_Rules.pdf](</Users/brettreynolds/projects/LLM-CLI-projects/papers/retarget/kinds-as-projectibility-profiles/Kinds_as_Projectibility_Profiles-Support_Grades_and_Demotion_Rules.pdf>) | — | [source](https://philarchive.org/rec/REYKAP-2) | `8268a9e3c711ac07a0aa3dbf9ca7f6c39c4360dedf90261d099a2616e2223f72` |
 | `robodebtRoyalCommission2023` | Report of the Royal Commission into the Robodebt Scheme | Evidentiary Assurance | local full text | [robodebtRoyalCommission2023.pdf](</Users/brettreynolds/projects/LLM-CLI-projects/literature/robodebtRoyalCommission2023.pdf>) | — | [source](https://www.royalcommission.gov.au/robodebt/report) | `9837ca00ecf7022694abb9eae1be57f49a8a791d4df8951339be282a2c76cf42` |
 | `rottger2024xstest` | XSTest: A Test Suite for Identifying Exaggerated Safety Behaviours in Large Language Models | Adversarial Pragmatics | local full text | [rottger2024xstest.pdf](</Users/brettreynolds/projects/LLM-CLI-projects/literature/rottger2024xstest.pdf>) | — | [source](https://aclanthology.org/2024.naacl-long.301/) | `094ef8a30e2609d1b62ac53aa628a0524fc3a2f6e0eecd5441d5d76b789502a0` |
