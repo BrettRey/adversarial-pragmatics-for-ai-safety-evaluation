@@ -10,4 +10,6 @@
 
 **Adversarial pragmatics:** framing only. The Guha paper in the same feature is the one AP wants. See `notes/source-hooks/guha-2026-benchmark-institutions.md`.
 
-**Verify before citing:** the primary sources behind the reported figures (over 1,600 cases with hallucinations; US 112th of 143 on civil-justice accessibility; Legal Services Corporation's 92%). Each has its own citation in the original. An editors' introduction is a weak authority for a statistic that sits one hop from its source, and this project's rule is to read the source rather than the paper that mentions it.
+**Source chain, traced 2026-07-26** (full table in the central note). The civil-justice rank (World Justice Project 2025 Rule of Law Index) and the LSC 92% both verified against their primary sources and both stated correctly by Ho et al. The hallucination count traces to Damien Charlotin's live *AI Hallucination Cases* tracker, so it is time-indexed and needs an access date. The NYT article is Shaila Dewan, "Prosecutor Used Flawed A.I. to Try to Keep a Man in Jail, His Lawyers Say," and Ho et al.'s reference dates it 2026 while the URL path says 2025-11-25; resolve before citing.
+
+**If EA uses the asymmetric-access case**, go to the NYT article and, better, to the filings behind it. A newspaper report inside an editors' introduction is two hops from the record.
