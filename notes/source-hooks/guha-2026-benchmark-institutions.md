@@ -1,8 +1,8 @@
 # Source hook: Guha et al. 2026, institutional view of legal AI benchmarking
-<!-- SUMMARY: PNAS Perspective on benchmark design dimensions, capture, and legibility; hooks into AP's inference-bearer argument and EA's record-adequacy layer · status: uncited, DOI needed · updated: 2026-07-26 -->
+<!-- SUMMARY: PNAS Perspective on benchmark design dimensions, capture, and legibility; hooks into AP's inference-bearer argument and EA's record-adequacy layer · status: uncited, metadata complete · updated: 2026-07-26 -->
 
 - **Central note:** `literature/guha_etal_2026_no_free_benchmark_legal_ai.notes.md`
-- **Cite as:** Guha, Zhang, Tsang, Manning, Nyarko & Ho (2026), "There is no free benchmark: An institutional view of legal AI benchmarking," *PNAS*, published 2026-07-20, CC BY. **DOI not in the local copy; obtain before citing.**
+- **Cite as:** Guha, Zhang, Tsang, Manning, Nyarko & Ho (2026), "There is no free benchmark: An institutional view of legal AI benchmarking," *PNAS* 123(30), published 2026-07-20, CC BY. DOI `10.1073/pnas.2509757122`, Crossref-verified 2026-07-26.
 
 **Why these papers care.** AP argues that a single benchmark label conceals four different inference bearers, and that what a score licenses depends on which target you declare. Guha et al. make the institutional version of the same argument: benchmarking involves six discretionary design choices (task definition, construction, evaluation protocol, measurements, choice of systems, transparency), and who makes them determines what the resulting number can support. Same structure, different level of explanation, which is worth being explicit about rather than eliding.
 
@@ -15,4 +15,4 @@
 
 **Explanation-level caution.** Guha et al. work at the institutional level: incentives, capacity, ownership. AP works at the measurement and pragmatic level. Don't let the citation slide between them. AP's claim is about what a label licenses given how items were built; theirs is about which labels get built at all, given who pays. They're complementary, and saying so is more useful than treating them as the same point.
 
-**Verify before citing:** the DOI. The vendor claims are Guha et al.'s characterisations, so attribute them rather than asserting the vendor behaviour directly. Note also the declared competing interests (Manning advises LLM companies; Guha has consulted for CaseText and Snorkel AI), which matters if the paper is used as evidence about vendor conduct rather than about benchmarking design.
+**Verify before citing:** the vendor claims are Guha et al.'s characterisations, so attribute them rather than asserting the vendor behaviour directly. Note also the declared competing interests (Manning advises LLM companies; Guha has consulted for CaseText and Snorkel AI), which matters if the paper is used as evidence about vendor conduct rather than about benchmarking design.
