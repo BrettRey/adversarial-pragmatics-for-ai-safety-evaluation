@@ -23,17 +23,34 @@ cp "$ROOT"/figures/*.pdf "$OUT_DIR/figures/"
 # uploaded font binaries, the same bare filenames still resolve against TeX Live's
 # ebgaramond / inconsolata / charissil. Do not reintroduce Path=fonts/: a bundled
 # fonts/ subdir plus Path=fonts/ is what failed on arXiv.
-for font in \
-  EBGaramond-Regular.otf \
-  EBGaramond-Italic.otf \
-  EBGaramond-Bold.otf \
-  EBGaramond-BoldItalic.otf \
-  InconsolataN-Regular.otf \
-  InconsolataN-Bold.otf \
-  CharisSIL-Regular.ttf \
-  CharisSIL-Italic.ttf \
-  CharisSIL-Bold.ttf \
-  CharisSIL-BoldItalic.ttf
+#
+# Ship only the fonts this submission actually uses. Charis SIL exists solely to
+# back \ipafont; when no source file calls it, four font files are dead weight in
+# the upload. Detected rather than hardcoded so the bundle self-corrects if a
+# later version does use IPA. A bare \newfontfamily still loads its font at
+# compile time, so dropping the files means dropping the declaration too (below).
+FONTS=(
+  EBGaramond-Regular.otf
+  EBGaramond-Italic.otf
+  EBGaramond-Bold.otf
+  EBGaramond-BoldItalic.otf
+  InconsolataN-Regular.otf
+  InconsolataN-Bold.otf
+)
+# Scan the document bodies only. preamble.tex holds the \newfontfamily
+# declaration, and a declaration is not a use; including it here always matches.
+USES_IPA=0
+IPA_SCAN=("$OUT_DIR/adversarial-pragmatics-for-ai-safety-evaluation.tex" "$OUT_DIR/supplement.tex")
+while IFS= read -r s; do IPA_SCAN+=("$s"); done < <(find "$OUT_DIR/sections" -name '*.tex' 2>/dev/null)
+if grep -qE '\\ipafont\b' "${IPA_SCAN[@]}" 2>/dev/null; then
+  USES_IPA=1
+  FONTS+=(CharisSIL-Regular.ttf CharisSIL-Italic.ttf CharisSIL-Bold.ttf CharisSIL-BoldItalic.ttf)
+  echo "IPA font in use: bundling Charis SIL."
+else
+  echo "No \\ipafont use found: omitting Charis SIL (4 files) and its declaration."
+fi
+
+for font in "${FONTS[@]}"
 do
   font_path="$(kpsewhich "$font" || true)"
   if [[ -z "$font_path" ]]; then
@@ -47,8 +64,15 @@ perl -0pi -e 's/\\input\{\.house-style\/preamble\.tex\}/\\input\{preamble.tex\}/
   "$OUT_DIR/adversarial-pragmatics-for-ai-safety-evaluation.tex" "$OUT_DIR/supplement.tex"
 perl -0pi -e 's/\\setmainfont\{EB Garamond\}\[\n  Numbers=OldStyle,\n  Ligatures=TeX,\n  BoldFont=\{EB Garamond\},\n\]/\\setmainfont{EBGaramond-Regular.otf}[\n  Numbers=OldStyle,\n  Ligatures=TeX,\n  ItalicFont=EBGaramond-Italic.otf,\n  BoldFont=EBGaramond-Bold.otf,\n  BoldItalicFont=EBGaramond-BoldItalic.otf,\n]/g' \
   "$OUT_DIR/preamble.tex"
-perl -0pi -e 's/\\newfontfamily\\ipafont\{Charis SIL\}/\\newfontfamily\\ipafont{CharisSIL-Regular.ttf}[\n  ItalicFont=CharisSIL-Italic.ttf,\n  BoldFont=CharisSIL-Bold.ttf,\n  BoldItalicFont=CharisSIL-BoldItalic.ttf,\n]/g' \
-  "$OUT_DIR/preamble.tex"
+if [[ "$USES_IPA" == "1" ]]; then
+  perl -0pi -e 's/\\newfontfamily\\ipafont\{Charis SIL\}/\\newfontfamily\\ipafont{CharisSIL-Regular.ttf}[\n  ItalicFont=CharisSIL-Italic.ttf,\n  BoldFont=CharisSIL-Bold.ttf,\n  BoldItalicFont=CharisSIL-BoldItalic.ttf,\n]/g' \
+    "$OUT_DIR/preamble.tex"
+else
+  # No Charis SIL in the package, so the declaration has to go with it: a bare
+  # \newfontfamily loads its font while the preamble is read and would fail.
+  perl -0pi -e 's/\\newfontfamily\\ipafont\{Charis SIL\}/% IPA font omitted from the arXiv package; this submission contains no \\ipafont use.\n\\newcommand{\\ipafont}{}/g' \
+    "$OUT_DIR/preamble.tex"
+fi
 perl -0pi -e 's/% CJK fallback font \(Japanese \/ Chinese \/ Korean\)\n\\newfontfamily\\cjkfont\{Hiragino Mincho ProN\}\n\\newcommand\{\\cjk\}\[1\]\{\{\\cjkfont #1\}\}/% CJK fallback disabled for the arXiv package; this submission contains no CJK text.\n\\newcommand{\\cjk}[1]{#1}/g' \
   "$OUT_DIR/preamble.tex"
 perl -0pi -e 's/\\setmonofont\{Inconsolata\}\[Scale=MatchLowercase\]/\\setmonofont{InconsolataN-Regular.otf}[\n  Scale=MatchLowercase,\n  BoldFont=InconsolataN-Bold.otf,\n]/g' \

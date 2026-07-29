@@ -1,5 +1,5 @@
 # Adversarial Pragmatics for AI Safety Evaluation
-<!-- SUMMARY: empirical adversarial-pragmatics benchmark; arXiv v2 public 2026-07-16 (retitled locally, v3 pending); EA taken through two external-review rounds to minor revision + interval-decision analyzer; all three papers shipped to public main 2026-07-24; HREB partially answered Study A scope inquiry 2026-07-28 (participant-status cleared, jurisdiction question still open); EA release tag/DOI and venue record still pending · status: active · updated: 2026-07-28 -->
+<!-- SUMMARY: empirical adversarial-pragmatics benchmark; arXiv v3 submitted 2026-07-29 as submit/7884568, processing; EA taken through two external-review rounds to minor revision + interval-decision analyzer; all three papers shipped to public main 2026-07-24; HREB partially answered Study A scope inquiry 2026-07-28 (participant-status cleared, jurisdiction question still open); EA release tag/DOI and venue record still pending · status: active · updated: 2026-07-28 -->
 
 Status: active research artifact. Scaffold created 2026-06-26; public arXiv identifier assigned 2026-07-01; v2 replacement public 2026-07-16.
 
