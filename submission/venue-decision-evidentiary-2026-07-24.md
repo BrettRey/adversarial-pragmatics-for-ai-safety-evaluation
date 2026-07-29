@@ -1,5 +1,5 @@
 # Venue Decision Record: Evidentiary Assurance
-<!-- SUMMARY: proposes Computer Law & Security Review for Evidentiary Assurance, with a stop condition on engaging the reviewability literature - status: approved; stop condition closed 2026-07-29 - updated: 2026-07-24 -->
+<!-- SUMMARY: proposes Computer Law & Security Review for Evidentiary Assurance, with a stop condition on engaging the reviewability literature CLOSED 2026-07-29; abstract still opens on a requirements landscape - status: approved, package work may begin - updated: 2026-07-29 -->
 
 ## Record
 
@@ -11,8 +11,8 @@
 - [x] Date checked: 2026-07-24
 - [x] Decision owner: Brett
 - [x] Assisting agent/model: Claude Opus 5 (1M context)
-- [x] Recommendation status: **proposed** (not yet approved)
-- [ ] Final decision: submit / retarget / revise before target choice / defer
+- [x] Recommendation status: **approved** (Brett, 2026-07-24, pending the CLSR article check, which passed 2026-07-24)
+- [x] Final decision: **submit to CLSR.** Both stop-condition requirements closed 2026-07-29; package work may begin.
 
 Prior state: EA had no venue record at all. It has been through two external
 review rounds against an unstated "AI-governance journal" target, and its §5
@@ -27,12 +27,15 @@ therefore been shaped by a venue that was never chosen.
 > action was authorized, and by supplying a review procedure that keeps the
 > historical question and the evidentiary one apart.
 
-- [ ] The debate/problem is visible in the title, abstract, and first two pages.
-      **Currently no.** The abstract opens on "AI governance increasingly
-      requires logs, documentation, human oversight..." which names a
-      requirements landscape, not a debate, and no scholar's position.
-- [ ] The contribution is journal-local, not only topically adjacent. **Not yet
-      demonstrated.** See the stop condition below.
+- [x] The debate/problem is visible in the first two pages **as of 2026-07-29**:
+      the reviewability engagement now sits on the first page of body text and
+      names Cobbe & Singh's position before departing from it. **The abstract
+      still opens on a requirements landscape rather than a debate**, so this is
+      closed for the body and open for the abstract. Worth a pass before
+      submission.
+- [x] The contribution is journal-local: it continues the reviewability
+      programme at the point its authors leave open, rather than arriving from
+      outside it.
 - [x] The expected reader can tell why the paper belongs here without relying on
       a cover letter: achievable, because reviewability is a CLSR-native frame.
 - [ ] Reader's vocabulary decided (free/earned). Provisional split for a
