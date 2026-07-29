@@ -1,5 +1,5 @@
 # Venue Decision Record: Evidentiary Assurance
-<!-- SUMMARY: proposes Computer Law & Security Review for Evidentiary Assurance, with a stop condition on engaging the reviewability literature - status: proposed, awaiting Brett - updated: 2026-07-24 -->
+<!-- SUMMARY: proposes Computer Law & Security Review for Evidentiary Assurance, with a stop condition on engaging the reviewability literature - status: approved; stop condition closed 2026-07-29 - updated: 2026-07-24 -->
 
 ## Record
 
@@ -182,21 +182,21 @@ Resolution:
 
 - [ ] Risks resolved in manuscript before package work.
 - [ ] Risks accepted explicitly by Brett.
-- [x] **Risks unresolved: pause.**
+- [x] **Both stop-condition requirements closed 2026-07-29.** Remaining risks are the ones no revision removes: the apparatus reading as terminology, and the paper's own disclosed non-validation.
 
 ### Stop condition
 
 Two requirements, the second confirmed against primary texts on 2026-07-24 and
 now the more important of the pair.
 
-**1. Join a conversation.** Page one should say that reviewability tells an
+**1. Join a conversation. CLOSED 2026-07-29.** Page one should say that reviewability tells an
 institution which records to keep and in what form, and that this leaves open
 what a kept record warrants about whether the action was authorized, which is
 what a contested case turns on. EA already contains that point; it isn't on
 page one and isn't attached to anyone's position. EA cites Cobbe, Lee & Singh
 once, in `sections-evidentiary/01-introduction.tex:11`, as background.
 
-**2. Run the apparatus against one sustained, named, real case.** This is the
+**2. Run the apparatus against one sustained, named, real case. CLOSED 2026-07-26** (Robodebt promoted to spine). This is the
 sharper gap. In every apparatus-bearing paper in the CLSR sample, the typology
 or matrix is cashed out against fully concrete, named, real systems or statutes
 *from opening to conclusion*: EUIPO and BOIP's actual trademark search engines
@@ -271,3 +271,31 @@ Decision summary for `DECISIONS.md`, to be added only if Brett approves:
 ```markdown
 2026-07-24 - Venue decision: Computer Law & Security Review for Evidentiary Assurance. Owner: Brett, agent-assisted. Record: `submission/venue-decision-evidentiary-2026-07-24.md`. Reason: CLSR is the journal home of the reviewability framework EA extends (Cobbe & Singh 2020) and carries a live 2025-26 accountability conversation. Risks accepted: none; a stop condition on engaging that literature remains open.
 ```
+
+## Stop condition closed, 2026-07-29
+
+Acquired and read Cobbe & Singh's *CLSR* paper (green OA author copy, Cambridge
+Apollo, archived with hash). Two things it supplies that the earlier draft of
+this record only guessed at:
+
+- Reviewability is derived from **administrative law**, where judicial review
+  assesses the decision-making process as a whole rather than the decision
+  alone. Robodebt is public-sector automated decision-making of exactly that
+  kind, so EA's spine and the venue's own framework are about the same object.
+  That was luck rather than design, and it makes the engagement much stronger.
+- Cobbe & Singh state their own open problem: what record-keeping suits each
+  step and what information is worth retaining. EA's question sits immediately
+  after it, which lets EA position as continuing their programme rather than
+  competing with it.
+
+The rewrite also fixed a defect the stop condition hadn't named. EA argued
+against explanation-focused approaches on its own account, then cited Cobbe &
+Singh afterwards as background, when their section 2 is titled "Limits of
+Explanations" and makes that argument. Re-deriving a cited author's argument and
+then citing them for background is the signature of not engaging. The
+explainability paragraph now takes their objection as read and states where EA
+departs instead.
+
+Placement: both the Robodebt opening and the reviewability engagement sit on the
+first page of body text (PDF page 2; page 1 is title, abstract, keywords, and
+the AI disclosure). EA builds clean at 34 pp with the new citation resolving.
