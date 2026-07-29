@@ -1,5 +1,5 @@
 # Adversarial Pragmatics for AI Safety Evaluation
-<!-- SUMMARY: empirical adversarial-pragmatics benchmark; arXiv v3 submitted 2026-07-29 as submit/7884568, processing; EA taken through two external-review rounds to minor revision + interval-decision analyzer; all three papers shipped to public main 2026-07-24; HREB partially answered Study A scope inquiry 2026-07-28 (participant-status cleared, jurisdiction question still open); EA release tag/DOI and venue record still pending · status: active · updated: 2026-07-28 -->
+<!-- SUMMARY: empirical adversarial-pragmatics benchmark; arXiv v3 submitted 2026-07-29 as submit/7884568, processing; external code review 2026-07-29 found 7 false-pass bugs, all closed, but assurance-check is deliberately red pending DA claim-register migration; assurance tags and preprints held; EA taken through two external-review rounds to minor revision + interval-decision analyzer; all three papers shipped to public main 2026-07-24; HREB partially answered Study A scope inquiry 2026-07-28 (participant-status cleared, jurisdiction question still open); EA release tag/DOI and venue record still pending · status: active · updated: 2026-07-28 -->
 
 Status: active research artifact. Scaffold created 2026-06-26; public arXiv identifier assigned 2026-07-01; v2 replacement public 2026-07-16.
 
@@ -378,3 +378,46 @@ Focused session on `delegation-assurance.tex` (targeting *Minds and Machines*), 
 - **Polish**: removed editorial scar tissue (changelog framing) from §3.6/§8; fixed three integral-vs-non-integral citation doublings (South, Kühlewind & Birkholz, Hinkle).
 
 State at session end: delegation-assurance builds clean, 39 pp, 0 undefined citations. **Open for Brett**: whether to normalize `\parencite`/`\citep` across the three-paper suite; the M&M portfolio conflict (Truth-Tracking Profiles and the AGI-evaluation paper also point at M&M); and the round-1 items still deferred (non-amplification as a history-sensitive relation, institutional-mode worked case, content-interpretation fifth field). Heavy concurrent multi-session activity in this repo this session (one references-local.bib clobber-and-recover); verify before assuming any single file's state.
+
+## 2026-07-29 External adversarial code review, and the seven repairs
+
+An external reviewer was given the executable artifacts with one brief: can you make any
+analyzer or validator emit a false pass? Seven attack families, all reproduced, and I
+reproduced all seven independently before accepting the report. The reviewer's diagnosis
+of the set: several checks established internal consistency while their output labels
+implied stronger semantic, temporal, or procedural assurance. Verdict was to keep
+developing the papers but hold the immutable software release.
+
+All seven are now closed and the reviewer's own unmodified script returns 0/7 (its
+SHA-256 was checked against the filed copy, so the suite was not gamed). Test count went
+from 91 to 127 across eight suites, each attack having become a standing regression.
+Repairs, in the reviewer's order: chronological authority-state evaluation so a revoked
+parent can no longer confer child authority; a calibration rule under which near-total
+abstention cannot pass and required-node NOT_ESTIMATED blocks a use-level pass; evaluator
+views constructed from recursive typed contracts with the presented bytes digested,
+replacing banned-key-name scanning; externally anchored prospective claims; Study B
+validating required Cartesian cells and recomputing digests from item bytes; and the
+stamper separating permanently available read-only checks from closed writes.
+
+Study B's estimator was ported to the multilevel model the supplement already described,
+resolving that paper/code discrepancy in the paper's favour on Brett's call: DerSimonian
+-Laird estimates tau-squared by method of moments and then treats it as known, which
+understates uncertainty badly at four families. It follows the eight-schools
+implementation already in the repo, extended to two-dimensional quadrature so pooling runs
+across families and bases as the paper says.
+
+**`make assurance-check` is red, and correctly so.** The hardened projective-claim schema
+rejects `assurance/delegation/projective-claim-register.json`, whose three claims
+self-attest `declaration_timing: before_target_outcomes` and carry no `repository_anchor`
+or structured `target_selection`. That self-attestation was the vulnerability, so the
+failure is the repair working. Migrating those three claims needs genuine anchors and
+honest inclusion rules, not a schema shuffle, and it is the next task. The evidentiary and
+Study B registers already pass.
+
+Held until that closes: the `delegation-assurance-r1` and `evidentiary-assurance-r3` tags,
+and therefore the two assurance preprints, whose artifact statements name them. Not held:
+Adversarial Pragmatics, whose benchmark, pilot, and judge results run through none of this
+code, and whose JAIR submission is the next available piece of work.
+
+Review, reproduction script, results, bypass fixture, and the exact reviewed package are
+preserved with hashes under `reviews/code-review-20260729/`.
