@@ -1,0 +1,14 @@
+run: external adversarial code review of the assurance artifacts
+date: 2026-07-29
+reviewed_package: reviews/code-review-20260729/raw/reviewed-package.zip
+reviewed_commit: 812d407
+brief: "can you make any analyzer or validator emit a false pass?"
+outcome: 7 of 7 attack families reproduced; reviewer advises holding the immutable release
+independently_reproduced_by: Claude Opus 5, 2026-07-29, by running the reviewer's script
+  against a fresh extraction of the same zip; 7/7 reproduced
+artifacts:
+  - raw/code-review-report.md
+  - raw/code-review-adversarial-reproductions.py
+  - raw/code-review-adversarial-results.json
+  - raw/posthoc-claim-bypass.json
+  - raw/reviewed-package.zip

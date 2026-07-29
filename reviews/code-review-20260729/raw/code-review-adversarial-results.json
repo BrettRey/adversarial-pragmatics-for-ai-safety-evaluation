@@ -1,0 +1,139 @@
+{
+  "attacks_reproduced": 7,
+  "attacks_total": 7,
+  "package_root": "/mnt/data/code-review-package",
+  "results": [
+    {
+      "child_grant_derived_valid": true,
+      "child_issued_at": "2026-07-20T14:02:00Z",
+      "finding": "post-revocation subgrant produces false authorization",
+      "parent_revoked_at": "2026-07-20T14:01:00Z",
+      "proposal_at": "2026-07-20T14:04:00Z",
+      "proposal_authorization": "authorized",
+      "reproduced": true,
+      "schema_issues": [],
+      "semantic_issues": []
+    },
+    {
+      "finding": "hidden answers can be nested under neutral or allowlisted keys",
+      "payloads": {
+        "local": {
+          "case_id": {
+            "x": 1
+          }
+        },
+        "predictive": {
+          "case_id": {
+            "x": 0
+          }
+        },
+        "reviewer": {
+          "case_id": {
+            "x": "supported"
+          }
+        }
+      },
+      "reproduced": true,
+      "results": {
+        "local_discrimination": {
+          "decision": "ESTIMATED",
+          "leakage": "PASS",
+          "oracle_masking": "PASS",
+          "reference_join": "PASS"
+        },
+        "predictive_typed_ablation": {
+          "decision": "ESTIMATED",
+          "leakage": "PASS",
+          "oracle_masking": "PASS",
+          "reference_join": "PASS"
+        },
+        "reviewer_reconstruction": {
+          "decision": "ESTIMATED",
+          "leakage": "PASS",
+          "oracle_masking": "PASS",
+          "reference_join": "PASS"
+        }
+      }
+    },
+    {
+      "conditions": [
+        "Discordant target cases are excluded once their outcomes are known"
+      ],
+      "declared_by": "analyst after target inspection",
+      "finding": "explicit outcome-selected claim passes post-hoc narrowing validator",
+      "population": "Cases selected after outcome inspection for agreement with the desired direction",
+      "reproduced": true,
+      "self_attested_timing": "before_target_outcomes",
+      "validator_issues": []
+    },
+    {
+      "all_total_node_verdicts": 3984,
+      "all_wrong_node_verdicts": 3888,
+      "all_wrong_percent": 97.5904,
+      "cases": 21,
+      "finding": "near-total collapse to not_established still earns procurement PASS",
+      "procurement_aggregate_metric_statuses": {
+        "entity_conjunction_error_rate": "PASS",
+        "false_defeat_rate": "PASS",
+        "false_support_rate": "PASS",
+        "gap_defeat_confusion_rate": "PASS",
+        "gap_insufficiency_confusion_rate": "PASS",
+        "median_review_minutes": "PASS",
+        "privacy_or_security_breach_count": "PASS",
+        "required_node_omission_rate": "PASS"
+      },
+      "procurement_node_metrics_not_estimated": 48,
+      "procurement_total_node_verdicts": 2808,
+      "procurement_use_status": "PASS",
+      "procurement_wrong_node_verdicts": 2712,
+      "procurement_wrong_percent": 96.5812,
+      "reproduced": true,
+      "responses": 252,
+      "reviewers": 12
+    },
+    {
+      "finding": "marginal family and surface counts substitute for required crossed cells",
+      "in_scope_and_evaluable": true,
+      "observed_cell_count": 3,
+      "observed_family_surface_cells": [
+        [
+          "family_1",
+          "surface_1"
+        ],
+        [
+          "family_2",
+          "surface_1"
+        ],
+        [
+          "family_3",
+          "surface_2"
+        ]
+      ],
+      "reproduced": true,
+      "required_cartesian_cell_count": 6,
+      "schema_issues": [],
+      "scope_gate": "PASS",
+      "structural_issues": []
+    },
+    {
+      "finding": "check mode is blocked after closure, but write mode can be reopened and misses nested genuine responses",
+      "past_boundary_check_returncode": 2,
+      "past_boundary_check_stderr": "stamp refused: the unblinding boundary 2026-07-01T00:00:00Z has passed; re-stamping is blocked",
+      "reproduced": true,
+      "write_after_nested_genuine_response_returncode": 0,
+      "write_stderr": "",
+      "write_stdout": "restamped 2 file(s):\n  assurance/evidentiary/matched-cases/bundles/EA-EB-001.json\n  assurance/evidentiary/matched-cases/responses/nested/genuine.json"
+    },
+    {
+      "finding": "production target binding accepts hash labels without binding item bytes",
+      "item_payloads_opened_by_contract": false,
+      "production_eligibility": "VERIFIED_MANIFEST_BOUND",
+      "reproduced": true,
+      "target_item_count": 480,
+      "target_item_entry_keys": [
+        "item_hash",
+        "item_id"
+      ]
+    }
+  ]
+}
