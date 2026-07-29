@@ -6,8 +6,10 @@ with intervals.  It never replaces the noncompensatory family vector with a
 single decision score, and it holds no loss function from which to make a
 go/no-go decision.  A valid input with no observations, or without every
 required family, returns NOT_ESTIMATED.  Integrity failures (split overlap,
-failed reset, reference leakage, or a pre-lock oracle join) are invalid
-analysis inputs rather than empirical results.
+failed reset, an untrusted presented view, or a pre-lock oracle join) are
+invalid analysis inputs rather than empirical results.  Evaluator views are
+constructed from exact typed contracts here; caller-supplied view objects are
+accepted only when they exactly record those constructed bytes.
 """
 
 from __future__ import annotations
@@ -39,6 +41,40 @@ LOCAL_PRESENTATION_ARMS = {
     "placebo",
     "order_reversal",
     "shortcut",
+}
+
+# These are the complete recursive contracts for bytes that may be presented
+# during each programme.  Hidden outcomes and reference labels deliberately
+# have no source in these contracts.  All leaves are scalar, and every object
+# rejects undeclared properties, so an allowlisted name cannot contain an
+# arbitrary nested carrier for an answer.
+TRUSTED_VIEW_SCHEMAS: dict[str, dict[str, Any]] = {
+    "local_discrimination": {
+        "type": "object",
+        "additionalProperties": False,
+        "required": ["case_id", "standing_representation"],
+        "properties": {
+            "case_id": {"type": "string", "minLength": 1},
+            "standing_representation": {"const": "assigned"},
+        },
+    },
+    "predictive_typed_ablation": {
+        "type": "object",
+        "additionalProperties": False,
+        "required": ["case_id"],
+        "properties": {
+            "case_id": {"type": "string", "minLength": 1},
+        },
+    },
+    "reviewer_reconstruction": {
+        "type": "object",
+        "additionalProperties": False,
+        "required": ["case_id", "record_condition"],
+        "properties": {
+            "case_id": {"type": "string", "minLength": 1},
+            "record_condition": {"enum": ["typed", "degraded"]},
+        },
+    },
 }
 
 
@@ -88,6 +124,66 @@ def iso(value: str, label: str) -> datetime:
 def canonical_sha256(value: Any) -> str:
     payload = json.dumps(value, sort_keys=True, separators=(",", ":")).encode("utf-8")
     return hashlib.sha256(payload).hexdigest()
+
+
+def construct_local_evaluator_view(base_item_id: str) -> dict[str, Any]:
+    """Build the evaluator bytes without access to the hidden direction."""
+
+    return {
+        "case_id": base_item_id,
+        "standing_representation": "assigned",
+    }
+
+
+def construct_predictor_view(observation_id: str) -> dict[str, Any]:
+    """Build the predictor bytes without access to the held-out target."""
+
+    return {"case_id": observation_id}
+
+
+def construct_reviewer_view(case_id: str, condition: str) -> dict[str, Any]:
+    """Build the reviewer bytes without access to the hidden reference label."""
+
+    return {"case_id": case_id, "record_condition": condition}
+
+
+def commit_presented_view(
+    program_id: str,
+    supplied_view: Any,
+    constructed_view: dict[str, Any],
+    label: str,
+) -> str:
+    """Validate, match, and hash the exact canonical bytes presented.
+
+    ``constructed_view`` comes from a programme-specific function whose
+    signature excludes the hidden answer.  ``supplied_view`` is therefore only
+    a claimed presentation record: it never supplies a value to the trusted
+    view.  Exact equality prevents even a schema-valid caller value from being
+    substituted for the derived value.
+    """
+
+    schema = TRUSTED_VIEW_SCHEMAS[program_id]
+    require_schema(constructed_view, schema, f"{label} trusted view")
+    supplied_issues = schema_issues(
+        supplied_view, schema, f"{label} supplied view record"
+    )
+    if supplied_issues:
+        raise AnalysisError(
+            f"{label}: non-allowlisted or wrongly typed supplied view data "
+            "violates the trusted construction contract\n"
+            + "\n".join(supplied_issues)
+        )
+    presented_bytes = json.dumps(
+        constructed_view, sort_keys=True, separators=(",", ":")
+    ).encode("utf-8")
+    supplied_bytes = json.dumps(
+        supplied_view, sort_keys=True, separators=(",", ":")
+    ).encode("utf-8")
+    if supplied_bytes != presented_bytes:
+        raise AnalysisError(
+            f"{label}: supplied view record does not match the trusted constructed view"
+        )
+    return hashlib.sha256(presented_bytes).hexdigest()
 
 
 def mean(values: Iterable[float]) -> float:
@@ -278,21 +374,6 @@ def unique_ids(rows: list[dict[str, Any]], key: str, label: str) -> None:
     duplicates = sorted({value for value in values if values.count(value) > 1})
     if duplicates:
         raise AnalysisError(f"{label}: duplicate {key} values {duplicates}")
-
-
-def banned_key_paths(value: Any, banned_tokens: set[str], prefix: str = "") -> list[str]:
-    paths: list[str] = []
-    if isinstance(value, dict):
-        for key, item in value.items():
-            path = f"{prefix}.{key}" if prefix else key
-            normalized = key.lower().replace("-", "_")
-            if any(token in normalized for token in banned_tokens):
-                paths.append(path)
-            paths.extend(banned_key_paths(item, banned_tokens, path))
-    elif isinstance(value, list):
-        for index, item in enumerate(value):
-            paths.extend(banned_key_paths(item, banned_tokens, f"{prefix}[{index}]"))
-    return paths
 
 
 def validate_specifications(artifact_dir: Path) -> tuple[dict[str, Any], dict[str, dict[str, Any]]]:
@@ -532,7 +613,6 @@ def analyze_local(input_data: dict[str, Any], specification: dict[str, Any]) -> 
             "local discrimination: assignment manifest doesn't exactly cover observation IDs"
         )
     seen_pairs: set[tuple[str, str]] = set()
-    banned = set(specification["integrity_rules"]["banned_view_key_tokens"])
     vectors: list[dict[str, Any]] = []
     by_family: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for row in rows:
@@ -544,9 +624,12 @@ def analyze_local(input_data: dict[str, Any], specification: dict[str, Any]) -> 
         seen_pairs.add(pair)
         if not row["reset_confirmed"]:
             raise AnalysisError(f"{row['observation_id']}: evaluator reset was not confirmed")
-        leaked = banned_key_paths(row["evaluator_view"], banned)
-        if leaked:
-            raise AnalysisError(f"{row['observation_id']}: evaluator view leaks reference keys {leaked}")
+        view_sha256 = commit_presented_view(
+            "local_discrimination",
+            row["evaluator_view"],
+            construct_local_evaluator_view(row["base_item_id"]),
+            row["observation_id"],
+        )
         if iso(row["reference_joined_at"], row["observation_id"]) <= iso(
             row["response_locked_at"], row["observation_id"]
         ):
@@ -576,6 +659,7 @@ def analyze_local(input_data: dict[str, Any], specification: dict[str, Any]) -> 
             "nuisance_adjusted_authority_effect": signed_effect
             - common_nuisance_covariate,
             "control_correct": row["control_correct"],
+            "presented_view_sha256": view_sha256,
         }
         vector = {"observation_id": row["observation_id"], "family": row["family"], "values": values}
         vectors.append(vector)
@@ -752,7 +836,6 @@ def analyze_predictive(input_data: dict[str, Any], specification: dict[str, Any]
     expected_allowlist = set(specification["integrity_rules"]["feature_allowlist"])
     if set(design["feature_allowlist"]) != expected_allowlist:
         raise AnalysisError("predictive ablation: feature allowlist differs from the frozen specification")
-    banned = set(specification["integrity_rules"]["banned_view_key_tokens"])
     rows = input_data["observations"]
     unique_ids(rows, "observation_id", "predictive ablation")
     vectors: list[dict[str, Any]] = []
@@ -760,13 +843,12 @@ def analyze_predictive(input_data: dict[str, Any], specification: dict[str, Any]
     for row in rows:
         if row["trace_family_id"] not in held_out:
             raise AnalysisError(f"{row['observation_id']}: trace family is not in the held-out split")
-        view_keys = set(row["predictor_view"])
-        disallowed = view_keys - expected_allowlist
-        if disallowed:
-            raise AnalysisError(f"{row['observation_id']}: predictor view contains non-allowlisted fields {sorted(disallowed)}")
-        leaked = banned_key_paths(row["predictor_view"], banned)
-        if leaked:
-            raise AnalysisError(f"{row['observation_id']}: predictor view leaks oracle/reference fields {leaked}")
+        view_sha256 = commit_presented_view(
+            "predictive_typed_ablation",
+            row["predictor_view"],
+            construct_predictor_view(row["observation_id"]),
+            row["observation_id"],
+        )
         if iso(row["reference_joined_at"], row["observation_id"]) <= iso(
             row["prediction_locked_at"], row["observation_id"]
         ):
@@ -782,6 +864,7 @@ def analyze_predictive(input_data: dict[str, Any], specification: dict[str, Any]
             "typed_brier_loss": typed_loss,
             "baseline_brier_loss": baseline_loss,
             "paired_brier_improvement": baseline_loss - typed_loss,
+            "presented_view_sha256": view_sha256,
         }
         vector = {"observation_id": row["observation_id"], "family": row["family"], "values": values}
         vectors.append(vector)
@@ -930,7 +1013,6 @@ def analyze_reviewer(input_data: dict[str, Any], specification: dict[str, Any]) 
         )
     case_families: dict[str, str] = {}
     case_references: dict[str, str] = {}
-    banned = set(specification["integrity_rules"]["banned_view_key_tokens"])
     vectors: list[dict[str, Any]] = []
     by_family: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for row in rows:
@@ -939,20 +1021,23 @@ def analyze_reviewer(input_data: dict[str, Any], specification: dict[str, Any]) 
         prior_family = case_families.setdefault(row["case_id"], row["family"])
         if prior_family != row["family"]:
             raise AnalysisError(f"{row['judgment_id']}: one held-out case is assigned to multiple families")
+        if row["oracle_visible_to_reviewer"]:
+            raise AnalysisError(f"{row['judgment_id']}: oracle visibility violates masking")
+        view_sha256 = commit_presented_view(
+            "reviewer_reconstruction",
+            row["reviewer_view"],
+            construct_reviewer_view(row["case_id"], row["condition"]),
+            row["judgment_id"],
+        )
+        if iso(row["reference_joined_at"], row["judgment_id"]) <= iso(
+            row["review_locked_at"], row["judgment_id"]
+        ):
+            raise AnalysisError(f"{row['judgment_id']}: reference was not joined after review lock")
         prior_reference = case_references.setdefault(row["case_id"], row["reference_label"])
         if prior_reference != row["reference_label"]:
             raise AnalysisError(
                 f"{row['judgment_id']}: the hidden reference changes across record conditions"
             )
-        if row["oracle_visible_to_reviewer"]:
-            raise AnalysisError(f"{row['judgment_id']}: oracle visibility violates masking")
-        leaked = banned_key_paths(row["reviewer_view"], banned)
-        if leaked:
-            raise AnalysisError(f"{row['judgment_id']}: reviewer view leaks oracle/reference fields {leaked}")
-        if iso(row["reference_joined_at"], row["judgment_id"]) <= iso(
-            row["review_locked_at"], row["judgment_id"]
-        ):
-            raise AnalysisError(f"{row['judgment_id']}: reference was not joined after review lock")
         concordant = int(row["reviewer_verdict"] == row["reference_label"])
         false_certainty = int(not concordant and not row["justified_uncertainty"])
         values = {
@@ -965,6 +1050,7 @@ def analyze_reviewer(input_data: dict[str, Any], specification: dict[str, Any]) 
             "justified_uncertainty": row["justified_uncertainty"],
             "false_certainty": false_certainty,
             "technical_locus_correct": row["technical_locus_correct"],
+            "presented_view_sha256": view_sha256,
         }
         vector = {"observation_id": row["judgment_id"], "family": row["family"], "values": values}
         vectors.append(vector)

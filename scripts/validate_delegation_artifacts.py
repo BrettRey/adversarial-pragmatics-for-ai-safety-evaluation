@@ -66,6 +66,23 @@ def iso(value: str, label: str) -> datetime:
         raise ValueError(f"{label}: invalid ISO timestamp {value!r}") from exc
 
 
+def chronological(
+    values: Iterable[dict[str, Any]], timestamp_key: str, identifier_key: str
+) -> list[dict[str, Any]]:
+    """Order RFC 3339 records by absolute instant, then stable identifier."""
+
+    return sorted(
+        values,
+        key=lambda item: (
+            iso(
+                item[timestamp_key],
+                f"{item.get(identifier_key, '<unknown>')}.{timestamp_key}",
+            ),
+            item.get(identifier_key, ""),
+        ),
+    )
+
+
 def in_interval(timestamp: datetime, interval: dict[str, Any]) -> bool:
     start = iso(interval["starts_at"], "interval.starts_at")
     end_value = interval.get("ends_at")
@@ -265,38 +282,123 @@ def validate_regime_semantics(regime: dict[str, Any], errors: list[str]) -> None
 
 
 def derive_grant_validity(
-    regime: dict[str, Any], trace: dict[str, Any], errors: list[str]
+    regime: dict[str, Any],
+    trace: dict[str, Any],
+    errors: list[str],
+    transition_effects: dict[str, str] | None = None,
 ) -> dict[str, bool]:
     grants = {grant["grant_id"]: grant for grant in trace["grants"]}
+    if transition_effects is None:
+        transition_effects = derive_transition_effects(regime, trace, set(grants), errors)
     validity: dict[str, bool] = {}
-    visiting: set[str] = set()
+    active: set[str] = set()
+    applied_transition_ids: set[str] = set()
+    explicit_activation: dict[str, bool] = {}
 
-    def valid(grant_id: str) -> bool:
-        if grant_id in validity:
-            return validity[grant_id]
+    visiting: set[str] = set()
+    visited: set[str] = set()
+
+    def check_lineage(grant_id: str) -> None:
+        if grant_id in visited:
+            return
         if grant_id in visiting:
             errors.append(f"{trace['trace_id']}.{grant_id}: cyclic parent grants")
-            validity[grant_id] = False
-            return False
+            return
         visiting.add(grant_id)
-        grant = grants[grant_id]
-        issued_at = iso(grant["issued_at"], f"{trace['trace_id']}.{grant_id}.issued_at")
-        end_value = grant["effective_interval"].get("ends_at")
-        grant_end = iso(end_value, f"{trace['trace_id']}.{grant_id}.ends_at") if end_value else None
-        interval_valid = interval_ordered(grant["effective_interval"]) and interval_within(
-            grant["effective_interval"], regime["effective_interval"]
+        for parent_id in grants[grant_id]["parent_grant_ids"]:
+            if parent_id in grants:
+                check_lineage(parent_id)
+        visiting.remove(grant_id)
+        visited.add(grant_id)
+
+    for grant_id in grants:
+        check_lineage(grant_id)
+
+    # Equal-instant policy: effective transitions are applied before grant
+    # issuances. Grants at the same instant cannot parent one another because a
+    # parent must have been issued strictly earlier. Revocation is targeted and
+    # does not cascade to already-issued descendants unless a regime transition
+    # expressly targets those descendant grant IDs.
+    events = [
+        (
+            iso(transition["timestamp"], f"{transition['transition_id']}.timestamp"),
+            0,
+            transition["transition_id"],
+            "transition",
+            transition,
         )
+        for transition in trace["transitions"]
+    ] + [
+        (
+            iso(grant["issued_at"], f"{grant['grant_id']}.issued_at"),
+            1,
+            grant["grant_id"],
+            "grant",
+            grant,
+        )
+        for grant in trace["grants"]
+    ]
+
+    for timestamp, _, identifier, event_kind, event in sorted(events):
+        if event_kind == "transition":
+            if transition_effects.get(identifier) != "effective":
+                continue
+            applied_transition_ids.add(identifier)
+            rule = transition_rule(regime, event)
+            assert rule is not None
+            payload = event["normative_payload"]
+            if rule["effect_kind"] == "activate_grant":
+                grant_id = payload["grant_id"]
+                explicit_activation[grant_id] = True
+                if validity.get(grant_id):
+                    active.add(grant_id)
+            elif rule["effect_kind"] == "deactivate_grant":
+                grant_id = payload["grant_id"]
+                explicit_activation[grant_id] = False
+                active.discard(grant_id)
+            for grant_id, grant in grants.items():
+                if (
+                    grant["activation_transition_id"] == identifier
+                    and validity.get(grant_id)
+                    and explicit_activation.get(grant_id, True)
+                ):
+                    active.add(grant_id)
+            continue
+
+        grant = event
+        end_value = grant["effective_interval"].get("ends_at")
+        grant_end = (
+            iso(end_value, f"{trace['trace_id']}.{identifier}.ends_at")
+            if end_value
+            else None
+        )
+        interval_valid = interval_ordered(
+            grant["effective_interval"]
+        ) and interval_within(grant["effective_interval"], regime["effective_interval"])
         if (
-            not in_interval(issued_at, regime["effective_interval"])
+            not in_interval(timestamp, regime["effective_interval"])
             or not interval_valid
-            or (grant_end is not None and issued_at > grant_end)
+            or (grant_end is not None and timestamp > grant_end)
         ):
             result = False
         elif grant["parent_grant_ids"]:
             result = True
             for parent_id in grant["parent_grant_ids"]:
                 parent = grants.get(parent_id)
-                if parent is None or not valid(parent_id):
+                parent_issued_at = (
+                    iso(parent["issued_at"], f"{parent_id}.issued_at")
+                    if parent is not None
+                    else None
+                )
+                parent_active_at_issue = (
+                    parent is not None
+                    and validity.get(parent_id) is True
+                    and parent_id in active
+                    and parent_issued_at is not None
+                    and parent_issued_at < timestamp
+                    and in_interval(timestamp, parent["effective_interval"])
+                )
+                if not parent_active_at_issue:
                     result = False
                     continue
                 if grant["grantor_ids"] != [parent["grantee_id"]]:
@@ -315,18 +417,26 @@ def derive_grant_validity(
                 grant["grantor_ids"],
                 "issue",
                 grant["authority_object"],
-                issued_at,
+                timestamp,
                 grant["guard_evidence"],
             )
             if standing is None:
-                errors.append(f"{trace['trace_id']}.{grant_id}: missing evidence for grant standing")
+                errors.append(
+                    f"{trace['trace_id']}.{identifier}: missing evidence for grant standing"
+                )
             result = standing is True
-        visiting.remove(grant_id)
-        validity[grant_id] = result
-        return result
-
-    for identifier in grants:
-        valid(identifier)
+        validity[identifier] = result
+        if not result:
+            continue
+        activation_transition_id = grant["activation_transition_id"]
+        if activation_transition_id is None:
+            if explicit_activation.get(identifier, True):
+                active.add(identifier)
+        elif (
+            activation_transition_id in applied_transition_ids
+            and explicit_activation.get(identifier, True)
+        ):
+            active.add(identifier)
     return validity
 
 
@@ -345,12 +455,12 @@ def transition_rule(
 def derive_transition_effects(
     regime: dict[str, Any],
     trace: dict[str, Any],
-    valid_grants: dict[str, bool],
+    known_grants: Iterable[str],
     errors: list[str],
 ) -> dict[str, str]:
-    grant_ids = set(valid_grants)
+    grant_ids = set(known_grants)
     effects: dict[str, str] = {}
-    for transition in sorted(trace["transitions"], key=lambda item: item["timestamp"]):
+    for transition in chronological(trace["transitions"], "timestamp", "transition_id"):
         prefix = f"{trace['trace_id']}.{transition['transition_id']}"
         timestamp = iso(transition["timestamp"], prefix)
         rule = transition_rule(regime, transition)
@@ -405,7 +515,7 @@ def normative_state_at(
         and in_interval(timestamp, grant["effective_interval"])
     }
     object_states = copy.deepcopy(regime["initial_normative_state"]["authority_object_states"])
-    for transition in sorted(trace["transitions"], key=lambda item: item["timestamp"]):
+    for transition in chronological(trace["transitions"], "timestamp", "transition_id"):
         transition_time = iso(transition["timestamp"], transition["transition_id"])
         if transition_time > timestamp or transition_effects[transition["transition_id"]] != "effective":
             continue
@@ -487,7 +597,9 @@ def apply_delta(before: dict[str, Any], delta: dict[str, Any]) -> dict[str, Any]
 def state_continuity(trace: dict[str, Any], errors: list[str]) -> bool:
     current = copy.deepcopy(trace["boundary"]["initial_execution_state"])
     continuous = True
-    for execution in sorted(trace["records"]["executions"], key=lambda item: item["timestamp"]):
+    for execution in chronological(
+        trace["records"]["executions"], "timestamp", "execution_id"
+    ):
         prefix = f"{trace['trace_id']}.{execution['execution_id']}"
         state = execution["state"]
         if state["before"] != current:
@@ -504,7 +616,9 @@ def state_continuity(trace: dict[str, Any], errors: list[str]) -> bool:
 def evaluate_conditions(
     regime: dict[str, Any], trace: dict[str, Any], errors: list[str]
 ) -> tuple[dict[str, list[bool]], dict[str, bool], dict[str, bool], bool]:
-    executions = sorted(trace["records"]["executions"], key=lambda item: item["timestamp"])
+    executions = chronological(
+        trace["records"]["executions"], "timestamp", "execution_id"
+    )
     prefix_results: dict[str, list[bool]] = {}
     cumulative_results: dict[str, bool] = {}
     terminal_results: dict[str, bool] = {}
@@ -726,8 +840,8 @@ def derive_trace_results(
         errors.append(f"{prefix}: operational records contain actors outside the declared boundary")
         actor_links = False
 
-    valid_grants = derive_grant_validity(regime, trace, errors)
-    transition_effects = derive_transition_effects(regime, trace, valid_grants, errors)
+    transition_effects = derive_transition_effects(regime, trace, set(grants), errors)
+    valid_grants = derive_grant_validity(regime, trace, errors, transition_effects)
 
     transition_links = True
     for transition in trace["transitions"]:
@@ -800,7 +914,7 @@ def derive_trace_results(
 
     execution_authorizations: dict[str, str] = {}
     execution_links = True
-    for execution in sorted(executions.values(), key=lambda item: item["timestamp"]):
+    for execution in chronological(executions.values(), "timestamp", "execution_id"):
         proposal = proposals.get(execution["proposal_id"])
         if proposal is None:
             errors.append(f"{prefix}.{execution['execution_id']}: unknown proposal")

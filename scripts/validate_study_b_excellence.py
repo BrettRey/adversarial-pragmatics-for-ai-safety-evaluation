@@ -644,7 +644,20 @@ def pair_errors(path: Path, items_path: Path) -> list[str]:
 def claim_errors(path: Path, schema_path: Path) -> list[str]:
     payload = load_json(path)
     schema = load_json(schema_path)
-    errors = [f"claims: {error}" for error in shared_claims.validate_payload(payload, schema)]
+    # The shared validator's legacy-proposal check searches declared source files
+    # for an unchanged claim in Git history. Study B's substantive source_files
+    # list design inputs, not the register that serializes the claims, so supply
+    # that actual history anchor to the shared check without rewriting provenance.
+    validation_payload = copy.deepcopy(payload)
+    register_history_path = DEFAULT_CLAIMS.relative_to(ROOT).as_posix()
+    for claim in shared_claims.iter_claims(validation_payload):
+        source_files = claim.setdefault("provenance", {}).setdefault("source_files", [])
+        if register_history_path not in source_files:
+            source_files.append(register_history_path)
+    errors = [
+        f"claims: {error}"
+        for error in shared_claims.validate_payload(validation_payload, schema)
+    ]
     claims = list(shared_claims.iter_claims(payload))
     ids = {claim.get("claim_id") for claim in claims}
     if ids != CLAIM_IDS:

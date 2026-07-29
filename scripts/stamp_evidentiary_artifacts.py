@@ -7,10 +7,10 @@ reviewer package commit to each bundle and to the hidden reference key. Those
 commitments exist so that a key or map cannot be edited after reviewers have
 seen the material.
 
-Re-stamping is therefore legitimate only while the set is still pre-review. This
-script refuses to run once any genuine reviewer response exists or once the
-declared unblinding boundary has passed, so maintaining the fixtures cannot
-become a route around the freeze. Version fields are the author's
+Re-stamping is therefore legitimate only while the set is still pre-review.
+Write mode refuses once any genuine reviewer response exists or once the
+Git-anchored unblinding boundary has passed. Check mode remains permanently
+available and strictly read-only. Version fields are the author's
 responsibility; this script only recomputes digests and propagates them.
 
 Usage:
@@ -25,6 +25,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -59,6 +60,71 @@ def sha256_object(value: Any) -> str:
     return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
 
 
+def parse_datetime(value: str, label: str) -> datetime:
+    try:
+        moment = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except (AttributeError, ValueError) as exc:
+        raise StampError(f"{label} is not a valid date-time") from exc
+    if moment.tzinfo is None:
+        raise StampError(f"{label} must include a UTC offset")
+    return moment.astimezone(timezone.utc)
+
+
+def git_relative(path: Path) -> str:
+    try:
+        return path.resolve().relative_to(ROOT.resolve()).as_posix()
+    except ValueError as exc:
+        raise StampError(f"{path} is outside the Git-anchored repository") from exc
+
+
+def anchored_unblinding_boundary() -> datetime:
+    """Return the earliest boundary committed in this repository's history.
+
+    A working-tree edit cannot move this anchor. Taking the earliest committed
+    value also makes closure monotonic: a later commit cannot reopen a boundary
+    that repository history already records.
+    """
+    package_path = MATCHED / "reviewer-package.json"
+    relative = git_relative(package_path)
+    history = subprocess.run(
+        ["git", "-C", str(ROOT), "log", "--format=%H", "--", relative],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    commits = [line.strip() for line in history.stdout.splitlines() if line.strip()]
+    if history.returncode or not commits:
+        detail = history.stderr.strip()
+        raise StampError(
+            "write mode requires a committed reviewer-package boundary"
+            + (f": {detail}" if detail else "")
+        )
+
+    boundaries: list[datetime] = []
+    for commit in commits:
+        shown = subprocess.run(
+            ["git", "-C", str(ROOT), "show", f"{commit}:{relative}"],
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        if shown.returncode:
+            continue
+        try:
+            package = json.loads(shown.stdout)
+            boundaries.append(
+                parse_datetime(
+                    package["reference_key_unblinding_not_before"],
+                    f"committed boundary at {commit}",
+                )
+            )
+        except (KeyError, json.JSONDecodeError, StampError):
+            continue
+    if not boundaries:
+        raise StampError("repository history contains no valid unblinding boundary")
+    return min(boundaries)
+
+
 class Tree:
     """Holds every artifact file in memory so digests are computed once, in order."""
 
@@ -88,11 +154,22 @@ class Tree:
 def guard_pre_review(tree: Tree) -> None:
     """Refuse to re-stamp a set that reviewers may already have acted on."""
     if RESPONSES.exists():
-        genuine = [
-            path
-            for path in RESPONSES.glob("*.json")
-            if read_json(path).get("response_source") == "genuine_reviewer"
-        ]
+        genuine: list[Path] = []
+        for path in RESPONSES.rglob("*.json"):
+            try:
+                payload = read_json(path)
+            except (OSError, json.JSONDecodeError) as exc:
+                raise StampError(
+                    f"reviewer response {path.relative_to(RESPONSES)} cannot be "
+                    "classified safely; re-stamping is blocked"
+                ) from exc
+            if not isinstance(payload, dict):
+                raise StampError(
+                    f"reviewer response {path.relative_to(RESPONSES)} is not an object; "
+                    "re-stamping is blocked"
+                )
+            if payload.get("response_source") == "genuine_reviewer":
+                genuine.append(path)
         if genuine:
             raise StampError(
                 f"{len(genuine)} genuine reviewer response(s) exist; re-stamping is "
@@ -101,19 +178,39 @@ def guard_pre_review(tree: Tree) -> None:
     if (MATCHED / "hidden" / "unblinding-record.json").exists():
         raise StampError("an unblinding record exists; this set is closed to re-stamping")
     package = tree.load(MATCHED / "reviewer-package.json")
-    boundary = datetime.fromisoformat(
-        package["reference_key_unblinding_not_before"].replace("Z", "+00:00")
+    local_boundary = parse_datetime(
+        package["reference_key_unblinding_not_before"],
+        "working-tree unblinding boundary",
     )
-    if datetime.now(timezone.utc) >= boundary:
+    anchored_boundary = anchored_unblinding_boundary()
+    if local_boundary != anchored_boundary:
+        raise StampError(
+            "working-tree unblinding boundary differs from the earliest Git-anchored "
+            "boundary; a local edit cannot reopen or replace the freeze"
+        )
+    if datetime.now(timezone.utc) >= anchored_boundary:
         raise StampError(
             f"the unblinding boundary {package['reference_key_unblinding_not_before']} "
             "has passed; re-stamping is blocked"
         )
 
 
+def artifact_json_paths() -> list[Path]:
+    """Return stampable artifacts, permanently excluding reviewer responses."""
+    response_root = RESPONSES.absolute()
+    paths: list[Path] = []
+    for path in EA.rglob("*.json"):
+        try:
+            path.absolute().relative_to(response_root)
+        except ValueError:
+            paths.append(path)
+    return sorted(paths)
+
+
 def stamp(check_only: bool) -> int:
     tree = Tree()
-    guard_pre_review(tree)
+    if not check_only:
+        guard_pre_review(tree)
 
     map_path = EA / "applicability-map.json"
     classifier_path = EA / "action-classifier.json"
@@ -201,8 +298,9 @@ def stamp(check_only: bool) -> int:
         ):
             link[field] = json.loads(json.dumps(use[field]))
 
-    # 6. Canonicalize every remaining artifact file so the tree has one on-disk form.
-    for path in sorted(EA.rglob("*.json")):
+    # 6. Canonicalize every remaining authored artifact. Reviewer responses are
+    #    immutable inputs: this script never registers them in its writable tree.
+    for path in artifact_json_paths():
         tree.load(path)
 
     rewritten = tree.flush(check_only)

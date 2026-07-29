@@ -1,5 +1,24 @@
 #!/usr/bin/env python3
-"""Analyze genuine evidentiary-assurance calibration responses after unblinding."""
+"""Analyze genuine evidentiary-assurance calibration responses after unblinding.
+
+The object measured here is selective five-status discrimination: whether a
+configured review procedure tells support, substantive defeat, not established,
+record gap, and conflict apart at the nodes where each is expected. That is a
+two-sided property, so the metric set is two-sided. Alongside the directional
+safety rates (false support, false defeat, and the two gap confusions) sit a
+miss rate for each of the five statuses and an exact-status discordance rate.
+Answering `record_gap` where a record gap is expected remains a correct answer
+and costs nothing. Answering `not_established` where the record settled the node
+is a miss, and it is scored as one.
+
+Two rules follow, and they are the whole decision procedure. A use passes only
+when every metric is demonstrably met, at the class level and separately at each
+prospectively required node. A required-node metric that is NOT_ESTIMATED,
+because the status was never presented there or because the credible interval is
+too wide to decide, blocks a pass; it does not sit out. Nothing compensates for
+anything else and no scalar is formed, so a review that reports nothing cannot
+read as a review that established something.
+"""
 
 from __future__ import annotations
 
@@ -10,8 +29,9 @@ import json
 import math
 import statistics
 import sys
-from collections import defaultdict
+from collections import Counter, defaultdict
 from datetime import datetime, timezone
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -23,13 +43,36 @@ EA = ROOT / "assurance" / "evidentiary"
 MATCHED = EA / "matched-cases"
 NOT_ESTIMATED = "NOT_ESTIMATED"
 
-METRIC_TOLERANCES = {
+# The five evidentiary statuses of the record-and-verdict test, and the marker
+# for a required address on which the reviewer returned nothing at all.
+STATUSES = ("support", "substantive_defeat", "not_established", "record_gap", "conflict")
+OMITTED = "__omitted__"
+
+# Directional safety diagnostics: they catch a reviewer who asserts more than
+# the record carries. They say nothing about the opposite error, which is why
+# the status-specific miss rates below exist.
+DIRECTIONAL_METRICS = {
     "false_support_rate": "false_support_rate_max",
     "false_defeat_rate": "false_defeat_rate_max",
     "gap_defeat_confusion_rate": "gap_defeat_confusion_rate_max",
     # A gap says the recording failed; not established says the showing fell
     # short on an adequate record. Confusing them misdirects the remedy.
     "gap_insufficiency_confusion_rate": "gap_insufficiency_confusion_rate_max",
+}
+
+# Selective five-status discrimination. A miss rate is the complement of recall
+# for one expected status: of the verdicts whose reference status is s, the
+# share the reviewer returned as anything else, including nothing at all. These
+# are the metrics that make abstention cost something. A reviewer who answers
+# not_established wherever support, substantive defeat, or conflict is expected
+# leaves every directional rate above at zero and drives these to one.
+STATUS_MISS_METRICS = {status: f"{status}_miss_rate" for status in STATUSES}
+DISCORDANCE_METRIC = "exact_status_discordance_rate"
+
+METRIC_TOLERANCES = {
+    **DIRECTIONAL_METRICS,
+    **{name: f"{name}_max" for name in STATUS_MISS_METRICS.values()},
+    DISCORDANCE_METRIC: f"{DISCORDANCE_METRIC}_max",
     # Reporting an answerability chain or review path that no single entity
     # occupies. Tracked separately because it is a logical error, not a judgement call.
     "entity_conjunction_error_rate": "entity_conjunction_error_rate_max",
@@ -37,6 +80,10 @@ METRIC_TOLERANCES = {
     "median_review_minutes": "median_review_minutes_max",
     "privacy_or_security_breach_count": "privacy_or_security_breach_count_max",
 }
+
+# Metrics whose ceiling a use may leave undeclared, in which case it is derived
+# from the ceilings the use does declare. See resolve_tolerance().
+DERIVED_TOLERANCE_METRICS = frozenset(STATUS_MISS_METRICS.values()) | {DISCORDANCE_METRIC}
 
 
 class AnalysisError(ValueError):
@@ -115,7 +162,39 @@ RATE_METRICS = {
     "gap_insufficiency_confusion_rate",
     "entity_conjunction_error_rate",
     "required_node_omission_rate",
+    DISCORDANCE_METRIC,
+    *STATUS_MISS_METRICS.values(),
 }
+
+
+def resolve_tolerance(
+    metric: str, tolerances: dict[str, float | int]
+) -> tuple[float | int, str] | None:
+    """The ceiling this use puts on one metric, and where that ceiling came from.
+
+    A use weights the statuses by declaring a separate ceiling for each miss
+    rate; that is the noncompensatory form of a loss matrix, and it is the only
+    weighting this analyser will apply, because the declared uses set
+    `scalar_aggregation_permitted: false` and a scalar loss would let a status
+    the procedure never recognizes be offset by one it recognizes easily.
+
+    Where a use declares no ceiling for a miss rate, the strictest judgement-error
+    ceiling it does declare is applied. A use that tolerates five percent false
+    support has not thereby tolerated ninety-five percent missed support, and
+    inventing a looser number here would be an unprospective tolerance chosen
+    after the fact. Where nothing at all is declared, the metric is undecidable
+    and returns NOT_ESTIMATED, which blocks a pass rather than granting one.
+    """
+    name = METRIC_TOLERANCES[metric]
+    if name in tolerances:
+        return tolerances[name], "declared"
+    if metric in DERIVED_TOLERANCE_METRICS:
+        declared = [
+            tolerances[key] for key in DIRECTIONAL_METRICS.values() if key in tolerances
+        ]
+        if declared:
+            return min(declared), "derived_strictest_declared_judgement_error_ceiling"
+    return None
 
 
 def _betacf(a: float, b: float, x: float) -> float:
@@ -183,8 +262,13 @@ def beta_quantile(p: float, a: float, b: float) -> float:
     return 0.5 * (lo + hi)
 
 
+@lru_cache(maxsize=None)
 def jeffreys_interval(k: int, n: int, mass: float = 0.95) -> tuple[float, float]:
-    """Equal-tailed Jeffreys credible interval for a proportion: Beta(k+.5, n-k+.5)."""
+    """Equal-tailed Jeffreys credible interval for a proportion: Beta(k+.5, n-k+.5).
+
+    Cached because the five-status structure asks for the same few (k, n) pairs
+    thousands of times across nodes, cases, and reviewers; the function is pure.
+    """
     tail = (1.0 - mass) / 2.0
     a, b = k + 0.5, n - k + 0.5
     return beta_quantile(tail, a, b), beta_quantile(1.0 - tail, a, b)
@@ -206,6 +290,55 @@ def rate_record(numerator: int, denominator: int) -> dict[str, Any]:
         "ci_lower": lo,
         "ci_upper": hi,
     }
+
+
+def new_confusion() -> dict[str, Counter]:
+    """A full five-status confusion table, with a column for a missing verdict.
+
+    Every expected status keeps a row even when the sample never presents it, so
+    an untested status reads as a coverage hole rather than disappearing.
+    """
+    return {status: Counter() for status in STATUSES}
+
+
+def serialize_confusion(confusion: dict[str, Counter]) -> dict[str, dict[str, int]]:
+    return {
+        expected: {observed: count for observed, count in sorted(row.items())}
+        for expected, row in sorted(confusion.items())
+    }
+
+
+def status_metrics_from_confusion(confusion: dict[str, Counter]) -> dict[str, Any]:
+    """Status-specific miss rates and exact-status discordance from one table.
+
+    The miss rate for status s is the share of reference-s verdicts returned as
+    anything else. Answering record_gap where a record gap is expected is
+    correct and costs nothing here; answering not_established there, or
+    answering not_established where support, substantive defeat, or conflict is
+    expected, is a miss. That is the boundary the five statuses exist to draw:
+    abstention is a finding about an adequate record, not a free pass on nodes
+    the record could have settled.
+    """
+    metrics: dict[str, Any] = {}
+    for status in STATUSES:
+        row = confusion.get(status, Counter())
+        denominator = sum(row.values())
+        hits = row.get(status, 0)
+        record = rate_record(denominator - hits, denominator)
+        record["expected_instances"] = denominator
+        record["correct"] = hits
+        record["recall"] = None if record["value"] is None else 1.0 - record["value"]
+        metrics[STATUS_MISS_METRICS[status]] = record
+    # Discordance runs over every row present, so a reference status outside the
+    # declared five is still counted rather than quietly dropped.
+    correct = sum(row.get(expected, 0) for expected, row in confusion.items())
+    observations = sum(sum(row.values()) for row in confusion.values())
+    discordance = rate_record(observations - correct, observations)
+    discordance["expected_instances"] = observations
+    discordance["correct"] = correct
+    discordance["concordance"] = None if discordance["value"] is None else 1.0 - discordance["value"]
+    metrics[DISCORDANCE_METRIC] = discordance
+    return metrics
 
 
 def median_ci(values: list[float], mass: float = 0.95) -> tuple[float | None, float | None]:
@@ -304,6 +437,8 @@ def raw_metrics(
     minutes: list[float] = []
     breach_count = 0
     vectors: list[dict[str, Any]] = []
+    confusion = new_confusion()
+    node_confusion: dict[str, dict[str, Counter]] = defaultdict(new_confusion)
     node_counts: dict[str, dict[str, int]] = defaultdict(
         lambda: {
             "false_support_n": 0, "false_support_d": 0,
@@ -366,6 +501,9 @@ def raw_metrics(
                     "confidence": verdict.get("confidence") if verdict else None,
                 }
             )
+            cell = OMITTED if observed is None else observed
+            confusion.setdefault(expected, Counter())[cell] += 1
+            node_confusion[node_id].setdefault(expected, Counter())[cell] += 1
             if expected != "support":
                 false_support_d += 1
                 false_support_n += observed == "support"
@@ -398,14 +536,18 @@ def raw_metrics(
                 node_counts[node_id]["insufficiency_n"] += confused
 
     node_error_metrics: dict[str, Any] = {}
-    for node_id, counts in sorted(node_counts.items()):
+    node_status_confusion: dict[str, Any] = {}
+    for node_id in sorted(set(node_counts) | set(node_confusion)):
+        counts = node_counts[node_id]
         node_error_metrics[node_id] = {
             "false_support_rate": rate_record(counts["false_support_n"], counts["false_support_d"]),
             "false_defeat_rate": rate_record(counts["false_defeat_n"], counts["false_defeat_d"]),
             "gap_defeat_confusion_rate": rate_record(counts["confusion_n"], counts["confusion_d"]),
             "gap_insufficiency_confusion_rate": rate_record(counts["insufficiency_n"], counts["insufficiency_d"]),
             "required_node_omission_rate": rate_record(counts["omission_n"], counts["omission_d"]),
+            **status_metrics_from_confusion(node_confusion[node_id]),
         }
+        node_status_confusion[node_id] = serialize_confusion(node_confusion[node_id])
 
     median_lo, median_hi = median_ci(minutes)
     return {
@@ -416,6 +558,9 @@ def raw_metrics(
         "gap_insufficiency_confusion_rate": rate_record(insufficiency_n, insufficiency_d),
         "entity_conjunction_error_rate": rate_record(conjunction_n, conjunction_d),
         "required_node_omission_rate": rate_record(omission_n, omission_d),
+        **status_metrics_from_confusion(confusion),
+        "status_confusion_matrix": serialize_confusion(confusion),
+        "node_status_confusion": node_status_confusion,
         "median_review_minutes": {
             "value": statistics.median(minutes) if minutes else None,
             "ci_lower": median_lo,
@@ -439,40 +584,105 @@ def decide_metric(metric: str, record: dict[str, Any], threshold: float | int) -
     raise AnalysisError(f"unknown metric {metric!r}")
 
 
-def threshold_metrics(raw: dict[str, Any], tolerances: dict[str, float | int]) -> dict[str, Any]:
-    results: dict[str, Any] = {}
-    for metric, tolerance_name in METRIC_TOLERANCES.items():
-        threshold = tolerances[tolerance_name]
-        decision = decide_metric(metric, raw[metric], threshold)
-        results[metric] = {
-            **raw[metric],
-            "threshold_max": threshold,
-            "decision": decision,
-            "status": DECISION_TO_STATUS[decision],
+def decided_metric(
+    metric: str, record: dict[str, Any], tolerances: dict[str, float | int]
+) -> dict[str, Any]:
+    """One metric record with its ceiling, provenance, and decision attached."""
+    resolved = resolve_tolerance(metric, tolerances)
+    if resolved is None:
+        return {
+            **record,
+            "threshold_max": None,
+            "tolerance_source": "undeclared",
+            "decision": NOT_ESTIMATED,
+            "status": NOT_ESTIMATED,
         }
-    return results
+    threshold, source = resolved
+    decision = decide_metric(metric, record, threshold)
+    return {
+        **record,
+        "threshold_max": threshold,
+        "tolerance_source": source,
+        "decision": decision,
+        "status": DECISION_TO_STATUS[decision],
+    }
+
+
+def threshold_metrics(raw: dict[str, Any], tolerances: dict[str, float | int]) -> dict[str, Any]:
+    return {
+        metric: decided_metric(metric, raw[metric], tolerances)
+        for metric in METRIC_TOLERANCES
+    }
 
 
 def threshold_node_metrics(
     raw: dict[str, dict[str, Any]], tolerances: dict[str, float | int]
 ) -> dict[str, Any]:
-    results: dict[str, Any] = {}
-    for node_id, metrics in sorted(raw.items()):
-        node_result: dict[str, Any] = {}
-        for metric, observed_record in metrics.items():
-            tolerance_name = METRIC_TOLERANCES[metric]
-            if tolerance_name not in tolerances:
+    return {
+        node_id: {
+            metric: decided_metric(metric, record, tolerances)
+            for metric, record in sorted(metrics.items())
+        }
+        for node_id, metrics in sorted(raw.items())
+    }
+
+
+def unmet_reason(metric: dict[str, Any]) -> str:
+    """Why a node metric fell short of demonstrating its tolerance."""
+    if metric["decision"] == EXCEEDS:
+        return "exceeds_tolerance"
+    if metric.get("threshold_max") is None:
+        return "no_declared_tolerance"
+    if not metric.get("denominator"):
+        return "never_exercised_at_this_node"
+    return "interval_straddles_tolerance"
+
+
+def required_node_gate(
+    node_metrics: dict[str, Any], required: set[str]
+) -> dict[str, Any]:
+    """Noncompensation at prospectively required nodes.
+
+    The graph is noncompensatory at required nodes, so a use-level pass has to
+    be earned at each of them separately. A required-node metric that is
+    NOT_ESTIMATED is not a neutral absence: either the sample never presented
+    the status there, or the interval is too wide to decide it. Neither shows
+    that reviewers can make the distinction, so neither may be counted as
+    passing. The gate returns FAIL only for a demonstrated breach; an
+    undemonstrated node yields NOT_ESTIMATED, and the unmet list names which
+    node, which metric, and why, so a study can be sized to close the hole.
+    """
+    unmet: list[dict[str, Any]] = []
+    failed = False
+    for node_id in sorted(required):
+        metrics = node_metrics.get(node_id)
+        if not metrics:
+            unmet.append({
+                "node_id": node_id,
+                "metric": None,
+                "status": NOT_ESTIMATED,
+                "reason": "required_node_never_exercised",
+            })
+            continue
+        for metric_name, metric in sorted(metrics.items()):
+            if metric["status"] == "PASS":
                 continue
-            threshold = tolerances[tolerance_name]
-            decision = decide_metric(metric, observed_record, threshold)
-            node_result[metric] = {
-                **observed_record,
-                "threshold_max": threshold,
-                "decision": decision,
-                "status": DECISION_TO_STATUS[decision],
-            }
-        results[node_id] = node_result
-    return results
+            failed = failed or metric["status"] == "FAIL"
+            unmet.append({
+                "node_id": node_id,
+                "metric": metric_name,
+                "status": metric["status"],
+                "reason": unmet_reason(metric),
+            })
+    status = "FAIL" if failed else ("PASS" if not unmet else NOT_ESTIMATED)
+    return {
+        "status": status,
+        "rule": "Every prospectively required node must demonstrably meet every declared metric; NOT_ESTIMATED at a required node blocks a pass and never grants one.",
+        "required_nodes": sorted(required),
+        "unmet_count": len(unmet),
+        "unmet_reason_counts": dict(Counter(item["reason"] for item in unmet)),
+        "unmet": unmet,
+    }
 
 
 def minimum_reach_result(
@@ -717,20 +927,22 @@ def analyze(
             node_metrics = threshold_node_metrics(raw["node_error_metrics"], use["tolerances"])
             reach = minimum_reach_result(subset, use["minimum_reach_thresholds"])
             aggregate_status = conjunctive_status([aggregate_metrics])
-            node_failure = any(
-                metric["status"] == "FAIL"
-                for metrics in node_metrics.values()
-                for metric in metrics.values()
-            )
+            node_gate = required_node_gate(node_metrics, required_nodes.get(action_class, set()))
             class_status = (
-                "FAIL" if aggregate_status == "FAIL" or node_failure
-                else NOT_ESTIMATED if aggregate_status == NOT_ESTIMATED or reach["status"] != "PASS"
+                "FAIL" if aggregate_status == "FAIL" or node_gate["status"] == "FAIL"
+                else NOT_ESTIMATED
+                if aggregate_status == NOT_ESTIMATED
+                or node_gate["status"] != "PASS"
+                or reach["status"] != "PASS"
                 else "PASS"
             )
             class_results[action_class] = {
                 "status": class_status,
                 "metrics": aggregate_metrics,
                 "node_error_metrics": node_metrics,
+                "required_node_gate": node_gate,
+                "status_confusion_matrix": raw["status_confusion_matrix"],
+                "node_status_confusion": raw["node_status_confusion"],
                 "minimum_reach": reach,
                 "scalar_score": None,
             }
@@ -745,7 +957,17 @@ def analyze(
         )
         uses[use["use_id"]] = {
             "status": status,
-            "rule": "Every metric must pass in every declared action class; no metric or class compensates for another.",
+            "rule": (
+                "Every metric must be demonstrably met in every declared action class, at the "
+                "class level and at every prospectively required node. The metric set covers all "
+                "five statuses in both directions: a status-specific miss rate and exact-status "
+                "discordance sit beside the false-support and false-defeat rates, so returning "
+                "not_established where the record settles the node costs exactly what asserting "
+                "support without a record costs. A required-node metric that is NOT_ESTIMATED, "
+                "whether because the status was never presented there or because the interval is "
+                "too wide to decide, blocks a pass. No metric, node, or class compensates for "
+                "another, and no scalar is formed."
+            ),
             "class_results": class_results,
             "substantive_coverage": coverage,
             "scalar_score": None,
@@ -978,21 +1200,134 @@ def run_self_tests() -> list[str]:
     assert hi120 < hi12
     checks.append("posterior interval contains mean and tightens with n")
 
-    # A fully clean, richly exercised sample can reach a use-level pass, so the
-    # framework is not merely capable of withholding judgement.
-    rich_vec = {
-        ("FS", None): "record_gap",
-        ("FD", None): "support",
-        ("SD", None): "substantive_defeat",
-        ("NE", None): "not_established",
-        ("BB", "E1"): "support",
-    }
-    rich_res = {f"C{i}": {"J_B": {"satisfied": True, "satisfying_entity_ids": ["E1"]}} for i in range(40)}
-    rich, refs, classes, required = population(
-        rich_vec, 60, resolution_of=lambda _i: {"J_B": {"satisfied": True, "satisfying_entity_ids": ["E1"]}})
-    result = analyze(rich, refs, classes, required, make_use(), None, rich_res)
+    # --- Five-status discrimination. ---
+
+    rich_addresses = (("N1", None), ("N2", None), ("BB", "E1"))
+
+    def five_status_population(
+        n_responses: int, observed_of=None
+    ) -> tuple[list[dict[str, Any]], dict[str, Any], dict[str, str], dict[str, set[str]], dict[str, Any]]:
+        """Every required node carries every status, over enough cases to decide it.
+
+        Each case fixes one reference status at every address; cases cycle
+        through all five. `observed_of(expected_vector)` may return what the
+        reviewer said instead, which is how an abstaining population is built.
+        """
+        reviewers = ("RA", "RB", "RC")
+        refs: dict[str, dict[tuple[str, str | None], str]] = {}
+        resolutions: dict[str, Any] = {}
+        responses: list[dict[str, Any]] = []
+        made = 0
+        case_index = 0
+        while made < n_responses:
+            status = STATUSES[case_index % len(STATUSES)]
+            case_id = f"S{case_index}"
+            refs[case_id] = {address: status for address in rich_addresses}
+            resolutions[case_id] = {
+                "J_B": {
+                    "satisfied": status == "support",
+                    "satisfying_entity_ids": ["E1"] if status == "support" else [],
+                }
+            }
+            for reviewer in reviewers:
+                if made >= n_responses:
+                    break
+                observed = observed_of(refs[case_id]) if observed_of else dict(refs[case_id])
+                responses.append(synthetic_response(
+                    reviewer, case_id, observed,
+                    presentation_order=case_index + 1,
+                    resolution=resolutions[case_id],
+                ))
+                made += 1
+            case_index += 1
+        classes = {case_id: "c" for case_id in refs}
+        required = {"c": {node for node, _entity in rich_addresses}}
+        return responses, refs, classes, required, resolutions
+
+    # A fully clean sample that exercises all five statuses at every required
+    # node, at the ~49 observations per cell the 5% ceiling needs, reaches a
+    # use-level pass. The framework is not merely capable of withholding
+    # judgement, and the strengthened rule is attainable by a study designed for it.
+    rich, refs, classes, required, resolutions = five_status_population(255)
+    result = analyze(rich, refs, classes, required, make_use(), None, resolutions)
     assert result["uses"]["u"]["status"] == "PASS"
-    checks.append("rich clean sample reaches a use-level pass")
+    checks.append("rich five-status clean sample reaches a use-level pass")
+
+    # The reviewer's attack, in miniature: keep genuine record gaps, abstain
+    # everywhere else. Every directional rate stays at zero, and the use must
+    # still not pass. A review that established nothing may not read as one that
+    # established something.
+    def abstain(expected_vector: dict[tuple[str, str | None], str]) -> dict[tuple[str, str | None], str]:
+        return {
+            address: (status if status == "record_gap" else "not_established")
+            for address, status in expected_vector.items()
+        }
+
+    blanket, refs, classes, required, resolutions = five_status_population(255, observed_of=abstain)
+    result = analyze(blanket, refs, classes, required, make_use(), None, resolutions)
+    use_result = result["uses"]["u"]
+    assert use_result["status"] == "FAIL"
+    metrics = use_result["class_results"]["c"]["metrics"]
+    assert metrics["false_support_rate"]["decision"] == MEETS
+    assert metrics["false_defeat_rate"]["decision"] == MEETS
+    assert metrics["support_miss_rate"]["decision"] == EXCEEDS
+    assert metrics["substantive_defeat_miss_rate"]["decision"] == EXCEEDS
+    assert metrics["conflict_miss_rate"]["decision"] == EXCEEDS
+    # The gaps the reviewers got right stay right, and abstention where the
+    # record was adequate is where the cost lands.
+    assert metrics["record_gap_miss_rate"]["decision"] == MEETS
+    assert metrics["not_established_miss_rate"]["decision"] == MEETS
+    checks.append("blanket not_established fails five-status calibration while genuine gaps still count as correct")
+
+    # An unexercised status at a required node is a coverage hole, not a pass.
+    # Withhold conflict from the sample and the use can no longer pass, but it
+    # is reported NOT_ESTIMATED rather than refuted.
+    partial, refs, classes, required, resolutions = five_status_population(255)
+    keep = {case_id for case_id, vector in refs.items() if "conflict" not in vector.values()}
+    partial = [response for response in partial if response["case_id"] in keep]
+    refs = {case_id: vector for case_id, vector in refs.items() if case_id in keep}
+    classes = {case_id: "c" for case_id in refs}
+    result = analyze(partial, refs, classes, required, make_use(), None, resolutions)
+    use_result = result["uses"]["u"]
+    assert use_result["status"] == NOT_ESTIMATED
+    gate = use_result["class_results"]["c"]["required_node_gate"]
+    assert gate["status"] == NOT_ESTIMATED
+    assert gate["unmet_reason_counts"].get("never_exercised_at_this_node")
+    assert all(
+        item["metric"] == "conflict_miss_rate" for item in gate["unmet"]
+    ), gate["unmet"]
+    checks.append("required-node NOT_ESTIMATED blocks a use-level pass")
+
+    # The confusion table keeps every reference status addressable, including
+    # one the sample never presents.
+    matrix = result["uses"]["u"]["class_results"]["c"]["status_confusion_matrix"]
+    assert set(matrix) == set(STATUSES)
+    assert matrix["conflict"] == {}
+    assert matrix["support"] == {"support": 153}, matrix["support"]
+    checks.append("five-status confusion table retains untested statuses")
+
+    # A missing verdict is a miss, not an absence: it lands in the table under
+    # its own column rather than vanishing from the denominator.
+    dropped_conflict, refs, classes, required, resolutions = five_status_population(255)
+    for response in dropped_conflict:
+        if refs[response["case_id"]][("N1", None)] == "conflict":
+            response["node_verdicts"] = [
+                item for item in response["node_verdicts"] if item["node_id"] != "N1"
+            ]
+    result = analyze(dropped_conflict, refs, classes, required, make_use(), None, resolutions)
+    node_matrix = result["uses"]["u"]["class_results"]["c"]["node_status_confusion"]["N1"]
+    assert node_matrix["conflict"] == {OMITTED: 51}, node_matrix["conflict"]
+    assert result["uses"]["u"]["class_results"]["c"]["node_error_metrics"]["N1"]["conflict_miss_rate"]["decision"] == EXCEEDS
+    checks.append("an omitted verdict counts as a missed status")
+
+    # A use that declares its own miss ceiling gets that ceiling; one that
+    # declares none inherits the strictest judgement-error ceiling it declares.
+    declared = make_use({"conflict_miss_rate_max": 0.0})
+    assert resolve_tolerance("conflict_miss_rate", declared[0]["tolerances"]) == (0.0, "declared")
+    assert resolve_tolerance("support_miss_rate", declared[0]["tolerances"]) == (
+        0.05, "derived_strictest_declared_judgement_error_ceiling")
+    assert resolve_tolerance("support_miss_rate", {"median_review_minutes_max": 25}) is None
+    checks.append("status ceilings are declared or derived, never invented")
 
     # --- Structural checks that do not depend on the threshold semantics. ---
     struct_vec = {("N1", None): "substantive_defeat", ("N3", None): "support"}

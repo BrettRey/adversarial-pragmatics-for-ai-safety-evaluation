@@ -221,11 +221,17 @@ def bind_production(payload: dict, directory: str) -> tuple[dict, Path]:
     bound["configuration"]["wrapper_versions"] = ["BOUND-WRAPPER-V1"]
 
     target_items = []
+    item_directory = root / "target-item-payloads"
+    item_directory.mkdir()
     for base in bound["target_bases"]:
         target_items.extend(
             {
                 "item_id": base["condition_item_ids"][condition],
                 "item_hash": base["condition_item_hashes"][condition],
+                "item_path": (
+                    f"target-item-payloads/"
+                    f"{base['condition_item_hashes'][condition].removeprefix('sha256:')}.item"
+                ),
             }
             for condition in ANALYZER.CONDITIONS
         )
@@ -233,16 +239,22 @@ def bind_production(payload: dict, directory: str) -> tuple[dict, Path]:
             {
                 "item_id": variant[arm]["item_id"],
                 "item_hash": variant[arm]["item_hash"],
+                "item_path": (
+                    "target-item-payloads/"
+                    f"{variant[arm]['item_hash'].removeprefix('sha256:')}.item"
+                ),
             }
             for variant in base["shortcut_variants"]
             for arm in ANALYZER.SHORTCUT_ARMS
         )
+    for item in target_items:
+        (root / item["item_path"]).write_bytes(item["item_id"].encode("utf-8"))
 
     documents = {
         "claim_register": {
             "claims": [{"claim_id": "APB_BEH_001", "claim_version": "1.1"}]
         },
-        "target_items": {"schema_version": "1.0", "items": target_items},
+        "target_items": {"schema_version": "1.1", "items": target_items},
         "lineage_manifest": {
             "schema_version": "1.0",
             "bases": sorted(
@@ -388,6 +400,42 @@ class StudyBAnalysisTests(unittest.TestCase):
                 "5_noncontrolling_full_distribution_differences",
                 "6_matched_operativity_c1_minus_n1",
             },
+        )
+
+    def test_sparse_family_surface_cross_is_out_of_scope(self) -> None:
+        """Permanent reproduction of the reviewer's 3-margin/3-cell attack."""
+
+        payload = synthetic_payload(repeats=1, shortcut_repeats=1, full_scope=True)
+        selected_cells = {"F1-S1", "F2-S1", "F3-S2"}
+        payload["declared_cells"] = [
+            row for row in payload["declared_cells"] if row["cell_id"] in selected_cells
+        ]
+        payload["target_bases"] = [
+            row for row in payload["target_bases"] if row["cell_id"] in selected_cells
+        ]
+        base_ids = {row["base_id"] for row in payload["target_bases"]}
+        payload["observations"] = [
+            row for row in payload["observations"] if row["base_id"] in base_ids
+        ]
+        payload["shortcut_observations"] = [
+            row for row in payload["shortcut_observations"] if row["base_id"] in base_ids
+        ]
+
+        result = self.analyze(payload)
+        scope = result["scope_gate"]
+        self.assertEqual(len(scope["observed_families"]), 3)
+        self.assertEqual(len(scope["observed_application_surfaces"]), 2)
+        self.assertFalse(scope["complete_cartesian_cross"])
+        self.assertEqual(
+            scope["missing_cartesian_cells"],
+            [["family_1", "surface_2"], ["family_2", "surface_2"], ["family_3", "surface_1"]],
+        )
+        self.assertEqual(scope["gate"], "FAIL")
+        self.assertFalse(result["behavioural_claim"]["all_cells_evaluable"])
+        self.assertFalse(result["behavioural_claim"]["in_scope_and_evaluable"])
+        self.assertEqual(
+            result["behavioural_claim"]["pooled_selective_margin"]["status"],
+            "NOT_ESTIMATED_OUT_OF_SCOPE",
         )
 
     def test_failed_call_c1_cannot_pass_as_reference_concordance(self) -> None:
@@ -559,14 +607,106 @@ class StudyBAnalysisTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             bound, binding_root = bind_production(payload, directory)
             result = self.analyze(bound, binding_root=binding_root)
-        self.assertEqual(result["evidence_status"], "MANIFEST_BOUND_PRODUCTION_TARGET_ANALYSIS")
-        self.assertEqual(result["production_eligibility"], "VERIFIED_MANIFEST_BOUND")
+        self.assertEqual(
+            result["evidence_status"],
+            "MANIFEST_AND_ITEM_BYTES_BOUND_PRODUCTION_TARGET_ANALYSIS",
+        )
+        self.assertEqual(
+            result["production_eligibility"],
+            "VERIFIED_MANIFEST_AND_ITEM_BYTES_BOUND",
+        )
         self.assertEqual(result["scope_gate"]["gate"], "PASS")
         claim = result["behavioural_claim"]
         self.assertEqual(claim["status"], "ESTIMAND_REPORTED")
         self.assertTrue(claim["in_scope_and_evaluable"])
         self.assertIn("pooled_selective_margin", claim)
         self.assertEqual(len(claim["family_selective_margins"]), 6)
+        pooled = claim["pooled_selective_margin"]
+        self.assertIn("multilevel", pooled["estimator"].lower())
+        self.assertNotIn("DerSimonian", pooled["estimator"])
+        self.assertEqual(pooled["n_families"], 3)
+        self.assertEqual(pooled["n_family_surface_cells"], 6)
+        self.assertEqual(pooled["n_bases"], 24)
+        self.assertEqual(
+            pooled["prior"]["family_heterogeneity_sd"], "HalfNormal(0, 0.25)"
+        )
+
+    def test_multilevel_estimator_partially_pools_family_and_cell_effects(self) -> None:
+        """Standing guard against relabelling a two-stage DL estimator."""
+
+        base_effects = []
+        raw_family_effects = {"family_1": 0.80, "family_2": 0.20, "family_3": 0.20}
+        for family, raw_effect in raw_family_effects.items():
+            for surface in ("surface_1", "surface_2"):
+                cell_id = f"{family}-{surface}"
+                for base_number in range(1, 5):
+                    base_effects.append(
+                        {
+                            "base_id": f"{cell_id}-base-{base_number}",
+                            "cell_id": cell_id,
+                            "phenomenon_family": family,
+                            "application_surface": surface,
+                            "point_estimate": raw_effect,
+                            "standard_error": 0.12,
+                        }
+                    )
+        result = ANALYZER.multilevel_partial_pooling(
+            base_effects,
+            0.20,
+            grid_size=40,
+            n_draws=1200,
+            seed=23,
+        )
+        self.assertIn("multilevel", result["estimator"].lower())
+        self.assertNotIn("DerSimonian", result["estimator"])
+        self.assertEqual(result["n_families"], 3)
+        self.assertEqual(result["n_family_surface_cells"], 6)
+        self.assertEqual(result["n_bases"], 24)
+        pooled = result["point_estimate"]
+        high_family = result["family_effects"]["family_1"]["posterior_mean"]
+        self.assertGreater(high_family, pooled)
+        self.assertLess(high_family, raw_family_effects["family_1"])
+
+    def test_hash_labels_without_item_payload_paths_are_rejected(self) -> None:
+        """Permanent reproduction of the reviewer's rehashed two-field manifest."""
+
+        payload = synthetic_payload(repeats=1, shortcut_repeats=1)
+        with tempfile.TemporaryDirectory() as directory:
+            bound, binding_root = bind_production(payload, directory)
+            manifest_path = binding_root / bound["production_binding"]["manifest_path"]
+            manifest = ANALYZER.load_json(manifest_path)
+            target_binding = manifest["artifacts"]["target_items"]
+            target_path = binding_root / target_binding["path"]
+            target_document = ANALYZER.load_json(target_path)
+            for item in target_document["items"]:
+                item.pop("item_path")
+            write_json(target_path, target_document)
+            target_binding["sha256"] = ANALYZER.sha256_path(target_path)
+            write_json(manifest_path, manifest)
+            bound["production_binding"]["manifest_sha256"] = ANALYZER.sha256_path(
+                manifest_path
+            )
+            with self.assertRaisesRegex(
+                ANALYZER.StudyBAnalysisError, "must bind item_id, item_hash, and item_path"
+            ):
+                ANALYZER.analyze_payload(
+                    bound, self.shortcut_policy, binding_root=binding_root
+                )
+
+    def test_changed_item_bytes_are_rejected_after_manifest_binding(self) -> None:
+        payload = synthetic_payload(repeats=1, shortcut_repeats=1)
+        with tempfile.TemporaryDirectory() as directory:
+            bound, binding_root = bind_production(payload, directory)
+            manifest_path = binding_root / bound["production_binding"]["manifest_path"]
+            manifest = ANALYZER.load_json(manifest_path)
+            target_binding = manifest["artifacts"]["target_items"]
+            target_document = ANALYZER.load_json(binding_root / target_binding["path"])
+            item_path = binding_root / target_document["items"][0]["item_path"]
+            item_path.write_bytes(b"changed item bytes")
+            with self.assertRaisesRegex(ANALYZER.StudyBAnalysisError, "hash mismatch"):
+                ANALYZER.analyze_payload(
+                    bound, self.shortcut_policy, binding_root=binding_root
+                )
 
     def test_placeholder_configuration_is_rejected_even_when_bound(self) -> None:
         payload = synthetic_payload()

@@ -6,7 +6,9 @@ The committed input contains no target observations and therefore returns
 marked non-evidential. A production record is rejected unless one frozen
 manifest binds the claim, items, lineage, reference review, pair schedule,
 counterbalance, shortcut variants, configuration, analysis policy, and exact
-repeat sets to verified local hashes.
+repeat sets to verified local hashes. Production item hashes are recomputed from
+the bytes at manifest-bound relative paths; caller-supplied digest labels alone
+never establish item binding.
 """
 
 from __future__ import annotations
@@ -21,6 +23,8 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from statistics import NormalDist, stdev
 from typing import Any, Iterable
+
+import numpy as np
 
 try:
     from jsonschema import Draft202012Validator, FormatChecker
@@ -64,6 +68,15 @@ REQUIRED_PRODUCTION_ARTIFACTS = {
     "analysis_policy_manifest",
 }
 PLACEHOLDERS = {"NOT_ASSIGNED", "NOT_APPLICABLE", "TBD", "UNKNOWN", "UNSET"}
+MULTILEVEL_SEED = 20260729
+MULTILEVEL_DRAWS = 12000
+MULTILEVEL_GRID_SIZE = 160
+# The selective-margin scale is probability-difference units and has theoretical
+# support wider than [-1, 1]. HalfNormal(0, 0.25) puts 95% of either heterogeneity
+# component below about 0.49: broad enough for substantively large 20--50 point
+# variation, while regularizing variance components that only three families and
+# two surfaces cannot estimate stably from likelihood alone.
+MULTILEVEL_TAU_PRIOR_SCALE = 0.25
 
 
 class StudyBAnalysisError(ValueError):
@@ -176,13 +189,14 @@ def verify_bound_object_contracts(
     payload: dict[str, Any],
     artifact_paths: dict[str, Path],
     shortcut_policy: dict[str, dict[str, Any]],
+    binding_root: Path,
 ) -> None:
     """Check the production objects whose internal identifiers drive scoring."""
 
     target_document = load_json(artifact_paths["target_items"])
     if not isinstance(target_document, dict) or set(target_document) != {"schema_version", "items"}:
         raise StudyBAnalysisError("NOT_ELIGIBLE: target-items object has the wrong contract")
-    if target_document["schema_version"] != "1.0" or not isinstance(
+    if target_document["schema_version"] != "1.1" or not isinstance(
         target_document["items"], list
     ):
         raise StudyBAnalysisError("NOT_ELIGIBLE: target-items object is malformed")
@@ -205,16 +219,31 @@ def verify_bound_object_contracts(
         )
     observed_items = target_document["items"]
     if any(
-        not isinstance(row, dict) or set(row) != {"item_id", "item_hash"}
+        not isinstance(row, dict) or set(row) != {"item_id", "item_hash", "item_path"}
         for row in observed_items
     ):
-        raise StudyBAnalysisError("NOT_ELIGIBLE: target-items entries are malformed")
-    if canonical_records(observed_items, "item_id") != canonical_records(
+        raise StudyBAnalysisError(
+            "NOT_ELIGIBLE: target-items entries must bind item_id, item_hash, and item_path"
+        )
+    observed_item_labels = [
+        {"item_id": row["item_id"], "item_hash": row["item_hash"]}
+        for row in observed_items
+    ]
+    if canonical_records(observed_item_labels, "item_id") != canonical_records(
         expected_items, "item_id"
     ):
         raise StudyBAnalysisError(
             "NOT_ELIGIBLE: result item IDs or hashes do not match the frozen target-items object"
         )
+    opened_paths: set[Path] = set()
+    for row in observed_items:
+        item_path = bound_path(binding_root, row["item_path"])
+        if item_path in opened_paths:
+            raise StudyBAnalysisError(
+                f"NOT_ELIGIBLE: target item path is reused: {row['item_path']!r}"
+            )
+        opened_paths.add(item_path)
+        verify_hash(item_path, row["item_hash"], f"target item {row['item_id']!r}")
 
     expected_lineage = canonical_records(
         [
@@ -373,7 +402,7 @@ def verify_production_binding(
             )
     if has_placeholder(payload["configuration"]):
         raise StudyBAnalysisError("NOT_ELIGIBLE: production configuration contains a placeholder")
-    verify_bound_object_contracts(payload, artifact_paths, shortcut_policy)
+    verify_bound_object_contracts(payload, artifact_paths, shortcut_policy, binding_root)
     return manifest
 
 
@@ -647,44 +676,271 @@ def cluster_estimand(values: list[float], floor: float) -> dict[str, Any]:
     }
 
 
-def dersimonian_laird(
-    estimates: list[float], variances: list[float], floor: float
-) -> dict[str, Any]:
-    """Random-effects pooling across families (partial pooling): families share a
-    mean but vary, and the pooled interval carries both within- and estimated
-    between-family variance. Supplies the multiplicity control that separate
-    per-cell tests lacked."""
-    k = len(estimates)
-    if k == 0:
-        return {"point_estimate": None, "pooled_interval": [None, None], "n_families": 0}
-    finite = [v for v in variances if v not in (float("inf"), 0.0)]
-    if not finite:
-        return {
-            "estimator": "families report point estimates but no finite variance",
-            "point_estimate": sum(estimates) / k,
-            "pooled_interval": [None, None],
-            "n_families": k,
-            "design_floor": floor,
-        }
-    fixed_w = [1.0 / v if v not in (float("inf"), 0.0) else 0.0 for v in variances]
-    total_w = sum(fixed_w)
-    mean_fixed = sum(w * e for w, e in zip(fixed_w, estimates)) / total_w
-    q = sum(w * (e - mean_fixed) ** 2 for w, e in zip(fixed_w, estimates))
-    c = total_w - sum(w * w for w in fixed_w) / total_w
-    tau2 = max(0.0, (q - (k - 1)) / c) if c > 0 else 0.0
-    re_w = [1.0 / (v + tau2) if (v + tau2) > 0 else 0.0 for v in variances]
-    mean_re = sum(w * e for w, e in zip(re_w, estimates)) / sum(re_w)
-    se_re = math.sqrt(1.0 / sum(re_w))
-    z = NormalDist().inv_cdf(0.975)
-    lower, upper = mean_re - z * se_re, mean_re + z * se_re
+def posterior_summary(values: np.ndarray) -> dict[str, Any]:
+    """Summarize seeded posterior draws without turning an interval into a gate."""
+
     return {
-        "estimator": "DerSimonian-Laird random-effects pooling across families",
-        "point_estimate": mean_re,
-        "pooled_interval": [lower, upper],
-        "between_family_variance_tau2": tau2,
-        "n_families": k,
+        "posterior_mean": float(np.mean(values)),
+        "posterior_median": float(np.median(values)),
+        "posterior_interval": [
+            float(np.percentile(values, 2.5)),
+            float(np.percentile(values, 97.5)),
+        ],
+    }
+
+
+def multilevel_partial_pooling(
+    base_effects: list[dict[str, Any]],
+    floor: float,
+    *,
+    prior_scale: float = MULTILEVEL_TAU_PRIOR_SCALE,
+    grid_size: int = MULTILEVEL_GRID_SIZE,
+    n_draws: int = MULTILEVEL_DRAWS,
+    seed: int = MULTILEVEL_SEED,
+) -> dict[str, Any]:
+    """Fit the Study B normal-normal multilevel estimator.
+
+    Each base supplies an observed selective margin and a standard error derived
+    from its repeat-level simultaneous interval. Within a family-by-surface cell,
+    inverse-variance aggregation is a sufficient reduction of those independent
+    normal likelihoods. The joint model for the resulting cell summaries is::
+
+        d_fs ~ Normal(mu + beta_s + u_f + g_fs, v_fs)
+        u_f  ~ Normal(0, tau_family^2)
+        g_fs ~ Normal(0, tau_family_surface^2)
+
+    Surface effects are centered fixed effects, so ``mu`` is the balanced mean
+    across declared surfaces. Independent HalfNormal(0, prior_scale) priors are
+    used for both heterogeneity standard deviations and the fixed effects have a
+    flat prior. Their joint posterior is evaluated by deterministic two-dimensional
+    quadrature; seeded draws only summarize the resulting normal mixtures.
+    """
+
+    if prior_scale <= 0 or grid_size < 20 or n_draws < 100:
+        raise StudyBAnalysisError("unsupported multilevel integration settings")
+    if not base_effects:
+        raise StudyBAnalysisError("multilevel estimator needs base effects")
+
+    by_cell: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    cell_meanings: dict[str, tuple[str, str]] = {}
+    for row in base_effects:
+        cell_id = row["cell_id"]
+        meaning = (row["phenomenon_family"], row["application_surface"])
+        if cell_id in cell_meanings and cell_meanings[cell_id] != meaning:
+            raise StudyBAnalysisError(f"{cell_id}: inconsistent multilevel cell meaning")
+        cell_meanings[cell_id] = meaning
+        se = float(row["standard_error"])
+        if not math.isfinite(se) or se <= 0:
+            raise StudyBAnalysisError(
+                f"{row['base_id']}: multilevel standard error must be finite and positive"
+            )
+        by_cell[cell_id].append(row)
+
+    cell_ids = sorted(by_cell)
+    families = sorted({cell_meanings[cell_id][0] for cell_id in cell_ids})
+    surfaces = sorted({cell_meanings[cell_id][1] for cell_id in cell_ids})
+    observed_pairs = {cell_meanings[cell_id] for cell_id in cell_ids}
+    expected_pairs = {(family, surface) for family in families for surface in surfaces}
+    if observed_pairs != expected_pairs or len(families) < 2 or len(surfaces) < 2:
+        raise StudyBAnalysisError(
+            "multilevel estimator requires a complete cross with at least two families and surfaces"
+        )
+
+    cell_estimates: list[float] = []
+    cell_variances: list[float] = []
+    for cell_id in cell_ids:
+        estimates = np.asarray(
+            [float(row["point_estimate"]) for row in by_cell[cell_id]], dtype=float
+        )
+        variances = np.asarray(
+            [float(row["standard_error"]) ** 2 for row in by_cell[cell_id]], dtype=float
+        )
+        weights = 1.0 / variances
+        cell_estimates.append(float(np.sum(weights * estimates) / np.sum(weights)))
+        cell_variances.append(float(1.0 / np.sum(weights)))
+
+    d = np.asarray(cell_estimates, dtype=float)
+    sampling_variance = np.asarray(cell_variances, dtype=float)
+    family_index = {family: index for index, family in enumerate(families)}
+    surface_index = {surface: index for index, surface in enumerate(surfaces)}
+    cell_family = np.asarray(
+        [family_index[cell_meanings[cell_id][0]] for cell_id in cell_ids], dtype=int
+    )
+    cell_surface = np.asarray(
+        [surface_index[cell_meanings[cell_id][1]] for cell_id in cell_ids], dtype=int
+    )
+
+    # Centered treatment coding makes beta[0] the balanced surface mean rather
+    # than the alphabetically first surface's mean.
+    fixed_columns = [np.ones(len(cell_ids), dtype=float)]
+    for index in range(len(surfaces) - 1):
+        fixed_columns.append(
+            (cell_surface == index).astype(float) - 1.0 / len(surfaces)
+        )
+    x = np.column_stack(fixed_columns)
+    z_family = np.zeros((len(cell_ids), len(families)), dtype=float)
+    z_family[np.arange(len(cell_ids)), cell_family] = 1.0
+    family_covariance = z_family @ z_family.T
+
+    upper = max(1.0, 4.0 * prior_scale)
+    tau_grid = np.linspace(1e-4, upper, grid_size)
+    cell_tau_grid = np.linspace(1e-4, upper, grid_size)
+    log_posterior = np.full((grid_size, grid_size), -np.inf, dtype=float)
+    for family_position, tau_family in enumerate(tau_grid):
+        family_component = tau_family**2 * family_covariance
+        for cell_position, tau_cell in enumerate(cell_tau_grid):
+            covariance = (
+                np.diag(sampling_variance + tau_cell**2) + family_component
+            )
+            sign_v, logdet_v = np.linalg.slogdet(covariance)
+            if sign_v <= 0:
+                continue
+            solved_x = np.linalg.solve(covariance, x)
+            solved_d = np.linalg.solve(covariance, d)
+            fixed_precision = x.T @ solved_x
+            sign_fixed, logdet_fixed = np.linalg.slogdet(fixed_precision)
+            if sign_fixed <= 0:
+                continue
+            fixed_mean = np.linalg.solve(fixed_precision, x.T @ solved_d)
+            residual = d - x @ fixed_mean
+            residual_quad = float(residual @ np.linalg.solve(covariance, residual))
+            log_posterior[family_position, cell_position] = (
+                -0.5 * logdet_v
+                -0.5 * logdet_fixed
+                -0.5 * residual_quad
+                -0.5 * (tau_family / prior_scale) ** 2
+                -0.5 * (tau_cell / prior_scale) ** 2
+            )
+
+    finite = np.isfinite(log_posterior)
+    if not np.any(finite):
+        raise StudyBAnalysisError("multilevel posterior integration failed")
+    weights = np.zeros_like(log_posterior)
+    maximum = float(np.max(log_posterior[finite]))
+    weights[finite] = np.exp(log_posterior[finite] - maximum)
+    weights /= np.sum(weights)
+
+    rng = np.random.default_rng(seed)
+    flat_positions = rng.choice(weights.size, size=n_draws, p=weights.ravel())
+    family_positions, cell_positions = np.unravel_index(flat_positions, weights.shape)
+    tau_family_draws = tau_grid[family_positions]
+    tau_cell_draws = cell_tau_grid[cell_positions]
+
+    # Draw fixed and random effects from their conjugate conditional posterior.
+    # Grouping identical quadrature cells keeps this inexpensive and deterministic.
+    n_fixed = x.shape[1]
+    n_family = len(families)
+    n_cell = len(cell_ids)
+    design = np.column_stack(
+        [x, z_family, np.eye(n_cell, dtype=float)]
+    )
+    sampling_precision = 1.0 / sampling_variance
+    sufficient_precision = design.T @ (sampling_precision[:, None] * design)
+    sufficient_mean = design.T @ (sampling_precision * d)
+    parameter_draws = np.empty((n_draws, n_fixed + n_family + n_cell), dtype=float)
+    unique_positions, inverse_positions = np.unique(flat_positions, return_inverse=True)
+    for group_index, flat_position in enumerate(unique_positions):
+        selected = np.flatnonzero(inverse_positions == group_index)
+        family_position, cell_position = np.unravel_index(
+            flat_position, weights.shape
+        )
+        tau_family = tau_grid[family_position]
+        tau_cell = cell_tau_grid[cell_position]
+        precision = sufficient_precision.copy()
+        family_slice = slice(n_fixed, n_fixed + n_family)
+        cell_slice = slice(n_fixed + n_family, None)
+        precision[family_slice, family_slice] += np.eye(n_family) / tau_family**2
+        precision[cell_slice, cell_slice] += np.eye(n_cell) / tau_cell**2
+        covariance = np.linalg.inv(precision)
+        mean = covariance @ sufficient_mean
+        # Numerical symmetrization prevents tiny round-off asymmetries from
+        # upsetting Cholesky at the smallest variance grid points.
+        covariance = (covariance + covariance.T) / 2
+        cholesky = np.linalg.cholesky(covariance)
+        normals = rng.normal(size=(len(selected), len(mean)))
+        parameter_draws[selected] = mean + normals @ cholesky.T
+
+    mu_draws = parameter_draws[:, 0]
+    surface_coefficients = parameter_draws[:, 1:n_fixed]
+    family_random = parameter_draws[:, n_fixed : n_fixed + n_family]
+    cell_random = parameter_draws[:, n_fixed + n_family :]
+    surface_deviations = np.empty((n_draws, len(surfaces)), dtype=float)
+    coefficient_average = (
+        np.sum(surface_coefficients, axis=1) / len(surfaces)
+        if surface_coefficients.shape[1]
+        else np.zeros(n_draws)
+    )
+    for index in range(len(surfaces)):
+        surface_deviations[:, index] = -coefficient_average
+        if index < len(surfaces) - 1:
+            surface_deviations[:, index] += surface_coefficients[:, index]
+
+    family_effects = {
+        family: posterior_summary(mu_draws + family_random[:, index])
+        for family, index in family_index.items()
+    }
+    cell_effects: dict[str, dict[str, Any]] = {}
+    for index, cell_id in enumerate(cell_ids):
+        family = cell_meanings[cell_id][0]
+        surface = cell_meanings[cell_id][1]
+        draws = (
+            mu_draws
+            + surface_deviations[:, surface_index[surface]]
+            + family_random[:, family_index[family]]
+            + cell_random[:, index]
+        )
+        cell_effects[cell_id] = {
+            "phenomenon_family": family,
+            "application_surface": surface,
+            **posterior_summary(draws),
+        }
+
+    pooled = posterior_summary(mu_draws)
+    lower, upper_interval = pooled["posterior_interval"]
+    return {
+        "status": "ESTIMATED",
+        "estimator": (
+            "Bayesian normal-normal multilevel meta-regression with partial pooling "
+            "over families and family-by-surface cells"
+        ),
+        "model": (
+            "base selective margins with repeat-derived standard errors; centered fixed "
+            "surface effects; family and family-by-surface random effects"
+        ),
+        "point_estimate": pooled["posterior_mean"],
+        "posterior_median": pooled["posterior_median"],
+        "pooled_interval": pooled["posterior_interval"],
+        "posterior_interval": pooled["posterior_interval"],
+        "probability_above_design_floor": float(np.mean(mu_draws > floor)),
+        "between_family_sd_tau": posterior_summary(tau_family_draws),
+        "family_by_surface_sd_tau": posterior_summary(tau_cell_draws),
+        "family_effects": family_effects,
+        "surface_effects": {
+            surface: posterior_summary(surface_deviations[:, index])
+            for surface, index in surface_index.items()
+        },
+        "cell_effects": cell_effects,
+        "n_families": len(families),
+        "n_application_surfaces": len(surfaces),
+        "n_family_surface_cells": len(cell_ids),
+        "n_bases": len(base_effects),
+        "prior": {
+            "family_heterogeneity_sd": f"HalfNormal(0, {prior_scale})",
+            "family_by_surface_heterogeneity_sd": f"HalfNormal(0, {prior_scale})",
+            "scale_units": "selective-margin probability difference",
+            "rationale": (
+                "95% prior mass below about 0.49 permits large heterogeneity while "
+                "regularizing variance components weakly identified by three families"
+            ),
+        },
+        "integration": {
+            "method": "deterministic two-dimensional quadrature over heterogeneity SDs",
+            "grid_points_per_dimension": grid_size,
+            "posterior_summary_draws": n_draws,
+            "seed": seed,
+        },
         "design_floor": floor,
-        "floor_position": floor_position(lower, upper, floor),
+        "floor_position": floor_position(lower, upper_interval, floor),
     }
 
 
@@ -858,6 +1114,14 @@ def analyze_payload(
         ) / 2
         margin_lower = reference_lower - mean_nuisance_upper
         margin_upper = reference_upper + mean_nuisance_upper
+        # Convert the conservative derived simultaneous interval back to a
+        # normal-likelihood scale for the hierarchical model. Taking the larger
+        # side preserves its asymmetry conservatively and, unlike raw binomial
+        # plug-in variances, remains positive at all-success/all-failure endpoints.
+        margin_standard_error = max(
+            margin - margin_lower, margin_upper - margin
+        ) / z
+        margin_standard_error = max(margin_standard_error, 1e-6)
         # base_gate is now a DATA-EVALUABILITY verdict (did the arms produce
         # interpretable reference behaviour). The selective margin itself is
         # reported as an estimand with an interval and a design floor, never gated:
@@ -916,6 +1180,11 @@ def analyze_payload(
                 "c0_minus_n1_later_main": placebo_shift,
                 "nuisance_subtraction": "mean of the two absolute nuisance shifts",
                 "point_estimate": margin,
+                "standard_error": margin_standard_error,
+                "standard_error_method": (
+                    "larger derived simultaneous-interval half-width divided by "
+                    "the simultaneous normal critical value"
+                ),
                 "simultaneous_interval": [margin_lower, margin_upper],
                 "design_floor": design_floor,
                 "floor_position": floor_position(margin_lower, margin_upper, design_floor),
@@ -1088,20 +1357,89 @@ def analyze_payload(
 
     families = {cell["phenomenon_family"] for cell in cells.values()}
     surfaces = {cell["application_surface"] for cell in cells.values()}
+    observed_pairs = {
+        (cell["phenomenon_family"], cell["application_surface"])
+        for cell in cells.values()
+    }
+    required_pairs = {
+        (family, surface) for family in families for surface in surfaces
+    }
+    missing_pairs = sorted(required_pairs - observed_pairs)
+    complete_cartesian_cross = observed_pairs == required_pairs
+    required_bases = payload["analysis_policy"]["required_bases_per_cell"]
+    bases_by_pair = Counter(
+        (
+            cells[base["cell_id"]]["phenomenon_family"],
+            cells[base["cell_id"]]["application_surface"],
+        )
+        for base in bases.values()
+    )
+    every_required_cell_has_exact_bases = all(
+        bases_by_pair[pair] == required_bases for pair in required_pairs
+    )
     scope_pass = (
         len(families) >= payload["analysis_policy"]["required_families"]
         and len(surfaces) >= payload["analysis_policy"]["required_application_surfaces"]
+        and complete_cartesian_cross
+        and every_required_cell_has_exact_bases
     )
-    all_cells_evaluable = all(row["cell_gate"] == "PASS" for row in cell_results)
-    pooled_margin = dersimonian_laird(
-        [row["family_selective_margin"]["point_estimate"] for row in cell_results],
-        [row["family_selective_margin"]["standard_error"] ** 2 for row in cell_results],
-        design_floor,
+    # This field refers to the required design, not merely whichever declared
+    # cells remain in the payload. A sparse cross therefore cannot report that
+    # "all cells" are evaluable by quantifying over only the surviving cells.
+    all_cells_evaluable = scope_pass and all(
+        row["cell_gate"] == "PASS" for row in cell_results
     )
+    if scope_pass:
+        pooled_margin = multilevel_partial_pooling(
+            [
+                {
+                    "base_id": base_id,
+                    "cell_id": base["cell_id"],
+                    "phenomenon_family": cells[base["cell_id"]]["phenomenon_family"],
+                    "application_surface": cells[base["cell_id"]]["application_surface"],
+                    "point_estimate": base_results[base_id]["selective_margin"][
+                        "point_estimate"
+                    ],
+                    "standard_error": base_results[base_id]["selective_margin"][
+                        "standard_error"
+                    ],
+                }
+                for base_id, base in sorted(bases.items())
+            ],
+            design_floor,
+        )
+    else:
+        pooled_margin = {
+            "status": "NOT_ESTIMATED_OUT_OF_SCOPE",
+            "estimator": (
+                "Bayesian normal-normal multilevel meta-regression with partial pooling "
+                "over families and family-by-surface cells"
+            ),
+            "point_estimate": None,
+            "pooled_interval": [None, None],
+            "reason": (
+                "The declared design does not contain the complete required family-by-"
+                "surface cross with the exact base count in every cell."
+            ),
+            "n_families": len(families),
+            "n_application_surfaces": len(surfaces),
+            "n_family_surface_cells": len(cells),
+            "n_bases": len(bases),
+            "prior": {
+                "family_heterogeneity_sd": (
+                    f"HalfNormal(0, {MULTILEVEL_TAU_PRIOR_SCALE})"
+                ),
+                "family_by_surface_heterogeneity_sd": (
+                    f"HalfNormal(0, {MULTILEVEL_TAU_PRIOR_SCALE})"
+                ),
+                "scale_units": "selective-margin probability difference",
+            },
+            "design_floor": design_floor,
+        }
     evidence_status = (
         "NON_EVIDENTIAL_SYNTHETIC"
         if payload["data_kind"] == "synthetic_test"
-        else "MANIFEST_BOUND_PRODUCTION_TARGET_ANALYSIS"
+        else "MANIFEST_AND_ITEM_BYTES_BOUND_PRODUCTION_TARGET_ANALYSIS"
     )
     return {
         "dataset_id": payload["dataset_id"],
@@ -1110,7 +1448,7 @@ def analyze_payload(
         "production_eligibility": (
             "NOT_APPLICABLE_SYNTHETIC"
             if payload["data_kind"] == "synthetic_test"
-            else "VERIFIED_MANIFEST_BOUND"
+            else "VERIFIED_MANIFEST_AND_ITEM_BYTES_BOUND"
         ),
         "synthetic_warning": (
             "Synthetic self-test results are regression checks, not evidence about a model, "
@@ -1134,6 +1472,16 @@ def analyze_payload(
             "required_application_surface_count": payload["analysis_policy"][
                 "required_application_surfaces"
             ],
+            "observed_family_surface_cells": [list(pair) for pair in sorted(observed_pairs)],
+            "required_cartesian_cells": [list(pair) for pair in sorted(required_pairs)],
+            "missing_cartesian_cells": [list(pair) for pair in missing_pairs],
+            "complete_cartesian_cross": complete_cartesian_cross,
+            "required_bases_per_cell": required_bases,
+            "observed_bases_per_cell": {
+                f"{family} :: {surface}": bases_by_pair[(family, surface)]
+                for family, surface in sorted(required_pairs)
+            },
+            "every_required_cell_has_exact_bases": every_required_cell_has_exact_bases,
             "gate": "PASS" if scope_pass else "FAIL",
         },
         "behavioural_claim": {

@@ -170,8 +170,7 @@ def predictive_input(with_observations: bool = True) -> dict:
                         "typed_probability": 0.75 if predicted_positive else 0.25,
                         "baseline_probability": 0.50,
                         "predictor_view": {
-                            "case_id": f"case_{family}_{index}",
-                            "trace_length": 3,
+                            "case_id": f"{family}_prediction_{index}",
                         },
                         "prediction_locked_at": "2026-07-21T10:00:00Z",
                         "reference_joined_at": "2026-07-21T10:01:00Z",
@@ -493,6 +492,53 @@ class DelegationProgrammeTests(unittest.TestCase):
         with self.assertRaisesRegex(AnalysisError, "non-allowlisted|leaks"):
             analyze_input(input_data)
 
+    def test_neutral_nested_value_cannot_carry_local_reference(self) -> None:
+        input_data = local_input()
+        row = input_data["observations"][0]
+        row["evaluator_view"] = {"case_id": {"x": row["reference_direction"]}}
+        with self.assertRaisesRegex(AnalysisError, "trusted construction contract"):
+            analyze_input(input_data)
+
+    def test_allowlisted_field_cannot_carry_predictive_target(self) -> None:
+        input_data = predictive_input()
+        row = input_data["observations"][0]
+        row["predictor_view"] = {"case_id": {"x": row["target"]}}
+        with self.assertRaisesRegex(AnalysisError, "trusted construction contract"):
+            analyze_input(input_data)
+
+    def test_neutral_nested_value_cannot_carry_reviewer_reference(self) -> None:
+        input_data = reviewer_input()
+        row = input_data["observations"][0]
+        row["reviewer_view"] = {"case_id": {"x": row["reference_label"]}}
+        with self.assertRaisesRegex(AnalysisError, "trusted construction contract"):
+            analyze_input(input_data)
+
+    def test_schema_valid_view_value_must_be_derived_by_trusted_builder(self) -> None:
+        input_data = predictive_input()
+        input_data["observations"][0]["predictor_view"]["case_id"] = "arbitrary"
+        with self.assertRaisesRegex(AnalysisError, "does not match the trusted constructed view"):
+            analyze_input(input_data)
+
+    def test_exact_presented_view_bytes_are_committed_per_observation(self) -> None:
+        fixtures = (
+            (local_input(), "evaluator_view"),
+            (predictive_input(), "predictor_view"),
+            (reviewer_input(), "reviewer_view"),
+        )
+        for input_data, view_key in fixtures:
+            with self.subTest(program=input_data["program_id"]):
+                output = analyze_input(input_data)
+                by_id = {
+                    vector["observation_id"]: vector
+                    for vector in output["observation_vectors"]
+                }
+                for row in input_data["observations"]:
+                    row_id = row.get("observation_id", row.get("judgment_id"))
+                    self.assertEqual(
+                        by_id[row_id]["values"]["presented_view_sha256"],
+                        canonical_sha256(row[view_key]),
+                    )
+
     def test_manifest_hash_mismatch_is_rejected(self) -> None:
         input_data = local_input(False)
         input_data["design_object_bindings"]["assignment_manifest"]["content"][
@@ -520,7 +566,7 @@ class DelegationProgrammeTests(unittest.TestCase):
     def test_reviewer_oracle_masking_is_enforced(self) -> None:
         input_data = reviewer_input()
         input_data["observations"][0]["reviewer_view"]["reference_label"] = "supported"
-        with self.assertRaisesRegex(AnalysisError, "leaks oracle/reference"):
+        with self.assertRaisesRegex(AnalysisError, "trusted construction contract"):
             analyze_input(input_data)
 
     def test_reviewer_reference_cannot_change_between_record_conditions(self) -> None:
