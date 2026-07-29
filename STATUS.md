@@ -1,5 +1,5 @@
 # Adversarial Pragmatics for AI Safety Evaluation
-<!-- SUMMARY: empirical adversarial-pragmatics benchmark; arXiv v2 public 2026-07-16 (retitled locally, v3 pending); EA taken through two external-review rounds to minor revision + interval-decision analyzer; all three papers shipped to public main 2026-07-24; EA release tag/DOI and venue record still pending · status: active · updated: 2026-07-24 -->
+<!-- SUMMARY: empirical adversarial-pragmatics benchmark; arXiv v2 public 2026-07-16 (retitled locally, v3 pending); EA taken through two external-review rounds to minor revision + interval-decision analyzer; all three papers shipped to public main 2026-07-24; HREB partially answered Study A scope inquiry 2026-07-28 (participant-status cleared, jurisdiction question still open); EA release tag/DOI and venue record still pending · status: active · updated: 2026-07-28 -->
 
 Status: active research artifact. Scaffold created 2026-06-26; public arXiv identifier assigned 2026-07-01; v2 replacement public 2026-07-16.
 
@@ -125,6 +125,31 @@ submission/arxiv/adversarial-pragmatics-arxiv-source.tar.gz
   September; it does not say whether a narrow scope inquiry will be answered
   during the closure. External collection remains paused, but non-collection
   development can continue.
+- **2026-07-28: HREB replied (REB Coordinator Suzan Abdelkarim, 17:42:18 UTC).**
+  Determination: the six experts are not human research participants under
+  TCPS 2 Article 2.1, because the design does not require them to provide
+  their own data or respond to interventions from the researcher — they
+  evaluate fixed AI-output objects. This answers only the participant-status
+  question; the jurisdiction/auspices question was not asked in the sent
+  version and HREB's reply does not address it. Per the inquiry record's own
+  criterion, that leaves the collection gate not yet formally passed on the
+  HREB dimension — a follow-up asking the jurisdiction question directly, or a
+  deliberate decision to treat the current reply as sufficient, is Brett's
+  call to make, not to be inferred. Full record:
+  `notes/study-a-hreb-determination-record-2026-07-28.md`. Evidence preserved
+  at `private/study-a/production/evidence/hreb-scope-determination-received-2026-07-28.eml`
+  (ignored, mode 0600, SHA-256 `f5b3b04a17150763185c09e27ef946cc77b3f926c4740ef9fd16476855de1837`).
+  **Brett's decision (same day):** no jurisdiction follow-up will be sent — as
+  a Humber employee he is never "off duty" for ethics purposes, matching his
+  own 2026-07-16 annotation on this exact question, so the omission from the
+  sent email doesn't reflect real doubt on his side. This resolves the
+  HREB/ethics dimension of the collection gate. It does **not** make Study A
+  collection-ready by itself: `study-a-collection-launch-decisions-2026-07-16.md`
+  §8's remaining steps (finalize evaluator materials, operational config,
+  timing runs, assignment registry + attestation, verified freeze stamp,
+  explicit tag authorization, then tag + `make study-a-collection-ready`) are
+  unaffected and still outstanding. No recruitment, package distribution, or
+  external collection authorized yet.
 - A fresh local stamp-2 production candidate was rebuilt and semantically
   verified on 2026-07-16 after the object-only and gate-v3 repairs. Freeze
   readiness passes. This public-project commit is not the Study A freeze tag;

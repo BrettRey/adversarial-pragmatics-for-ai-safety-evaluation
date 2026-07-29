@@ -1,7 +1,7 @@
 # Study A HREB inquiry record
 
 **Sent:** 2026-07-16 at 19:10:41 UTC
-**Status:** written response pending; external collection remains closed
+**Status:** partial written response received 2026-07-28 (participant-status question answered; jurisdiction/auspices question not asked, not addressed). See `study-a-hreb-determination-record-2026-07-28.md`. External collection remains closed pending a decision on the open jurisdiction question.
 
 ## Question sent
 
