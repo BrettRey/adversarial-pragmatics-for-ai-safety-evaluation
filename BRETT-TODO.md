@@ -41,10 +41,16 @@ I'd take (a). It costs one word and removes the ambiguity outright.
 
 ## 2. Two small checks, five minutes total, both browser-only.
 
-**2a. SSRN's generative-AI policy.** Their support page 404s and I could not
-verify it. You disclose AI assistance on page 1, so this needs a human look
-before Evidentiary Assurance is posted there. If they run a prohibition model
-rather than a disclosure model, we move EA's preprint elsewhere.
+**2a. DONE, by you.** SSRN's current policy (15 July 2026) permits AI for language,
+structure, translation, and literature discovery, so extensive assistance isn't
+disqualifying. SSRN stays as EA's preprint venue; my suggestion to move it to arXiv is
+withdrawn. Acting on what you found, the disclosure in all three papers has been rewritten
+to meet the four required elements, since the old one failed two of them.
+
+**Still yours, one paste:** SSRN requires the AI statement in the submission record
+alongside the abstract, not only in the PDF. The text to paste is in the papers' page-1
+note. Undisclosed substantial use risks rejection or account closure with no appeal, so
+this is not optional.
 
 **2b. Is CLSR on U of T's covered list?** Open <https://search.scifree.se/utoronto>
 and search "Computer Law" or ISSN 2212-473X. If it's listed as a covered Elsevier
