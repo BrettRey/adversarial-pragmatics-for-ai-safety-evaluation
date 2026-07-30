@@ -62,7 +62,7 @@ Discretionary (change only deliberately):
 
 - **Submission id:** `submit/7884568` -- Replacement of `2607.01153`.
 - **Title submitted:** Adversarial Pragmatics for AI Safety Evaluation: A Diagnostic Framework and Seed Benchmark for Language-Mediated Control
-- **Status at hand-off:** processing.
+- **Status:** ANNOUNCED public 2026-07-29. Paper password recorded in `private/arxiv-credentials.md`.
 - **Source package:** built from commit `9181b71`; AP 32 pp, supplement 13 pp, 6 figures, 17 tables.
 - **Unchanged, deliberately:** primary category cs.CL with cs.AI and cs.SE cross-listed; CC BY 4.0 licence (JAIR publishes CC BY, so the Springer preprint clause that ruled out Language Resources and Evaluation never applies); DOI `10.48550/arXiv.2607.01153`.
 - **Package hygiene, changed after this submission:** the bundle shipped ten font files, four of them Charis SIL backing an `\ipafont` this submission never calls. `scripts/build_arxiv_bundle.sh` now detects `\ipafont` use in the document bodies and ships Charis SIL only when it is used, dropping the declaration with the files. Package fell from 2.7 MB to 1.3 MB. **The v3 upload used the older 2.7 MB package**; the slimmer one applies from v4 on.

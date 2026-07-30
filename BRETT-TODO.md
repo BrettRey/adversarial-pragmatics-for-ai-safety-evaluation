@@ -1,7 +1,7 @@
 # What needs you
 <!-- SUMMARY: the only open items that require Brett rather than an agent, ordered by dependency, each pre-drafted to a decision or a paste - status: live - updated: 2026-07-29 -->
 
-Six items. Two are one-word decisions, three are short checks, one is real work
+Four items left. Two are one-word decisions, three are short checks, one is real work
 I can do once you've answered item 1. Everything else in this project is either
 done or is mine to get on with.
 
