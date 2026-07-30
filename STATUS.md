@@ -1,7 +1,38 @@
-# Adversarial Pragmatics for AI Safety Evaluation
-<!-- SUMMARY: empirical adversarial-pragmatics benchmark; arXiv v3 PUBLIC 2026-07-29 (retitle live, sibling citations now resolve); external code review 2026-07-29 found 7 false-pass bugs, all closed, but DA claim register migrated, assurance-check green again; assurance tags still held pending Brett's call on 'frozen' language in DA; EA taken through two external-review rounds to minor revision + interval-decision analyzer; all three papers shipped to public main 2026-07-24; HREB partially answered Study A scope inquiry 2026-07-28 (participant-status cleared, jurisdiction question still open); EA release tag/DOI and venue record still pending · status: active · updated: 2026-07-28 -->
+---
+slug: adversarial-pragmatics-for-ai-safety-evaluation
+kind: paper
+title: 'Adversarial Pragmatics for AI Safety Evaluation: A Diagnostic Framework and Seed Benchmark for
+  Language-Mediated Control'
+stage: complete
+external: preprint
+blocked_on: []
+updated: 2026-07-30
+source:
+- STATUS.md
+- PORTFOLIO.md
+venue: JAIR
+preprints:
+- arXiv:2607.01153
+next_action: 'JAIR submission (STATUS.md: "the next available piece of work")'
+notes: 'Classified on the flagship Adversarial Pragmatics (AP) paper, matching the directory/manifest
+  title. This repository holds three stand-alone papers (AP itself; delegation-assurance.tex; evidentiary-assurance.tex)
+  plus a shared supplement. ADJUDICATION 2026-07-30: DA and EA now have their own registry entries in
+  batch-10.yaml, with `path` pointing at this directory, per the v2 rule that the registry unit is the
+  manuscript rather than the directory. This block covers AP only. STATUS.md/SUMMARY: arXiv v3 is public
+  (2607.01153, retitled, 2026-07-29 timestamp); "Not held: Adversarial Pragmatics, whose benchmark, pilot,
+  and judge results run through none of this [external-review] code, and whose JAIR submission is the
+  next available piece of work" -- i.e. AP has never been submitted to a venue (external: preprint, blocked_on:
+  none), unlike DA/EA whose release tags are explicitly "held" pending Brett''s call on "frozen" language.
+  AP carries a known but STATUS.md-described-as-non-critical v3 defect (supplement.tex:361 estimator misdescription,
+  deferred to v4; "No computed result is affected"), not treated as blocking stage: complete.
 
-Status: active research artifact. Scaffold created 2026-06-26; public arXiv identifier assigned 2026-07-01; v2 replacement public 2026-07-16.
+  '
+---
+
+# Adversarial Pragmatics for AI Safety Evaluation
+<!-- SUMMARY: empirical adversarial-pragmatics benchmark; arXiv v3 PUBLIC 2026-07-29 (retitle live, sibling citations now resolve); external code review 2026-07-29 found 7 false-pass bugs, all closed, but DA claim register migrated, assurance-check green again; assurance tags still held pending Brett's call on 'frozen' language in DA; EA taken through two external-review rounds to minor revision + interval-decision analyzer; all three papers shipped to public main 2026-07-24; HREB partially answered Study A scope inquiry 2026-07-28 (participant-status cleared, jurisdiction question still open); EA release tag/DOI and venue record still pending; v3 ships a known supplement estimator misdescription, deferred to v4 · status: active · updated: 2026-07-30 -->
+
+Status: active research artifact. Scaffold created 2026-06-26; public arXiv identifier assigned 2026-07-01; v2 replacement public 2026-07-16; **v3 replacement public, announced in the 2026-07-30 mailing** (arXiv version timestamp 2026-07-29 15:40:42 UTC, 942 KB).
 
 ## Deferred: two corpus follow-ups (2026-07-25)
 
@@ -9,7 +40,9 @@ The naturalistic-pragmatic-extremes-v2 corpus has (1) a detection blind spot for
 
 Title: *Adversarial Pragmatics for AI Safety Evaluation: A Diagnostic Framework and Seed Benchmark for Language-Mediated Control*.
 
-Public arXiv identifier: `arXiv:2607.01153` (v2 public since 2026-07-16). Submission-system identifiers: `submit/7776593` (v1), `submit/7830880` (v2 replacement). Paper password recorded in `private/arxiv-credentials.md` (gitignored).
+Public arXiv identifier: `arXiv:2607.01153` (v3 public, announced 2026-07-30; the identifier is unchanged across versions). Submission-system identifiers: `submit/7776593` (v1), `submit/7830880` (v2 replacement), `submit/7884568` (v3 replacement). Paper password recorded in `private/arxiv-credentials.md` (gitignored; unchanged by the v3 replacement, verified 2026-07-30).
+
+**v3 carries a known defect, deliberately not corrected by an emergency v4.** `supplement.tex:361` describes Study B's family-level estimator as "a single multilevel model with partial pooling across families and bases", while `scripts/analyze_study_b.py:650` implements DerSimonian--Laird two-stage random-effects pooling. This text is new since v2 and was already in flight when the discrepancy was found on 2026-07-29 (see DECISIONS.md). No computed result is affected: Study B's record is NOT_ESTIMATED and no target data exists, so this misdescribes a planned estimator rather than reporting a wrong number. Queue it with the font-bundle change that DECISIONS.md already defers to v4.
 
 ## Canonical Local State
 
