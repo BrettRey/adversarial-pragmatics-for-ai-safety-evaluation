@@ -1,5 +1,5 @@
 # Adversarial Pragmatics for AI Safety Evaluation
-<!-- SUMMARY: empirical adversarial-pragmatics benchmark; arXiv v3 submitted 2026-07-29 as submit/7884568, processing; external code review 2026-07-29 found 7 false-pass bugs, all closed, but assurance-check is deliberately red pending DA claim-register migration; assurance tags and preprints held; EA taken through two external-review rounds to minor revision + interval-decision analyzer; all three papers shipped to public main 2026-07-24; HREB partially answered Study A scope inquiry 2026-07-28 (participant-status cleared, jurisdiction question still open); EA release tag/DOI and venue record still pending · status: active · updated: 2026-07-28 -->
+<!-- SUMMARY: empirical adversarial-pragmatics benchmark; arXiv v3 submitted 2026-07-29 as submit/7884568, processing; external code review 2026-07-29 found 7 false-pass bugs, all closed, but DA claim register migrated, assurance-check green again; assurance tags still held pending Brett's call on 'frozen' language in DA; EA taken through two external-review rounds to minor revision + interval-decision analyzer; all three papers shipped to public main 2026-07-24; HREB partially answered Study A scope inquiry 2026-07-28 (participant-status cleared, jurisdiction question still open); EA release tag/DOI and venue record still pending · status: active · updated: 2026-07-28 -->
 
 Status: active research artifact. Scaffold created 2026-06-26; public arXiv identifier assigned 2026-07-01; v2 replacement public 2026-07-16.
 
@@ -406,7 +406,24 @@ understates uncertainty badly at four families. It follows the eight-schools
 implementation already in the repo, extended to two-dimensional quadrature so pooling runs
 across families and bases as the paper says.
 
-**`make assurance-check` is red, and correctly so.** The hardened projective-claim schema
+**Resolved same day.** DA's three claims were migrated to `status: proposed` with
+`declaration_timing: repository_anchored_target_chronology_not_established`, and
+`assurance-check` is green. That enum value is the honest one: the claims are anchored in
+the repository's Git history, but no target inventory has been fixed, so prospectivity is
+not established. The stronger values require a digested target inventory checked at both
+HEAD and the anchor commit, which DA cannot supply because the items each programme will
+run on have never been enumerated. Building those inventories is real design work and
+would make the claims genuinely prospective; until then this is what is true.
+
+**Open for Brett: the word "frozen" now carries two senses.** `sections-delegation/07-conclusion.tex`
+says the specifications are "frozen before any target outcome", which is true and
+Git-verifiable of the specifications. The claim register's `frozen` status now means
+something stronger, anchored plus a fixed target inventory, which those claims do not
+meet. Two senses of one word across paper and artifact is exactly the label problem the
+review was about, and it wants either a different word in the paper or a sentence
+distinguishing them.
+
+Superseded note, kept for the record: **`make assurance-check` was red, and correctly so.** The hardened projective-claim schema
 rejects `assurance/delegation/projective-claim-register.json`, whose three claims
 self-attest `declaration_timing: before_target_outcomes` and carry no `repository_anchor`
 or structured `target_selection`. That self-attestation was the vulnerability, so the
