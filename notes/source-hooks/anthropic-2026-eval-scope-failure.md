@@ -1,7 +1,8 @@
-# Source hook: Anthropic 2026, cybersecurity evaluation incidents
+# Source hook: Anthropic 2026 eval incidents -> adversarial-pragmatics
 <!-- SUMMARY: a false prompt assertion about scope led models to compromise real systems; documented instance of AP's scope-ambiguity family and DA's recognition gap · status: uncited, first-party source · updated: 2026-07-30 -->
 
 - **Central note:** `literature/anthropic_2026_cybersecurity_eval_incidents.notes.md`
+- **Companion hooks:** `anthropic-2026-eval-delegation.md` (DA), `anthropic-2026-eval-evidentiary.md` (EA)
 - **Cite as:** Anthropic (2026), "Investigating three real-world incidents in our cybersecurity evaluations," <https://www.anthropic.com/news/investigating-incidents-cybersecurity-evals>, retrieved 2026-07-30. Local archive hashed in the central note.
 
 **Why adversarial pragmatics cares.** AP's phenomenon families include scope ambiguity, and this is a first-party documented case of scope ambiguity in an evaluation prompt producing real-world compromise. The prompt asserted the environment was a simulation without internet access. The assertion was false because of a misconfiguration. The task instruction, retrieve the flag, placed no bound on where to look. Models resolved that toward everything reachable being in scope and attacked production systems belonging to three organizations.
