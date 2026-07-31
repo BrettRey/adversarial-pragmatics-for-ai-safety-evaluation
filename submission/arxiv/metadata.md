@@ -25,23 +25,26 @@ Notes for submission:
 - The source package includes `adversarial-pragmatics-for-ai-safety-evaluation.tex` and `supplement.tex` as XeLaTeX top-level files using TeX Live 2025, so arXiv should assemble the paper and supplement into one generated PDF.
 - Table count methodology: the main paper's 8 tables use the `table` environment; the supplement's 9 tables all use `longtable` (for page-breaking) but are captioned and numbered like ordinary tables. A grep for `\begin{table}` alone returns 0 for the supplement and undercounts the true total. Count both environments when citing a table total.
 
-## Live arXiv record (v2, current as of 2026-07-24)
+## Live arXiv record (v3, verified against arxiv.org/abs/2607.01153 on 2026-07-30)
 
-Title (v2, live -- differs from the target title above): Adversarial Pragmatics for AI Safety Evaluation: A Benchmark for Instruction Conflict, Embedded Commands, and Policy Ambiguity
+Title (v3, live -- now matches the target title above; the v2 title lag is closed): Adversarial Pragmatics for AI Safety Evaluation: A Diagnostic Framework and Seed Benchmark for Language-Mediated Control
 
 Primary category: cs.CL
 
 Cross-list: cs.AI, cs.SE
 
-Comments (v2, exact): 18-page main paper plus 10-page supplement; 6 figures and 11 tables total; code and data artifact available at the linked repository.
+Comments (v3, exact, as rendered on the abs page): 32-page main paper plus 13-page supplement; 6 figures and 17 tables total; code and data artifact available at the linked repository
 
 DOI: https://doi.org/10.48550/arXiv.2607.01153
 
-Submission history:
+Submission history (copied from the abs page's submission-history block):
 - v1: 2026-07-01 16:33:14 UTC, 2,733 KB
 - v2: 2026-07-15 18:56:34 UTC, 2,741 KB; announced 2026-07-16
+- v3: 2026-07-29 15:40:42 UTC, 942 KB; announced in the 2026-07-30 mailing
 
-Submission-system identifier (v2): submit/7776593 -- historical, tied to the v2 submission transaction. A v3 replacement is assigned a new `submit/` ID by arXiv; the public identifier 2607.01153 stays the same.
+Submission-system identifiers: submit/7776593 (v1), submit/7830880 (v2), submit/7884568 (v3). Each is historical and tied to its own submission transaction; the public identifier 2607.01153 stays the same across versions.
+
+Abstract wording to respect on downstream surfaces: the v3 abstract does **not** claim multi-turn agent-transcript coverage. It says the framework "is designed to extend to multi-turn agent transcripts, but the seed set represents that family with a single-turn tool-result contrast." Any mirror, website description, or llms.txt entry that lists multi-turn agent transcripts among the covered phenomena is asserting what v3 deliberately pulled back.
 
 ## v3 replacement checklist
 
