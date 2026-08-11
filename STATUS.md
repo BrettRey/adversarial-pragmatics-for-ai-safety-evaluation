@@ -23,14 +23,15 @@ notes: 'Classified on the flagship Adversarial Pragmatics (AP) paper, matching t
   and judge results run through none of this [external-review] code, and whose JAIR submission is the
   next available piece of work" -- i.e. AP has never been submitted to a venue (external: preprint, blocked_on:
   none), unlike DA/EA whose release tags are explicitly "held" pending Brett''s call on "frozen" language.
-  AP carries a known but STATUS.md-described-as-non-critical v3 defect (supplement.tex:361 estimator misdescription,
-  deferred to v4; "No computed result is affected"), not treated as blocking stage: complete.
+  The v3 "estimator misdescription" this block previously recorded (supplement.tex:361, deferred to v4) was
+  CLOSED on 2026-07-29 in bef3c33 and the note was stale; corrected 2026-08-04. The analyzer was ported to the
+  multilevel partial-pooling model the supplement already described, so v3 ships no known estimator defect.
 
   '
 ---
 
 # Adversarial Pragmatics for AI Safety Evaluation
-<!-- SUMMARY: empirical adversarial-pragmatics benchmark; arXiv v3 PUBLIC 2026-07-29 (retitle live, sibling citations now resolve); external code review 2026-07-29 found 7 false-pass bugs, all closed, but DA claim register migrated, assurance-check green again; assurance tags still held pending Brett's call on 'frozen' language in DA; EA taken through two external-review rounds to minor revision + interval-decision analyzer; all three papers shipped to public main 2026-07-24; HREB partially answered Study A scope inquiry 2026-07-28 (participant-status cleared, jurisdiction question still open); EA release tag/DOI and venue record still pending; v3 ships a known supplement estimator misdescription, deferred to v4 · status: active · updated: 2026-07-30 -->
+<!-- SUMMARY: empirical adversarial-pragmatics benchmark; arXiv v3 PUBLIC 2026-07-29 (retitle live, sibling citations now resolve); external code review 2026-07-29 found 7 false-pass bugs, all closed, but DA claim register migrated, assurance-check green again; assurance tags still held pending Brett's call on 'frozen' language in DA; EA taken through two external-review rounds to minor revision + interval-decision analyzer; all three papers shipped to public main 2026-07-24; HREB partially answered Study A scope inquiry 2026-07-28 (participant-status cleared, jurisdiction question still open); EA release tag/DOI and venue record still pending; the supplement estimator discrepancy found 2026-07-29 was CLOSED the same day in bef3c33 (analyzer ported to the multilevel model the paper describes); v4 queue is now just the font bundle and the Meincke citation · status: active · updated: 2026-07-30 -->
 
 Status: active research artifact. Scaffold created 2026-06-26; public arXiv identifier assigned 2026-07-01; v2 replacement public 2026-07-16; **v3 replacement public, announced in the 2026-07-30 mailing** (arXiv version timestamp 2026-07-29 15:40:42 UTC, 942 KB).
 
@@ -42,7 +43,7 @@ Title: *Adversarial Pragmatics for AI Safety Evaluation: A Diagnostic Framework 
 
 Public arXiv identifier: `arXiv:2607.01153` (v3 public, announced 2026-07-30; the identifier is unchanged across versions). Submission-system identifiers: `submit/7776593` (v1), `submit/7830880` (v2 replacement), `submit/7884568` (v3 replacement). Paper password recorded in `private/arxiv-credentials.md` (gitignored; unchanged by the v3 replacement, verified 2026-07-30).
 
-**v3 carries a known defect, deliberately not corrected by an emergency v4.** `supplement.tex:361` describes Study B's family-level estimator as "a single multilevel model with partial pooling across families and bases", while `scripts/analyze_study_b.py:650` implements DerSimonian--Laird two-stage random-effects pooling. This text is new since v2 and was already in flight when the discrepancy was found on 2026-07-29 (see DECISIONS.md). No computed result is affected: Study B's record is NOT_ESTIMATED and no target data exists, so this misdescribes a planned estimator rather than reporting a wrong number. Queue it with the font-bundle change that DECISIONS.md already defers to v4.
+**~~v3 carries a known defect~~ — CLOSED, and this block was stale. Corrected 2026-08-04.** The recorded discrepancy was that `supplement.tex:361` described Study B's family-level estimator as "a single multilevel model with partial pooling across families and bases" while the analyzer implemented DerSimonian--Laird two-stage pooling. **It was resolved in the paper's favour the same day it was found**, in `bef3c33` (2026-07-29 16:16 EDT, "Close all seven false-pass findings from the external code review"): `scripts/analyze_study_b.py` now runs a Bayesian normal-normal multilevel meta-regression with partial pooling over families and family-by-surface cells, on two-dimensional quadrature, and the string "DerSimonian" no longer occurs anywhere in the script. The supplement sentence is accurate as published, so **v3 ships no estimator misdescription and v4 needs no change on this point.** The resolution is already described in this file's own Study B narrative below ("Study B's estimator was ported to the multilevel model the supplement already described"); this block and the SUMMARY line simply weren't updated to match, and PORTFOLIO.md inherited the stale version. Remaining v4 queue: the font-bundle scan and the Meincke et al. citation. <!--record-->
 
 ## Canonical Local State
 
@@ -411,6 +412,276 @@ Focused session on `delegation-assurance.tex` (targeting *Minds and Machines*), 
 - **Polish**: removed editorial scar tissue (changelog framing) from §3.6/§8; fixed three integral-vs-non-integral citation doublings (South, Kühlewind & Birkholz, Hinkle).
 
 State at session end: delegation-assurance builds clean, 39 pp, 0 undefined citations. **Open for Brett**: whether to normalize `\parencite`/`\citep` across the three-paper suite; the M&M portfolio conflict (Truth-Tracking Profiles and the AGI-evaluation paper also point at M&M); and the round-1 items still deferred (non-amplification as a history-sensitive relation, institutional-mode worked case, content-interpretation fifth field). Heavy concurrent multi-session activity in this repo this session (one references-local.bib clobber-and-recover); verify before assuming any single file's state.
+
+## 2026-08-08 Delegation Assurance retargeted from Minds and Machines to the Journal of Computer Security
+
+Brett resolved the three-way M&M collision: the AGI-evaluation paper keeps that
+slot, Truth-Tracking Profiles retargets separately (to *Synthese*, decided in a
+concurrent session), and Delegation Assurance goes to the **Journal of Computer
+Security**. Not a fit failure ~-- JCS was already the July record's named
+runner-up and its "highest ceiling of any venue found." Record:
+`submission/venue-decision-2026-08-08.md`, superseding
+`venue-decision-2026-07-22.md`, whose alternatives analysis and risk test stand
+and were re-screened rather than redone.
+
+Verified against the current author instructions on 2026-08-08: no word or page
+limit, no submission or publication fees, single-anonymized review (so no
+author-anonymization pass, unlike M&M's double-blind), preprints explicitly
+permitted, LaTeX accepted. Two costs found that the July record didn't carry:
+**Sage Vancouver reference style**, a numeric style against the house
+biblatex/APA setup. Sage's AI policy was re-read against the current live page
+and confirms July's quote verbatim, including the word *solely*.
+
+**The retarget is approved but not actionable, on two prerequisites.**
+
+1. **The authorization canon has to be engaged.** ABLP, SPKI/SDSI, Delegation
+   Logic, SecPAL, UCON, XACML. Grep reconfirms zero hits across
+   `sections-delegation/`, `references-local.bib`, and `references.bib`. The
+   July record *accepted* this risk explicitly, but only on the ground that M&M
+   reviewers don't own that canon. JCS is exactly the readership that does, and
+   the external referee called the gap decisive "for a security, access-control,
+   or formal-methods venue." That acceptance is therefore withdrawn. SecPAL
+   matters most: it was published in this journal.
+2. **Page one has to be reaimed at a security readership, partly reversing
+   July's fix.** Commit `8da2df6` ("Target Minds and Machines and reaim
+   Delegation Assurance's opening") replaced a security-framed opening ~--
+   prompt injection, jailbreaks, tool misuse, data exfiltration, memory
+   poisoning ~-- with the current Rashid-led, meaningful-human-control opening.
+   That was right for M&M and is wrong for JCS, where a desk editor reading four
+   paragraphs of AI-governance philosophy will not see a security paper. The old
+   opening is recoverable at `git show 777aea0:sections-delegation/01-introduction.tex`.
+   **This is not a revert:** the `typed` definition, the two withdrawn
+   overclaims, and §2.3 all stay. The AI-governance material moves from
+   page-one framing to related work.
+
+Sequenced after those, not blocking: deciding what "strengthening the formal
+core" concretely means for this readership (build a grammar and typing
+judgments, versus positioning the meta-model rigorously and declining the
+formalization), and the Vancouver conversion at submission-gate time.
+
+**The methodological-fit question is answered, and favourably.** JCS's reputed
+"formal modelling with proofs" norm does not describe what it currently
+publishes: of 33 articles since 2026-01-01 (Crossref, cross-checked in OpenAlex;
+note the DOI prefix changed mid-2025 from IOS Press `10.3233` to Sage `10.1177`
+under one journal record, so prefix-scoped queries undercount), about 67% is
+empirical security work, 18% proof-carrying, and 15% neither ~-- 9% SoK/survey
+and 6% framework-plus-worked-example. The paper sits in that 6% row alongside
+Nguyen et al. (2026) and Abdunabi et al. (2025), the two confirmed in-venue
+neighbours.
+
+That correction matters because the sweep initially placed the paper *below*
+that row, on my own bad brief: I passed forward Brett's July phrase "no threat
+model, no attacks, no defences, no security evaluation," and the agent read it as
+"no worked example." Verified in the repo instead: §3.4's procurement running
+example, seven fixtures, a hidden-oracle set, two analyzers, a simulation-based
+design analysis, and 22 passing tests (`make validate-delegation` green today).
+**The real gap against the two neighbours is synthetic-versus-real
+demonstration, not absent-versus-present** ~-- they validate against real
+business-process event logs and Petri-net verification. Narrower, and it points
+at one concrete move: supply a real reconstructed case, or defend the synthetic
+fixture design explicitly before a referee asks.
+
+**JCS has published nothing on LLM agents or AI-agent delegation** in those 33
+articles (all titles and abstracts read; two WebSearch queries recorded in the
+sweep), so the paper opens a thread here rather than joining one ~-- SecPAL,
+published in this journal in 2010, is the strongest available anchor.
+
+**Editorial board read by Brett in a browser, 2026-08-08**, after every
+automated route hit a Cloudflare challenge with no Wayback coverage. It cuts
+both ways, and the second half is the more important. The paper now has named
+plausible handlers: **Sushil Jajodia** (George Mason) is among the few people
+anywhere who own the entire canon prerequisite 1 has to engage, and **Danfeng
+Zhang** (Duke) and **Abhishek Bichhawat** (IIT) both work in language-based
+security and type systems, which bears directly on §1's `typed` framing. Ting
+Wang, Kui Ren, and Shuai Wang supply real ML/AI-security presence. Delaune is
+off the board entirely, corroborating her own CV against the secondary sources
+still calling her a current co-EiC; Peng Liu is the confirmed EiC and Calzavara
+the plausible successor by page position, unverified since the page labels no
+roles. Metrics the July record lacked: IF 1.3, 5-year 1.8.
+
+**But the board partly re-raises the methodology risk the corpus check had
+downgraded.** Calzavara, Millen, Bartoletti, Bichhawat, Boureanu, Koutsos,
+Squarcina, and Zhang between them are protocol verification, process calculi,
+type systems, and information-flow proofs. The corpus says ~18% proof-carrying;
+the board says the reviewer pool leans formal, and **the reviewer pool is what a
+submission meets, not the corpus average.** Net: treat the methodology risk as
+moderate rather than downgraded, and expect §3.5's meta-model concession to be
+the sentence a formal-methods referee stops on. This also settles the shape of
+open item 3 in favour of the demonstration route: a half-built formalization in
+front of that board is worse than an honest meta-model plus a real worked case.
+
+Sage's AI policy was confirmed verbatim, including the word *solely*, from the
+current live page. Its prohibited-use list covers fabricated references and
+inappropriate attribution, which is a direct constraint on prerequisite 1: the
+canon archive is marked do-not-cite until read, because a citation error there
+would land as an integrity issue at a venue that reserves rejection at any
+stage. Jajodia's presence on the board sharpens the same point ~-- the canon
+engagement will be read by someone who knows it cold.
+
+## 2026-08-08 Flagship (AP): the comparator table has gone stale, and column (c) is the real problem
+
+Not a Delegation Assurance item. This is the **Adversarial Pragmatics flagship,
+whose next action is JAIR submission**, and it is exposed independently of the DA
+hold. Full assessment: `notes/canon-audit/mate-competitor-assessment.md`, sweep in
+`rival-benchmarks-2025-26.md`.
+
+**MATE itself is not a threat.** Verified as *MATE: Policy-Aware Security Auditing
+for Mobile Agents via Synthesis-Driven Trajectory Learning* (Jiang et al., Fudan +
+Shanghai Innovation Institute), USENIX Security '26 Cycle 2, **Short
+Presentation**, PDF not public until 2026-08-12 so everything is abstract-only.
+Two corrections to what I briefed: **the 140K is MATE's training corpus, not
+MATEBench**, whose size is unstated, so there is no "18 vs 140K" fact to defend;
+and it is **mobile-GUI trajectory auditing**, touching none of the pragmatic
+phenomena, with no quotation, use/mention, competing sources, refusal, or
+failure-cause attribution. It also *assumes* policy application is decidable,
+which inverts the flagship's policy-boundary family. Needs a row
+(`MATEBench & N & N & N & P & N & P & N`), two word changes ("six"→"seven"), and
+a supplement evidence-map paragraph. Its pipeline-generated references are a free
+2026 illustration of the paper's own construct-validity argument.
+
+**What looking for it turned up is damaging.** The comparator set is a 2023--2025
+sample going into an August 2026 submission, and **the two gaps §02 honestly
+declares as its own are exactly where the field moved in 2026.** Column (e),
+nuisance/placebo transformations, declared future work: Same Payload/SAS
+(arXiv:2606.00566) does matched-payload channel-only minimal pairs, published two
+months before v1. Column (d), "only one measures its own grader's error": true of
+the six chosen, indefensible as a field claim, since six 2025--26 papers do a
+version of it. Column (g): MP-Bench (arXiv:2603.25001) calls itself "the first
+benchmark designed for multi-perspective failure attribution." And the genre is
+now crowded ~-- AgentAtlas audited fifteen agent benchmarks in May 2026.
+
+**Column (b) survives and is the paper's real asset.** Across three citation
+graphs and two targeted searches, nothing varies whether a string is used or
+mentioned alongside source role, with the queries stated so the negative is
+inspectable. The revision should lead with (b) and demote (d) to supporting.
+
+**The worst finding is about the flagship, not any rival, and it points at Study
+A.** The paper's own column (c) is **N**: `sections/07a-limitations-next-steps.tex:4`
+says "one expert adjudicator, the author, labelling items he wrote from
+expected-behaviour fields he also wrote." So on the single dimension where
+small-and-adjudicated beats large-and-synthesized, **it currently scores the same
+as the thing it is compared to.** The paper says so twice and that candour is its
+defence, but candour about a gap is not closure of it, and a JAIR reviewer can put
+it starkly: 18 self-authored, self-labelled, self-adjudicated items plus a
+prospective Study A/B, against a released benchmark with a real-device holdout.
+
+**Getting independent adjudication onto even a handful of the 18 items, turning
+(c) from N to P, is worth more than every citation fix combined**, because it is
+the only item that changes what the paper *has* rather than what it cites. Study
+A is built for exactly this. Its HREB dimension closed 2026-07-28; what remains is
+§8's operational steps and **Brett's explicit tag authorization**. That gate is
+now the highest-value thing in the whole stack.
+
+## 2026-08-08 Priority verdict: DA's core claim is open, the ground around it is not. HELD for Brett's call.
+
+**Brett's decision, same day: hold and think.** No further manuscript changes.
+The audit notes are complete and readable; the direction call is his to make with
+them in front of him. Nothing is committed.
+
+**New input to that call, arrived the same evening.** Anthropic's auto-mode
+announcement (2026-08-07, default from 2026-08-14) is a shipping classifier that
+authorizes agent tool calls in place of user prompts. It lands on DA's one
+surviving claim and it lands favourably: it is a live, industrial, first-party
+instance of classification feeding an authorization decision, made **without** a
+semantics, and the probe's output is explicitly advisory ~-- "a warning is added
+to Claude's context" ~-- rather than a typed input to a verdict. It also supplies
+the real case the venue record's Evidence and Motivation Test says the paper
+lacks, against the constructed procurement example. Archived with hashes,
+verified as L98, hook at `notes/source-hooks/anthropic-2026-auto-mode.md`,
+central note `literature/anthropic2026autoModeDefault-note.md`. Uncited, and DA
+stays held; this changes the evidence, not the decision.
+
+Two checks run after the canon audit left the paper resting on one claim.
+Reports: `notes/canon-audit/prior-art-audit.md` (the ten already-cited security
+works) and `notes/canon-audit/priority-sweep.md` (outward, 31 rated hits, full
+query log). Disposition: `notes/canon-audit/claim-disposition.md`.
+
+**OPEN, with a strong evidenced negative.** No authorization semantics makes the
+contextual status of a natural-language string an input to the decision,
+separately from the standing of its source. Behind that: complete DBLP title
+listings for 19 venue streams (5,198 records), full SACMAT/CODASPY/AsiaCCS
+Crossref proceedings, and the CSF/SaTML/USENIX/NDSS accepted-paper pages, showing
+no 2024--2026 paper at any of them extending ABLP, SPKI/SDSI, Delegation Logic,
+SecPAL, RT, UCON or XACML to LLM agents. CSF has zero LLM-agent papers in three
+years.
+
+**TAKEN, all within about six months.** The reframing (Siu et al., ICML 2026,
+Dawn Song's group ~-- including indirect prompt injection recast as Hardy's
+confused deputy, which is the page-one move made earlier the same day);
+compositional delegation with soundness proofs (Ibrahim \& Li, arXiv:2606.03518);
+the presupposition argument (Lin, Chen \& Sun, SACMAT 2026 Blue Sky); and
+trajectory-scoped authorization (Reddi, Siu et al., and **MATE** at USENIX
+Security 2026 with a 140K-trajectory benchmark released).
+
+**And a live opposing position, which is the harder problem.** AttriGuard,
+LLMbda, and CaMeL all argue in print that classification is the wrong move. The
+paper would need an argument for why status classification is necessary despite
+their results, not a claim that nobody has tried it. The strongest available line
+is evidenced: they exclude the class of cases rather than solve it, and each says
+so in its own assumptions.
+
+**The finding that cuts the other way, and it partly reverses the canon audit.**
+Against Ibrahim \& Li, the closest formal competitor, the differentiator is
+precisely claim (A), which the canon audit had downgraded. They have one graph,
+so the recorded relation *is* the authorization; this paper keeps \(A_R(t)\) and
+\(\hat A(s_t)\) apart and makes record-soundness a separate claim, which is what
+lets it say a perfect trace can represent an invalid grant. Their graph can't
+express that, they have no guarded hyperedge for joint grants, and their paper
+contains zero occurrences of "natural language", "classification", "trajectory",
+or "sequence". **(A) is weak against 1993 and strong against 2026.**
+
+**Standing note on the page-one reaim done earlier today:** it leads with Hardy's
+confused deputy, and Siu et al. now own that move. If that opening is ever
+shipped it needs a Siu citation, or it reads as following.
+
+## 2026-08-08 Canon audit: three of the paper's results don't survive, one contribution does
+
+All six authorization-canon works read against Delegation Assurance's claims
+(prerequisite 1 of the JCS retarget). Disposition:
+`notes/canon-audit/claim-disposition.md`, four per-source audits beside it.
+**Prerequisite 1 is bigger than "add a literature section."**
+
+Conceded: **(C-i)**, cumulative limits, doesn't survive ~-- it's what UCON was
+built to close, stated in this paper's own terms and backed by four worked
+mechanisms. **Grant-relative non-amplification** is directly anticipated by
+SPKI's tuple reduction and Delegation Logic's step-9 rule, though three
+qualifications survive. **(B)** is near-trivial across all six, a design property
+of SPKI and DL rather than an observation. **(A)** survives only as a reframing
+of XACML §9 and ABLP's `A|B`.
+
+**(C-ii), joint disclosure, is the dangerous one, and it needed cross-reading to
+see.** One reader found it "survives cleanly" on zero hits for
+`inference`/`aggregation` in UCON and XACML. Another found Lampson et al.
+scoping the problem out *by name* and pointing at Denning 1976. The zero hits are
+a boundary marker, not absence of coverage, and Jajodia ~-- on this board ~--
+works on inference and aggregation in multilevel databases. Claiming novelty
+there reads as not knowing the field.
+
+**What survives cleanly is the interpretation step, which the paper currently
+treats as setup.** All six presuppose correctly identified principals and
+correctly classified requests; SecPAL's principals simply *are* public keys, with
+authentication happening before SecPAL runs, and zero hits for `classif`,
+`recogni`, `spoof`, `forge`, `injection`. That's the real contribution and the
+retarget is a chance to lead with it.
+
+**My earlier formal-core recommendation was wrong and is corrected.** I'd said
+demonstration over formalization, reasoning from Nguyen and Abdunabi. SecPAL is
+the closer precedent (same venue, same topic, the paper this title invites
+comparison with) and it delivered four body theorems, seventeen appendix lemmas
+with all proofs, twelve comparative idiom subsections, and **no experiments at
+all**. The venue supports a no-experiments paper, not a no-theorems one. Revised:
+both, small ~-- one proposition about action-axis non-composition in the shape of
+SecPAL's Prop. 3.3--3.6, plus reorganizing the seven existing fixtures into a
+comparative idiom table in its §6 form. Same decision as the title question.
+
+Two new required sources: **Becker \& Nanz 2007** (SecPAL names it as the easy
+fix for exactly this gap, so the paper must argue why "easily extended" is
+wrong) and the **information-flow/inference-aggregation line**. Neither acquired.
+
+Two mechanical cautions: the paper must distinguish its action-axis
+non-composition claim from ABLP's *proven* principal-axis non-associativity; and
+four of seven local copies are author versions whose pagination doesn't map to
+the published pages, so cite by section, definition, and example number.
 
 ## 2026-07-29 External adversarial code review, and the seven repairs
 

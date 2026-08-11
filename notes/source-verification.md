@@ -120,6 +120,32 @@ Checked 2026-06-26 for use in the literature review, benchmark design, and citat
 | L95 | `/Users/brettreynolds/projects/LLM-CLI-projects/literature/messick1995validity.pdf`; https://doi.org/10.1037/0003-066X.50.9.741 | Messick treats validity as an integrated evidential judgment about the adequacy and appropriateness of interpretations and actions based on assessment results, not as a property of a test itself. His deliberately broad sense of assessment result includes qualitative judgments and ratings about objects, situations, environments, groups, and institutions, and his six aspects are content, substantive, structural, generalizability, external, and consequential. | verified 2026-07-21 from the complete nine-page American Psychologist article, especially pp. 741--745; applies directly to interpretations and uses of benchmark, evaluator, authorization-review, and evidence-review outputs, without implying that legal or institutional authority is a psychometric construct. |
 | L96 | `/Users/brettreynolds/projects/LLM-CLI-projects/literature/messick1995standards_validity_of_standards.pdf`; https://doi.org/10.1111/j.1745-3992.1995.tb00881.x | Messick applies the same six-aspect framework to performance assessment and argues that both content and performance standards need validation against the construct domain; scoring structure, comparability, generalization across tasks, contexts, occasions, and raters, and consequences all require evidence. | verified 2026-07-21 from the complete four-page Educational Measurement: Issues and Practice article, 14(4):5--8; supports testing rather than assuming that one common rubric, evidence kind, or assurance standard remains comparable across domains and forums. |
 | L97 | `/Users/brettreynolds/projects/LLM-CLI-projects/literature/pierce2002_ch11_simple_extensions.pdf`; https://mitpress.mit.edu/9780262162098/types-and-programming-languages/ | Pierce presents type systems as classifying expressions by the values they compute; Chapter 11 gives typing rules for compound expressions, and §11.8 defines labelled records and their record types. | verified 2026-07-28 from the complete 32-page Chapter 11 extract and the MIT Press book page; terminology orientation in all three papers. |
+| L98 | `/Users/brettreynolds/projects/LLM-CLI-projects/literature/anthropic2026autoModeDefault.html` (sha256 `178a0ae7ec0061ae9e9e68ab81e18daf475a796a112d7f4d61968b58e449482b`); `.md` derivative (sha256 `534636383f97e37d2ae6d267eac73a8b00e433fc13c6550e3d05241324174760`); https://claude.com/blog/auto-mode-default-in-claude-code | Anthropic describes a classifier that evaluates each proposed tool call and permits or blocks it in place of a user prompt, "targeted at blocking actions that are irreversible, destructive, or aimed outside your environment," with fallback to manual approval after "three blocks in a row, or twenty across a session." Pre-existing permission rules still fire first "except for allow rules broad enough to grant arbitrary code execution," which are "set aside while in auto mode" without modifying settings files. Data exfiltration is a hard-deny category "the classifier is designed to never approve," overridable only by leaving auto mode. The classifier "checks whether the destination of a git push or pull request is public, private, or trusted before the action runs," because "the same push can be routine or an exfiltration depending on where it lands." Tool results are probe-scanned for injection attempts, and on a hit "a warning is added to Claude's context" ~-- advisory, not a typed authorization input. Reported measurements: 97% of permission prompts approved; a 1,053-tester controlled study in which humans caught 13.6% of a swapped dangerous command against the classifier's 89%, with human block rate falling from ~17% to ~5% over a session while the classifier stayed flat; and a model-re-graded sample of safety-flagged sessions giving 6.3% vs 2.4% at severity 7+. | verified 2026-08-08 from the complete archived page (curl, HTTP 200, 559,735 bytes), read in full; **NOT** from the WebFetch model summary taken first. Announcement dated 2026-08-07 for a 2026-08-14 default, so it is an announced change, not an observed deployment ~-- cite both dates. First-party vendor claims about its own product, same epistemic class as L94 (OpenAI long-horizon): supports construct motivation and attributed case description only. Does not support prevalence, safeguard efficacy, or comparative model performance ~-- no confidence intervals anywhere; the observational arm is doubly selected (safety-pipeline-flagged sessions, training-opt-in accounts only); the two 0--10 severity/explicitness scales are model-graded with no validation, inter-rater check, or published codebook; the Trajectory Labs competitor comparison is harness- and version-bound (Codex v0.144.5, models as of 2026-07-17) and excludes the competitor's own browser safeguards by Anthropic's own statement. Page is mutable with no version history; re-fetch after 2026-08-14. Central note: `literature/anthropic2026autoModeDefault-note.md`; project hook: `notes/source-hooks/anthropic-2026-auto-mode.md`. |
+
+## Second canon-audit acquisition (2026-08-08, evening)
+
+Acquired for the information-flow/inference branch and the two works the audits
+named as required. Inward check first, all four absent: `lit resolve` no match,
+`grep -a` content sweep of `literature/`, the 22,058-line central bib,
+`references-local.bib`, and `~/pdf-inbox`. **STATUS: IDENTITY-VERIFIED, CONTENT
+NOT YET READ except where noted. Do not cite from this table** ~-- add a normal
+`L`-row with a verified claim and locator first.
+
+| Work | Archive (`literature/`) | SHA-256 (first 12) | Pages |
+|---|---|---|---|
+| Becker & Nanz (2007), state-modifying authorization policies, **Microsoft Research TR MSR-TR-2007-32** | `becker_nanz_2007_state_modifying_authorization_policies.pdf` + `.md` | `d9889afd0e12` | 29 |
+| Debenedetti et al. (2025), "Defeating Prompt Injections by Design" (CaMeL), arXiv:2503.18813v2 | `debenedetti_2025_camel_defeating_prompt_injections.pdf` + `.md` | `c3719f6ce73e` | 125 |
+| Denning (1976), "A lattice model of secure information flow," *CACM* 19(5):236--243 | `denning_1976_lattice_model_secure_information_flow.pdf` + `.md` | `dbd25312c946` | 8 |
+| Lunt (1989), aggregation and inference, facts and fallacies, IEEE S&P | `lunt_1989_aggregation_inference_facts_fallacies.pdf` + `.md` | `313c7e2e3b56` | 8 |
+| Li, Huang et al. (2025), access control for LLM-based agent systems, **arXiv:2510.11108v2 preprint** | `li_huang_2025_access_control_llm_agent_systems.pdf` + `.md` | `34d5f6b86892` | 11 |
+
+**Five traps recorded, each of which would have produced a wrong citation.**
+
+1. **CaMeL's author list.** There is **no Beurer-Kellner** on this paper ~-- he is on *AgentDojo*, already in the central bib. Confirmed three ways (arXiv API, PDF title page, SaTML listing): Debenedetti, Shumailov, Fan, Hayes, Carlini, Fabian, Kern, Shi, Terzis, Tramèr. **SaTML 2026 acceptance verified live** at `satml.org/2026/accepted-papers/`, Research Papers category.
+2. **The ICECCS chapter was NOT obtained, and the preprint is not a substitute.** Springer is login-walled with no OA copy indexed; the first author's homepage doesn't list it. The archived arXiv preprint differs from the published chapter in **title** ("LLM-*based* Agent Systems"), **first author** (Xinfeng Li vs Dong Huang), **length** (11 pp vs 6 pp at 467--472), and **three author names each way**. DBLP holds them as two unlinked records and the arXiv PDF never mentions ICECCS, Springer, or Hangzhou. **Cite as a preprint or get the chapter from a library; do not merge the author lists.** The "nobody has read it" gap is now closed for the preprint only: its AAC framework covers information-flow governance, contextual evaluation, and adaptive response.
+3. **Becker & Nanz is the 29-page technical report, not the 16-page ESORICS version.** Page cites must say which. Microsoft Research's own page misstates the venue as "IEEE Infocom 2010"; ignore it.
+4. **Quote Lunt from the PDF, not the `.md`** ~-- the derivative is an OCR scan with noise.
+5. **Morgenstern 1987** (SIGMOD, the canonical inference-problem paper) is gold OA but Cloudflare-blocked; one real browser session away. **Hinke 1988, Thuraisingham 1987, and Jajodia & Meadows 1995** are paywalled or print-only. All four have verified DBLP/Crossref citations in `notes/canon-audit/source-acquisition-4-sources.md` and are safe to cite without the file.
 
 ## Verification Rule
 
@@ -132,3 +158,63 @@ When a source is checked, add:
 
 ## Claude Code security docs (added 2026-07-23)
 - `anthropic2026claudeCodeSecurity` (https://code.claude.com/docs/en/security) and `anthropic2026claudeSecurityPlugin` (https://code.claude.com/docs/en/claude-security). WebFetch-captured 2026-07-23 to notes/sources/claude-code-security-2026-07-23.md (sha256 8920b1be321a70810eccd88a7e8087023cf0487e504b9e81ab0c4f75a219fcab). Fidelity: model extraction with exact quotes, NOT raw HTML; take a proper HTML/PDF archive before final citation. Use as gap-setup background, not as validation; see notes/claude-code-security-mapping.md.
+
+## Authorization-formalization canon (acquired 2026-08-08 for the JCS retarget)
+
+Acquired for prerequisite 1 of `submission/venue-decision-2026-08-08.md`: the
+authorization canon whose total absence an external referee ranked as the
+manuscript's decisive defect for a security/access-control venue. None of the
+seven was previously held anywhere in the portfolio. That negative is evidenced,
+not a one-search claim: `lit resolve` on authors/titles/key-guesses, a grep of
+the ~2162-entry central bib, a filename search across 3,119 files in
+`literature/`, a full-text grep of every Markdown sidecar there, and a `qmd`
+semantic query. The single incidental hit was `south2025authenticated.md`, an
+already-held paper that mentions XACML in passing.
+
+**STATUS: IDENTITY-VERIFIED, CONTENT NOT YET READ. Do not cite from this table.**
+Each file was confirmed to be the real, complete document (first page read, page
+count checked, DOI resolved live against Crossref, author order checked against
+the document's own front matter). That establishes *which document this is*, and
+nothing about what it says. No claim attributed to any of these works may be
+written into the manuscript until someone reads the relevant sections and adds a
+normal `L`-numbered row above with a verified claim and page reference. The
+source-grounding LAW applies with full force here precisely because the
+engagement section will be making comparative claims about what each formalism
+can and cannot express.
+
+| Work | DOI / URL | Local archive | SHA-256 (first 12) | Pages |
+|---|---|---|---|---|
+| Abadi, Burrows, Lampson & Plotkin (1993), "A Calculus for Access Control in Distributed Systems," *ACM TOPLAS* 15(4):706--734 | 10.1145/155183.155225 | `literature/abadi1993calculus.pdf` | `04b16c6305d4` | 29 |
+| Lampson, Abadi, Burrows & Wobber (1992), "Authentication in Distributed Systems: Theory and Practice," *ACM TOCS* 10(4):265--310 | 10.1145/138873.138874 | `literature/lampson1992authentication.pdf` | `694d90263c28` | 47 |
+| Ellison, Frantz, Lampson, Rivest, Thomas & Ylonen (1999), *SPKI Certificate Theory*, RFC 2693 | 10.17487/RFC2693 | `literature/ellison1999spki.txt` | `6822d668195c` | 43 |
+| Li, Grosof & Feigenbaum (2003), "Delegation Logic: A Logic-based Approach to Distributed Authorization," *ACM TISSEC* 6(1):128--171 | 10.1145/605434.605438 | `literature/li2003delegationlogic.pdf` | `e046b9462d50` | 42 |
+| Becker, Fournet & Gordon (2010), "SecPAL: Design and Semantics of a Decentralized Authorization Language," *Journal of Computer Security* 18(4):619--665 | 10.3233/JCS-2009-0364 | `literature/becker2010secpal.pdf` | `fee113c49325` | 59 |
+| Park & Sandhu (2004), "The UCON\textsubscript{ABC} Usage Control Model," *ACM TISSEC* 7(1):128--174 | 10.1145/984334.984339 | `literature/park2004ucon.pdf` | `af3c4e8af37e` | 47 |
+| OASIS XACML TC (2013), *eXtensible Access Control Markup Language (XACML) Version 3.0*, OASIS Standard, 22 Jan 2013 | docs.oasis-open.org/xacml/3.0/xacml-3.0-core-spec-os-en.pdf (no DOI; standards document) | `literature/oasis2013xacml.pdf` | `516743fc1c99` | 154 |
+
+Notes for whoever drafts the engagement section:
+
+- **SecPAL is the one to read first.** It was published in the target venue, so
+  it doubles as fit evidence and as the closest methodological precedent for
+  what JCS expects a decentralized-authorization paper to look like.
+- **Read these properly, not defensively.** The JCS editorial board (read
+  2026-08-08) includes **Sushil Jajodia**, who is among the few people anywhere
+  who own this entire canon. A thin or wrong characterization of ABLP, SPKI,
+  Delegation Logic, UCON, or XACML will be visible immediately to a plausible
+  handler of this submission. Combined with Sage's prohibited-use list naming
+  fabricated references and inappropriate attribution, that makes the do-not-cite
+  rule above a hard gate rather than a caution.
+- Two near-miss traps were hit and avoided during acquisition, both worth
+  knowing about: the SecPAL search also returns a shorter 2006 PLAS workshop
+  precursor with a near-identical title minus the "SecPAL:" prefix (discarded;
+  the archived copy is the 59-page journal version), and Microsoft Research
+  serves an HTML interstitial rather than the PDF to a generic user-agent.
+- Retrieval was from author copies and standards bodies (Plotkin's Edinburgh
+  page, Li's Stanford page, Sandhu's own site, rfc-editor.org, OASIS, Microsoft
+  Research). No shadow-library acquisition, consistent with the 2026-07-21 pass.
+- Not pursued, flagged if wanted later: Rivest & Lampson's standalone 1996 SDSI
+  white paper (RFC 2693 is the SPKI/SDSI merger document and the standard
+  citation target), and the broader UCON set including Zhang, Parisi-Presicce,
+  Sandhu & Park's 2005 formal-model TISSEC paper.
+- Full acquisition report, including every query string used for the inward
+  search: `notes/sources/authorization-formalization-sources-20260808.md`.

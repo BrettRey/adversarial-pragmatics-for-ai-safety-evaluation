@@ -1,5 +1,15 @@
 # Venue Decision Record: Delegation Assurance
-<!-- SUMMARY: Venue analysis for delegation-assurance.tex; M&M proposed primary, JCS the target if the authorization-literature work happens; awaiting Brett's approval · status: proposed · updated: 2026-07-22 -->
+<!-- SUMMARY: Venue analysis for delegation-assurance.tex; M&M proposed primary, JCS the target if the authorization-literature work happens; awaiting Brett's approval · status: SUPERSEDED 2026-08-08, see venue-decision-2026-08-08.md · updated: 2026-07-22 -->
+
+**SUPERSEDED 2026-08-08.** M&M went to the AGI-evaluation paper instead (Brett's
+call, resolving the three-way portfolio collision this record's own "Open
+portfolio conflict" section flagged below). Delegation Assurance now targets
+*Journal of Computer Security*, the alternative this record already identified
+as "primary target if the literature section and formal core get built." The
+Alternatives Considered, Fit Evidence, and Risk Test sections below are
+unchanged and remain the evidentiary basis for the new decision; only the
+Final Decision and Package Authorization sections are overridden. See
+`venue-decision-2026-08-08.md`.
 
 ## Record
 
